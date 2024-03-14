@@ -1,0 +1,1 @@
+export { CollisionDetectionPlugin } from './collisionDetectionPlugin'

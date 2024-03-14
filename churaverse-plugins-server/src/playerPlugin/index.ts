@@ -1,0 +1,1 @@
+export { PlayerPlugin } from './playerPlugin'
