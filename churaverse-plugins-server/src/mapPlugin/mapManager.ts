@@ -24,7 +24,7 @@ export class MapManager implements IMapManager {
    * マップのJSONデータを読み込んで返す
    */
   public static async loadMapJSON(fileName: string): Promise<TiledMapOrthogonal> {
-    return (await import('./data/' + fileName)) as TiledMapOrthogonal
+    return (await import('@assets/mapData/' + fileName)) as TiledMapOrthogonal
   }
 
   /**
