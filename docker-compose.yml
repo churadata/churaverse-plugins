@@ -1,0 +1,22 @@
+version: "3"
+
+services:
+  churaverse-plugins-client:
+    image: node:18.14.0
+    container_name: churaverse-plugins-client
+    tty: true
+    volumes:
+      - ../../cvPackages:/usr/cvPackages
+    working_dir: /usr/cvPackages/churaverse-plugins/churaverse-plugins-client
+    init: true
+    command: bash -c "npm i && npm run link:cvPackages && /bin/bash"
+
+  churaverse-plugins-server:
+    image: node:18.14.0
+    container_name: churaverse-plugins-server
+    tty: true
+    volumes:
+      - ../../cvPackages:/usr/cvPackages
+    working_dir: /usr/cvPackages/churaverse-plugins/churaverse-plugins-server
+    init: true
+    command: bash -c "npm i && npm run link:cvPackages && /bin/bash"
