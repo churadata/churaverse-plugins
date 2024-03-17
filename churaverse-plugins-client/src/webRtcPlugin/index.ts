@@ -1,0 +1,1 @@
+export { WebRtcPlugin } from './webRtcPlugin'

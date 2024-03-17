@@ -1,0 +1,21 @@
+import { Store, IMainScene } from 'churaverse-engine-client'
+import { LkLocalCameraManager } from '../localDeviceManager/livekitApi/lkLocalCameraManager'
+import { LkLocalMicrophoneManager } from '../localDeviceManager/livekitApi/lkLocalMicrophoneManager'
+import { LkLocalSpeakerManager } from '../localDeviceManager/livekitApi/lkLocalSpeakerManager'
+import { WebRtc } from '../webRtc'
+import { WebRtcPluginStore } from './defWebRtcPluginStore'
+
+export function initWebRtcPluginStore(store: Store<IMainScene>): void {
+  const ownPlayerId = store.of('playerPlugin').ownPlayerId
+
+  const webRtc = new WebRtc(ownPlayerId)
+
+  const webRtcPluginStore: WebRtcPluginStore = {
+    webRtc,
+    localCameraManager: new LkLocalCameraManager(webRtc.room),
+    localMicrophoneManager: new LkLocalMicrophoneManager(webRtc.room),
+    localSpeakerManager: new LkLocalSpeakerManager(webRtc.room),
+  }
+
+  store.setInit('webRtcPlugin', webRtcPluginStore)
+}

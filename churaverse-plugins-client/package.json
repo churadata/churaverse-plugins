@@ -12,8 +12,10 @@
     "format": "prettier --write src"
   },
   "devDependencies": {
+    "@types/node": "^20.11.27",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.18",
+    "@types/uuid": "^9.0.8",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-standard-with-typescript": "^43.0.1",
@@ -46,5 +48,13 @@
       "require": "./dist/index.umd.cjs",
       "import": "./dist/index.js"
     }
+  },
+  "dependencies": {
+    "@livekit/track-processors": "^0.3.0",
+    "livekit-client": "^2.0.7",
+    "phaser": "^3.80.1",
+    "socket.io-client": "^4.7.4",
+    "uuid": "^9.0.1",
+    "web-vitals": "^3.5.2"
   }
 }

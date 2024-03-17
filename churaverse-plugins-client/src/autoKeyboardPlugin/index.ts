@@ -1,0 +1,1 @@
+export { AutoKeyBoardPlugin } from './autoKeyboardPlugin'
