@@ -1,4 +1,4 @@
-import { IMainScene } from '../../../scene/IScene/IMainScene'
+import { IMainScene } from 'churaverse-engine-client'
 import { BaseMessage } from '../../networkPlugin/message/baseMessage'
 import { SendableObject } from '../../networkPlugin/types/sendable'
 

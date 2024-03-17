@@ -1,4 +1,4 @@
-import { IDialog } from '../../../domain/IRender/IDialog'
+import { IDialog } from './IDialog'
 import { KnownKeyOf } from 'churaverse-engine-client'
 
 export interface IDialogSwitcher {

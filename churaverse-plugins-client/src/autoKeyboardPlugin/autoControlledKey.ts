@@ -2,6 +2,7 @@ import { KeyCodeRotator } from './keyCodeRotator'
 import { AutoModeControlButton } from './autoModeControlButton'
 import { IKey } from '../keyboardPlugin/interface/IKey'
 import { KeyCode } from '../keyboardPlugin/types/keyCode'
+import { PhaserKeyboardNullError } from '../keyboardPlugin/error/phaserKeyboardNullError'
 
 /**
  * 自クラスが保持しているkeyCodeが押されているかを確認するクラス
@@ -25,7 +26,9 @@ export class AutoControlledKey implements IKey {
   ) {
     this.keyRotators = keyCodeRotators
     this.autoModeControlButton = autoModeControlButton
-    this.phaserKey = scene.input.keyboard.addKey(keyCode, false)
+
+    if (scene.input.keyboard === null) throw new PhaserKeyboardNullError()
+    this.phaserKey = scene.input.keyboard?.addKey(keyCode, false)
   }
 
   public get isJustDown(): boolean {

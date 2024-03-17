@@ -10,7 +10,7 @@ export default defineConfig({
       fileName: 'index',
     },
     rollupOptions: {
-      external: ['react'],
+      external: ['react', 'churaverse-engine-client'],
       output: {
         globals: {
           react: 'React',

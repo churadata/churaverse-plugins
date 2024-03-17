@@ -1,4 +1,4 @@
-import { JSXFunc } from '../../../../interface/ui/util/domManager'
+import { JSXFunc } from 'churaverse-engine-client'
 import dialogStyle from './style.module.scss'
 
 interface Props {

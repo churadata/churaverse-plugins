@@ -1,4 +1,4 @@
-import { IDialog } from '../../../domain/IRender/IDialog'
+import { IDialog } from '../interface/IDialog'
 import { IEventBus, Scenes } from 'churaverse-engine-client'
 import { ActivateUiEvent } from '../event/activateUiEvent'
 import { DeactivateUiEvent } from '../event/deactivateUiEvent'

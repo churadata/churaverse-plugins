@@ -1,6 +1,5 @@
 import { Scene } from 'phaser'
-import { FRAME_RATE } from '../../../interface/ui/animationConfig'
-import { layerSetting, Position } from 'churaverse-engine-client'
+import { layerSetting, Position, FRAME_RATE } from 'churaverse-engine-client'
 import bombImage from '../assets/bomb_large_explosion.png'
 import { IBombRenderer } from '../domain/IBombRenderer'
 
@@ -32,12 +31,9 @@ const _anims: Array<{ key: string; frameStart: number; frameEnd: number }> = [
  * Bomb描画クラス
  */
 export class BombRenderer implements IBombRenderer {
-  private readonly scene
   private readonly sprite
 
   public constructor(scene: Scene) {
-    this.scene = scene
-
     this.sprite = scene.add
       .sprite(
         // 爆弾の初期生成位置

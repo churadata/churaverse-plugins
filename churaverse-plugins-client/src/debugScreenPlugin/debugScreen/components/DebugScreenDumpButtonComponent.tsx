@@ -1,4 +1,4 @@
-import { JSXFunc } from '../../../../interface/ui/util/domManager'
+import { JSXFunc } from 'churaverse-engine-client'
 import { DEBUG_SCREEN_DUMP_BUTTON_ID } from '../debugScreenDumpButton'
 import style from './style.module.scss'
 

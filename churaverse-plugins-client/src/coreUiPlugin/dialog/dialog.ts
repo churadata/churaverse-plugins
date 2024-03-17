@@ -1,8 +1,9 @@
 import { DomManager, makeLayerHigherTemporary, domLayerSetting } from 'churaverse-engine-client'
-import { InsertPosition, IDialog } from '../../../domain/IRender/IDialog'
 import { Section } from './section'
 import { DialogPanel, Props } from './components/Panel'
 import { CvUi } from '../cvUi'
+import { IDialog, InsertPosition } from '../interface/IDialog'
+
 /** メインカラー */
 export const PRIMARY_COLOR = 'lightsteelblue'
 

@@ -1,10 +1,8 @@
-import { IEventBus } from '../../../eventbus/IEventBus'
-import { IMainScene } from '../../../scene/IScene/IMainScene'
-import { RegisterKeyActionEvent } from '../../keyboardPlugin/event/registerKayActionEvent'
+import { IEventBus, IMainScene, Store } from 'churaverse-engine-client'
+import { RegisterKeyActionEvent } from '../../keyboardPlugin/event/registerKeyActionEvent'
 import { RegisterKeyActionListenerEvent } from '../../keyboardPlugin/event/registerKeyActionListenerEvent'
 import { BaseKeyboardController } from '../../keyboardPlugin/interface/baseKeyboardController'
 import { KeyAction } from '../../keyboardPlugin/keyAction/keyAction'
-import { Store } from '../../store/store'
 import { DebugScreenPluginStore } from '../store/defDebugScreenPluginStore'
 
 export class KeyboardController extends BaseKeyboardController<IMainScene> {
