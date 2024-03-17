@@ -1,4 +1,5 @@
 import { Position } from 'churaverse-engine-client'
+import { NotExistsPropertyLayerError } from '../error/notExistsPropertyLayerError'
 
 export type LayerName = 'Collision' | 'Spawn' | 'Base'
 
@@ -16,6 +17,19 @@ export class WorldMap {
     public readonly layerProperty: Map<string, boolean[][]>
   ) {
     this.spawnablePoint = this.getSpawnablePoint()
+  }
+
+  public getLayerCellCount(layer: LayerName): number {
+    const layerPropertyMap = this.layerProperty.get(layer)
+    if (layerPropertyMap === undefined) throw new NotExistsPropertyLayerError(layer)
+
+    let cellCount = 0
+    for (let i = 0; i < layerPropertyMap.length; i++) {
+      for (let j = 0; j < layerPropertyMap[i].length; j++) {
+        if (layerPropertyMap[i][j]) cellCount++
+      }
+    }
+    return cellCount
   }
 
   /**

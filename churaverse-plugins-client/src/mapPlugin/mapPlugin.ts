@@ -1,6 +1,15 @@
 import { BasePlugin, IMainScene, UtilStoreInMain, PhaserSceneInit } from 'churaverse-engine-client'
+import { DebugDetailScreenSection } from '../debugScreenPlugin/debugScreen/debugDetailScreenSection'
+import { DumpDebugDataEvent } from '../debugScreenPlugin/event/dumpDebugDataEvent'
+import { DebugScreenPluginStore } from '../debugScreenPlugin/store/defDebugScreenPluginStore'
 import { NetworkPluginStore } from '../networkPlugin/store/defNetworkPluginStore'
 import { SocketController } from './controller/socketController'
+import {
+  ICollisionCountDebugDetailScreen,
+  ISpawnCountDebugDetailScreen,
+} from './debugScreen/IDebugScreen/IMapInfoDebugScreen'
+import { CollisionCountDebugDetailScreen } from './debugScreen/collisionCountDebugDetailScreen'
+import { SpawnCountDebugDetailScreen } from './debugScreen/spawnCountDebugDetailScreen'
 import { MapManagerUndefinedError } from './error/mapManagerUndefinedError'
 import { ChangeMapEvent } from './event/changeMapEvent'
 import { DidChangeMapEvent } from './event/didChangeMapEvent'
@@ -18,7 +27,10 @@ export class MapPlugin extends BasePlugin<IMainScene> {
   private rendererFactory?: MapRendererFactory
   private networkStore!: NetworkPluginStore<IMainScene>
   private utilStore!: UtilStoreInMain
+  private debugScreenStore!: DebugScreenPluginStore
   private mapSelector?: MapSelector
+  private collisionCountDebugDetailScreen!: ICollisionCountDebugDetailScreen
+  private spawnCountDebugDetailScreen!: ISpawnCountDebugDetailScreen
 
   public listenEvent(): void {
     this.bus.subscribeEvent('phaserSceneInit', this.phaserSceneInit.bind(this))
@@ -34,6 +46,7 @@ export class MapPlugin extends BasePlugin<IMainScene> {
     this.bus.subscribeEvent('didInitMap', this.onDidInitMap.bind(this))
     this.bus.subscribeEvent('changeMap', this.onChangeMap.bind(this))
     this.bus.subscribeEvent('didChangeMap', this.onDidChangeMap.bind(this))
+    this.bus.subscribeEvent('dumpDebugData', this.dumpDebugData.bind(this))
   }
 
   private phaserSceneInit(ev: PhaserSceneInit): void {
@@ -48,11 +61,20 @@ export class MapPlugin extends BasePlugin<IMainScene> {
   private getStores(): void {
     this.utilStore = this.store.of('util')
     this.networkStore = this.store.of('networkPlugin')
+    this.debugScreenStore = this.store.of('debugScreenPlugin')
   }
 
   private start(): void {
     if (this.mapManager === undefined) throw new MapManagerUndefinedError()
+    this.setupDebugScreen()
     this.mapSelector = setupMapUi(this.store, this.bus, this.mapManager)
+  }
+
+  private setupDebugScreen(): void {
+    const debugDetailScreenContainer = this.debugScreenStore.debugDetailScreenContainer
+    debugDetailScreenContainer.addSection(new DebugDetailScreenSection('mapInfo', 'Map'))
+    this.collisionCountDebugDetailScreen = new CollisionCountDebugDetailScreen(debugDetailScreenContainer)
+    this.spawnCountDebugDetailScreen = new SpawnCountDebugDetailScreen(debugDetailScreenContainer)
   }
 
   private onInitMap(ev: InitMapEvent): void {
@@ -79,6 +101,8 @@ export class MapPlugin extends BasePlugin<IMainScene> {
       .catch((err) => {
         throw err
       })
+    this.collisionCountDebugDetailScreen.update(currentMap.getLayerCellCount('Collision'))
+    this.spawnCountDebugDetailScreen.update(currentMap.getLayerCellCount('Spawn'))
   }
 
   private onChangeMap(ev: ChangeMapEvent): void {
@@ -94,5 +118,12 @@ export class MapPlugin extends BasePlugin<IMainScene> {
   private onDidChangeMap(ev: DidChangeMapEvent): void {
     window.alert(`マップが変更されました。再度入場してください。`)
     this.store.of('transitionPlugin').transitionManager.transitionTo('TitleScene')
+  }
+
+  private dumpDebugData(ev: DumpDebugDataEvent): void {
+    if (this.mapManager === undefined) throw new MapManagerUndefinedError()
+    const currentMap = this.mapManager.currentMap
+    ev.dataDumper.dump('collisionCount', currentMap.getLayerCellCount('Collision').toString())
+    ev.dataDumper.dump('spawnCount', currentMap.getLayerCellCount('Spawn').toString())
   }
 }
