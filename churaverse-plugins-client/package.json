@@ -50,8 +50,8 @@
     }
   },
   "dependencies": {
-    "@livekit/track-processors": "^0.3.0",
-    "livekit-client": "^2.0.7",
+    "@livekit/track-processors": "^0.2.6",
+    "livekit-client": "^1.13.4",
     "phaser": "^3.80.1",
     "socket.io-client": "^4.7.4",
     "uuid": "^9.0.1",

@@ -1,5 +1,4 @@
-import { IEventBus } from '../../../../eventbus/IEventBus'
-import { IMainScene } from '../../../../scene/IScene/IMainScene'
+import { IEventBus, IMainScene } from 'churaverse-engine-client'
 import { ITopBarIconContainer } from '../../../coreUiPlugin/interface/ITopBarIconContainer'
 import { TopBarIconRenderer } from '../../../coreUiPlugin/topBarIcon'
 import { ToggleMegaphoneEvent } from '../../event/toggleMegaphoneEvent'

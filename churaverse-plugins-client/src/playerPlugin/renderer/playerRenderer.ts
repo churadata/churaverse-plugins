@@ -1,10 +1,15 @@
-import { vectorToName, Direction, Position, GRID_SIZE, layerSetting } from 'churaverse-engine-client'
+import {
+  vectorToName,
+  Direction,
+  Position,
+  GRID_SIZE,
+  layerSetting,
+  FRAME_RATE,
+  HpBarRenderer,
+} from 'churaverse-engine-client'
 import { GameObjects, Scene } from 'phaser'
-import { FRAME_RATE } from '../../../interface/ui/animationConfig'
 import { IPlayerRenderer } from '../domain/IPlayerRenderer'
 import { PLAYER_COLOR_NAMES, PlayerColor } from '../types/playerColor'
-import { HpBarRenderer } from '../../../interface/ui/Render/entity/hpBarRenderer'
-import { PlayerIconsRenderer } from '../../../interface/ui/Render/entity/playerIconsRenderer'
 import heroBasic from '../assets/hero.png'
 import heroRed from '../assets/hero_red.png'
 import heroBlack from '../assets/hero_black.png'
@@ -60,7 +65,7 @@ const _relativePositionToNamePlate = { x: 0, y: -40 }
  */
 export class PlayerRenderer implements IPlayerRenderer {
   private readonly scene
-  private sprite
+  private readonly sprite
 
   private tween?: Phaser.Tweens.Tween
   private readonly _playerNamePlateTween?: Phaser.Tweens.Tween
@@ -125,8 +130,6 @@ export class PlayerRenderer implements IPlayerRenderer {
         frameHeight: 32,
       })
     )
-
-    PlayerIconsRenderer.loadAssets(scene)
   }
 
   /**

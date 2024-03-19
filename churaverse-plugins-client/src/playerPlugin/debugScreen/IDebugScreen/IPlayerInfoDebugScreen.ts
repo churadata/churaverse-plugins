@@ -1,5 +1,4 @@
-import { Direction } from '../../../../domain/model/core/direction'
-import { Position } from '../../../../domain/model/core/position'
+import { Direction, Position } from 'churaverse-engine-client'
 import { IDebugScreen } from '../../../debugScreenPlugin/debugScreen/IDebugScreen/IDebugScreen'
 import { PlayerColor } from '../../types/playerColor'
 import { PlayerRole } from '../../types/playerRole'

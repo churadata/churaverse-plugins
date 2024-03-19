@@ -1,4 +1,4 @@
-import { IDialog } from '../../../../domain/IRender/IDialog'
+import { IDialog } from '../../../coreUiPlugin/interface/IDialog'
 import { TextChatSection } from '../textChatDialog/textChatSection'
 
 export interface ITextChatDialog extends IDialog<TextChatSection> {}

@@ -1,10 +1,10 @@
-import { DomManager } from '../../../../interface/ui/util/domManager'
+import { DomManager } from 'churaverse-engine-client'
 import { DebugSummaryScreenContainer } from '../debugSummaryScreenContainer'
 import { IWorldDeployVersionDebugScreen } from '../../IDebugRenderer/IWorldInfoDebugScreen'
 import { ElementDebugScreenComponent } from '../components/ElementDebugScreenComponent'
 
 export class WorldDeployVersionDebugScreen implements IWorldDeployVersionDebugScreen {
-  private content: HTMLElement
+  private readonly content: HTMLElement
 
   public constructor(debugSummaryScreenContainer: DebugSummaryScreenContainer) {
     const element =

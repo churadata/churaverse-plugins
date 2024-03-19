@@ -1,6 +1,7 @@
 import { io, Socket as ioSocket } from 'socket.io-client'
 import { Packet } from './packet'
-import { Scenes } from 'churaverse-engine-client'
+import { Scenes, getChuraverseConfig } from 'churaverse-engine-client'
+import { NotExistsMySocketIdError } from '../errors/notExistsMySocketIdError'
 
 const SEND_PACKET_TO_SERVER = 'sendPacketToServer'
 const SEND_PACKET_TO_CLIENT = 'sendPacketToClient'
@@ -20,12 +21,14 @@ export class Socket<Scene extends Scenes> {
 
     const regexpUrlHasScheme = /^.+:\/\//
 
-    const urlStr = regexpUrlHasScheme.test(import.meta.env.VITE_BACKEND_URL)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    const urlStr = regexpUrlHasScheme.test(getChuraverseConfig().backendUrl)
       ? // true
-        import.meta.env.VITE_BACKEND_URL
+        getChuraverseConfig().backendUrl
       : // false
-        'http://' + import.meta.env.VITE_BACKEND_URL
+        'http://' + getChuraverseConfig().backendUrl
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const url = new URL(urlStr)
 
     const ioSocket = io(url.host, {
@@ -42,10 +45,10 @@ export class Socket<Scene extends Scenes> {
   }
 
   public listenPacket(packetListener: (packet: Packet<Scene>) => void): void {
-    if (this.ioSocket.connected) {
+    if (this.iosocket.connected) {
       this._listenPacket(packetListener)
     } else {
-      this.ioSocket.once('connect', () => {
+      this.iosocket.once('connect', () => {
         this._listenPacket(packetListener)
       })
     }
@@ -61,11 +64,7 @@ export class Socket<Scene extends Scenes> {
   }
 
   public get socketId(): string {
+    if (this.iosocket.id === undefined) throw new NotExistsMySocketIdError()
     return this.iosocket.id
-  }
-
-  public get ioSocket(): ioSocket {
-    // TODO: 旧Socketクラスが置き換わり次第, 関数削除
-    return this.iosocket
   }
 }

@@ -14,6 +14,10 @@ export class Shark extends Entity implements WeaponEntity {
   public ownerId: string
   public spawnTime: number
 
+  public get id(): string {
+    return this.sharkId
+  }
+
   public constructor(sharkId: string, ownerId: string, position: Position, direction: Direction, spawnTime: number) {
     super(position, direction)
     this.sharkId = sharkId

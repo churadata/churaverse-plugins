@@ -1,11 +1,11 @@
-import { DomManager } from '../../../../interface/ui/util/domManager'
+import { DomManager } from 'churaverse-engine-client'
 import { DebugSummaryScreenContainer } from '../debugSummaryScreenContainer'
 import { IWorldFpsDebugScreen } from '../../IDebugRenderer/IWorldInfoDebugScreen'
 import { Scene } from 'phaser'
 import { ElementDebugScreenComponent } from '../components/ElementDebugScreenComponent'
 
 export class WorldFpsDebugScreen implements IWorldFpsDebugScreen {
-  private content: HTMLElement
+  private readonly content: HTMLElement
   private readonly scene: Scene
 
   public constructor(scene: Scene, debugSummaryScreenContainer: DebugSummaryScreenContainer) {

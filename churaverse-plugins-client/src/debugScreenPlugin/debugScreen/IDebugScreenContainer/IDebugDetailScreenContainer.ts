@@ -1,4 +1,4 @@
-import { IDialog } from '../../../../domain/IRender/IDialog'
+import { IDialog } from '../../../coreUiPlugin/interface/IDialog'
 import { DebugDetailScreenSection } from '../debugDetailScreenSection'
 
 export interface IDebugDetailScreenContainer extends IDialog<DebugDetailScreenSection> {}

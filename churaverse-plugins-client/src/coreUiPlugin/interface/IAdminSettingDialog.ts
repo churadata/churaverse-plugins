@@ -1,4 +1,4 @@
-import { IDialog } from '../../../domain/IRender/IDialog'
+import { IDialog } from './IDialog'
 import { AdminSettingSection } from '../adminSettingDialog/adminSettingSection'
 
 export interface IAdminSettingDialog extends IDialog<AdminSettingSection> {}
@@ -8,4 +8,3 @@ declare module './IDialogSwitcher' {
     adminSetting: IAdminSettingDialog
   }
 }
-

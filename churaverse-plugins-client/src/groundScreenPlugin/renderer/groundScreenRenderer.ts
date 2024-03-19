@@ -17,8 +17,12 @@ export class GroundScreenRenderer implements IGroundScreenRenderer {
     this.phaserVideo = this.scene.add
       .video(position.x, position.y)
       .loadMediaStream(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         this.video.captureStream(),
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         'loadeddata',
         false
       )
@@ -43,6 +47,7 @@ export class GroundScreenRenderer implements IGroundScreenRenderer {
    * 共有された画面の比率に合わせて大きさを調整
    */
   private fitScale(): void {
+    if (this.phaserVideo.video === null) return
     const videoWidth = this.phaserVideo.video.videoWidth
     const videoHeight = this.phaserVideo.video.videoHeight
 

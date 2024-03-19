@@ -1,6 +1,6 @@
-import { SettingSection } from '../../../../plugins/coreUiPlugin/settingDialog/settingSection'
+import { SettingSection } from '../../../coreUiPlugin/settingDialog/settingSection'
 
-declare module '../../../../plugins/coreUiPlugin/settingDialog/settingDialog' {
+declare module '../../../coreUiPlugin/settingDialog/settingDialog' {
   export interface SettingSectionMap {
     keyboardSetting: SettingSection
   }

@@ -1,6 +1,5 @@
-import { IEventBus } from '../../../eventbus/IEventBus'
-import { IMainScene } from '../../../scene/IScene/IMainScene'
-import { Store } from '../../store/store'
+import { IEventBus, IMainScene, Store } from 'churaverse-engine-client'
+
 import { DebugDetailScreenContainer } from '../debugScreen/debugDetailScreenContainer'
 import { DebugSummaryScreenContainer } from '../debugScreen/debugSummaryScreenContainer'
 import { DebugScreenPluginStore } from './defDebugScreenPluginStore'

@@ -1,6 +1,4 @@
-import { IEventBus } from '../../../eventbus/IEventBus'
-import { IMainScene } from '../../../scene/IScene/IMainScene'
-import { Store } from '../../store/store'
+import { IEventBus, IMainScene, Store } from 'churaverse-engine-client'
 import { IVoiceChatSender } from '../domain/IVoiceChatSender'
 import { MegaphoneIcon } from './voiceChatIcon/megaphoneIcon'
 import { MicIcon } from './voiceChatIcon/micIcon'

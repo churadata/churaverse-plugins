@@ -1,4 +1,4 @@
-import { Position } from '../../../domain/model/core/position'
+import { Position } from 'churaverse-engine-client'
 import { BaseDebugSummaryScreen } from '../../debugScreenPlugin/core/baseDebugSummaryScreen'
 import { DebugSummaryScreenContainer } from '../../debugScreenPlugin/debugScreen/debugSummaryScreenContainer'
 import { IPlayerPositionDebugScreen } from './IDebugScreen/IPlayerInfoDebugScreen'

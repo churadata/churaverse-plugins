@@ -1,7 +1,6 @@
-import { Direction, Position, layerSetting, vectorToName } from 'churaverse-engine-client'
+import { Direction, Position, layerSetting, vectorToName, FRAME_RATE } from 'churaverse-engine-client'
 import { ISharkRenderer } from '../domain/ISharkRenderer'
 import { Scene } from 'phaser'
-import { FRAME_RATE } from '../../../interface/ui/animationConfig'
 import { SHARK_WALK_LIMIT_MS } from '../domain/shark'
 import sharkImage from '../assets/shark.png'
 
