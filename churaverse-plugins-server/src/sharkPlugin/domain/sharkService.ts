@@ -1,6 +1,6 @@
 import { ISharkRepository } from './ISharkRepository'
 import { Shark } from './shark'
-import { WorldMap } from '../../mapPlugin/domain/worldMap'
+import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
 
 /**
  * 衝突した or 消滅時間に達したサメを削除
