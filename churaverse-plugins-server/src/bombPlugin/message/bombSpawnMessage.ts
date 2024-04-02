@@ -4,7 +4,7 @@ import { SendableObject } from '@churaverse/network-plugin-server/types/sendable
 
 export interface BombSpawnData extends SendableObject {
   bombId: string
-  startPos: Vector
+  startPos: Vector & SendableObject
   direction: Direction
   spawnTime: number
 }

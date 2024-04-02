@@ -1,5 +1,5 @@
 {
-  "name": "@churaverse/bombplugin-server",
+  "name": "@churaverse/bomb-plugin-server",
   "version": "0.1.0",
   "description": "",
   "main": "dist/index.js",
@@ -12,6 +12,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@churaverse/network-plugin-server": "^0.1.0"
+    "churaverse-engine-server": "^0.1.0",
+    "@churaverse/network-plugin-server": "^0.1.0",
+    "@churaverse/map-plugin-server": "^0.1.0",
+    "@churaverse/collision-detection-plugin-server": "^0.1.0",
+    "@churaverse/player-plugin-server": "^0.1.0"
   }
 }

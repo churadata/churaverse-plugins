@@ -16,6 +16,7 @@ import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-s
 import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { BombDamageCause } from './domain/bombDamageCause'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
+import { PlayerPluginStore } from '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 
 export class BombPlugin extends BasePlugin<IMainScene> {
   private bombPluginStore!: BombPluginStore
