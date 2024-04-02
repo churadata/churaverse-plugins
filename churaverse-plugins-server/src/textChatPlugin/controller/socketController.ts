@@ -1,6 +1,6 @@
 import { IEventBus, IMainScene, Store } from 'churaverse-engine-server'
-import { RegisterMessageEvent } from '../../networkPlugin/event/registerMessageEvent'
-import { BaseSocketController } from '../../networkPlugin/interface/baseSocketController'
+import { RegisterMessageEvent } from '@churaverse/network-plugin-server/event/registerMessageEvent'
+import { BaseSocketController } from '@churaverse/network-plugin-server/interface/baseSocketController'
 import { SendTextChatMessage } from '../message/sendTextChatMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {

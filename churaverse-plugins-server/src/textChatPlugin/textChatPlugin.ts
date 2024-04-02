@@ -1,5 +1,5 @@
 import { IMainScene, BasePlugin } from 'churaverse-engine-server'
-import { NetworkPluginStore } from '../networkPlugin/store/defNetworkPluginStore'
+import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { SocketController } from './controller/socketController'
 import { SendTextChatEvent } from './event/sendTextChatEvent'
 import { SendTextChatMessage } from './message/sendTextChatMessage'
