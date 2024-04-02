@@ -1,6 +1,6 @@
 import { IMainScene } from 'churaverse-engine-server'
-import { BaseMessage } from '../../networkPlugin/message/baseMessage'
-import { SendableObject } from '../../networkPlugin/types/sendable'
+import { BaseMessage } from '@churaverse/network-plugin-server/message/baseMessage'
+import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
 import { PlayerJoinData } from './playerJoinMessage'
 
 export interface ExistPlayers {
@@ -20,7 +20,7 @@ export class PriorPlayerDataMessage extends BaseMessage<IMainScene> {
   }
 }
 
-declare module '../../networkPlugin/message/messages' {
+declare module '@churaverse/network-plugin-server/message/messages' {
   export interface MainMessageMap {
     priorPlayerData: PriorPlayerDataMessage
   }

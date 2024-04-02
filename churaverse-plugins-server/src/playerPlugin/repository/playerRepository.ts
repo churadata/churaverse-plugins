@@ -1,4 +1,4 @@
-import { CollidableEntityRepository } from '../../collisionDetectionPlugin/domain/collisionDetection/collidableEntityRepository'
+import { CollidableEntityRepository } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntityRepository'
 import { Player } from '../domain/player'
 import { IPlayerRepository } from '../domain/IPlayerRepository'
 

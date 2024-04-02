@@ -1,6 +1,6 @@
 import { Position, Direction, Vector, WorldTime, LivingEntity } from 'churaverse-engine-server'
-import { ICollidableEntity } from '../../collisionDetectionPlugin/domain/collisionDetection/collidableEntity/ICollidableEntity'
-import { IRectangle } from '../../collisionDetectionPlugin/domain/collisionDetection/collidableEntity/IRectangle'
+import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/ICollidableEntity'
+import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
 import { PlayerColor } from '../types/playerColor'
 import { PlayerRole } from '../types/playerRole'
 

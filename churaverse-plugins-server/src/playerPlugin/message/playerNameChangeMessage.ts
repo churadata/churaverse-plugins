@@ -1,5 +1,5 @@
-import { SendableObject } from '../../networkPlugin/types/sendable'
-import { BaseMessage } from '../../networkPlugin/message/baseMessage'
+import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
+import { BaseMessage } from '@churaverse/network-plugin-server/message/baseMessage'
 import { IMainScene } from 'churaverse-engine-server'
 
 export interface PlayerNameChangeData extends SendableObject {
@@ -12,7 +12,7 @@ export class PlayerNameChangeMessage extends BaseMessage<IMainScene> {
   }
 }
 
-declare module '../../networkPlugin/message/messages' {
+declare module '@churaverse/network-plugin-server/message/messages' {
   export interface MainMessageMap {
     playerNameChange: PlayerNameChangeMessage
   }

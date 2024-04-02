@@ -1,6 +1,6 @@
 import { IMainScene } from 'churaverse-engine-server'
-import { BaseMessage } from '../../networkPlugin/message/baseMessage'
-import { SendableObject } from '../../networkPlugin/types/sendable'
+import { BaseMessage } from '@churaverse/network-plugin-server/message/baseMessage'
+import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
 
 export interface PlayerLeaveData extends SendableObject {
   playerId: string
@@ -12,7 +12,7 @@ export class PlayerLeaveMessage extends BaseMessage<IMainScene> {
   }
 }
 
-declare module '../../networkPlugin/message/messages' {
+declare module '@churaverse/network-plugin-server/message/messages' {
   export interface MainMessageMap {
     playerLeave: PlayerLeaveMessage
   }
