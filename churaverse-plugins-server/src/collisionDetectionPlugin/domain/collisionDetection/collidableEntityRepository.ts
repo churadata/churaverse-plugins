@@ -1,7 +1,7 @@
 import { ICollidableEntity } from './collidableEntity/ICollidableEntity'
 import { LinearQuadTreeSpace } from './linearQuadTreeSpace'
 import { EntityRepository } from 'churaverse-engine-server'
-import { WorldMap } from '../../../mapPlugin/domain/worldMap'
+import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
 
 /**
  * 当たり判定を取るオブジェクトのリポジトリはこのクラスを継承する

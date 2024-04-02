@@ -1,4 +1,4 @@
-import { WorldMap } from '../../../mapPlugin/domain/worldMap'
+import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
 import { IRectangle } from './collidableEntity/IRectangle'
 
 // 空間階層のことをレベル、
