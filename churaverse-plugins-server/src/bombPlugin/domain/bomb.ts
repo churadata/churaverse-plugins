@@ -1,6 +1,6 @@
 import { Position, Direction, Entity } from 'churaverse-engine-server'
-import { ICollidableEntity } from '../../collisionDetectionPlugin/domain/collisionDetection/collidableEntity/ICollidableEntity'
-import { IRectangle } from '../../collisionDetectionPlugin/domain/collisionDetection/collidableEntity/IRectangle'
+import { ICollidableEntity } from '@churaverse/collision-detection-plugin/domain/collisionDetection/collidableEntity/ICollidableEntity'
+import { IRectangle } from '@churaverse/collision-detection-plugin/domain/collisionDetection/collidableEntity/IRectangle'
 
 export class Bomb extends Entity implements ICollidableEntity {
   public isCollidable = false

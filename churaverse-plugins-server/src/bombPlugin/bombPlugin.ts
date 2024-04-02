@@ -12,10 +12,10 @@ import { Bomb } from './domain/bomb'
 import { checkExplode, removeExplodedBomb, sendExplodedBomb } from './domain/bombService'
 import { BombPluginStore } from './store/defBombPluginStore'
 import { initBombPluginStore } from './store/initBombPluginStore'
-import { RegisterOnOverlapEvent } from '../collisionDetectionPlugin/event/registerOnOverlap'
-import { Player } from '../playerPlugin/domain/player'
+import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
+import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { BombDamageCause } from './domain/bombDamageCause'
-import { NetworkPluginStore } from '../networkPlugin/store/defNetworkPluginStore'
+import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 
 export class BombPlugin extends BasePlugin<IMainScene> {
   private bombPluginStore!: BombPluginStore

@@ -1,7 +1,7 @@
 import { IBombRepository } from './IBombRepository'
 import { BombExplosionMessage } from '../message/bombExplosionMessage'
 import { IMainScene } from 'churaverse-engine-server'
-import { IMessageSender } from '../../networkPlugin/interface/IMessageSender'
+import { IMessageSender } from '@churaverse/network-plugin-server/interface/IMessageSender'
 
 /**
  * 爆弾が爆破する時間を超えているかチェックする
