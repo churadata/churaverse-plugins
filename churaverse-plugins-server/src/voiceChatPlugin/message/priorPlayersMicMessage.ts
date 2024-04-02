@@ -1,6 +1,6 @@
 import { IMainScene } from 'churaverse-engine-server'
-import { BaseMessage } from '../../networkPlugin/message/baseMessage'
-import { SendableObject } from '../../networkPlugin/types/sendable'
+import { BaseMessage } from '@churaverse/network-plugin-server/message/baseMessage'
+import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
 
 export interface ExistPlayersMic {
   [id: string]: boolean
@@ -19,7 +19,7 @@ export class PriorPlayersMicMessage extends BaseMessage<IMainScene> {
   }
 }
 
-declare module '../../networkPlugin/message/messages' {
+declare module '@churaverse/network-plugin-server/message/messages' {
   export interface MainMessageMap {
     priorPlayersMicData: PriorPlayersMicMessage
   }
