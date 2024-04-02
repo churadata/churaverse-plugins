@@ -1,5 +1,5 @@
 import { CVEvent, IMainScene } from 'churaverse-engine-server'
-import { Player } from '../../playerPlugin/domain/player'
+import { Player } from '@churaverse/player-plugin-server/domain/player'
 
 /**
  * プレイヤーキック時にpostされるイベント

@@ -1,0 +1,19 @@
+{
+  "name": "@churaverse/kick-plugin-server",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tsc",
+    "link:cvPackages": "sh npm_link_cvPackages.sh"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@churaverse/collision-detection-plugin-server": "0.1.0",
+    "@churaverse/network-plugin-server": "0.1.0",
+    "@churaverse/player-plugin-server": "0.1.0"
+  }
+}
