@@ -29,6 +29,15 @@
   },
   "dependencies": {
     "async-lock": "^1.4.1",
-    "socket.io": "^4.7.4"
+    "socket.io": "^4.7.4",
+    "@churaverse/bomb-plugin-server": "0.1.0",
+    "@churaverse/collision-detection-plugin-server": "0.1.0",
+    "@churaverse/kick-plugin-server": "0.1.0",
+    "@churaverse/map-plugin-server": "0.1.0",
+    "@churaverse/network-plugin-server": "0.1.0",
+    "@churaverse/player-plugin-server": "0.1.0",
+    "@churaverse/shark-plugin-server": "0.1.0",
+    "@churaverse/textchat-plugin-server": "0.1.0",
+    "@churaverse/voicechat-plugin-server": "0.1.0"
   }
 }
