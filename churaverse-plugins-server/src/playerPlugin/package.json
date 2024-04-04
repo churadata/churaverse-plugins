@@ -14,6 +14,7 @@
   "dependencies": {
     "@churaverse/map-plugin-server": "^0.1.0",
     "@churaverse/network-plugin-server": "^0.1.0",
-    "@churaverse/collision-detection-plugin-server": "^0.1.0"
+    "@churaverse/collision-detection-plugin-server": "^0.1.0",
+    "churaverse-engine-server": "^0.1.0"
   }
 }

@@ -21,6 +21,7 @@ import { PlayerPluginStore } from '@churaverse/player-plugin-server/store/defPla
 export class BombPlugin extends BasePlugin<IMainScene> {
   private bombPluginStore!: BombPluginStore
   private networkPluginStore!: NetworkPluginStore<IMainScene>
+  private playerPluginStore!: PlayerPluginStore
 
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.init.bind(this))
@@ -52,12 +53,13 @@ export class BombPlugin extends BasePlugin<IMainScene> {
   private getStores(): void {
     this.bombPluginStore = this.store.of('bombPlugin')
     this.networkPluginStore = this.store.of('networkPlugin')
+    this.playerPluginStore = this.store.of('playerPlugin')
   }
 
   private registerOnOverlap(ev: RegisterOnOverlapEvent): void {
     ev.collisionDetector.register(
       this.bombPluginStore.bombs,
-      this.store.of('playerPlugin').players,
+      this.playerPluginStore.players,
       this.bombHitPlayer.bind(this)
     )
   }
