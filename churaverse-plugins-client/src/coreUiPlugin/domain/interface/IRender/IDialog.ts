@@ -1,4 +1,4 @@
-import { Section } from '../dialog/section'
+import { Section } from '../../../dialog/section'
 
 export type InsertPosition = 'head' | 'tail'
 

@@ -1,5 +1,4 @@
 import { Room, RoomOptions, VideoPresets } from 'livekit-client'
-import { WebRtcPlugin } from './webRtcPlugin'
 
 /**
  * backend_livekitが返すアクセストークンのJSON
@@ -34,7 +33,7 @@ export class WebRtc {
   private async connect(ownPlayerId: string): Promise<void> {
     try {
       const token = await this.getAccessToken(ownPlayerId)
-      await this.room.connect(WebRtcPlugin.backendLivekitUrl, token)
+      await this.room.connect(`${import.meta.env.VITE_LIVEKIT_URL ?? 'ws://localhost:8080/livekit'}`, token)
 
       console.log(`connected to room. roomName: ${this.room.name}`)
     } catch {
@@ -49,7 +48,9 @@ export class WebRtc {
       userName: ownPlayerId,
     }
     const query = new URLSearchParams(params).toString()
-    const res = await fetch(`${WebRtcPlugin.backendLivekitUrl}/?${query}`)
+    const res = await fetch(
+      `${import.meta.env.VITE_BACKEND_LIVEKIT_URL ?? 'http://localhost:8080/backend_livekit'}/?${query}`
+    )
     const data = (await res.json()) as AccessTokenResponse
     return data.token
   }

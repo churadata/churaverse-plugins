@@ -10,10 +10,6 @@ export class Bomb extends Entity implements WeaponEntity {
   public ownerId: string
   public spawnTime: number
 
-  public get id(): string {
-    return this.bombId
-  }
-
   public constructor(bombId: string, ownerId: string, position: Position, direction: Direction, spawnTime: number) {
     super(position, Direction.down)
     this.bombId = bombId

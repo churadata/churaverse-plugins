@@ -7,6 +7,7 @@ import {
   StartEvent,
   EntitySpawnEvent,
   EntityDespawnEvent,
+  Vector,
 } from 'churaverse-engine-client'
 import { DebugDetailScreenSection } from '../debugScreenPlugin/debugScreen/debugDetailScreenSection'
 import { DumpDebugDataEvent } from '../debugScreenPlugin/event/dumpDebugDataEvent'
@@ -26,6 +27,7 @@ import { BombRendererFactory } from './renderer/bombRendererFactory'
 import { BombPluginStore } from './store/defBombPluginStore'
 import { initBombPluginStore } from './store/initBombPluginStore'
 import { DeathLog } from '../playerPlugin/ui/deathLog/deathLog'
+import { SendableObject } from '../networkPlugin/types/sendable'
 
 export class BombPlugin extends BasePlugin<IMainScene> {
   private rendererFactory?: BombRendererFactory
@@ -106,7 +108,7 @@ export class BombPlugin extends BasePlugin<IMainScene> {
       this.networkStore.messageSender.send(
         new BombSpawnMessage({
           bombId: bomb.bombId,
-          startPos: bomb.position.toVector(),
+          startPos: bomb.position.toVector() as Vector & SendableObject ,
           direction: bomb.direction,
           spawnTime: bomb.spawnTime,
         })

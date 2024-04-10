@@ -1,4 +1,4 @@
-import { IEventBus, SceneName, Scenes } from 'churaverse-engine-client'
+import { CVEvent, IEventBus, SceneName, Scenes } from 'churaverse-engine-client'
 import { ITransitionManager } from './interface/ITransitionManager'
 import { WillSceneTransitionEvent } from './event/willSceneTransitionEvent'
 import { ISceneTransitionDataTransporter } from './interface/ISceneTransitionDataTransporter'
@@ -18,7 +18,7 @@ export class TransitionManager<CurrentScene extends Scenes> implements ITransiti
   private static receivedData?: any = undefined
 
   public transitionTo(dest: SceneName): void {
-    this.eventBus.post(new WillSceneTransitionEvent(this.currentSceneName, dest, this.sceneDataTransporter))
+    this.eventBus.post(new WillSceneTransitionEvent(this.currentSceneName, dest, this.sceneDataTransporter) as CVEvent<Scenes>)
   }
 
   /**

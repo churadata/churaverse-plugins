@@ -1,6 +1,8 @@
 import {
   BasePlugin,
+  CVEvent,
   EVENT_PRIORITY,
+  IMainScene,
   PhaserSceneInit,
   SceneUndefinedError,
   Scenes,
@@ -16,7 +18,7 @@ import { KeyFactory } from './keyFactory'
 import { KeyStateGetter } from './keyStateGetter'
 import { setupKeyboardUi } from './ui/setupKeyboardUi'
 import { IKeyboardSetupInfoWriter } from './interface/keySettingSave/IKeyboardSetupInfoWriter'
-import { CookieStore } from '../../interface/repository/cookieStore'
+import { CookieStore } from '../dataPersistencePlugin/cookieStore'
 import { KeyboardSetupInfoWriter } from './keySettingSave/keyboardSetupInfoWriter'
 import { KeyboardSetupInfoReader } from './keySettingSave/keyboardSettingInfoReader'
 import { CanSettingKeyActType } from './ui/keyboardSetting/canSettingKeyActionType'
@@ -85,8 +87,8 @@ export class KeyboardPlugin extends BasePlugin<Scenes> {
   private listenRegister(): void {
     if (this.keyActionManager === undefined) throw new KeyActionManagerUndefinedError()
 
-    this.bus.post(new RegisterKeyActionEvent(this.keyActionManager))
-    this.bus.post(new RegisterKeyActionListenerEvent(this.keyActionManager))
+    this.bus.post(new RegisterKeyActionEvent(this.keyActionManager) as CVEvent<Scenes>)
+    this.bus.post(new RegisterKeyActionListenerEvent(this.keyActionManager) as CVEvent<Scenes>)
   }
 
   private update(ev: UpdateEvent): void {

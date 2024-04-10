@@ -1,7 +1,7 @@
 import { GameObjects, Scene } from 'phaser'
 import { ITitlePlayerRoleRenderer } from '../../domain/ITitlePlayerRoleRenderer'
 import { createUIContainer } from 'churaverse-engine-client'
-import { PlayerSetupInfoReader } from '../../../../../interface/playerSetupInfo/playerSetupInfoReader'
+import { PlayerSetupInfoReader } from '../../../../playerPlugin/interface/playerSetupInfoReader'
 
 export class TitlePlayerRoleRenderer implements ITitlePlayerRoleRenderer {
   private readonly container: GameObjects.Container

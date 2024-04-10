@@ -3,6 +3,7 @@ import { SettingSection } from '../../coreUiPlugin/settingDialog/settingSection'
 import { IKeyActionRegister } from '../interface/IKeyActionRegister'
 import { KeyboardSettingPopUpWindow } from './keyboardSetting/keySettingPopUpWindow'
 import { PopUpKeySettingWindowButton } from './keyboardSetting/popUpKeySettingWindowButton'
+import { CoreUiPluginStore } from '../../coreUiPlugin/store/defCoreUiPluginStore'
 
 export function setupKeyboardUi(store: Store<IMainScene>, keyActionRegister: IKeyActionRegister<IMainScene>): void {
   const uiStore = store.of('coreUiPlugin')

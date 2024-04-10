@@ -1,4 +1,4 @@
-import { IDialog } from '../../coreUiPlugin/interface/IDialog'
+import { IDialog } from '../../coreUiPlugin/domain/interface/IRender/IDialog'
 import { PlayerListSection } from '../playerListDialog/playerListSection'
 
 export interface IPlayerListDialog extends IDialog<PlayerListSection> {}

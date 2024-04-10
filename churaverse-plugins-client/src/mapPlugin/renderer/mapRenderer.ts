@@ -1,8 +1,6 @@
 import { Scene, Tilemaps } from 'phaser'
 import { GRID_SIZE } from 'churaverse-engine-client'
-import { DrawingMapData } from '../drawingMapData'
-import { NotExistsTilesetImageError } from '../error/notExistsTilesetImageError'
-import { NotExistsMapLayerError } from '../error/notExistsMapLayerError'
+import { DrawingMapData } from '../mapJsonLoader'
 
 /**
  * tilesetのテクスチャ名
@@ -21,22 +19,16 @@ export class MapRenderer {
   private readonly tilemap: Tilemaps.Tilemap
   private readonly layers = new Map<string, Tilemaps.TilemapLayer>()
 
-  private constructor(
-    private readonly scene: Scene,
-    mapData: DrawingMapData
-  ) {
+  private constructor(private readonly scene: Scene, mapData: DrawingMapData) {
     this.tilemap = this.scene.add.tilemap(mapData.mapId)
 
     const tiles = mapData.tilesetNames.map((tilesetName) => {
-      const tilesetImg = this.tilemap.addTilesetImage(tilesetName, tilesetName)
-      if (tilesetImg === null) throw new NotExistsTilesetImageError(tilesetName)
-      return tilesetImg
-    })
+      return this.tilemap.addTilesetImage(tilesetName, tilesetName)
+    }).filter((item): item is NonNullable<typeof item> => item != null);
 
     mapData.layerNames.forEach((layerName) => {
       const layer = this.tilemap.createLayer(layerName, tiles, -GRID_SIZE / 2, -GRID_SIZE / 2) // (0, 0)がタイルの中心になるようにx, yを半グリッド分ずらす
-      if (layer === null) throw new NotExistsMapLayerError(layerName)
-      this.layers.set(layerName, layer)
+      if(layer != null)this.layers.set(layerName, layer)
     })
 
     /**

@@ -1,10 +1,10 @@
 import { Vector, Direction, IMainScene } from 'churaverse-engine-client'
 import { BaseMessage } from '../../networkPlugin/message/baseMessage'
-import { SendableObject } from '../../networkPlugin/types/sendable'
+import {  SendableObject } from '../../networkPlugin/types/sendable'
 
 export interface BombSpawnData extends SendableObject {
   bombId: string
-  startPos: Vector
+  startPos: Vector & SendableObject
   direction: Direction
   spawnTime: number
 }

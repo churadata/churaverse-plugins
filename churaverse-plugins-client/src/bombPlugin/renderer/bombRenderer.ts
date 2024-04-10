@@ -1,5 +1,5 @@
 import { Scene } from 'phaser'
-import { layerSetting, Position, FRAME_RATE } from 'churaverse-engine-client'
+import { FRAME_RATE,layerSetting, Position } from 'churaverse-engine-client'
 import bombImage from '../assets/bomb_large_explosion.png'
 import { IBombRenderer } from '../domain/IBombRenderer'
 

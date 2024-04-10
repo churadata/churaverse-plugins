@@ -12,10 +12,7 @@ import { StartScreenShare } from './event/startScreenShareEvent'
 import { StopScreenShare } from './event/stopScreenShareEvent'
 
 export class ScreenShareSender implements IScreenShareSender {
-  public constructor(
-    private readonly room: Room,
-    private readonly eventBus: IEventBus<IMainScene>
-  ) {
+  public constructor(private readonly room: Room, private readonly eventBus: IEventBus<IMainScene>) {
     this.room
       .on(RoomEvent.LocalTrackPublished, this.onStartStream.bind(this))
       .on(RoomEvent.LocalTrackUnpublished, this.onStopStream.bind(this))

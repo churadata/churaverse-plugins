@@ -10,5 +10,7 @@ declare module '../../debugScreenPlugin/debugScreen/dataDumper' {
   interface DumpDataMap {
     collisionCount: string
     spawnCount: string
+    worldName: string
+    worldSize: string
   }
 }

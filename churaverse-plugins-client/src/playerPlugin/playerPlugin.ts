@@ -17,8 +17,8 @@ import {
   DamageCauseType,
   vectorToName,
 } from 'churaverse-engine-client'
-import { PlayerSetupInfoWriter } from '../../interface/playerSetupInfo/playerSetupInfoWriter'
-import { CookieStore } from '../../interface/repository/cookieStore'
+import { PlayerSetupInfoWriter } from './interface/playerSetupInfoWriter'
+import { CookieStore } from '../dataPersistencePlugin/cookieStore'
 import { CoreUiPluginStore } from '../coreUiPlugin/store/defCoreUiPluginStore'
 import { DebugSummaryScreenSection } from '../debugScreenPlugin/debugScreen/debugSummaryScreenSection'
 import { DumpDebugDataEvent } from '../debugScreenPlugin/event/dumpDebugDataEvent'

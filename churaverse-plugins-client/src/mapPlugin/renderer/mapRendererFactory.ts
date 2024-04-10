@@ -1,6 +1,6 @@
 import { Scene } from 'phaser'
 import { MapRenderer } from './mapRenderer'
-import { DrawingMapData } from '../drawingMapData'
+import { DrawingMapData } from '../mapJsonLoader'
 
 export class MapRendererFactory {
   public constructor(private readonly scene: Scene) {}

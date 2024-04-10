@@ -1,4 +1,4 @@
-import { IPersistStore } from '../../../interactor/IPersistStore'
+import { IPersistStore } from '../../dataPersistencePlugin/interface/IPersistStore'
 import { IMainScene } from 'churaverse-engine-client'
 import { IKeyboardSetupInfoWriter } from '../interface/keySettingSave/IKeyboardSetupInfoWriter'
 import { KEYBOARD_SETTING_PROPERTY } from '../interface/keySettingSave/keyboardSetupInfo'

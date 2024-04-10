@@ -1,4 +1,4 @@
-import { IDialog } from './IDialog'
+import { IDialog } from '../domain/interface/IRender/IDialog'
 import { SettingSection } from '../settingDialog/settingSection'
 
 export interface ISettingDialog extends IDialog<SettingSection> {}

@@ -4,7 +4,7 @@ import { IWorldDeployVersionDebugScreen } from '../../IDebugRenderer/IWorldInfoD
 import { ElementDebugScreenComponent } from '../components/ElementDebugScreenComponent'
 
 export class WorldDeployVersionDebugScreen implements IWorldDeployVersionDebugScreen {
-  private readonly content: HTMLElement
+  private content: HTMLElement
 
   public constructor(debugSummaryScreenContainer: DebugSummaryScreenContainer) {
     const element =

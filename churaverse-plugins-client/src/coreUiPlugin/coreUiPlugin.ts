@@ -19,6 +19,8 @@ import { KeyboardPluginStore } from '../keyboardPlugin/store/defKeyboardPluginSt
 import { KeyboardController } from './controller/keyboardController'
 import { CoreUiPluginStore } from './store/defCoreUiPluginStore'
 import { initCoreUiPlugin } from './store/initCoreUiPluginStore'
+// import because of dependency 
+import { TitlePlayerPluginStore } from '../titlePlugins/titlePlayerPlugin/store/defTitlePlayerPlugin'
 
 export class CoreUiPlugin extends BasePlugin<IMainScene> {
   private scene?: Scene

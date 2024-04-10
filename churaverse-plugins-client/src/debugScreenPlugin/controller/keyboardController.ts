@@ -1,4 +1,4 @@
-import { IEventBus, IMainScene, Store } from 'churaverse-engine-client'
+import { IEventBus,IMainScene,Store } from 'churaverse-engine-client'
 import { RegisterKeyActionEvent } from '../../keyboardPlugin/event/registerKeyActionEvent'
 import { RegisterKeyActionListenerEvent } from '../../keyboardPlugin/event/registerKeyActionListenerEvent'
 import { BaseKeyboardController } from '../../keyboardPlugin/interface/baseKeyboardController'

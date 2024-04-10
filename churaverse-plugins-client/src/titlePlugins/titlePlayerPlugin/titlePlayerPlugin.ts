@@ -11,8 +11,8 @@ import {
   IMainScene,
 } from 'churaverse-engine-client'
 import { NetworkPluginStore } from '../../networkPlugin/store/defNetworkPluginStore'
-import { PlayerSetupInfoReader } from '../../../interface/playerSetupInfo/playerSetupInfoReader'
-import { CookieStore } from '../../../interface/repository/cookieStore'
+import { PlayerSetupInfoReader } from '../../playerPlugin/interface/playerSetupInfoReader'
+import { CookieStore } from '../../dataPersistencePlugin/cookieStore'
 import { PlayerRenderer } from '../../playerPlugin/renderer/playerRenderer'
 import { Player, DEFAULT_HP } from '../../playerPlugin/domain/player'
 import { PLAYER_COLOR_NAMES } from '../../playerPlugin/types/playerColor'

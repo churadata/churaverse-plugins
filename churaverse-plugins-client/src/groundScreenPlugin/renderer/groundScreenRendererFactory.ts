@@ -14,7 +14,7 @@ export class GroundScreenRendererFactory {
   ) {}
 
   public build(video: HTMLVideoElement): IGroundScreenRenderer {
-    const configPos = mapConfig.maps[this.mapManager.currentMap.mapId].pluginOptions.groundScreenPos
+    const configPos = mapConfig.maps[this.mapManager.currentMap.mapId].groundScreenPos
     let pos: Position | undefined
     if (configPos !== undefined) {
       pos = Position.from(configPos)

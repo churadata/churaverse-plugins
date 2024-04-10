@@ -1,5 +1,5 @@
 import { Scene } from 'phaser'
-import { createUIContainer, getChuraverseConfig } from 'churaverse-engine-client'
+import { createUIContainer } from 'churaverse-engine-client'
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class VersionDisplayRenderer {
@@ -29,7 +29,7 @@ export class VersionDisplayRenderer {
     }
 
     /** backendVersionの表示 */
-    fetch(getChuraverseConfig().backendUrl.replace(/\/$/, '') + '/version')
+    fetch(import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '') + '/version')
       .then((response) => {
         if (response === null) {
           return 'Versionの取得ができませんでした。'

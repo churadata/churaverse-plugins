@@ -1,4 +1,4 @@
-import { DomManager, getChuraverseConfig } from 'churaverse-engine-client'
+import { DomManager } from 'churaverse-engine-client'
 import { DebugSummaryScreenContainer } from '../debugSummaryScreenContainer'
 import { IWorldBackendVersionDebugScreen } from '../../IDebugRenderer/IWorldInfoDebugScreen'
 import { ElementDebugScreenComponent } from '../components/ElementDebugScreenComponent'
@@ -20,7 +20,7 @@ export class WorldBackendVersionDebugScreen implements IWorldBackendVersionDebug
   }
 
   public async getBackendVersion(): Promise<string> {
-    const response = await fetch(getChuraverseConfig().backendUrl.replace(/\/$/, '') + '/version').catch(() => {
+    const response = await fetch(import.meta.env.VITE_BACKEND_URL.replace(/\/$/, '') + '/version').catch(() => {
       return null
     })
     if (response === null) {
