@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build ",
+    "build": "tsc && bash copyAssetsToDist.sh && bash copyNonTSFiles.sh",
     "link:cvPackages": "sh npm_link_cvPackages.sh",
     "preview": "vite preview",
     "lint": "eslint src",
@@ -42,7 +42,8 @@
   "author": "",
   "license": "MIT",
   "files": [
-    "dist"
+    "dist",
+    "**/assets/*"
   ],
   "exports": {
     ".": {
