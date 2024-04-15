@@ -45,27 +45,31 @@ export class BombRenderer implements IBombRenderer {
       .setDisplaySize(DISPLAY_SIZE, DISPLAY_SIZE)
 
     // 爆発前のアニメーションを作成
-    scene.anims.create({
-      key: _anims[0].key,
-      frames: scene.anims.generateFrameNames(BOMB_ANIM_KEY, {
-        start: _anims[0].frameStart,
-        end: _anims[0].frameEnd,
-      }),
-      frameRate: FRAME_RATE,
-      repeat: -1,
-    })
+    if (!scene.anims.exists(_anims[0].key)) {
+      scene.anims.create({
+        key: _anims[0].key,
+        frames: scene.anims.generateFrameNames(BOMB_ANIM_KEY, {
+          start: _anims[0].frameStart,
+          end: _anims[0].frameEnd,
+        }),
+        frameRate: FRAME_RATE,
+        repeat: -1,
+      })
+    }
 
     // 爆発のアニメーションを作成
-    scene.anims.create({
-      key: _anims[1].key,
-      frames: scene.anims.generateFrameNames(BOMB_ANIM_KEY, {
-        start: _anims[1].frameStart,
-        end: _anims[1].frameEnd,
-      }),
-      frameRate: FRAME_RATE,
-      repeat: 0,
-      hideOnComplete: true,
-    })
+    if (!scene.anims.exists(_anims[1].key)){
+      scene.anims.create({
+        key: _anims[1].key,
+        frames: scene.anims.generateFrameNames(BOMB_ANIM_KEY, {
+          start: _anims[1].frameStart,
+          end: _anims[1].frameEnd,
+        }),
+        frameRate: FRAME_RATE,
+        repeat: 0,
+        hideOnComplete: true,
+      })
+    }
 
     layerSetting(this.sprite, 'player', 10)
   }

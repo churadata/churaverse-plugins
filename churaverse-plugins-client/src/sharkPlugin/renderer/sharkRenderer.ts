@@ -53,15 +53,17 @@ export class SharkRenderer implements ISharkRenderer {
 
     // アニメーションの設定配列から各アニメーションを生成
     _anims.forEach((cfg) => {
-      scene.anims.create({
-        key: cfg.key,
-        frames: scene.anims.generateFrameNames(SHARK_ANIM_KEY, {
-          start: cfg.frameStart,
-          end: cfg.frameEnd,
-        }),
-        frameRate: FRAME_RATE,
-        repeat: -1,
-      })
+      if (!scene.anims.exists(cfg.key)) {
+        scene.anims.create({
+          key: cfg.key,
+          frames: scene.anims.generateFrameNames(SHARK_ANIM_KEY, {
+            start: cfg.frameStart,
+            end: cfg.frameEnd,
+          }),
+          frameRate: FRAME_RATE,
+          repeat: -1,
+        })
+      }
     })
 
     layerSetting(this.sprite, 'player', 20)
