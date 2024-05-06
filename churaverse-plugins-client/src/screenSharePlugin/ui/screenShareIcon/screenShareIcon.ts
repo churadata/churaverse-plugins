@@ -2,8 +2,8 @@ import { IScreenShareSender } from '../../interface/IScreenShareSender'
 import { ITopBarIconContainer } from '@churaverse/core-ui-plugin-client/interface/ITopBarIconContainer'
 import { TopBarIconRenderer } from '@churaverse/core-ui-plugin-client/topBarIcon'
 
-const SCREEN_SHARE_ACTIVE_ICON_PATH = 'src/game/plugins/screenSharePlugin/assets/screenshare.png'
-const SCREEN_SHARE_INACTIVE_ICON_PATH = 'src/game/plugins/screenSharePlugin/assets/screenshare_off.png'
+const SCREEN_SHARE_ACTIVE_ICON_PATH = new URL('../../assets/screenshare.png', import.meta.url).href
+const SCREEN_SHARE_INACTIVE_ICON_PATH = new URL('../../assets/screenshare_off.png', import.meta.url).href
 
 export class ScreenShareIcon extends TopBarIconRenderer {
   public constructor(iconContainer: ITopBarIconContainer, private readonly screenShareSender: IScreenShareSender) {

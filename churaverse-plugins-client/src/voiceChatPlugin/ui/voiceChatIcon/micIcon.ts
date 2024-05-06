@@ -2,8 +2,8 @@ import { ITopBarIconContainer } from '@churaverse/core-ui-plugin-client/interfac
 import { TopBarIconRenderer } from '@churaverse/core-ui-plugin-client/topBarIcon'
 import { IVoiceChatSender } from '../../domain/IVoiceChatSender'
 
-export const MIC_ACTIVE_ICON_PATH = '../../assets/microphone.png'
-export const MIC_INACTIVE_ICON_PATH = '../../assets/microphone_off.png'
+export const MIC_ACTIVE_ICON_PATH = new URL('../../assets/microphone.png', import.meta.url).href
+export const MIC_INACTIVE_ICON_PATH = new URL('../../assets/microphone_off.png', import.meta.url).href
 
 export class MicIcon extends TopBarIconRenderer {
   public constructor(iconContainer: ITopBarIconContainer, private readonly voiceChatSender: IVoiceChatSender) {

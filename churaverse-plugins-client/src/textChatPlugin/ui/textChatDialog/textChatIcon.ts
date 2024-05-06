@@ -4,7 +4,7 @@ import { ITopBarIconContainer } from '@churaverse/core-ui-plugin-client/interfac
 import { Badge } from './badge'
 import { ITextChatDialog } from '../interface/ITextChatDialog'
 
-const CHAT_ICON_PATH = `../../../assets/chat.png`
+const CHAT_ICON_PATH = new URL(`../../../assets/chat.png`, import.meta.url).href
 
 export class TextChatIcon extends TopBarIconRenderer {
   private readonly iconContainer: HTMLDivElement

@@ -3,7 +3,7 @@ import { Player } from '@churaverse/player-plugin-client/domain/player'
 import { RequestKickPlayerEvent } from '../../event/requestKickPlayerEvent'
 import { KickButtonComponent } from './components/KickButtonComponent'
 
-const KICK_ICON_PATH = './component/exit.png'
+const KICK_ICON_PATH = new URL('./component/exit.png', import.meta.url).href
 
 export class KickButton {
   public readonly node: HTMLButtonElement

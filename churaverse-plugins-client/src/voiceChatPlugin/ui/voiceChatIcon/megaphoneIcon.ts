@@ -3,7 +3,7 @@ import { ITopBarIconContainer } from '@churaverse/core-ui-plugin-client/interfac
 import { TopBarIconRenderer } from '@churaverse/core-ui-plugin-client/topBarIcon'
 import { ToggleMegaphoneEvent } from '../../event/toggleMegaphoneEvent'
 
-export const MEGAPHONE_ICON_PATH = '../../assets/megaphone.png'
+export const MEGAPHONE_ICON_PATH = new URL('../../assets/megaphone.png', import.meta.url).href
 
 export class MegaphoneIcon extends TopBarIconRenderer {
   public constructor(

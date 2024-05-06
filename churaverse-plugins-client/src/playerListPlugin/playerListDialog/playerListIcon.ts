@@ -4,7 +4,7 @@ import { ITopBarIconContainer } from '@churaverse/core-ui-plugin-client/interfac
 import { TopBarIconRenderer } from '@churaverse/core-ui-plugin-client/topBarIcon'
 import { IPlayerListDialog } from '../interface/IPlayerListDialog'
 
-const PLAYER_LIST_ICON_PATH = 'src/game/plugins/playerListPlugin/assets/people.png'
+const PLAYER_LIST_ICON_PATH = new URL('../assets/people.png', import.meta.url).href
 
 export class PlayerListIcon extends TopBarIconRenderer implements ITopBarIconRenderer {
   public constructor(
