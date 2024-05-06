@@ -1,5 +1,5 @@
-import { BaseDebugDetailScreen } from '../../debugScreenPlugin/core/baseDebugDetailScreen'
-import { DebugDetailScreenContainer } from '../../debugScreenPlugin/debugScreen/debugDetailScreenContainer'
+import { BaseDebugDetailScreen } from '@churaverse/debug-screen-plugin-client/core/baseDebugDetailScreen'
+import { DebugDetailScreenContainer } from '@churaverse/debug-screen-plugin-client/debugScreen/debugDetailScreenContainer'
 import { IBombCountDebugDetailScreen } from './IDebugScreen/IBombCountDebugDetailScreen'
 
 export class BombCountDebugDetailScreen extends BaseDebugDetailScreen implements IBombCountDebugDetailScreen {

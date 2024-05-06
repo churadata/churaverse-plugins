@@ -18,14 +18,14 @@ import { KeyFactory } from './keyFactory'
 import { KeyStateGetter } from './keyStateGetter'
 import { setupKeyboardUi } from './ui/setupKeyboardUi'
 import { IKeyboardSetupInfoWriter } from './interface/keySettingSave/IKeyboardSetupInfoWriter'
-import { CookieStore } from '../dataPersistencePlugin/cookieStore'
+import { CookieStore } from '@churaverse/data-persistence-plugin-client/cookieStore'
 import { KeyboardSetupInfoWriter } from './keySettingSave/keyboardSetupInfoWriter'
 import { KeyboardSetupInfoReader } from './keySettingSave/keyboardSettingInfoReader'
 import { CanSettingKeyActType } from './ui/keyboardSetting/canSettingKeyActionType'
 import { KeyCode } from './types/keyCode'
-import { ActivateUiEvent } from '../coreUiPlugin/event/activateUiEvent'
-import { DeactivateUiEvent } from '../coreUiPlugin/event/deactivateUiEvent'
-import { WillSceneTransitionEvent } from '../transitionPlugin/event/willSceneTransitionEvent'
+import { ActivateUiEvent } from '@churaverse/core-ui-plugin-client/event/activateUiEvent'
+import { DeactivateUiEvent } from '@churaverse/core-ui-plugin-client/event/deactivateUiEvent'
+import { WillSceneTransitionEvent } from '@churaverse/transition-plugin-client/event/willSceneTransitionEvent'
 
 export class KeyboardPlugin extends BasePlugin<Scenes> {
   private scene?: Scene

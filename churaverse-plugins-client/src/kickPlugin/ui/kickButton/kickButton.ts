@@ -1,9 +1,9 @@
 import { IEventBus, DomManager, IMainScene } from 'churaverse-engine-client'
-import { Player } from '../../../playerPlugin/domain/player'
+import { Player } from '@churaverse/player-plugin-client/domain/player'
 import { RequestKickPlayerEvent } from '../../event/requestKickPlayerEvent'
 import { KickButtonComponent } from './components/KickButtonComponent'
 
-const KICK_ICON_PATH = 'src/game/plugins/coreUiPlugin/assets/exit.png'
+const KICK_ICON_PATH = './component/exit.png'
 
 export class KickButton {
   public readonly node: HTMLButtonElement

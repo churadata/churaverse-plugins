@@ -1,1 +1,1 @@
-export { AutoKeyBoardPlugin } from './autoKeyboardPlugin'
+export * from './autoKeyboardPlugin'

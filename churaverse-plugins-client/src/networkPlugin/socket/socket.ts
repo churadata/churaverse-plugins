@@ -34,6 +34,7 @@ export class Socket<Scene extends Scenes> {
     })
 
     Socket.instance = new Socket(ioSocket)
+    console.log('Socket.instance', Socket.instance)
     return Socket.instance
   }
 

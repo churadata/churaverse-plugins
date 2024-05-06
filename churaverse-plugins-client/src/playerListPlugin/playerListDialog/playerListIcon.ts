@@ -1,7 +1,7 @@
-import { ITopBarIconRenderer } from '../../coreUiPlugin/interface/IDialogIconRenderer'
-import { IDialogSwitcher } from '../../coreUiPlugin/interface/IDialogSwitcher'
-import { ITopBarIconContainer } from '../../coreUiPlugin/interface/ITopBarIconContainer'
-import { TopBarIconRenderer } from '../../coreUiPlugin/topBarIcon'
+import { ITopBarIconRenderer } from '@churaverse/core-ui-plugin-client/interface/IDialogIconRenderer'
+import { IDialogSwitcher } from '@churaverse/core-ui-plugin-client/interface/IDialogSwitcher'
+import { ITopBarIconContainer } from '@churaverse/core-ui-plugin-client/interface/ITopBarIconContainer'
+import { TopBarIconRenderer } from '@churaverse/core-ui-plugin-client/topBarIcon'
 import { IPlayerListDialog } from '../interface/IPlayerListDialog'
 
 const PLAYER_LIST_ICON_PATH = 'src/game/plugins/playerListPlugin/assets/people.png'

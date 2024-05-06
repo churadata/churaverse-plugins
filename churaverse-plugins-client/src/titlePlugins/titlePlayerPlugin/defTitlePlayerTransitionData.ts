@@ -1,6 +1,6 @@
-import { Player } from '../../playerPlugin/domain/player'
+import { Player } from '@churaverse/player-plugin-client/domain/player'
 
-declare module '../../transitionPlugin/sceneTransitionData/defSceneTransitionData' {
+declare module '@churaverse/transition-plugin-client/sceneTransitionData/defSceneTransitionData' {
   export interface TitleToMainData {
     ownPlayer: Player
   }

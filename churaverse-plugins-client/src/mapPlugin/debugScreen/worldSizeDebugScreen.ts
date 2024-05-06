@@ -1,7 +1,8 @@
-import { BaseDebugSummaryScreen } from '../../debugScreenPlugin/core/baseDebugSummaryScreen'
-import { DebugSummaryScreenContainer } from '../../debugScreenPlugin/debugScreen/debugSummaryScreenContainer'
+import { BaseDebugSummaryScreen } from '@churaverse/debug-screen-plugin-client/core/baseDebugSummaryScreen'
+import { DebugSummaryScreenContainer } from '@churaverse/debug-screen-plugin-client/debugScreen/debugSummaryScreenContainer'
 import { WorldMap } from '../domain/worldMap'
 import { IWorldSizeDebugScreen } from './IDebugScreen/IMapInfoDebugScreen'
+import './defMapInfo'
 
 export class WorldSizeDebugScreen extends BaseDebugSummaryScreen implements IWorldSizeDebugScreen {
   public constructor(debugSummaryScreenContainer: DebugSummaryScreenContainer) {

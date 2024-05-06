@@ -2,7 +2,7 @@ import { Device } from '../../domain/localDevice/device'
 import { IBaseLocalDeviceManager } from '../../interface/ILocalDeviceManager/IBaseLocalDeviceManager'
 import { DomManager, IEventBus, IMainScene, JSXFunc } from 'churaverse-engine-client'
 import { SwitchLocalDeviceEvent } from '../../event/switchLocalDeviceEvent'
-import { ISettingDialog } from '../../../coreUiPlugin/interface/ISettingDialog'
+import { ISettingDialog } from '@churaverse/core-ui-plugin-client/interface/ISettingDialog'
 
 export class DeviceSelector<DeviceType extends Device> {
   private readonly selectTag: HTMLSelectElement

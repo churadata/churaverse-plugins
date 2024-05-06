@@ -1,12 +1,12 @@
 import { DebugSummaryScreenSection } from '../debugSummaryScreenSection'
 
-declare module '../../../debugScreenPlugin/debugScreen/IDebugScreenContainer/IDebugSummaryScreenContainer' {
+declare module '../IDebugScreenContainer/IDebugSummaryScreenContainer' {
   export interface DebugScreenSettingSectionMap {
     worldInfo: DebugSummaryScreenSection
   }
 }
 
-declare module '../../../debugScreenPlugin/debugScreen/dataDumper' {
+declare module '../dataDumper' {
   interface DumpDataMap {
     fps: string
     frontendVersion: string

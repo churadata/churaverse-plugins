@@ -16,16 +16,18 @@ import {
   WeaponDamageCause,
   DamageCauseType,
   vectorToName,
+  Vector,
 } from 'churaverse-engine-client'
 import { PlayerSetupInfoWriter } from './interface/playerSetupInfoWriter'
-import { CookieStore } from '../dataPersistencePlugin/cookieStore'
-import { CoreUiPluginStore } from '../coreUiPlugin/store/defCoreUiPluginStore'
-import { DebugSummaryScreenSection } from '../debugScreenPlugin/debugScreen/debugSummaryScreenSection'
-import { DumpDebugDataEvent } from '../debugScreenPlugin/event/dumpDebugDataEvent'
-import { DebugScreenPluginStore } from '../debugScreenPlugin/store/defDebugScreenPluginStore'
-import { MapPluginStore } from '../mapPlugin/store/defMapPluginStore'
-import { NetworkPluginStore } from '../networkPlugin/store/defNetworkPluginStore'
-import { TransitionPluginStore } from '../transitionPlugin/store/defTransitionPluginStore'
+import { CookieStore } from '@churaverse/data-persistence-plugin-client/cookieStore'
+import { CoreUiPluginStore } from '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
+import { DebugSummaryScreenSection } from '@churaverse/debug-screen-plugin-client/debugScreen/debugSummaryScreenSection'
+import { DumpDebugDataEvent } from '@churaverse/debug-screen-plugin-client/event/dumpDebugDataEvent'
+import { DebugScreenPluginStore } from '@churaverse/debug-screen-plugin-client/store/defDebugScreenPluginStore'
+import { MapPluginStore } from '@churaverse/map-plugin-client/store/defMapPluginStore'
+import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
+import { TransitionPluginStore } from '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
+import { WillSceneTransitionEvent } from '@churaverse/transition-plugin-client/event/willSceneTransitionEvent'
 import { KeyboardController } from './controller/keyboardController'
 import { SocketController } from './controller/socketController'
 import {
@@ -67,6 +69,7 @@ import { DeathLog } from './ui/deathLog/deathLog'
 import { DeathLogRepository } from './ui/deathLog/deathLogRepository'
 import { JoinLeaveLogRenderer } from './ui/joinLeaveLogRenderer/joinLeaveLogRenderer'
 import { setupPlayerUi } from './ui/setupPlayerUi'
+import { Sendable } from '@churaverse/network-plugin-client/types/sendable' 
 
 export class PlayerPlugin extends BasePlugin<IMainScene> {
   private rendererFactory?: PlayerRendererFactory
@@ -151,10 +154,10 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
 
   private createOwnPlayer(): void {
     const player = this.transitionPluginStore.transitionManager.getReceivedData<ITitleScene>().ownPlayer
-
+    console.log({player: player})
     const data: PlayerJoinData = {
       hp: player.hp,
-      position: player.position.toVector(),
+      position: player.position.toVector() as Vector & Sendable,
       direction: player.direction,
       playerId: player.id,
       heroColor: player.color,
@@ -165,7 +168,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
 
     this.networkStore.messageSender.send(new PlayerJoinMessage(data))
     this.bus.post(new EntitySpawnEvent(player))
-
+    console.log(player.id)
     const renderer = this.playerPluginStore.playerRenderers.get(player.id)
     if (renderer === undefined) throw Error('ownPlayerRenderer is undefined')
     this.uiStore.focusTargetRepository.addFocusTarget(renderer)
@@ -206,9 +209,19 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
   }
 
   private onPlayerJoin(ev: EntitySpawnEvent): void {
-    if (!(ev.entity instanceof Player)) return
-    const player = ev.entity
-    this.playerPluginStore.players.set(player.id, player)
+    console.log("onPlayerJoin",ev.entity, ev.entity instanceof Player, typeof ev.entity, ev.entity.constructor.name)
+    // if (!(ev.entity instanceof Player)) {
+    // プラグインをまたぐ関係か型が来ないので無理やり補正
+    if (!(ev.entity.constructor.name === 'Player')) {
+      return
+    }
+    const player = ev.entity as Player
+    console.log({
+      netStore: this.networkStore.socketId,
+      player_id : player.id,
+    })
+    this.playerPluginStore.players.set(player.id !== '' ? player.id : this.networkStore.socketId, player)
+    console.log("onPlayerJoin",player)
 
     const ownPlayerSpawnTime = this.playerPluginStore.players.get(this.playerPluginStore.ownPlayerId)?.spawnTime ?? 0
     if (ownPlayerSpawnTime < player.spawnTime) {
@@ -292,7 +305,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     if (this.playerPluginStore.ownPlayerId === ev.id) {
       // 移動開始時の座標をemitする必要がある
       this.networkStore.messageSender.send(
-        new PlayerWalkMessage({ startPos: startPos.toVector(), direction: ev.direction, speed })
+        new PlayerWalkMessage({ startPos: startPos.toVector() as Vector & Sendable, direction: ev.direction, speed })
       )
     }
 
@@ -312,7 +325,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
           player.stop()
           if (this.playerPluginStore.ownPlayerId === ev.id) {
             this.networkStore.messageSender.send(
-              new PlayerStopMessage({ stopPos: player.position.toVector(), direction: player.direction })
+              new PlayerStopMessage({ stopPos: player.position.toVector() as Vector & Sendable, direction: player.direction })
             )
           }
         }

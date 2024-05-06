@@ -1,5 +1,5 @@
-import { BaseDebugSummaryScreen } from '../../debugScreenPlugin/core/baseDebugSummaryScreen'
-import { DebugSummaryScreenContainer } from '../../debugScreenPlugin/debugScreen/debugSummaryScreenContainer'
+import { BaseDebugSummaryScreen } from '@churaverse/debug-screen-plugin-client/core/baseDebugSummaryScreen'
+import { DebugSummaryScreenContainer } from '@churaverse/debug-screen-plugin-client/debugScreen/debugSummaryScreenContainer'
 import { PlayerRole } from '../types/playerRole'
 import { IPlayerRoleDebugScreen } from './IDebugScreen/IPlayerInfoDebugScreen'
 

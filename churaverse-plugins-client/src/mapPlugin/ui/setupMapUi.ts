@@ -1,7 +1,8 @@
 import { Store, IMainScene, IEventBus } from 'churaverse-engine-client'
-import { AdminSettingSection } from '../../coreUiPlugin/adminSettingDialog/adminSettingSection'
+import { AdminSettingSection } from '@churaverse/core-ui-plugin-client/adminSettingDialog/adminSettingSection'
 import { MapManager } from '../mapManager'
 import { MapSelector } from './mapSelector/mapSelector'
+import '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
 
 export function setupMapUi(
   store: Store<IMainScene>,

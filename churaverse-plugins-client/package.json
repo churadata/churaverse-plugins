@@ -36,7 +36,7 @@
     "vite-plugin-dts": "^3.7.2",
     "@vitejs/plugin-react": "^4.2.0"
   },
-  "main": "./dist/index.umd.cjs",
+  "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
   "author": "",
@@ -47,7 +47,7 @@
   ],
   "exports": {
     ".": {
-      "require": "./dist/index.umd.cjs",
+      "require": "./dist/index.js",
       "import": "./dist/index.js"
     }
   },

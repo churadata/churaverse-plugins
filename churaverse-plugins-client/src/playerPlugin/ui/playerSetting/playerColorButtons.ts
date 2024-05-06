@@ -1,7 +1,7 @@
 import { IEventBus, IMainScene, DomManager } from 'churaverse-engine-client'
 import { PLAYER_COLOR_NAMES, PlayerColor } from '../../types/playerColor'
 import { PlayerColorButtonsComponent } from './components/PlayerColorButtonsComponent'
-import { ISettingDialog } from '../../../coreUiPlugin/interface/ISettingDialog'
+import { ISettingDialog } from '@churaverse/core-ui-plugin-client/interface/ISettingDialog'
 import { PlayerColorChangeEvent } from '../../event/playerColorChangeEvent'
 
 export const PLAYER_COLOR_BUTTON_ID: (colorName: PlayerColor) => string = (colorName) => {

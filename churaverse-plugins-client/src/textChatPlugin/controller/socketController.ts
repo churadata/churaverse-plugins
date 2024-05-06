@@ -1,11 +1,12 @@
 import { IMainScene, IEventBus, Store } from 'churaverse-engine-client'
-import { RegisterMessageEvent } from '../../networkPlugin/event/registerMessageEvent'
-import { RegisterMessageListenerEvent } from '../../networkPlugin/event/registerMessageListenerEvent'
-import { BaseSocketController } from '../../networkPlugin/interface/baseSocketController'
+import { RegisterMessageEvent } from '@churaverse/network-plugin-client/event/registerMessageEvent'
+import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-client/event/registerMessageListenerEvent'
+import { BaseSocketController } from '@churaverse/network-plugin-client/interface/baseSocketController'
 import { TextChat } from '../model/textChat'
 import { AddTextChatEvent } from '../event/addTextChatEvent'
 import { SendTextChatMessage } from '../message/sendTextChatMessage'
-import { OwnPlayerUndefinedError } from '../../playerPlugin/errors/ownPlayerUndefinedError'
+import { OwnPlayerUndefinedError } from '@churaverse/player-plugin-client/errors/ownPlayerUndefinedError'
+import '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   public constructor(eventBus: IEventBus<IMainScene>, store: Store<IMainScene>) {

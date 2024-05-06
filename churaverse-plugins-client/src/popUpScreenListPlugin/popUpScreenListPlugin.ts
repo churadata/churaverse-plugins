@@ -1,6 +1,6 @@
 import { Scene } from 'phaser'
 import { IMainScene, BasePlugin, PhaserSceneInit } from 'churaverse-engine-client'
-import { WebRtcPluginStore } from '../webRtcPlugin/store/defWebRtcPluginStore'
+import { WebRtcPluginStore } from '@churaverse/web-rtc-plugin-client/store/defWebRtcPluginStore'
 import { initVideoStore } from './store/initVideoStore'
 import { PopUpScreenList } from './ui/popUpScreenList'
 

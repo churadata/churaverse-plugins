@@ -1,5 +1,5 @@
-import { SendableObject } from '../../networkPlugin/types/sendable'
-import { BaseMessage } from '../../networkPlugin/message/baseMessage'
+import { SendableObject } from '@churaverse/network-plugin-client/types/sendable'
+import { BaseMessage } from '@churaverse/network-plugin-client/message/baseMessage'
 import { IMainScene, Direction } from 'churaverse-engine-client'
 
 export interface PlayerTurnData extends SendableObject {
@@ -12,7 +12,7 @@ export class PlayerTurnMessage extends BaseMessage<IMainScene> {
   }
 }
 
-declare module '../../networkPlugin/message/messages' {
+declare module '@churaverse/network-plugin-client/message/messages' {
   export interface MainMessageMap {
     playerTurn: PlayerTurnMessage
   }

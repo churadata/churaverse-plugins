@@ -1,6 +1,6 @@
-import { IPersistStore } from '../../dataPersistencePlugin/interface/IPersistStore'
-import { PlayerColor } from '..//types/playerColor'
-import { PlayerRole } from '..//types/playerRole'
+import { IPersistStore } from '@churaverse/data-persistence-plugin-client/interface/IPersistStore'
+import { PlayerColor } from '../types/playerColor'
+import { PlayerRole } from '../types/playerRole'
 import { PLAYER_SETUP_PROPERTY } from './playerSetupInfo'
 // クッキーにプレイヤー情報を保存するクラス
 export class PlayerSetupInfoWriter {

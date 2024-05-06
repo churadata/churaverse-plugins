@@ -1,6 +1,6 @@
 import { Scene } from 'phaser'
 import { StartEvent, IMainScene, BasePlugin, PhaserSceneInit } from 'churaverse-engine-client'
-import { WebRtcPluginStore } from '../webRtcPlugin/store/defWebRtcPluginStore'
+import { WebRtcPluginStore } from '@churaverse/web-rtc-plugin-client/store/defWebRtcPluginStore'
 import { CameraVideoSender } from './cameraVideoSender'
 import { VideoChatUI } from './ui/videoChatUi'
 import { TriggerVideoSendingEvent } from './event/event'
@@ -9,12 +9,12 @@ import {
   IWebCameraIdDebugDetailScreen,
   IWebCameraMyStatusDebugDetailScreen,
 } from './debugScreen/IDebugScreen/IWebCameraInfoDebugScreen'
-import { DebugScreenPluginStore } from '../debugScreenPlugin/store/defDebugScreenPluginStore'
-import { DebugDetailScreenSection } from '../debugScreenPlugin/debugScreen/debugDetailScreenSection'
+import { DebugScreenPluginStore } from '@churaverse/debug-screen-plugin-client/store/defDebugScreenPluginStore'
+import { DebugDetailScreenSection } from '@churaverse/debug-screen-plugin-client/debugScreen/debugDetailScreenSection'
 import { WebCameraIdDebugDetailScreen } from './debugScreen/webCameraIdDebugDetailScreen'
 import { WebCameraMyStatusDebugDetailScreen } from './debugScreen/webCameraMyStatusDebugDetailScreen'
-import { PlayerPluginStore } from '../playerPlugin/store/defPlayerPluginStore'
-import { DumpDebugDataEvent } from '../debugScreenPlugin/event/dumpDebugDataEvent'
+import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
+import { DumpDebugDataEvent } from '@churaverse/debug-screen-plugin-client/event/dumpDebugDataEvent'
 
 export class CameraVideoChatPlugin extends BasePlugin<IMainScene> {
   private scene?: Scene

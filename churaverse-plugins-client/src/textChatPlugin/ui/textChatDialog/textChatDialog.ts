@@ -1,6 +1,6 @@
-import { Dialog } from '../../../coreUiPlugin/dialog/dialog'
+import { Dialog } from '@churaverse/core-ui-plugin-client/dialog/dialog'
 import { TextChatSection } from './textChatSection'
-import { Props } from '../../../coreUiPlugin/dialog/components/Panel'
+import { Props } from '@churaverse/core-ui-plugin-client/dialog/components/Panel'
 import { ITextChatDialog } from '../interface/ITextChatDialog'
 
 /**

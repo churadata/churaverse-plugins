@@ -1,5 +1,5 @@
-import { MapSelectorComponent } from '../../../../playerPlugin/ui/playerSetting/components/MapSelectorComponent'
-import dialogStyle from '../../../../coreUiPlugin/dialog/style.module.scss'
+import { MapSelectorComponent } from '@churaverse/player-plugin-client/ui/playerSetting/components/MapSelectorComponent'
+import dialogStyle from '@churaverse/core-ui-plugin-client/dialog/style.module.scss'
 import style from './MapChangeFormComponent.module.scss'
 import { MAP_CHANGE_FORM_ID, MAP_NAME_LIST_ID } from '../mapSelector'
 import { JSXFunc } from 'churaverse-engine-client'

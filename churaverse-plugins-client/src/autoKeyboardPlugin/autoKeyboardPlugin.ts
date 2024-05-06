@@ -1,7 +1,7 @@
 import { Scene } from 'phaser'
 import { BasePlugin, PhaserSceneInit, SceneUndefinedError, Scenes } from 'churaverse-engine-client'
 import { AutoKeyFactory } from './autoKeyFactory'
-import { KeyboardPluginStore } from '../keyboardPlugin/store/defKeyboardPluginStore'
+import { KeyboardPluginStore } from '@churaverse/keyboard-plugin-client/store/defKeyboardPluginStore'
 
 export class AutoKeyBoardPlugin extends BasePlugin<Scenes> {
   private scene?: Scene

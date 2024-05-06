@@ -6,6 +6,8 @@ import {
   IWebCameraIdDebugDetailScreen,
   IWebCameraMyStatusDebugDetailScreen,
 } from './debugScreen/IDebugScreen/IWebCameraInfoDebugScreen'
+import '@churaverse/popup-screen-list-plugin-client'
+import { TrackPublishOptions } from 'livekit-client/dist/src/room/track/options'
 
 export class CameraVideoSender implements IVideoSender {
   public constructor(
@@ -65,7 +67,11 @@ export class CameraVideoSender implements IVideoSender {
         frameRate: 30,
       },
     }
-    await this.room.localParticipant.setCameraEnabled(true, videoCaptureOptions)
+    const publishOptions : TrackPublishOptions = {
+      videoCodec: 'vp8',
+    }
+
+    await this.room.localParticipant.setCameraEnabled(true, videoCaptureOptions, publishOptions)
     return this.room.localParticipant.isCameraEnabled
   }
 

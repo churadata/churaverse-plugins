@@ -1,4 +1,4 @@
-import { IPersistStore } from '../../dataPersistencePlugin/interface/IPersistStore'
+import { IPersistStore } from '@churaverse/data-persistence-plugin-client/interface/IPersistStore'
 import { IKeyboardSetupInfoReader } from '../interface/keySettingSave/IKeyboardSetupInfoReader'
 import { KEYBOARD_SETTING_PROPERTY, KeyboardSetupInfo } from '../interface/keySettingSave/keyboardSetupInfo'
 import { KeyCode } from '../types/keyCode'

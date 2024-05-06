@@ -3,7 +3,7 @@ import { GameObjects, Scene } from 'phaser'
 import churaDataLogoImage from '../assets/churaDataLogo.png'
 import { TitlePlayerRoleChangeEvent } from '../event/titlePlayerRoleChangeEvent'
 import { TitlePlayerPluginStore } from '../../titlePlayerPlugin/store/defTitlePlayerPlugin'
-import { KeyboardPluginStore } from '../../../keyboardPlugin/store/defKeyboardPluginStore'
+import { KeyboardPluginStore } from '@churaverse/keyboard-plugin-client/store/defKeyboardPluginStore'
 
 const CHURADATA_LOGO_IMAGE_KEY = 'churaData-logo-image'
 

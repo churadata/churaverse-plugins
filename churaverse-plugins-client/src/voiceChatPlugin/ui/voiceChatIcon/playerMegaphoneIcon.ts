@@ -1,6 +1,6 @@
 import { Scene } from 'phaser'
 import { MEGAPHONE_ICON_PATH } from './megaphoneIcon'
-import { IPlayerRenderer } from '../../../playerPlugin/domain/IPlayerRenderer'
+import { IPlayerRenderer } from '@churaverse/player-plugin-client/domain/IPlayerRenderer'
 
 const MEGAPHONE_ACTIVE_TEXTURE_NAME = 'player_megaphone_active'
 

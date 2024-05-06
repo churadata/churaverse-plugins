@@ -1,6 +1,6 @@
 import { Position } from 'churaverse-engine-client'
-import { BaseDebugSummaryScreen } from '../../debugScreenPlugin/core/baseDebugSummaryScreen'
-import { DebugSummaryScreenContainer } from '../../debugScreenPlugin/debugScreen/debugSummaryScreenContainer'
+import { BaseDebugSummaryScreen } from '@churaverse/debug-screen-plugin-client/core/baseDebugSummaryScreen'
+import { DebugSummaryScreenContainer } from '@churaverse/debug-screen-plugin-client/debugScreen/debugSummaryScreenContainer'
 import { IPlayerPositionDebugScreen } from './IDebugScreen/IPlayerInfoDebugScreen'
 
 export class PlayerPositionDebugScreen extends BaseDebugSummaryScreen implements IPlayerPositionDebugScreen {

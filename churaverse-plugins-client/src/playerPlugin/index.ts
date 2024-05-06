@@ -1,1 +1,1 @@
-export { PlayerPlugin } from './playerPlugin'
+export * from './playerPlugin'

@@ -1,6 +1,6 @@
 import { GameObjects, Scene } from 'phaser'
-import { MIC_ACTIVE_ICON_PATH, MIC_INACTIVE_ICON_PATH } from '../../voiceChatPlugin/ui/voiceChatIcon/micIcon'
-import { MEGAPHONE_ICON_PATH } from '../../voiceChatPlugin/ui/voiceChatIcon/megaphoneIcon'
+import { MIC_ACTIVE_ICON_PATH, MIC_INACTIVE_ICON_PATH } from '@churaverse/voice-chat-plugin-client/ui/voiceChatIcon/micIcon'
+import { MEGAPHONE_ICON_PATH } from '@churaverse/voice-chat-plugin-client/ui/voiceChatIcon/megaphoneIcon'
 
 const PLAYER_MIC_TEXTURE_NAME = 'player_mic_icon'
 

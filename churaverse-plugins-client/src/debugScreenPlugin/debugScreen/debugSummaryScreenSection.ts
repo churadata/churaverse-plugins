@@ -1,4 +1,4 @@
-import { Section } from '../../coreUiPlugin/dialog/section'
+import { Section } from '@churaverse/core-ui-plugin-client/dialog/section'
 import { DebugScreenSectionId } from './IDebugScreenContainer/IDebugSummaryScreenContainer'
 import { PRIMARY_COLOR } from './debugSummaryScreenContainer'
 

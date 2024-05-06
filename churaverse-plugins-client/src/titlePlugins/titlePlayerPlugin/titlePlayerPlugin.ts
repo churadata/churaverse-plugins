@@ -10,25 +10,25 @@ import {
   Scenes,
   IMainScene,
 } from 'churaverse-engine-client'
-import { NetworkPluginStore } from '../../networkPlugin/store/defNetworkPluginStore'
-import { PlayerSetupInfoReader } from '../../playerPlugin/interface/playerSetupInfoReader'
-import { CookieStore } from '../../dataPersistencePlugin/cookieStore'
-import { PlayerRenderer } from '../../playerPlugin/renderer/playerRenderer'
-import { Player, DEFAULT_HP } from '../../playerPlugin/domain/player'
-import { PLAYER_COLOR_NAMES } from '../../playerPlugin/types/playerColor'
+import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
+import { PlayerSetupInfoReader } from '@churaverse/player-plugin-client/interface/playerSetupInfoReader'
+import { CookieStore } from '@churaverse/data-persistence-plugin-client/cookieStore'
+import { PlayerRenderer } from '@churaverse/player-plugin-client/renderer/playerRenderer'
+import { Player, DEFAULT_HP } from '@churaverse/player-plugin-client/domain/player'
+import { PLAYER_COLOR_NAMES } from '@churaverse/player-plugin-client/types/playerColor'
 import { TitlePlayerNameChangeEvent } from './event/titlePlayerNameChangeEvent'
 import { initTitlePlayerPluginStore } from './store/initTitlePlayerPlugin'
 import { TitlePlayerPluginStore } from './store/defTitlePlayerPlugin'
 import { setupTitlePlayerUi } from './ui/setupTitlePlayerUi'
 import { Scene } from 'phaser'
 import { TitlePlayerColorChangeEvent } from './event/titlePlayerColorChangeEvent'
-import { PlayerRendererFactory } from '../../playerPlugin/renderer/playerRendererFactory'
-import { IPlayerRenderer } from '../../playerPlugin/domain/IPlayerRenderer'
+import { PlayerRendererFactory } from '@churaverse/player-plugin-client/renderer/playerRendererFactory'
+import { IPlayerRenderer } from '@churaverse/player-plugin-client/domain/IPlayerRenderer'
 import { TitleNameFieldRenderer } from './ui/renderer/titleNameFieldRenderer'
 import { TitleArrowButtonRenderer } from './ui/renderer/titleArrowButtonRenderer'
 import { TitlePlayerRoleRenderer } from './ui/renderer/titlePlayerRoleRenderer'
-import { WillSceneTransitionEvent } from '../../transitionPlugin/event/willSceneTransitionEvent'
-import { Socket } from '../../networkPlugin/socket/socket'
+import { WillSceneTransitionEvent } from '@churaverse/transition-plugin-client/event/willSceneTransitionEvent'
+import { Socket } from '@churaverse/network-plugin-client/socket/socket'
 
 export class TitlePlayerPlugin extends BasePlugin<ITitleScene> {
   private scene!: Scene
@@ -81,6 +81,7 @@ export class TitlePlayerPlugin extends BasePlugin<ITitleScene> {
   private createOwnPlayer(): Player {
     const pos = new Position(800, 440)
     const direction = Direction.down
+    console.log({socketId: this.networkStore.socketId})
     const ownPlayer = new Player(
       this.networkStore.socketId,
       pos,

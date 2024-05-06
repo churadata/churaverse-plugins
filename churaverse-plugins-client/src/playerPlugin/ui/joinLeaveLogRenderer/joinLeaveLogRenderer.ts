@@ -1,4 +1,4 @@
-import { FadeOutLogRenderer } from '../../../coreUiPlugin/fadeOutLog/fadeOutLogRenderer'
+import { FadeOutLogRenderer } from '@churaverse/core-ui-plugin-client/fadeOutLog/fadeOutLogRenderer'
 import { IJoinLeaveLogRenderer } from '../../interface/IJoinLeaveLogRenderer'
 
 /**

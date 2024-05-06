@@ -1,8 +1,8 @@
 import { IChatBoardRenderer } from './IChatBoardRenderer'
 import { ITextChatDialog } from './ITextChatDialog'
 import { IChatInputRenderer } from '../textChatInput/IChatInputRenderer'
-import { ITopBarIconRenderer } from '../../../coreUiPlugin/interface/IDialogIconRenderer'
-import { IBadgeHolder } from '../../../coreUiPlugin/interface/ITopBarIconHasBadge'
+import { ITopBarIconRenderer } from '@churaverse/core-ui-plugin-client/interface/IDialogIconRenderer'
+import { IBadgeHolder } from '@churaverse/core-ui-plugin-client/interface/ITopBarIconHasBadge'
 
 export interface ITextChatUi {
   textChatDialog: ITextChatDialog

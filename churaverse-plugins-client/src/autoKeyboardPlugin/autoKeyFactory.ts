@@ -2,9 +2,9 @@ import { Scene } from 'phaser'
 import { KeyCodeRotator } from './keyCodeRotator'
 import { AutoModeControlButton } from './autoModeControlButton'
 import { AutoControlledKey } from './autoControlledKey'
-import { IKeyFactory } from '../keyboardPlugin/interface/IKeyFactory'
-import { KeyCode } from '../keyboardPlugin/types/keyCode'
-import { IKey } from '../keyboardPlugin/interface/IKey'
+import { IKeyFactory } from '@churaverse/keyboard-plugin-client/interface/IKeyFactory'
+import { KeyCode } from '@churaverse/keyboard-plugin-client/types/keyCode'
+import { IKey } from '@churaverse/keyboard-plugin-client/interface/IKey'
 
 /**
  * テストの際はKeyboardHelperクラス内でKeyFactoryの代わりにAutoKeyFactoryクラスのインスタンスを用いる

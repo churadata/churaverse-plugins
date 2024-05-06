@@ -1,4 +1,4 @@
-import { ITopBarIconRenderer } from '../../coreUiPlugin/interface/IDialogIconRenderer'
+import { ITopBarIconRenderer } from '@churaverse/core-ui-plugin-client/interface/IDialogIconRenderer'
 import { IPlayerListRenderer } from './IPlayerListRenderer'
 import { IPlayerListDialog } from './IPlayerListDialog'
 

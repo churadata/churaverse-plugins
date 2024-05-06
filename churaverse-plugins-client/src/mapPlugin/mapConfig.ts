@@ -1,5 +1,6 @@
 import { GRID_SIZE } from 'churaverse-engine-client'
 import { IMapConfig } from './interface/IMapConfig'
+import '@churaverse/ground-screen-plugin-client/addDefMapConfig'
 
 export const mapConfig: IMapConfig = {
   maps: {

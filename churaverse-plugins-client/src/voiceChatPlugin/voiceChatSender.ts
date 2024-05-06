@@ -11,7 +11,7 @@ import { IVoiceChatSender } from './domain/IVoiceChatSender'
 import { IEventBus, IMainScene, Store } from 'churaverse-engine-client'
 import { UnmuteEvent } from './event/unmuteEvent'
 import { MuteEvent } from './event/muteEvent'
-import { NetworkPluginStore } from '../networkPlugin/store/defNetworkPluginStore'
+import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { ToggleMicMessage } from './message/toggleMicMessage'
 import { VoiceChatPluginStore } from './store/defVoiceChatPluginStore'
 

@@ -1,6 +1,6 @@
 import { JSXFunc } from 'churaverse-engine-client'
 import { SEND_BUTTON_ID, TEXT_FIELD_ID } from '../renameForm'
-import dialogStyle from '../../../../coreUiPlugin/settingDialog/style.module.scss'
+import dialogStyle from '@churaverse/core-ui-plugin-client/settingDialog/style.module.scss'
 import style from './RenameComponent.module.scss'
 
 interface Props {

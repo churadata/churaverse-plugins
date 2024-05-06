@@ -1,12 +1,12 @@
 import { PlayerColor } from '../types/playerColor'
 import { PlayerRole } from '../types/playerRole'
 import { Direction, Vector, IMainScene } from 'churaverse-engine-client'
-import { BaseMessage } from '../../networkPlugin/message/baseMessage'
-import { SendableObject } from '../../networkPlugin/types/sendable'
+import { BaseMessage } from '@churaverse/network-plugin-client/message/baseMessage'
+import { Sendable, SendableObject } from '@churaverse/network-plugin-client/types/sendable'
 
 export interface PlayerJoinData extends SendableObject {
   hp: number
-  position: Vector
+  position: Vector & Sendable
   direction: Direction
   playerId: string
   heroColor: PlayerColor
@@ -21,7 +21,7 @@ export class PlayerJoinMessage extends BaseMessage<IMainScene> {
   }
 }
 
-declare module '../../networkPlugin/message/messages' {
+declare module '@churaverse/network-plugin-client/message/messages' {
   export interface MainMessageMap {
     playerJoin: PlayerJoinMessage
   }

@@ -1,6 +1,6 @@
 import { Scene } from 'phaser'
 import { MIC_ACTIVE_ICON_PATH, MIC_INACTIVE_ICON_PATH } from './micIcon'
-import { IPlayerRenderer } from '../../../playerPlugin/domain/IPlayerRenderer'
+import { IPlayerRenderer } from '@churaverse/player-plugin-client/domain/IPlayerRenderer'
 
 const PLAYER_MIC_TEXTURE_NAME = 'player_mic_icon'
 const PLAYER_MIC_INACTIVE_TEXTURE_NAME = 'player_mic_inactive_icon'

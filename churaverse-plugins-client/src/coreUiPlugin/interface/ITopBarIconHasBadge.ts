@@ -1,4 +1,4 @@
-import { IBadge } from '../../textChatPlugin/ui/interface/IBadge'
+import { IBadge } from '@churaverse/text-chat-plugin-client/ui/interface/IBadge'
 
 export interface ITopBarIconHasBadge {
   badge: IBadge

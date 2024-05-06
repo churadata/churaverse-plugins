@@ -1,5 +1,5 @@
-import { SendableObject } from '../../networkPlugin/types/sendable'
-import { BaseMessage } from '../../networkPlugin/message/baseMessage'
+import { SendableObject } from '@churaverse/network-plugin-client/types/sendable'
+import { BaseMessage } from '@churaverse/network-plugin-client/message/baseMessage'
 import { IMainScene } from 'churaverse-engine-client'
 import { PlayerColor } from '../types/playerColor'
 
@@ -13,7 +13,7 @@ export class PlayerColorChangeMessage extends BaseMessage<IMainScene> {
   }
 }
 
-declare module '../../networkPlugin/message/messages' {
+declare module '@churaverse/network-plugin-client/message/messages' {
   export interface MainMessageMap {
     playerColorChange: PlayerColorChangeMessage
   }

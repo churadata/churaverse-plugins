@@ -1,0 +1,1 @@
+export { DataPersistencePlugin } from './dataPersistencePlugin'

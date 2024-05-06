@@ -1,4 +1,4 @@
-import { PlayersRepository } from '../../playerPlugin/repository/playerRepository'
+import { PlayersRepository } from '@churaverse/player-plugin-client/repository/playerRepository'
 
 export interface IVoiceChatVolumeController {
   /**

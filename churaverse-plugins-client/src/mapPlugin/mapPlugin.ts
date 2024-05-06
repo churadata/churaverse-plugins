@@ -1,5 +1,5 @@
 import { BasePlugin, IMainScene, UtilStoreInMain, PhaserSceneInit } from 'churaverse-engine-client'
-import { NetworkPluginStore } from '../networkPlugin/store/defNetworkPluginStore'
+import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { SocketController } from './controller/socketController'
 import { MapManagerUndefinedError } from './error/mapManagerUndefinedError'
 import { ChangeMapEvent } from './event/changeMapEvent'
@@ -12,6 +12,7 @@ import { MapRendererFactory } from './renderer/mapRendererFactory'
 import { initMapPluginStore } from './store/initMapPluginStore'
 import { MapSelector } from './ui/mapSelector/mapSelector'
 import { setupMapUi } from './ui/setupMapUi'
+import '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
 
 export class MapPlugin extends BasePlugin<IMainScene> {
   private mapManager?: MapManager

@@ -1,8 +1,8 @@
 import { IEventBus, IMainScene, Store } from 'churaverse-engine-client'
-import { RegisterMessageEvent } from '../../networkPlugin/event/registerMessageEvent'
-import { RegisterMessageListenerEvent } from '../../networkPlugin/event/registerMessageListenerEvent'
-import { BaseSocketController } from '../../networkPlugin/interface/baseSocketController'
-import { PlayerPluginStore } from '../../playerPlugin/store/defPlayerPluginStore'
+import { RegisterMessageEvent } from '@churaverse/network-plugin-client/event/registerMessageEvent'
+import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-client/event/registerMessageListenerEvent'
+import { BaseSocketController } from '@churaverse/network-plugin-client/interface/baseSocketController'
+import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { RequestKickPlayerEvent } from '../event/requestKickPlayerEvent'
 import { RequestKickPlayerMessage } from '../message/requestKickPlayerMessage'
 

@@ -1,5 +1,6 @@
 import { IEventBus, IMainScene, Store } from 'churaverse-engine-client'
-import { SettingSection } from '../../coreUiPlugin/settingDialog/settingSection'
+import { SettingSection } from '@churaverse/core-ui-plugin-client/settingDialog/settingSection'
+import '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
 import { WebRtcPluginStore } from '../store/defWebRtcPluginStore'
 import { CameraSelector } from './deviceSelector/cameraSelector'
 import { MicSelector } from './deviceSelector/micSelector'

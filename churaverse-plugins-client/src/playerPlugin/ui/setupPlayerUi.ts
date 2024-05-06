@@ -1,9 +1,10 @@
 import { Store, IMainScene, IEventBus, ITitleScene } from 'churaverse-engine-client'
-import { SettingSection } from '../../coreUiPlugin/settingDialog/settingSection'
-import { DeathLogRenderer } from './deathLog/deathLogRenderer'
+import { SettingSection } from '@churaverse/core-ui-plugin-client/settingDialog/settingSection'
 import { JoinLeaveLogRenderer } from './joinLeaveLogRenderer/joinLeaveLogRenderer'
 import { PlayerColorButtons } from './playerSetting/playerColorButtons'
 import { RenameForm } from './playerSetting/renameForm'
+import '@churaverse/keyboard-plugin-client/store/defKeyboardPluginStore'
+import '@churaverse/title-plugin-client/titlePlayerPlugin/defTitlePlayerTransitionData'
 
 export function setupPlayerUi(store: Store<IMainScene>, eventBus: IEventBus<IMainScene>): JoinLeaveLogRenderer {
   const transitionPluginStore = store.of('transitionPlugin')

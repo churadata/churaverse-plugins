@@ -1,7 +1,7 @@
-import { SettingSection } from '../../../coreUiPlugin/settingDialog/settingSection'
+import { SettingSection } from '@churaverse/core-ui-plugin-client/settingDialog/settingSection'
 import { PopupKeySettingWindowButtonComponent } from './components/PopupKeySettingWindowButtonComponent'
 import { DomManager } from 'churaverse-engine-client'
-import { ISettingDialog } from '../../../coreUiPlugin/interface/ISettingDialog'
+import { ISettingDialog } from '@churaverse/core-ui-plugin-client/interface/ISettingDialog'
 import { IKeyboardSettingPopUpWindow } from '../interface/IKeySettingPopUpWindow'
 import { KeyboardPluginStore } from '../../store/defKeyboardPluginStore'
 /**

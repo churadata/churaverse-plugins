@@ -1,4 +1,4 @@
-import { IFocusableRenderer } from '../../coreUiPlugin/interface/IFocusableRenderer'
+import { IFocusableRenderer } from '@churaverse/core-ui-plugin-client/interface/IFocusableRenderer'
 
 /**
  * ワールドの地面に映像を描画する

@@ -1,12 +1,18 @@
-import { DebugDetailScreenSection } from '../../debugScreenPlugin/debugScreen/debugDetailScreenSection'
+import { DebugDetailScreenSection } from '@churaverse/debug-screen-plugin-client/debugScreen/debugDetailScreenSection'
 
-declare module '../../debugScreenPlugin/debugScreen/IDebugScreenContainer/IDebugDetailScreenContainer' {
+declare module '@churaverse/debug-screen-plugin-client/debugScreen/IDebugScreenContainer/IDebugDetailScreenContainer' {
   export interface DebugDetailScreenSettingSectionMap {
     mapInfo: DebugDetailScreenSection
   }
 }
 
-declare module '../../debugScreenPlugin/debugScreen/dataDumper' {
+declare module '@churaverse/debug-screen-plugin-client/debugScreen/IDebugScreenContainer/IDebugSummaryScreenContainer' {
+  export interface DebugScreenSettingSectionMap {
+    worldInfo: DebugDetailScreenSection
+  }
+}
+
+declare module '@churaverse/debug-screen-plugin-client/debugScreen/dataDumper' {
   interface DumpDataMap {
     collisionCount: string
     spawnCount: string

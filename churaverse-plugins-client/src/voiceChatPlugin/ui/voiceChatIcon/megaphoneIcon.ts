@@ -1,6 +1,6 @@
 import { IEventBus,IMainScene } from 'churaverse-engine-client'
-import { ITopBarIconContainer } from '../../../coreUiPlugin/interface/ITopBarIconContainer'
-import { TopBarIconRenderer } from '../../../coreUiPlugin/topBarIcon'
+import { ITopBarIconContainer } from '@churaverse/core-ui-plugin-client/interface/ITopBarIconContainer'
+import { TopBarIconRenderer } from '@churaverse/core-ui-plugin-client/topBarIcon'
 import { ToggleMegaphoneEvent } from '../../event/toggleMegaphoneEvent'
 
 export const MEGAPHONE_ICON_PATH = '../../assets/megaphone.png'

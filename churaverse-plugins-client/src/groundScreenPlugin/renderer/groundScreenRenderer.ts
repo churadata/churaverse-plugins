@@ -1,6 +1,6 @@
 import { Scene } from 'phaser'
 import { IGroundScreenRenderer } from '../interface/IGroundScreenRenderer'
-import { IFocusTargetRepository } from '../../coreUiPlugin/interface/IFocusTargetRepository'
+import { IFocusTargetRepository } from '@churaverse/core-ui-plugin-client/interface/IFocusTargetRepository'
 import { Position, layerSetting } from 'churaverse-engine-client'
 
 export class GroundScreenRenderer implements IGroundScreenRenderer {

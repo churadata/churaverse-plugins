@@ -1,4 +1,4 @@
-import { FadeOutLogRenderer } from '../../../coreUiPlugin/fadeOutLog/fadeOutLogRenderer'
+import { FadeOutLogRenderer } from '@churaverse/core-ui-plugin-client/fadeOutLog/fadeOutLogRenderer'
 import { IDeathLogRenderer, DeathLogMessageBuilder } from '../../interface/IDeathLogRenderer'
 import { DeathLog } from './deathLog'
 import { DamageCauseType } from 'churaverse-engine-client'

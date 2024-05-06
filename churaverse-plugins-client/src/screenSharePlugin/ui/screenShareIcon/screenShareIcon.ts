@@ -1,6 +1,6 @@
 import { IScreenShareSender } from '../../interface/IScreenShareSender'
-import { ITopBarIconContainer } from '../../../coreUiPlugin/interface/ITopBarIconContainer'
-import { TopBarIconRenderer } from '../../../coreUiPlugin/topBarIcon'
+import { ITopBarIconContainer } from '@churaverse/core-ui-plugin-client/interface/ITopBarIconContainer'
+import { TopBarIconRenderer } from '@churaverse/core-ui-plugin-client/topBarIcon'
 
 const SCREEN_SHARE_ACTIVE_ICON_PATH = 'src/game/plugins/screenSharePlugin/assets/screenshare.png'
 const SCREEN_SHARE_INACTIVE_ICON_PATH = 'src/game/plugins/screenSharePlugin/assets/screenshare_off.png'

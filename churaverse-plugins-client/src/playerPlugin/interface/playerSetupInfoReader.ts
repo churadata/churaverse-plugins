@@ -1,4 +1,4 @@
-import { IPersistStore } from '../../dataPersistencePlugin/interface/IPersistStore'
+import { IPersistStore } from '@churaverse/data-persistence-plugin-client/interface/IPersistStore'
 
 import { PlayerColor } from '../types/playerColor'
 import { PlayerRole } from '../types/playerRole'

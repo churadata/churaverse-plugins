@@ -1,6 +1,6 @@
 import { IEventBus, IMainScene, DomManager } from 'churaverse-engine-client'
 import { RenameFormComponent } from './components/RenameComponent'
-import { ISettingDialog } from '../../../coreUiPlugin/interface/ISettingDialog'
+import { ISettingDialog } from '@churaverse/core-ui-plugin-client/interface/ISettingDialog'
 import { PlayerNameChangeEvent } from '../../event/playerNameChangeEvent'
 
 /**

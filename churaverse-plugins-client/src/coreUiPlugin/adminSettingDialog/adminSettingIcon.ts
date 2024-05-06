@@ -1,4 +1,4 @@
-import { PlayerRole } from '../../playerPlugin/types/playerRole'
+import { PlayerRole } from '@churaverse/player-plugin-client/types/playerRole'
 import { IAdminSettingDialog } from '../interface/IAdminSettingDialog'
 import { IDialogSwitcher } from '../interface/IDialogSwitcher'
 import { ITopBarIconContainer } from '../interface/ITopBarIconContainer'

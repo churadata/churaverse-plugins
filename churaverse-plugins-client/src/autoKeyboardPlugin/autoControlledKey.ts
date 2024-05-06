@@ -1,8 +1,8 @@
 import { KeyCodeRotator } from './keyCodeRotator'
 import { AutoModeControlButton } from './autoModeControlButton'
-import { IKey } from '../keyboardPlugin/interface/IKey'
-import { KeyCode } from '../keyboardPlugin/types/keyCode'
-import { KeyboardPluginError } from '../keyboardPlugin/error/keyboardPluginError'
+import { IKey } from '@churaverse/keyboard-plugin-client/interface/IKey'
+import { KeyCode } from '@churaverse/keyboard-plugin-client/types/keyCode'
+import { KeyboardPluginError } from '@churaverse/keyboard-plugin-client/error/keyboardPluginError'
 
 /**
  * 自クラスが保持しているkeyCodeが押されているかを確認するクラス

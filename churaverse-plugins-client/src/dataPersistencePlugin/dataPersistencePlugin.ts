@@ -1,7 +1,7 @@
 import { BasePlugin, InitEvent, Scenes, EVENT_PRIORITY, OnGameShutdownEvent} from 'churaverse-engine-client'
 import { DataPersistence } from './dataPersistence'
 import { initDataPersistencePluginStore } from './store/initDataPersistencePluginStore'
-import { WillSceneTransitionEvent } from '../transitionPlugin/event/willSceneTransitionEvent'
+import { WillSceneTransitionEvent } from '@churaverse/transition-plugin-client/event/willSceneTransitionEvent'
 
 export class DataPersistencePlugin extends BasePlugin<Scenes> {
   private dataPersistence!: DataPersistence

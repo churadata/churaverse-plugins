@@ -1,10 +1,10 @@
-import { TopBarIconRenderer } from '../../../coreUiPlugin/topBarIcon'
-import { IDialogSwitcher } from '../../../coreUiPlugin/interface/IDialogSwitcher'
-import { ITopBarIconContainer } from '../../../coreUiPlugin/interface/ITopBarIconContainer'
+import { TopBarIconRenderer } from '@churaverse/core-ui-plugin-client/topBarIcon'
+import { IDialogSwitcher } from '@churaverse/core-ui-plugin-client/interface/IDialogSwitcher'
+import { ITopBarIconContainer } from '@churaverse/core-ui-plugin-client/interface/ITopBarIconContainer'
 import { Badge } from './badge'
 import { ITextChatDialog } from '../interface/ITextChatDialog'
 
-const CHAT_ICON_PATH = 'src/game/plugins/textChatPlugin/assets/chat.png'
+const CHAT_ICON_PATH = `../../../assets/chat.png`
 
 export class TextChatIcon extends TopBarIconRenderer {
   private readonly iconContainer: HTMLDivElement

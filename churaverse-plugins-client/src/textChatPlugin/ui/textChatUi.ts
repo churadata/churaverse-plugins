@@ -7,9 +7,10 @@ import { TextChatDialog } from './textChatDialog/textChatDialog'
 import { TextChatIcon } from './textChatDialog/textChatIcon'
 import { IChatInputRenderer } from './textChatInput/IChatInputRenderer'
 import { TextChatInput } from './textChatInput/textChatInput'
-import { OwnPlayerUndefinedError } from '../../playerPlugin/errors/ownPlayerUndefinedError'
-import { IBadgeHolder } from '../../coreUiPlugin/interface/ITopBarIconHasBadge'
-import { ITopBarIconRenderer } from '../../coreUiPlugin/interface/IDialogIconRenderer'
+import { OwnPlayerUndefinedError } from '@churaverse/player-plugin-client/errors/ownPlayerUndefinedError'
+import { IBadgeHolder } from '@churaverse/core-ui-plugin-client/interface/ITopBarIconHasBadge'
+import { ITopBarIconRenderer } from '@churaverse/core-ui-plugin-client/interface/IDialogIconRenderer'
+import '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
 
 export class TextChatUi implements ITextChatUi {
   public textChatDialog: TextChatDialog
@@ -19,9 +20,13 @@ export class TextChatUi implements ITextChatUi {
   public constructor(store: Store<IMainScene>, eventBus: IEventBus<IMainScene>) {
     this.textChatDialog = new TextChatDialog()
     this.textChatBoard = new TextChatBoard(store.of('playerPlugin').ownPlayerId, this.textChatDialog)
-
+    
     const coreUiPluginStore = store.of('coreUiPlugin')
     const playerPluginStoreUi = store.of('playerPlugin')
+    console.log({
+      network_store_id: store.of('networkPlugin').socketId,
+      player: playerPluginStoreUi.players
+    })
     const player = playerPluginStoreUi.players.get(playerPluginStoreUi.ownPlayerId)
     if (player === undefined) throw new OwnPlayerUndefinedError()
 

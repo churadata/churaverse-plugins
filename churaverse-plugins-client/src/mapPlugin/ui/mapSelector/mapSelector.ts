@@ -1,7 +1,7 @@
 import { IEventBus, IMainScene, DomManager } from 'churaverse-engine-client'
 import { MapChangeFormComponent } from './components/MapChangeFormComponent'
 import { ChangeMapEvent } from '../../event/changeMapEvent'
-import { IAdminSettingDialog } from '../../../coreUiPlugin/interface/IAdminSettingDialog'
+import { IAdminSettingDialog } from '@churaverse/core-ui-plugin-client/interface/IAdminSettingDialog'
 
 // mapChangeFormのID
 export const MAP_CHANGE_FORM_ID = 'mapSelector'
