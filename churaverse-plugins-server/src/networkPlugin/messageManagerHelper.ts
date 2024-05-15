@@ -67,6 +67,7 @@ export class MessageManagerHelper<Scene extends Scenes> {
   ): void {
     const packet = receiveQueue.popPacket()
     packet.forEach((sentMsg) => {
+      console.log('sentMsg', sentMsg)
       messageReceiver.getListenerList(sentMsg.type).forEach((listener) => {
         this.execListener(listener, messageRegistry, sentMsg)
       })

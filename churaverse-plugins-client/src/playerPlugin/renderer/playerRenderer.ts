@@ -1,4 +1,12 @@
-import { vectorToName, Direction, Position, GRID_SIZE, layerSetting, FRAME_RATE, HpBarRenderer } from 'churaverse-engine-client'
+import {
+  vectorToName,
+  Direction,
+  Position,
+  GRID_SIZE,
+  layerSetting,
+  FRAME_RATE,
+  HpBarRenderer,
+} from 'churaverse-engine-client'
 import { GameObjects, Scene } from 'phaser'
 import { IPlayerRenderer } from '../domain/IPlayerRenderer'
 import { PLAYER_COLOR_NAMES, PlayerColor } from '../types/playerColor'

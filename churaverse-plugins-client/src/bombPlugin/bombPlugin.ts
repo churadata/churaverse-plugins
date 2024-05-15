@@ -108,7 +108,7 @@ export class BombPlugin extends BasePlugin<IMainScene> {
       this.networkStore.messageSender.send(
         new BombSpawnMessage({
           bombId: bomb.bombId,
-          startPos: bomb.position.toVector() as Vector & SendableObject ,
+          startPos: bomb.position.toVector() as Vector & SendableObject,
           direction: bomb.direction,
           spawnTime: bomb.spawnTime,
         })

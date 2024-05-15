@@ -78,7 +78,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
   private playerJoin(msg: PlayerJoinMessage): void {
     const playerInfo = msg.data
     const pos = new Position(playerInfo.position.x, playerInfo.position.y)
-
     const newPlayer = new Player(
       playerInfo.playerId,
       pos,

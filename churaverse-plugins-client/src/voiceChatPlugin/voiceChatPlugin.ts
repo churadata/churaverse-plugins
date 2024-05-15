@@ -1,7 +1,7 @@
 import { Scene } from 'phaser'
 import { EntitySpawnEvent, PhaserLoadAssets, IMainScene, BasePlugin, PhaserSceneInit } from 'churaverse-engine-client'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
-import { Player } from '@churaverse/player-plugin-client/domain/player'
+import { Player, isPlayer } from '@churaverse/player-plugin-client/domain/player'
 import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { WebRtcPluginStore } from '@churaverse/web-rtc-plugin-client/store/defWebRtcPluginStore'
 import { SocketController } from './controller/socketController'
@@ -122,7 +122,8 @@ export class VoiceChatPlugin extends BasePlugin<IMainScene> {
   }
 
   private onJoinPlayer(ev: EntitySpawnEvent): void {
-    if (!(ev.entity instanceof Player)) return
+    // Check if ev.entity is capable of being a Player
+    if (!isPlayer(ev.entity)) return
     const playerId = ev.entity.id
     this.bus.post(new ToggleMegaphoneEvent(playerId, true))
     this.voiceChatVolumeController?.activateMegaphone(playerId)

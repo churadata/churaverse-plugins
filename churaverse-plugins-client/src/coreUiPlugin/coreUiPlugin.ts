@@ -19,11 +19,10 @@ import { KeyboardPluginStore } from '@churaverse/keyboard-plugin-client/store/de
 import { KeyboardController } from './controller/keyboardController'
 import { CoreUiPluginStore } from './store/defCoreUiPluginStore'
 import { initCoreUiPlugin } from './store/initCoreUiPluginStore'
-// import because of dependency 
-import { TitlePlayerPluginStore } from '@churaverse/title-plugin-client/titlePlayerPlugin/store/defTitlePlayerPlugin'
-import { WillSceneTransitionEvent } from '@churaverse/transition-plugin-client/event/willSceneTransitionEvent'
+// import because of dependency
+import '@churaverse/title-plugin-client/titlePlayerPlugin/store/defTitlePlayerPlugin'
+import '@churaverse/transition-plugin-client/event/willSceneTransitionEvent'
 import '@churaverse/title-plugin-client/titlePlayerPlugin/defTitlePlayerTransitionData'
-
 
 export class CoreUiPlugin extends BasePlugin<IMainScene> {
   private scene?: Scene

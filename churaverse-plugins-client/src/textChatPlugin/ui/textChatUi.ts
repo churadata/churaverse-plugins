@@ -23,10 +23,6 @@ export class TextChatUi implements ITextChatUi {
     
     const coreUiPluginStore = store.of('coreUiPlugin')
     const playerPluginStoreUi = store.of('playerPlugin')
-    console.log({
-      network_store_id: store.of('networkPlugin').socketId,
-      player: playerPluginStoreUi.players
-    })
     const player = playerPluginStoreUi.players.get(playerPluginStoreUi.ownPlayerId)
     if (player === undefined) throw new OwnPlayerUndefinedError()
 

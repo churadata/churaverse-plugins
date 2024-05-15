@@ -141,3 +141,19 @@ export class Player extends LivingEntity {
     return this._role
   }
 }
+
+/**
+ * 外部Pluginから型チェックするためのユーザー定義型ガード関数
+ */
+export function isPlayer(data: unknown): data is Player {
+  if (data == null) {
+    return false
+  }
+
+  // dataを一旦 Object.entriesみたいにして、dataのキーがPlayerのキーとあっているか確認する
+  const playerKeys = Object.keys(data) as Array<keyof Player>
+  const requiredKeys: Array<keyof Player> = ['id', 'position', 'direction', 'hp', 'spawnTime']
+  const hasRequiredKeys = requiredKeys.every((key) => playerKeys.includes(key))
+
+  return hasRequiredKeys
+}

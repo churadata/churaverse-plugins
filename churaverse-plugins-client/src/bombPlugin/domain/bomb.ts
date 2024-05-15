@@ -9,9 +9,11 @@ export class Bomb extends Entity implements WeaponEntity {
   public bombId: string
   public ownerId: string
   public spawnTime: number
+  readonly id: string
 
   public constructor(bombId: string, ownerId: string, position: Position, direction: Direction, spawnTime: number) {
     super(position, Direction.down)
+    this.id = bombId
     this.bombId = bombId
     this.ownerId = ownerId
     this.spawnTime = spawnTime

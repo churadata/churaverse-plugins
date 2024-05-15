@@ -67,9 +67,11 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
   }
 
   private onPlayerJoin(ev: EntitySpawnEvent): void {
+    console.log('onPlayerJoin', ev)
     if (!(ev.entity instanceof Player)) return
     const player = ev.entity
     this.playerPluginStore.players.set(player.id, player)
+    console.log('onPlayerJoin:players:', this.playerPluginStore.players)
   }
 
   private postPlayerLeaveEvent(ev: NetworkDisconnectEvent): void {
@@ -88,7 +90,9 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
   }
 
   private onPlayerWalk(ev: PlayerWalkEvent): void {
+    console.log('onPlayerWalk', ev)
     const player = this.playerPluginStore.players.get(ev.id)
+    console.log('onPlayerWalk:players:', this.playerPluginStore.players)
     if (player === undefined) return
     if (player.isDead) {
       player.stop()

@@ -3,7 +3,7 @@ import { ChangeLocalDeviceEvent } from './event/changeLocalDeviceEvent'
 import { WebRtcPluginStore } from './store/defWebRtcPluginStore'
 import { initWebRtcPluginStore } from './store/initWebRtcPluginStore'
 import { WebRtcUi } from './ui/webRtcUi'
-import { WillSceneTransitionEvent } from '@churaverse/transition-plugin-client/event/willSceneTransitionEvent'
+import '@churaverse/transition-plugin-client/event/willSceneTransitionEvent'
 
 export class WebRtcPlugin extends BasePlugin<IMainScene> {
   private webRtcPluginStore!: WebRtcPluginStore

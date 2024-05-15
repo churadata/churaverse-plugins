@@ -81,7 +81,6 @@ export class TitlePlayerPlugin extends BasePlugin<ITitleScene> {
   private createOwnPlayer(): Player {
     const pos = new Position(800, 440)
     const direction = Direction.down
-    console.log({socketId: this.networkStore.socketId})
     const ownPlayer = new Player(
       this.networkStore.socketId,
       pos,

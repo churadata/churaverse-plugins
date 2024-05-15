@@ -16,6 +16,5 @@ export function initNetworkPluginStore(
     socketId,
   }
 
-  console.log('initNetworkPluginStore', pluginStore)
   store.setInit('networkPlugin', pluginStore)
 }
