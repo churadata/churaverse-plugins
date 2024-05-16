@@ -19,7 +19,7 @@ export class KeyboardController extends BaseKeyboardController<IMainScene> {
   }
 
   public registerKeyAction(ev: RegisterKeyActionEvent<IMainScene>): void {
-    ev.keyActionRegister.registerKeyAction(new KeyAction('ShotShark', 'X', 'inGame', 300))
+    ev.keyActionRegister.registerKeyAction(new KeyAction('ShotShark', 'Z', 'inGame', 300))
   }
 
   public registerKeyActionListener(ev: RegisterKeyActionListenerEvent<IMainScene>): void {

@@ -23,7 +23,7 @@ export class KeyboardController extends BaseKeyboardController<IMainScene> {
   }
 
   public registerKeyAction(ev: RegisterKeyActionEvent<IMainScene>): void {
-    ev.keyActionRegister.registerKeyAction(new KeyAction('DropBomb', 'Z', 'inGame', 320))
+    ev.keyActionRegister.registerKeyAction(new KeyAction('DropBomb', 'X', 'inGame', 320))
   }
 
   public registerKeyActionListener(ev: RegisterKeyActionListenerEvent<IMainScene>): void {
