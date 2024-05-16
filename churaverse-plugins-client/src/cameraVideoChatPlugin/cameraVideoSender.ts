@@ -19,7 +19,6 @@ import {
 } from './debugScreen/IDebugScreen/IWebCameraInfoDebugScreen'
 import '@churaverse/popup-screen-list-plugin-client'
 import { EffectManager } from './effectManager'
-import { TrackPublishOptions } from 'livekit-client/dist/src/room/track/options'
 
 export class CameraVideoSender implements IVideoSender {
   private localVideoTrack: LocalVideoTrack | undefined = undefined
