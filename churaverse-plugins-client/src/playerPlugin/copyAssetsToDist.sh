@@ -26,7 +26,7 @@ find "$src_base" -type f -name '*.scss' | while read src_file; do
     # 対応するコピー先のファイルパスを生成
     dest_file="${src_file/$src_base/$dest_base}"
     # コピー元が dest_base ならスキップする処理
-    if [[ "$src_dir" == *"$dest_base"* ]]; then
+    if [[ "$src_file" == *"$dest_base"* ]]; then
         continue
     fi
     # コピー先のディレクトリを取得
