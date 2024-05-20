@@ -1,7 +1,7 @@
 import { Scene } from 'phaser'
 import { EntitySpawnEvent, PhaserLoadAssets, IMainScene, BasePlugin, PhaserSceneInit } from 'churaverse-engine-client'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
-import { Player, isPlayer } from '@churaverse/player-plugin-client/domain/player'
+import { isPlayer } from '@churaverse/player-plugin-client/domain/player'
 import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { WebRtcPluginStore } from '@churaverse/web-rtc-plugin-client/store/defWebRtcPluginStore'
 import { SocketController } from './controller/socketController'

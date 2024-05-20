@@ -4,7 +4,7 @@ import { PlayerList } from './playerListDialog/playerList'
 import { PlayerListDialog } from './playerListDialog/playerListDialog'
 import { PlayerListIcon } from './playerListDialog/playerListIcon'
 import { IPlayerListUi } from './interface/IPlayerListUi'
-import { CoreUiPluginStore } from '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
+import '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
 
 export class PlayerListUi implements IPlayerListUi {
   public playerListDialog: PlayerListDialog

@@ -1,5 +1,4 @@
-import { Scene } from 'phaser'
-import { StartEvent, IMainScene, BasePlugin, PhaserSceneInit } from 'churaverse-engine-client'
+import { IMainScene, BasePlugin } from 'churaverse-engine-client'
 import { WebRtcPluginStore } from '@churaverse/web-rtc-plugin-client/store/defWebRtcPluginStore'
 import { CameraVideoSender } from './cameraVideoSender'
 import { VideoChatUI } from './ui/videoChatUi'

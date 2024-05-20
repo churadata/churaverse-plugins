@@ -2,7 +2,6 @@ import {
   BasePlugin,
   CVEvent,
   EVENT_PRIORITY,
-  IMainScene,
   PhaserSceneInit,
   SceneUndefinedError,
   Scenes,

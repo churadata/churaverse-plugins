@@ -1,8 +1,8 @@
 import { BasePlugin, IMainScene, PhaserSceneInit, SceneUndefinedError } from 'churaverse-engine-client'
 import { GroundScreenRendererFactory } from './renderer/groundScreenRendererFactory'
 import { initGroundScreenPluginStore } from './store/initGroundScreenPluginStore'
-import { CoreUiPluginStore } from '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
-import { MapPluginStore } from '@churaverse/map-plugin-client/store/defMapPluginStore'
+import '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
+import '@churaverse/map-plugin-client/store/defMapPluginStore'
 
 export class GroundScreenPlugin extends BasePlugin<IMainScene> {
   private scene?: Phaser.Scene

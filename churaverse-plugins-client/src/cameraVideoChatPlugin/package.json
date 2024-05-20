@@ -40,11 +40,6 @@
   ],
   "dependencies": {
     "@livekit/track-processors": "^0.3.1",
-    "livekit-client": "^1.13.4",
-    "phaser": "^3.80.1",
-    "socket.io-client": "^4.7.4",
-    "unstorage": "^1.10.1",
-    "uuid": "^9.0.1",
-    "web-vitals": "^3.5.2"
+    "livekit-client": "^1.13.4"
   }
 }

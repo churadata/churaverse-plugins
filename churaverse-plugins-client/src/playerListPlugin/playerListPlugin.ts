@@ -1,7 +1,7 @@
 import { BasePlugin, IMainScene, EntitySpawnEvent, EntityDespawnEvent } from 'churaverse-engine-client'
 import { PlayerListUi } from './playerListUi'
 import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
-import { Player, isPlayer } from '@churaverse/player-plugin-client/domain/player'
+import { isPlayer } from '@churaverse/player-plugin-client/domain/player'
 import { PlayerNameChangeEvent } from '@churaverse/player-plugin-client/event/playerNameChangeEvent'
 import { initPlayerListPluginStore } from './store/initPlayerListPluginStore'
 
