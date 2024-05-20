@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && bash copyAssetsToDist.sh",
     "lint": "eslint src",
     "format": "prettier --write src"
   },
