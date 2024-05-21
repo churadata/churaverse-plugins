@@ -9,8 +9,7 @@
     "build": "npx tsc",
     "link:cvPackages": "sh npm_link_cvPackages.sh"
   },
-  "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@churaverse/map-plugin-server": "^0.1.0"
   }
