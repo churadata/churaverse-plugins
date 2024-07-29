@@ -1,6 +1,6 @@
 {
   "name": "@churaverse/camera-video-chat-plugin-client",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "type": "module",
   "scripts": {
     "build": "tsc && bash copyAssetsToDist.sh",
@@ -33,12 +33,14 @@
   "module": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
-  "files": [
-    "dist",
-    "**/assets/*"
-  ],
   "dependencies": {
+    "@churaverse/core-ui-plugin-client": "file:../coreUiPlugin",
+    "@churaverse/debug-screen-plugin-client": "file:../debugScreenPlugin",
+    "@churaverse/player-plugin-client": "file:../playerPlugin",
+    "@churaverse/popup-screen-list-plugin-client": "file:../popUpScreenListPlugin",
+    "@churaverse/web-rtc-plugin-client": "file:../webRtcPlugin",
     "@livekit/track-processors": "^0.3.1",
+    "churaverse-engine-client": "file:../../../../churaverse-engine/churaverse-engine-client",
     "livekit-client": "^1.13.4"
   }
 }
