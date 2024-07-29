@@ -1,6 +1,6 @@
 {
   "name": "@churaverse/bomb-plugin-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "scripts": {
     "build": "tsc && bash copyAssetsToDist.sh",
@@ -33,11 +33,12 @@
   "module": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
-  "files": [
-    "dist",
-    "**/assets/*"
-  ],
   "dependencies": {
+    "@churaverse/debug-screen-plugin-client": "file:../debugScreenPlugin",
+    "@churaverse/keyboard-plugin-client": "file:../keyboardPlugin",
+    "@churaverse/network-plugin-client": "file:../networkPlugin",
+    "@churaverse/player-plugin-client": "file:../playerPlugin",
+    "churaverse-engine-client": "file:../../../../churaverse-engine/churaverse-engine-client",
     "phaser": "^3.80.1"
   }
 }
