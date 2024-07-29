@@ -22,5 +22,6 @@
     "resolvePackageJsonExports": false,
     "outDir": "./dist"
   },
-  "include": ["."]
+  "include": ["."],
+  "exclude": ["node_modules", "dist"]
 }
