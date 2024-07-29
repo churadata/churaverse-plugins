@@ -4,7 +4,7 @@ import { IDialogSwitcher } from '../interface/IDialogSwitcher'
 import { ITopBarIconContainer } from '../interface/ITopBarIconContainer'
 import { TopBarIconRenderer } from '../topBarIcon'
 
-const ADMIN_SETTING_ICON_PATH = new URL('../assets/adminSetting.png', import.meta.url).href
+import ADMIN_SETTING_ICON_PATH from '../assets/adminSetting.png'
 
 export class AdminSettingIcon extends TopBarIconRenderer {
   public constructor(
