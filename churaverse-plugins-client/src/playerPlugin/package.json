@@ -1,6 +1,6 @@
 {
   "name": "@churaverse/player-plugin-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "scripts": {
     "build": "tsc && bash copyAssetsToDist.sh",
@@ -34,6 +34,16 @@
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "dependencies": {
-    "phaser": "^3.80.1"
+    "phaser": "^3.80.1",
+    "@churaverse/core-ui-plugin-client": "~0.1.0",
+    "@churaverse/data-persistence-plugin-client": "~0.1.0",
+    "@churaverse/debug-screen-plugin-client": "~0.1.0",
+    "@churaverse/keyboard-plugin-client": "~0.1.0",
+    "@churaverse/map-plugin-client": "~0.1.0",
+    "@churaverse/network-plugin-client": "~0.1.0",
+    "@churaverse/title-plugin-client": "~0.1.0",
+    "@churaverse/transition-plugin-client": "~0.1.0",
+    "@churaverse/voice-chat-plugin-client": "~0.1.0",
+    "churaverse-engine-client": "~0.1.0"
   }
 }

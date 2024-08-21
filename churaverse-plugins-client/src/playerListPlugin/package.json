@@ -1,6 +1,6 @@
 {
   "name": "@churaverse/player-list-plugin-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "scripts": {
     "build": "tsc && bash copyAssetsToDist.sh",
@@ -33,5 +33,9 @@
   "module": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "@churaverse/core-ui-plugin-client": "~0.1.0",
+    "@churaverse/player-plugin-client": "~0.1.0",
+    "churaverse-engine-client": "~0.1.0"
+  }
 }

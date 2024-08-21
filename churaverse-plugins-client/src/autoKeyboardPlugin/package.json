@@ -1,6 +1,6 @@
 {
   "name": "@churaverse/auto-keyboard-plugin-client",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "scripts": {
     "build": "tsc",
@@ -34,8 +34,8 @@
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "dependencies": {
-    "@churaverse/keyboard-plugin-client": "file:../keyboardPlugin",
-    "churaverse-engine-client": "file:../../../../churaverse-engine/churaverse-engine-client",
+    "@churaverse/keyboard-plugin-client": "~0.1.0",
+    "churaverse-engine-client": "~0.1.0",
     "phaser": "^3.80.1"
   }
 }
