@@ -1,0 +1,2 @@
+@churaverse/player-plugin-client
+@churaverse/network-plugin-client
