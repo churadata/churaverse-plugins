@@ -1,5 +1,5 @@
 import { IMainScene, BasePlugin, EntityDespawnEvent, EntitySpawnEvent } from 'churaverse-engine-server'
-import { Player } from '../playerPlugin/domain/player'
+import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { SocketController } from './controller/socketController'
 import { ToggleMegaphoneEvent } from './event/toggleMegaphoneEvent'
 import { ToggleMicEvent } from './event/toggleMicEvent'

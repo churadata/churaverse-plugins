@@ -1,6 +1,5 @@
-import { Scene } from 'phaser'
-import { StartEvent, IMainScene, BasePlugin, PhaserSceneInit } from 'churaverse-engine-client'
-import { WebRtcPluginStore } from '../webRtcPlugin/store/defWebRtcPluginStore'
+import { IMainScene, BasePlugin } from 'churaverse-engine-client'
+import { WebRtcPluginStore } from '@churaverse/web-rtc-plugin-client/store/defWebRtcPluginStore'
 import { CameraVideoSender } from './cameraVideoSender'
 import { VideoChatUI } from './ui/videoChatUi'
 import { TriggerVideoSendingEvent } from './event/event'
@@ -9,15 +8,17 @@ import {
   IWebCameraIdDebugDetailScreen,
   IWebCameraMyStatusDebugDetailScreen,
 } from './debugScreen/IDebugScreen/IWebCameraInfoDebugScreen'
-import { DebugScreenPluginStore } from '../debugScreenPlugin/store/defDebugScreenPluginStore'
-import { DebugDetailScreenSection } from '../debugScreenPlugin/debugScreen/debugDetailScreenSection'
+import { DebugScreenPluginStore } from '@churaverse/debug-screen-plugin-client/store/defDebugScreenPluginStore'
+import { DebugDetailScreenSection } from '@churaverse/debug-screen-plugin-client/debugScreen/debugDetailScreenSection'
 import { WebCameraIdDebugDetailScreen } from './debugScreen/webCameraIdDebugDetailScreen'
 import { WebCameraMyStatusDebugDetailScreen } from './debugScreen/webCameraMyStatusDebugDetailScreen'
-import { PlayerPluginStore } from '../playerPlugin/store/defPlayerPluginStore'
-import { DumpDebugDataEvent } from '../debugScreenPlugin/event/dumpDebugDataEvent'
+import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
+import { DumpDebugDataEvent } from '@churaverse/debug-screen-plugin-client/event/dumpDebugDataEvent'
+import { EffectSettingUI } from './ui/effectSettingUi'
+import { EffectManager } from './effectManager'
+import { CameraEffectSettingStore } from './cameraEffectSettingStore'
 
 export class CameraVideoChatPlugin extends BasePlugin<IMainScene> {
-  private scene?: Scene
   private webRtcPluginStore!: WebRtcPluginStore
   private playerPluginStore!: PlayerPluginStore
   private debugScreenPluginStore!: DebugScreenPluginStore
@@ -26,11 +27,12 @@ export class CameraVideoChatPlugin extends BasePlugin<IMainScene> {
   private cameraVideoReceiver!: VideoReceiver
   private webCameraIdDebugDetailScreen!: IWebCameraIdDebugDetailScreen
   private webCameraMyStatusDebugDetailScreen!: IWebCameraMyStatusDebugDetailScreen
+  private effectSettingUI!: EffectSettingUI
+  private effectManager!: EffectManager
+  private effectSettingStore!: CameraEffectSettingStore
 
   public listenEvent(): void {
-    this.bus.subscribeEvent('phaserSceneInit', this.phaserSceneInit.bind(this))
     this.bus.subscribeEvent('init', this.init.bind(this))
-    this.bus.subscribeEvent('start', this.start.bind(this))
     this.bus.subscribeEvent('triggerVideoSending', this.triggerVideoSending.bind(this))
     this.bus.subscribeEvent('dumpDebugData', this.dumpDebugData.bind(this))
   }
@@ -39,21 +41,32 @@ export class CameraVideoChatPlugin extends BasePlugin<IMainScene> {
     this.cameraVideoSender.handleVideoSendTrigger(ev)
   }
 
-  private phaserSceneInit(ev: PhaserSceneInit): void {
-    this.scene = ev.scene
-  }
-
   private init(): void {
     this.webRtcPluginStore = this.store.of('webRtcPlugin')
+    this.videoChatUI = new VideoChatUI(this.store, this.bus)
+    this.effectSettingStore = new CameraEffectSettingStore(this.bus, this.store)
+    this.effectManager = new EffectManager(this.effectSettingStore)
     this.playerPluginStore = this.store.of('playerPlugin')
     this.debugScreenPluginStore = this.store.of('debugScreenPlugin')
     this.setupDebugScreen()
-    this.cameraVideoSender = new CameraVideoSender(this.webRtcPluginStore.webRtc.room, this.store, this.webCameraIdDebugDetailScreen, this.webCameraMyStatusDebugDetailScreen)
-    this.cameraVideoReceiver = new VideoReceiver(this.webRtcPluginStore.webRtc.room, this.store, this.webCameraIdDebugDetailScreen)
-  }
-
-  private start(ev: StartEvent): void {
-    this.videoChatUI = new VideoChatUI(this.store, this.bus)
+    this.cameraVideoSender = new CameraVideoSender(
+      this.webRtcPluginStore.webRtc.room,
+      this.store,
+      this.effectManager,
+      this.webCameraIdDebugDetailScreen,
+      this.webCameraMyStatusDebugDetailScreen
+    )
+    this.effectSettingUI = new EffectSettingUI(
+      this.store,
+      this.effectManager,
+      this.cameraVideoSender,
+      this.effectSettingStore
+    )
+    this.cameraVideoReceiver = new VideoReceiver(
+      this.webRtcPluginStore.webRtc.room,
+      this.store,
+      this.webCameraIdDebugDetailScreen
+    )
   }
 
   private setupDebugScreen(): void {

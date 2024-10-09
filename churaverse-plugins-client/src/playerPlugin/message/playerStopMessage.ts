@@ -1,9 +1,9 @@
 import { Vector, Direction, IMainScene } from 'churaverse-engine-client'
-import { BaseMessage } from '../../networkPlugin/message/baseMessage'
-import { SendableObject } from '../../networkPlugin/types/sendable'
+import { BaseMessage } from '@churaverse/network-plugin-client/message/baseMessage'
+import { Sendable, SendableObject } from '@churaverse/network-plugin-client/types/sendable'
 
 export interface PlayerStopData extends SendableObject {
-  stopPos: Vector
+  stopPos: Vector & Sendable
   direction: Direction
 }
 
@@ -13,7 +13,7 @@ export class PlayerStopMessage extends BaseMessage<IMainScene> {
   }
 }
 
-declare module '../../networkPlugin/message/messages' {
+declare module '@churaverse/network-plugin-client/message/messages' {
   export interface MainMessageMap {
     playerStop: PlayerStopMessage
   }

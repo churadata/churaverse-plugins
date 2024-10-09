@@ -1,4 +1,4 @@
-import { KeyCode } from '../keyboardPlugin/types/keyCode'
+import { KeyCode } from '@churaverse/keyboard-plugin-client/types/keyCode'
 
 /**
  * AutoKeyFactoryクラスを使う際に用いられるクラス

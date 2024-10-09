@@ -1,4 +1,4 @@
-import dialogStyle from '../../../../../plugins/coreUiPlugin/settingDialog/style.module.scss'
+import dialogStyle from '@churaverse/core-ui-plugin-client/settingDialog/style.module.scss'
 import { JSXFunc } from 'churaverse-engine-client'
 import { TextChatBoardComponent } from './TextChatBoardComponent'
 import { TextChatInputComponent } from '../../textChatInput/components/TextChatInputComponent'

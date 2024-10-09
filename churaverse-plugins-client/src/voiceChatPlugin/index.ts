@@ -1,1 +1,1 @@
-export { VoiceChatPlugin } from './voiceChatPlugin'
+export * from './voiceChatPlugin'

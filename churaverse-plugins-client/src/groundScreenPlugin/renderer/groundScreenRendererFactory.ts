@@ -1,10 +1,10 @@
 import { Scene } from 'phaser'
 import { GroundScreenRenderer } from './groundScreenRenderer'
 import { IGroundScreenRenderer } from '../interface/IGroundScreenRenderer'
-import { IMapManager } from '../../mapPlugin/interface/IMapManager'
-import { mapConfig } from '../../mapPlugin/mapConfig'
+import { IMapManager } from '@churaverse/map-plugin-client/interface/IMapManager'
+import { mapConfig } from '@churaverse/map-plugin-client/mapConfig'
 import { Position } from 'churaverse-engine-client'
-import { IFocusTargetRepository } from '../../coreUiPlugin/interface/IFocusTargetRepository'
+import { IFocusTargetRepository } from '@churaverse/core-ui-plugin-client/interface/IFocusTargetRepository'
 
 export class GroundScreenRendererFactory {
   public constructor(
@@ -14,7 +14,7 @@ export class GroundScreenRendererFactory {
   ) {}
 
   public build(video: HTMLVideoElement): IGroundScreenRenderer {
-    const configPos = mapConfig.maps[this.mapManager.currentMap.mapId].pluginOptions.groundScreenPos
+    const configPos = mapConfig.maps[this.mapManager.currentMap.mapId].groundScreenPos
     let pos: Position | undefined
     if (configPos !== undefined) {
       pos = Position.from(configPos)

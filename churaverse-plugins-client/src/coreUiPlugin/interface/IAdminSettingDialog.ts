@@ -1,4 +1,4 @@
-import { IDialog } from './IDialog'
+import { IDialog } from '../domain/interface/IRender/IDialog'
 import { AdminSettingSection } from '../adminSettingDialog/adminSettingSection'
 
 export interface IAdminSettingDialog extends IDialog<AdminSettingSection> {}

@@ -1,1 +1,10 @@
 churaverse-engine/churaverse-engine-server
+churaverse-plugins/churaverse-plugins-server/src/networkPlugin
+churaverse-plugins/churaverse-plugins-server/src/mapPlugin
+churaverse-plugins/churaverse-plugins-server/src/collisionDetectionPlugin
+churaverse-plugins/churaverse-plugins-server/src/playerPlugin
+churaverse-plugins/churaverse-plugins-server/src/kickPlugin
+churaverse-plugins/churaverse-plugins-server/src/sharkPlugin
+churaverse-plugins/churaverse-plugins-server/src/bombPlugin
+churaverse-plugins/churaverse-plugins-server/src/textChatPlugin
+churaverse-plugins/churaverse-plugins-server/src/voiceChatPlugin

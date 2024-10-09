@@ -5,7 +5,7 @@ import { Scene } from 'phaser'
 import { ElementDebugScreenComponent } from '../components/ElementDebugScreenComponent'
 
 export class WorldFpsDebugScreen implements IWorldFpsDebugScreen {
-  private readonly content: HTMLElement
+  private content: HTMLElement
   private readonly scene: Scene
 
   public constructor(scene: Scene, debugSummaryScreenContainer: DebugSummaryScreenContainer) {

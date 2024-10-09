@@ -20,6 +20,5 @@ export function initPlayerPluginStore(
     deathLogRenderer: new DeathLogRenderer(store.of('coreUiPlugin').fadeOutLogRenderer),
     deathLogRepository: new DeathLogRepository(),
   }
-
   store.setInit('playerPlugin', playerPluginStore)
 }

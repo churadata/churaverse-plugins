@@ -12,13 +12,17 @@ import { Scene } from 'phaser'
 import { ExitButton } from './exit/exitButton'
 import { SettingIcon } from './settingDialog/settingIcon'
 import { AdminSettingIcon } from './adminSettingDialog/adminSettingIcon'
-import { OwnPlayerUndefinedError } from '../playerPlugin/errors/ownPlayerUndefinedError'
-import { TransitionPluginStore } from '../transitionPlugin/store/defTransitionPluginStore'
+import { OwnPlayerUndefinedError } from '@churaverse/player-plugin-client/errors/ownPlayerUndefinedError'
+import { TransitionPluginStore } from '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
 import { FocusSwitcher } from './focusSwitcher/focusSwitcher'
-import { KeyboardPluginStore } from '../keyboardPlugin/store/defKeyboardPluginStore'
+import { KeyboardPluginStore } from '@churaverse/keyboard-plugin-client/store/defKeyboardPluginStore'
 import { KeyboardController } from './controller/keyboardController'
 import { CoreUiPluginStore } from './store/defCoreUiPluginStore'
 import { initCoreUiPlugin } from './store/initCoreUiPluginStore'
+// import because of dependency
+import '@churaverse/title-plugin-client/titlePlayerPlugin/store/defTitlePlayerPlugin'
+import '@churaverse/transition-plugin-client/event/willSceneTransitionEvent'
+import '@churaverse/title-plugin-client/titlePlayerPlugin/defTitlePlayerTransitionData'
 
 export class CoreUiPlugin extends BasePlugin<IMainScene> {
   private scene?: Scene

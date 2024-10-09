@@ -1,7 +1,7 @@
 import { Vector } from 'churaverse-engine-client'
 
-declare module '../mapPlugin/interface/IMapConfig' {
-  export interface MapInfoPluginOptions {
+declare module '@churaverse/map-plugin-client/interface/IMapConfig' {
+  export interface MapInfo {
     groundScreenPos?: Vector
   }
 }

@@ -10,6 +10,7 @@ import {
 import { GameObjects, Scene } from 'phaser'
 import { IPlayerRenderer } from '../domain/IPlayerRenderer'
 import { PLAYER_COLOR_NAMES, PlayerColor } from '../types/playerColor'
+import { PlayerIconsRenderer } from './playerIconsRenderer'
 import heroBasic from '../assets/hero.png'
 import heroRed from '../assets/hero_red.png'
 import heroBlack from '../assets/hero_black.png'
@@ -65,7 +66,7 @@ const _relativePositionToNamePlate = { x: 0, y: -40 }
  */
 export class PlayerRenderer implements IPlayerRenderer {
   private readonly scene
-  private readonly sprite
+  private sprite
 
   private tween?: Phaser.Tweens.Tween
   private readonly _playerNamePlateTween?: Phaser.Tweens.Tween
@@ -130,6 +131,8 @@ export class PlayerRenderer implements IPlayerRenderer {
         frameHeight: 32,
       })
     )
+
+    PlayerIconsRenderer.loadAssets(scene)
   }
 
   /**

@@ -7,15 +7,15 @@ import {
   EntityDespawnEvent,
   LivingDamageEvent,
 } from 'churaverse-engine-client'
-import { BaseSocketController } from '../../networkPlugin/interface/baseSocketController'
+import { BaseSocketController } from '@churaverse/network-plugin-client/interface/baseSocketController'
 import { SharkPluginStore } from '../store/defSharkPluginStore'
-import { RegisterMessageEvent } from '../../networkPlugin/event/registerMessageEvent'
-import { RegisterMessageListenerEvent } from '../../networkPlugin/event/registerMessageListenerEvent'
+import { RegisterMessageEvent } from '@churaverse/network-plugin-client/event/registerMessageEvent'
+import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-client/event/registerMessageListenerEvent'
 import { SharkSpawnMessage } from '../message/sharkSpawnMessage'
 import { Shark } from '../domain/shark'
 import { SharkHitMessage } from '../message/sharkHitMessage'
-import { WeaponDamageMessage } from '../../playerPlugin/message/weaponDamageMessage'
-import { PlayerPluginStore } from '../../playerPlugin/store/defPlayerPluginStore'
+import { WeaponDamageMessage } from '@churaverse/player-plugin-client/message/weaponDamageMessage'
+import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { SharkDamageCause } from '../domain/sharkDamageCause'
 
 export class SocketController extends BaseSocketController<IMainScene> {

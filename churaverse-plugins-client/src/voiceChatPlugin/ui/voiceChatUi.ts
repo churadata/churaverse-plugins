@@ -1,8 +1,8 @@
-import { IEventBus, IMainScene, Store } from 'churaverse-engine-client'
+import { IEventBus,IMainScene,Store } from 'churaverse-engine-client'
 import { IVoiceChatSender } from '../domain/IVoiceChatSender'
 import { MegaphoneIcon } from './voiceChatIcon/megaphoneIcon'
 import { MicIcon } from './voiceChatIcon/micIcon'
-
+import '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
 /**
  * 画面上部に並ぶアイコンにボイスチャット関連のアイコンを追加するクラス
  */

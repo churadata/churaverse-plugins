@@ -1,0 +1,19 @@
+{
+  "name": "@churaverse/shark-plugin-server",
+  "version": "0.1.2",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tsc",
+    "link:cvPackages": "sh npm_link_cvPackages.sh"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "churaverse-engine-server": "^0.1.0",
+    "@churaverse/map-plugin-server": "^0.1.0",
+    "@churaverse/player-plugin-server": "^0.1.0",
+    "@churaverse/collision-detection-plugin-server": "^0.1.0"
+  }
+}

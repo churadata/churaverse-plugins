@@ -1,15 +1,15 @@
 import { IMainScene, IEventBus, Store, Position, EntitySpawnEvent, EntityDespawnEvent } from 'churaverse-engine-client'
 import { Player } from '../domain/player'
 import { PlayerWalkEvent } from '../event/playerWalkEvent'
-import { RegisterMessageEvent } from '../../networkPlugin/event/registerMessageEvent'
+import { RegisterMessageEvent } from '@churaverse/network-plugin-client/event/registerMessageEvent'
 import { PlayerJoinMessage } from '../message/playerJoinMessage'
 import { PlayerWalkMessage } from '../message/playerWalkMessage'
 import { PlayerStopMessage } from '../message/playerStopMessage'
-import { RegisterMessageListenerEvent } from '../../networkPlugin/event/registerMessageListenerEvent'
+import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-client/event/registerMessageListenerEvent'
 import { PlayerPluginStore } from '../store/defPlayerPluginStore'
 import { PlayerLeaveMessage } from '../message/playerLeaveMessage'
 import { PriorPlayerDataMessage } from '../message/priorPlayerDataMessage'
-import { BaseSocketController } from '../../networkPlugin/interface/baseSocketController'
+import { BaseSocketController } from '@churaverse/network-plugin-client/interface/baseSocketController'
 import { PlayerTurnMessage } from '../message/playerTurnMessage'
 import { PlayerTurnEvent } from '../event/playerTurnEvent'
 import { PlayerNameChangeMessage } from '../message/playerNameChangeMessage'
@@ -78,7 +78,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
   private playerJoin(msg: PlayerJoinMessage): void {
     const playerInfo = msg.data
     const pos = new Position(playerInfo.position.x, playerInfo.position.y)
-
     const newPlayer = new Player(
       playerInfo.playerId,
       pos,

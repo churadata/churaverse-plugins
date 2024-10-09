@@ -12,14 +12,16 @@ import { Bomb } from './domain/bomb'
 import { checkExplode, removeExplodedBomb, sendExplodedBomb } from './domain/bombService'
 import { BombPluginStore } from './store/defBombPluginStore'
 import { initBombPluginStore } from './store/initBombPluginStore'
-import { RegisterOnOverlapEvent } from '../collisionDetectionPlugin/event/registerOnOverlap'
-import { Player } from '../playerPlugin/domain/player'
+import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
+import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { BombDamageCause } from './domain/bombDamageCause'
-import { NetworkPluginStore } from '../networkPlugin/store/defNetworkPluginStore'
+import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
+import { PlayerPluginStore } from '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 
 export class BombPlugin extends BasePlugin<IMainScene> {
   private bombPluginStore!: BombPluginStore
   private networkPluginStore!: NetworkPluginStore<IMainScene>
+  private playerPluginStore!: PlayerPluginStore
 
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.init.bind(this))
@@ -51,12 +53,13 @@ export class BombPlugin extends BasePlugin<IMainScene> {
   private getStores(): void {
     this.bombPluginStore = this.store.of('bombPlugin')
     this.networkPluginStore = this.store.of('networkPlugin')
+    this.playerPluginStore = this.store.of('playerPlugin')
   }
 
   private registerOnOverlap(ev: RegisterOnOverlapEvent): void {
     ev.collisionDetector.register(
       this.bombPluginStore.bombs,
-      this.store.of('playerPlugin').players,
+      this.playerPluginStore.players,
       this.bombHitPlayer.bind(this)
     )
   }

@@ -1,5 +1,5 @@
 import { CVEvent, ITitleScene } from 'churaverse-engine-client'
-import { PlayerColor } from '../../../playerPlugin/types/playerColor'
+import { PlayerColor } from '@churaverse/player-plugin-client/types/playerColor'
 
 export class TitlePlayerColorChangeEvent extends CVEvent<ITitleScene> {
   public constructor(public readonly color: PlayerColor) {

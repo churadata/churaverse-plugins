@@ -1,4 +1,4 @@
-import { BasePlugin, Scenes, EVENT_PRIORITY, PhaserSceneInit, InitEvent } from 'churaverse-engine-client'
+import { BasePlugin, Scenes, EVENT_PRIORITY, PhaserSceneInit, InitEvent, CVEvent } from 'churaverse-engine-client'
 import { Scene } from 'phaser'
 import { initNetworkPluginStore } from './store/initNetworkPluginStore'
 import { PriorDataRequestMessage } from './message/priorDataMessage'
@@ -43,8 +43,8 @@ export class NetworkPlugin extends BasePlugin<Scenes> {
   private listenRegister(): void {
     if (this.messageManager === undefined) throw new MessageManagerUndefinedError()
 
-    this.bus.post(new RegisterMessageEvent(this.messageManager))
-    this.bus.post(new RegisterMessageListenerEvent(this.messageManager))
+    this.bus.post(new RegisterMessageEvent(this.messageManager) as CVEvent<Scenes>)
+    this.bus.post(new RegisterMessageListenerEvent(this.messageManager) as CVEvent<Scenes>)
   }
 
   private requestPriorData(): void {

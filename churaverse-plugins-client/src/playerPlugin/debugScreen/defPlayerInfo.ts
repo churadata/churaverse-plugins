@@ -1,12 +1,12 @@
-import { DebugSummaryScreenSection } from '../../debugScreenPlugin/debugScreen/debugSummaryScreenSection'
+import { DebugSummaryScreenSection } from '@churaverse/debug-screen-plugin-client/debugScreen/debugSummaryScreenSection'
 
-declare module '../../debugScreenPlugin/debugScreen/IDebugScreenContainer/IDebugSummaryScreenContainer' {
+declare module '@churaverse/debug-screen-plugin-client/debugScreen/IDebugScreenContainer/IDebugSummaryScreenContainer' {
   export interface DebugScreenSettingSectionMap {
     playerInfo: DebugSummaryScreenSection
   }
 }
 
-declare module '../../debugScreenPlugin/debugScreen/dataDumper' {
+declare module '@churaverse/debug-screen-plugin-client/debugScreen/dataDumper' {
   interface DumpDataMap {
     playerId: string
     playerName: string

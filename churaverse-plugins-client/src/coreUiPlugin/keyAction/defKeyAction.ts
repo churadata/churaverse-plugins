@@ -1,6 +1,6 @@
-import { KeyAction } from '../../keyboardPlugin/keyAction/keyAction'
+import { KeyAction } from '@churaverse/keyboard-plugin-client/keyAction/keyAction'
 
-declare module '../../keyboardPlugin/keyAction/keyActions' {
+declare module '@churaverse/keyboard-plugin-client/keyAction/keyActions' {
   export interface MainKeyActionMap {
     focusNext: KeyAction
   }

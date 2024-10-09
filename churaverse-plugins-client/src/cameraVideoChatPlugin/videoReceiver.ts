@@ -10,6 +10,7 @@ import {
 } from 'livekit-client'
 import { IMainScene, Store } from 'churaverse-engine-client'
 import { IWebCameraIdDebugDetailScreen } from './debugScreen/IDebugScreen/IWebCameraInfoDebugScreen'
+import '@churaverse/popup-screen-list-plugin-client/store/defVideoStore'
 
 export class VideoReceiver {
   public constructor(

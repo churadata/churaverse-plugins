@@ -4,6 +4,7 @@ import { LkLocalMicrophoneManager } from '../localDeviceManager/livekitApi/lkLoc
 import { LkLocalSpeakerManager } from '../localDeviceManager/livekitApi/lkLocalSpeakerManager'
 import { WebRtc } from '../webRtc'
 import { WebRtcPluginStore } from './defWebRtcPluginStore'
+import '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 
 export function initWebRtcPluginStore(store: Store<IMainScene>): void {
   const ownPlayerId = store.of('playerPlugin').ownPlayerId

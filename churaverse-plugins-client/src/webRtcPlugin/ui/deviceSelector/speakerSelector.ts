@@ -1,6 +1,6 @@
 import { DeviceSelector } from './deviceSelector'
 import { IEventBus, IMainScene } from 'churaverse-engine-client'
-import { ISettingDialog } from '../../../coreUiPlugin/interface/ISettingDialog'
+import { ISettingDialog } from '@churaverse/core-ui-plugin-client/interface/ISettingDialog'
 import { ILocalSpeakerManager } from '../../interface/ILocalDeviceManager/ILocalSpeakerManager'
 import { SpeakerSelectorComponent } from './components/SpeakerSelectorComponent'
 import { Speaker } from '../../domain/localDevice/speaker'

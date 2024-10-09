@@ -9,7 +9,10 @@ export class FadeOutLogRenderer implements IFadeOutLogRenderer {
   private readonly buffer: string[] = []
   private intervalId: NodeJS.Timeout | null = null // タイマーIDを格納するプロパティ
 
-  public constructor(private readonly scene: Scene, private readonly interval: number) {}
+  public constructor(
+    private readonly scene: Scene,
+    private readonly interval: number
+  ) {}
 
   public add(message: string, x: number = 25, y: number = 400): void {
     this.buffer.push(message)

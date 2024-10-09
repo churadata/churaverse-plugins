@@ -1,9 +1,9 @@
 import { ITitleScene, Store, IEventBus, createUIContainer, DomManager } from 'churaverse-engine-client'
 import { GameObjects, Scene } from 'phaser'
 import { IJoinButtonRenderer } from '../domain/IJoinButtonRenderer'
-import { PlayerRole } from '../../../playerPlugin/types/playerRole'
+import { PlayerRole } from '@churaverse/player-plugin-client/types/playerRole'
 import { TitlePlayerPluginStore } from '../../titlePlayerPlugin/store/defTitlePlayerPlugin'
-import { TransitionPluginStore } from '../../../transitionPlugin/store/defTransitionPluginStore'
+import { TransitionPluginStore } from '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
 
 const BUTTON_COLOR = {
   /* eslint-disable */

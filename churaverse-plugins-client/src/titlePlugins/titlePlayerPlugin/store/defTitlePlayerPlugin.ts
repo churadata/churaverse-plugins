@@ -1,5 +1,5 @@
-import { IPlayerRenderer } from '../../../playerPlugin/domain/IPlayerRenderer'
-import { Player } from '../../../playerPlugin/domain/player'
+import { IPlayerRenderer } from '@churaverse/player-plugin-client/domain/IPlayerRenderer'
+import { Player } from '@churaverse/player-plugin-client/domain/player'
 import { ITitleNameFieldRenderer } from '../domain/ITitleNameFieldRenderer'
 import { ITitlePlayerRoleRenderer } from '../domain/ITitlePlayerRoleRenderer'
 

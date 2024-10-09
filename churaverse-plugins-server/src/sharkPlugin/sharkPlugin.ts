@@ -10,18 +10,20 @@ import { SharkPluginStore } from './store/defSharkPluginStore'
 import { SocketController } from './controller/socketController'
 import { initSharkPluginStore } from './store/initSharkPluginStore'
 import { Shark } from './domain/shark'
-import { MapPluginStore } from '../mapPlugin/store/defMapPluginStore'
+import { MapPluginStore } from '@churaverse/map-plugin-server/store/defMapPluginStore'
 import { moveSharks, removeDieShark } from './domain/sharkService'
-import { RegisterOnOverlapEvent } from '../collisionDetectionPlugin/event/registerOnOverlap'
-import { Player } from '../playerPlugin/domain/player'
+import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
+import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { SharkDamageCause } from './domain/sharkDamageCause'
-import { NetworkPluginStore } from '../networkPlugin/store/defNetworkPluginStore'
+import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { SharkHitMessage } from './message/sharkHitMessage'
+import { PlayerPluginStore } from '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 
 export class SharkPlugin extends BasePlugin<IMainScene> {
   private sharkPluginStore!: SharkPluginStore
   private mapPluginStore!: MapPluginStore
   private networkPluginStore!: NetworkPluginStore<IMainScene>
+  private playerPluginStore!: PlayerPluginStore
 
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.init.bind(this))
@@ -44,6 +46,7 @@ export class SharkPlugin extends BasePlugin<IMainScene> {
     this.sharkPluginStore = this.store.of('sharkPlugin')
     this.mapPluginStore = this.store.of('mapPlugin')
     this.networkPluginStore = this.store.of('networkPlugin')
+    this.playerPluginStore = this.store.of('playerPlugin')
   }
 
   private update(ev: UpdateEvent): void {
@@ -57,7 +60,7 @@ export class SharkPlugin extends BasePlugin<IMainScene> {
   private registerOnOverlap(ev: RegisterOnOverlapEvent): void {
     ev.collisionDetector.register(
       this.sharkPluginStore.sharks,
-      this.store.of('playerPlugin').players,
+      this.playerPluginStore.players,
       this.sharkHitPlayer.bind(this)
     )
   }

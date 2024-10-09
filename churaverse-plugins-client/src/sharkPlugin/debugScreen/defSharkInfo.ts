@@ -1,12 +1,12 @@
-import { DebugDetailScreenSection } from '../../debugScreenPlugin/debugScreen/debugDetailScreenSection'
+import { DebugDetailScreenSection } from '@churaverse/debug-screen-plugin-client/debugScreen/debugDetailScreenSection'
 
-declare module '../../debugScreenPlugin/debugScreen/IDebugScreenContainer/IDebugDetailScreenContainer' {
+declare module '@churaverse/debug-screen-plugin-client/debugScreen/IDebugScreenContainer/IDebugDetailScreenContainer' {
   export interface DebugDetailScreenSettingSectionMap {
     sharkInfo: DebugDetailScreenSection
   }
 }
 
-declare module '../../debugScreenPlugin/debugScreen/dataDumper' {
+declare module '@churaverse/debug-screen-plugin-client/debugScreen/dataDumper' {
   interface DumpDataMap {
     sharkCount: string
   }

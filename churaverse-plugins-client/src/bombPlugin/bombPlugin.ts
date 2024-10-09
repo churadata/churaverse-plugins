@@ -7,13 +7,14 @@ import {
   StartEvent,
   EntitySpawnEvent,
   EntityDespawnEvent,
+  Vector,
 } from 'churaverse-engine-client'
-import { DebugDetailScreenSection } from '../debugScreenPlugin/debugScreen/debugDetailScreenSection'
-import { DumpDebugDataEvent } from '../debugScreenPlugin/event/dumpDebugDataEvent'
-import { DebugScreenPluginStore } from '../debugScreenPlugin/store/defDebugScreenPluginStore'
-import { KeyboardPluginStore } from '../keyboardPlugin/store/defKeyboardPluginStore'
-import { NetworkPluginStore } from '../networkPlugin/store/defNetworkPluginStore'
-import { PlayerPluginStore } from '../playerPlugin/store/defPlayerPluginStore'
+import { DebugDetailScreenSection } from '@churaverse/debug-screen-plugin-client/debugScreen/debugDetailScreenSection'
+import { DumpDebugDataEvent } from '@churaverse/debug-screen-plugin-client/event/dumpDebugDataEvent'
+import { DebugScreenPluginStore } from '@churaverse/debug-screen-plugin-client/store/defDebugScreenPluginStore'
+import { KeyboardPluginStore } from '@churaverse/keyboard-plugin-client/store/defKeyboardPluginStore'
+import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
+import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { KeyboardController } from './controller/keyboardController'
 import { SocketController } from './controller/socketController'
 import { IBombCountDebugDetailScreen } from './debugScreen/IDebugScreen/IBombCountDebugDetailScreen'
@@ -25,7 +26,8 @@ import { BombRenderer } from './renderer/bombRenderer'
 import { BombRendererFactory } from './renderer/bombRendererFactory'
 import { BombPluginStore } from './store/defBombPluginStore'
 import { initBombPluginStore } from './store/initBombPluginStore'
-import { DeathLog } from '../playerPlugin/ui/deathLog/deathLog'
+import { DeathLog } from '@churaverse/player-plugin-client/ui/deathLog/deathLog'
+import { SendableObject } from '@churaverse/network-plugin-client/types/sendable'
 
 export class BombPlugin extends BasePlugin<IMainScene> {
   private rendererFactory?: BombRendererFactory
@@ -95,7 +97,7 @@ export class BombPlugin extends BasePlugin<IMainScene> {
 
   public spawnBomb(ev: EntitySpawnEvent): void {
     if (!(ev.entity instanceof Bomb)) return
-    const bomb = ev.entity
+    const bomb = ev.entity as Bomb
     const renderer = this.bombPluginStore.bombRendererFactory.build()
     this.bombPluginStore.bombs.set(bomb.bombId, bomb)
     this.bombPluginStore.bombRenderers.set(bomb.bombId, renderer)
@@ -106,7 +108,7 @@ export class BombPlugin extends BasePlugin<IMainScene> {
       this.networkStore.messageSender.send(
         new BombSpawnMessage({
           bombId: bomb.bombId,
-          startPos: bomb.position.toVector(),
+          startPos: bomb.position.toVector() as Vector & SendableObject,
           direction: bomb.direction,
           spawnTime: bomb.spawnTime,
         })

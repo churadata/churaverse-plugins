@@ -10,5 +10,5 @@ paths=""
 while IFS= read -r line || [ "$line" ]; do
     paths="${paths} ${package_root}/${line}"
 done < ${package_paths}
-npm link ${paths}
+npm install ${paths}
 echo "finish link package"

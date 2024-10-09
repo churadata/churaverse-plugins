@@ -1,10 +1,10 @@
 import { IEventBus, IMainScene, Store } from 'churaverse-engine-client'
-import { IPlayerListRenderer } from '../../playerListPlugin/interface/IPlayerListRenderer'
-import { PlayerListPluginStore } from '../../playerListPlugin/store/defPlayerListPluginStore'
-import { Player } from '../../playerPlugin/domain/player'
-import { OwnPlayerUndefinedError } from '../../playerPlugin/errors/ownPlayerUndefinedError'
-import { PlayerNotExistsInPlayerRepositoryError } from '../../playerPlugin/errors/playerNotExistsInPlayerRepositoryError'
-import { PlayerPluginStore } from '../../playerPlugin/store/defPlayerPluginStore'
+import { IPlayerListRenderer } from '@churaverse/player-list-plugin-client/interface/IPlayerListRenderer'
+import { PlayerListPluginStore } from '@churaverse/player-list-plugin-client/store/defPlayerListPluginStore'
+import { Player } from '@churaverse/player-plugin-client/domain/player'
+import { OwnPlayerUndefinedError } from '@churaverse/player-plugin-client/errors/ownPlayerUndefinedError'
+import { PlayerNotExistsInPlayerRepositoryError } from '@churaverse/player-plugin-client/errors/playerNotExistsInPlayerRepositoryError'
+import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { KickButton } from './kickButton/kickButton'
 
 export class KickPluginUi {

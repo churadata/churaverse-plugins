@@ -1,9 +1,10 @@
-import { TopBarIconRenderer } from '../coreUiPlugin/topBarIcon'
+import { TopBarIconRenderer } from '@churaverse/core-ui-plugin-client/topBarIcon'
 import { Store, IMainScene } from 'churaverse-engine-client'
 import { PlayerList } from './playerListDialog/playerList'
 import { PlayerListDialog } from './playerListDialog/playerListDialog'
 import { PlayerListIcon } from './playerListDialog/playerListIcon'
 import { IPlayerListUi } from './interface/IPlayerListUi'
+import '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
 
 export class PlayerListUi implements IPlayerListUi {
   public playerListDialog: PlayerListDialog

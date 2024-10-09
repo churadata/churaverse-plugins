@@ -1,10 +1,10 @@
-import { PlayerRole } from '../../playerPlugin/types/playerRole'
+import { PlayerRole } from '@churaverse/player-plugin-client/types/playerRole'
 import { IAdminSettingDialog } from '../interface/IAdminSettingDialog'
 import { IDialogSwitcher } from '../interface/IDialogSwitcher'
 import { ITopBarIconContainer } from '../interface/ITopBarIconContainer'
 import { TopBarIconRenderer } from '../topBarIcon'
 
-const ADMIN_SETTING_ICON_PATH = 'assets/adminSetting.png'
+import ADMIN_SETTING_ICON_PATH from '../assets/adminSetting.png'
 
 export class AdminSettingIcon extends TopBarIconRenderer {
   public constructor(

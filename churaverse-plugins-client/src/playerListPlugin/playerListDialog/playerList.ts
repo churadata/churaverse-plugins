@@ -1,10 +1,10 @@
 import { IPlayerListRenderer } from '../interface/IPlayerListRenderer'
-import { Player } from '../../playerPlugin/domain/player'
+import { Player } from '@churaverse/player-plugin-client/domain/player'
 import { PlayerListItemComponent } from './components/PlayerListItemComponent'
 import { DomManager } from 'churaverse-engine-client'
 import { PlayerListDialog } from './playerListDialog'
 import { PlayerListDialogPanel } from './components/PlayerListDialogPanel'
-import { PlayersRepository } from '../../playerPlugin/repository/playerRepository'
+import { PlayersRepository } from '@churaverse/player-plugin-client/repository/playerRepository'
 
 /**
  * PlayerListのプレイヤー名の横に表示する要素を返す関数

@@ -1,5 +1,5 @@
 import { Position, Direction } from 'churaverse-engine-client'
-import { IFocusableRenderer } from '../../coreUiPlugin/interface/IFocusableRenderer'
+import { IFocusableRenderer } from '@churaverse/core-ui-plugin-client/interface/IFocusableRenderer'
 import { PlayerColor } from '../types/playerColor'
 
 import { GameObjects } from 'phaser'

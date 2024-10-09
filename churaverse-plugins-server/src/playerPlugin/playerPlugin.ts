@@ -7,12 +7,13 @@ import {
   LivingDamageEvent,
   EntitySpawnEvent,
   WeaponDamageCause,
+  Vector,
 } from 'churaverse-engine-server'
 import { SocketController } from './controller/socketController'
 import { initPlayerPluginStore } from './store/initPlayerPluginStore'
 import { PLAYER_RESPAWN_WAITING_TIME_MS, Player } from './domain/player'
 import { PlayerPluginStore } from './store/defPlayerPluginStore'
-import { NetworkDisconnectEvent } from '../networkPlugin/event/networkDisconnectEvent'
+import { NetworkDisconnectEvent } from '@churaverse/network-plugin-server/event/networkDisconnectEvent'
 import { PlayerWalkEvent } from './event/playerWalkEvent'
 import { PlayerStopEvent } from './event/playerStopEvent'
 import { PlayerTurnEvent } from './event/playerTurnEvent'
@@ -20,10 +21,11 @@ import { PlayerNameChangeEvent } from './event/playerNameChangeEvent'
 import { PlayerColorChangeEvent } from './event/playerColorChangeEvent'
 import { movePlayers } from './domain/playerService'
 import { WeaponDamageMessage } from './message/weaponDamageMessage'
-import { NetworkPluginStore } from '../networkPlugin/store/defNetworkPluginStore'
+import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { PlayerDieMessage } from './message/playerDieMessage'
-import { MapPluginStore } from '../mapPlugin/store/defMapPluginStore'
+import { MapPluginStore } from '@churaverse/map-plugin-server/store/defMapPluginStore'
 import { PlayerRespawnMessage } from './message/playerRespawnMessage'
+import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
 
 export class PlayerPlugin extends BasePlugin<IMainScene> {
   private playerPluginStore!: PlayerPluginStore
@@ -65,9 +67,11 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
   }
 
   private onPlayerJoin(ev: EntitySpawnEvent): void {
+    console.log('onPlayerJoin', ev)
     if (!(ev.entity instanceof Player)) return
     const player = ev.entity
     this.playerPluginStore.players.set(player.id, player)
+    console.log('onPlayerJoin:players:', this.playerPluginStore.players)
   }
 
   private postPlayerLeaveEvent(ev: NetworkDisconnectEvent): void {
@@ -86,7 +90,9 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
   }
 
   private onPlayerWalk(ev: PlayerWalkEvent): void {
+    console.log('onPlayerWalk', ev)
     const player = this.playerPluginStore.players.get(ev.id)
+    console.log('onPlayerWalk:players:', this.playerPluginStore.players)
     if (player === undefined) return
     if (player.isDead) {
       player.stop()
@@ -149,7 +155,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
 
         const playerRespawnMessage = new PlayerRespawnMessage({
           playerId: player.id,
-          position: player.position.toVector(),
+          position: player.position.toVector() as Vector & SendableObject,
           direction: player.direction,
         })
         this.networkPluginStore.messageSender.send(playerRespawnMessage)

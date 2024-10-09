@@ -6,17 +6,18 @@ import { MapInfo } from './interface/IMapConfig'
 import { NotExistsMapConfigInfoError } from './error/notExistsMapConfigInfoError'
 
 const DEFAULT_DRAWING_LAYERS: string[] = ['Base', 'Collision']
+type PickedMapInfo = Pick<MapInfo, 'jsonName' | 'displayName' | 'drawingLayerNames' | 'tilesets'>
 
 export class MapManager implements IMapManager {
-  private readonly mapConfigInfos = new Map<string, Required<MapInfo>>()
-
+  
+  private readonly mapConfigInfos = new Map<string, Required<PickedMapInfo>>()
   private _currentMap: WorldMap
 
   public constructor() {
     // priorMapDataMessage受信後に実際のcurrentMap代入
     this._currentMap = new WorldMap('dummy', 'dummy', 1, 1, 1, 1, 1, new Map())
     Object.entries(mapConfig.maps).forEach(([mapId, _mapInfo]) => {
-      const mapInfo: Required<MapInfo> = {
+      const mapInfo: Required<PickedMapInfo> = {
         ..._mapInfo,
         drawingLayerNames: _mapInfo.drawingLayerNames ?? DEFAULT_DRAWING_LAYERS,
       }
@@ -54,7 +55,7 @@ export class MapManager implements IMapManager {
     this._currentMap = this.loadMap(mapJSON, mapId)
   }
 
-  public getMapConfigInfo(mapId: string): Required<MapInfo> {
+  public getMapConfigInfo(mapId: string): Required<PickedMapInfo> {
     const mapConfigInfo = this.mapConfigInfos.get(mapId)
     if (mapConfigInfo === undefined) throw new NotExistsMapConfigInfoError(mapId)
 

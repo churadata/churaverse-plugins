@@ -1,1 +1,1 @@
-export { WebRtcPlugin } from './webRtcPlugin'
+export * from './webRtcPlugin'

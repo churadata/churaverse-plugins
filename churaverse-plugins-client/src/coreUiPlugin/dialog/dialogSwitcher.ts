@@ -1,5 +1,5 @@
-import { IDialog } from '../interface/IDialog'
-import { IEventBus, Scenes } from 'churaverse-engine-client'
+import { IDialog } from '../domain/interface/IRender/IDialog'
+import { CVEvent, IEventBus, IMainScene, Scenes} from 'churaverse-engine-client'
 import { ActivateUiEvent } from '../event/activateUiEvent'
 import { DeactivateUiEvent } from '../event/deactivateUiEvent'
 import { DialogType, IDialogSwitcher } from '../interface/IDialogSwitcher'
@@ -13,7 +13,7 @@ export class DialogSwitcher implements IDialogSwitcher {
   private readonly postCloseCallbacks = new Map<string, () => void>()
   private target: string | null = null
 
-  public constructor(private readonly eventBus: IEventBus<Scenes>) {}
+  public constructor(private readonly eventBus: IEventBus<IMainScene>) {}
 
   /**
    * ダイアログを管理対象にする
@@ -45,7 +45,8 @@ export class DialogSwitcher implements IDialogSwitcher {
     targetDialog.open()
     postOpen()
     this.target = name
-    this.eventBus.post(new ActivateUiEvent(targetDialog))
+    
+    this.eventBus.post(new ActivateUiEvent(targetDialog) as CVEvent<Scenes>)
   }
 
   /**
@@ -57,7 +58,7 @@ export class DialogSwitcher implements IDialogSwitcher {
       if (targetDialog === undefined) return
       targetDialog.close()
       this.postCloseCallbacks.get(this.target)?.()
-      this.eventBus.post(new DeactivateUiEvent(targetDialog))
+      this.eventBus.post(new DeactivateUiEvent(targetDialog) as CVEvent<Scenes>)
       this.target = null
     }
   }

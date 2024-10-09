@@ -1,6 +1,6 @@
 import { Scene } from 'phaser'
 import { IGroundScreenRenderer } from '../interface/IGroundScreenRenderer'
-import { IFocusTargetRepository } from '../../coreUiPlugin/interface/IFocusTargetRepository'
+import { IFocusTargetRepository } from '@churaverse/core-ui-plugin-client/interface/IFocusTargetRepository'
 import { Position, layerSetting } from 'churaverse-engine-client'
 
 export class GroundScreenRenderer implements IGroundScreenRenderer {
@@ -47,9 +47,8 @@ export class GroundScreenRenderer implements IGroundScreenRenderer {
    * 共有された画面の比率に合わせて大きさを調整
    */
   private fitScale(): void {
-    if (this.phaserVideo.video === null) return
-    const videoWidth = this.phaserVideo.video.videoWidth
-    const videoHeight = this.phaserVideo.video.videoHeight
+    const videoWidth = this.phaserVideo.video?.videoWidth ?? 1920 
+    const videoHeight = this.phaserVideo.video?.videoHeight ?? 1080
 
     const xRatio = this.width / videoWidth
     const yRatio = this.height / videoHeight

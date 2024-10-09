@@ -1,5 +1,5 @@
 import { JSXFunc } from 'churaverse-engine-client'
-import dialogStyle from '../../../../../plugins/coreUiPlugin/settingDialog/style.module.scss'
+import dialogStyle from '@churaverse/core-ui-plugin-client/dialog/style.module.scss'
 import { DeviceSelectorComponent } from './DeviceSelectorComponent'
 import { Camera } from '../../../domain/localDevice/camera'
 import { CAMERA_SELECT_TAG_ID } from '../cameraSelector'

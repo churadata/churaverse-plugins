@@ -1,4 +1,4 @@
-import { WorldMap } from '../../../mapPlugin/domain/worldMap'
+import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
 import { IRectangle } from './collidableEntity/IRectangle'
 
 // 空間階層のことをレベル、
@@ -42,6 +42,7 @@ export class LinearQuadTreeSpace {
    * エンティティのidを線形四分木空間に追加する
    */
   private addNode(id: string, level: number, index: number): void {
+    console.log("addNode", {id, level, index})
     const linearIndex = this.calcLinearIndex(level, index)
 
     // もしdataの長さが足りないなら拡張
@@ -69,6 +70,7 @@ export class LinearQuadTreeSpace {
     if (cell !== null) {
       cell.add(id)
     }
+    console.log("[linearIndexList]", id, this.linearIndexList)
   }
 
   /**
@@ -77,6 +79,7 @@ export class LinearQuadTreeSpace {
    */
   public getLinearIndex(id: string): number | undefined {
     const linearIndexList = this.linearIndexList.get(id)
+    console.debug(this.linearIndexList, id, linearIndexList)
     if (linearIndexList !== undefined) {
       return linearIndexList
     } else {
@@ -99,6 +102,7 @@ export class LinearQuadTreeSpace {
    * 四分木内に存在しないidを指定した場合は何もしない
    */
   public removeActor(id: string): void {
+    console.log("removeActor", id)
     const linearIndex = this.getLinearIndex(id)
     if (linearIndex === undefined) return
     this.data[linearIndex]?.delete(id)
@@ -142,6 +146,7 @@ export class LinearQuadTreeSpace {
    * 受け取った矩形情報からモートン番号を計算し、適切なセルに割り当てる
    */
   public addActor(id: string, rect: IRectangle): void {
+    console.log("addActor")
     const left = rect.position.x - rect.width / 2
     const right = rect.position.x + rect.width / 2
     const top = rect.position.y - rect.height / 2
@@ -161,6 +166,7 @@ export class LinearQuadTreeSpace {
     // それはひとつのセルに収まっているということなので、
     // 特に計算もせずそのまま現在のレベルのセルに入れる
     if (leftTopMorton === rightBottomMorton) {
+      console.log("addActor", {id, leftTopMorton})
       this.addNode(id, this.maxLevel, leftTopMorton)
       return
     }
@@ -177,6 +183,7 @@ export class LinearQuadTreeSpace {
 
     // セルに追加する
     this.addNode(id, level, cellNumber)
+    console.log("addActor", {id, level, cellNumber})
   }
 
   /**
@@ -208,6 +215,7 @@ export class LinearQuadTreeSpace {
 
     // ワールド外に出ている場合は四分木から削除
     if (leftTopMorton === -1 && rightBottomMorton === -1) {
+      console.log("removeActor:player is outbound", id, rect, {left,right,top,bottom}, {leftTopMorton,rightBottomMorton})
       this.removeActor(id)
       return false
     }
@@ -239,6 +247,7 @@ export class LinearQuadTreeSpace {
   private updateNode(id: string, level: number, index: number): void {
     const linearIndex = this.calcLinearIndex(level, index)
     if (linearIndex !== this.getLinearIndex(id)) {
+      console.log("updateNode", {id, level, index})
       this.removeActor(id)
       this.addNode(id, level, index)
     }

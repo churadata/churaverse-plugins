@@ -1,7 +1,7 @@
 import { ITitleScene, Store } from 'churaverse-engine-client'
-import { Player } from '../../../playerPlugin/domain/player'
+import { Player } from '@churaverse/player-plugin-client/domain/player'
 import { TitlePlayerPluginStore } from './defTitlePlayerPlugin'
-import { IPlayerRenderer } from '../../../playerPlugin/domain/IPlayerRenderer'
+import { IPlayerRenderer } from '@churaverse/player-plugin-client/domain/IPlayerRenderer'
 import { ITitleNameFieldRenderer } from '../domain/ITitleNameFieldRenderer'
 import { ITitlePlayerRoleRenderer } from '../domain/ITitlePlayerRoleRenderer'
 

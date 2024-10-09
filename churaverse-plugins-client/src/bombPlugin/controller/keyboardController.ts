@@ -1,9 +1,9 @@
 import { IMainScene, IEventBus, Store, Position, uniqueId, EntitySpawnEvent } from 'churaverse-engine-client'
-import { RegisterKeyActionEvent } from '../../keyboardPlugin/event/registerKeyActionEvent'
-import { RegisterKeyActionListenerEvent } from '../../keyboardPlugin/event/registerKeyActionListenerEvent'
-import { BaseKeyboardController } from '../../keyboardPlugin/interface/baseKeyboardController'
-import { KeyAction } from '../../keyboardPlugin/keyAction/keyAction'
-import { PlayerPluginStore } from '../../playerPlugin/store/defPlayerPluginStore'
+import { RegisterKeyActionEvent } from '@churaverse/keyboard-plugin-client/event/registerKeyActionEvent'
+import { RegisterKeyActionListenerEvent } from '@churaverse/keyboard-plugin-client/event/registerKeyActionListenerEvent'
+import { BaseKeyboardController } from '@churaverse/keyboard-plugin-client/interface/baseKeyboardController'
+import { KeyAction } from '@churaverse/keyboard-plugin-client/keyAction/keyAction'
+import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { Bomb } from '../domain/bomb'
 
 /**
@@ -23,7 +23,7 @@ export class KeyboardController extends BaseKeyboardController<IMainScene> {
   }
 
   public registerKeyAction(ev: RegisterKeyActionEvent<IMainScene>): void {
-    ev.keyActionRegister.registerKeyAction(new KeyAction('DropBomb', 'Z', 'inGame', 320))
+    ev.keyActionRegister.registerKeyAction(new KeyAction('DropBomb', 'X', 'inGame', 320))
   }
 
   public registerKeyActionListener(ev: RegisterKeyActionListenerEvent<IMainScene>): void {

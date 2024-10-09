@@ -1,5 +1,4 @@
 import { IEventBus, IMainScene, Store } from 'churaverse-engine-client'
-
 import { DebugDetailScreenContainer } from '../debugScreen/debugDetailScreenContainer'
 import { DebugSummaryScreenContainer } from '../debugScreen/debugSummaryScreenContainer'
 import { DebugScreenPluginStore } from './defDebugScreenPluginStore'

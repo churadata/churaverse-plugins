@@ -3,7 +3,7 @@ import { IDialogSwitcher } from '../interface/IDialogSwitcher'
 import { ISettingDialog } from '../interface/ISettingDialog'
 import { ITopBarIconContainer } from '../interface/ITopBarIconContainer'
 
-const SETTING_ICON_PATH = 'src/game/plugins/coreUiPlugin/assets/gear.png'
+import SETTING_ICON_PATH from '../assets/gear.png'
 
 export class SettingIcon extends TopBarIconRenderer {
   public constructor(

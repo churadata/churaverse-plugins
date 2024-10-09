@@ -2,7 +2,7 @@ import { Microphone } from '../../../domain/localDevice/microphone'
 import { JSXFunc } from 'churaverse-engine-client'
 import { MIC_SELECT_TAG_ID } from '../micSelector'
 import { DeviceSelectorComponent } from './DeviceSelectorComponent'
-import dialogStyle from '../../../../../plugins/coreUiPlugin/settingDialog/style.module.scss'
+import dialogStyle from '@churaverse/core-ui-plugin-client/settingDialog/style.module.scss'
 import style from './MicSelectorComponent.module.scss'
 
 interface Props {

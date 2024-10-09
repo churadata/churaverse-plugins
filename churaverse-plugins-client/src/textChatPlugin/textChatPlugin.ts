@@ -3,14 +3,14 @@ import { Scene } from 'phaser'
 import { SendTextChatEvent } from './event/sendTextChatEvent'
 import { initTextChatPluginStore } from './store/initTextChatPluginStore'
 import { TextChatPluginStore } from './store/defTextChatPluginStore'
-import { NetworkPluginStore } from '../networkPlugin/store/defNetworkPluginStore'
+import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { TextChat } from './model/textChat'
 import { SocketController } from './controller/socketController'
 import { AddTextChatEvent } from './event/addTextChatEvent'
 import { SendTextChatMessage } from './message/sendTextChatMessage'
 import { ITextChatUi } from './ui/interface/ITextChatUi'
 import { TextChatUi } from './ui/textChatUi'
-import { PlayerNameChangeEvent } from '../playerPlugin/event/playerNameChangeEvent'
+import { PlayerNameChangeEvent } from '@churaverse/player-plugin-client/event/playerNameChangeEvent'
 
 export class TextChatPlugin extends BasePlugin<IMainScene> {
   private scene?: Scene

@@ -3,7 +3,7 @@ import { ILocalCameraManager } from '../../interface/ILocalDeviceManager/ILocalC
 import { DeviceSelector } from './deviceSelector'
 import { IEventBus, IMainScene } from 'churaverse-engine-client'
 import { CameraSelectorComponent } from './components/CameraSelectorComponent'
-import { ISettingDialog } from '../../../coreUiPlugin/interface/ISettingDialog'
+import { ISettingDialog } from '@churaverse/core-ui-plugin-client/interface/ISettingDialog'
 
 /**
  * カメラセレクタのHTML内にあるselectタグのid

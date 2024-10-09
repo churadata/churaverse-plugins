@@ -1,11 +1,11 @@
 import { BasePlugin, IMainScene } from 'churaverse-engine-client'
-import { DebugDetailScreenSection } from '../debugScreenPlugin/debugScreen/debugDetailScreenSection'
-import { DumpDebugDataEvent } from '../debugScreenPlugin/event/dumpDebugDataEvent'
-import { DebugScreenPluginStore } from '../debugScreenPlugin/store/defDebugScreenPluginStore'
-import { IGroundScreenRenderer } from '../groundScreenPlugin/interface/IGroundScreenRenderer'
-import { GroundScreenPluginStore } from '../groundScreenPlugin/store/defGroundScreenPluginStore'
-import { PlayerPluginStore } from '../playerPlugin/store/defPlayerPluginStore'
-import { WebRtcPluginStore } from '../webRtcPlugin/store/defWebRtcPluginStore'
+import { DebugDetailScreenSection } from '@churaverse/debug-screen-plugin-client/debugScreen/debugDetailScreenSection'
+import { DumpDebugDataEvent } from '@churaverse/debug-screen-plugin-client/event/dumpDebugDataEvent'
+import { DebugScreenPluginStore } from '@churaverse/debug-screen-plugin-client/store/defDebugScreenPluginStore'
+import { IGroundScreenRenderer } from '@churaverse/ground-screen-plugin-client/interface/IGroundScreenRenderer'
+import { GroundScreenPluginStore } from '@churaverse/ground-screen-plugin-client/store/defGroundScreenPluginStore'
+import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
+import { WebRtcPluginStore } from '@churaverse/web-rtc-plugin-client/store/defWebRtcPluginStore'
 import {
   IScreenShareIdDebugDetailScreen,
   IScreenShareMyStatusDebugDetailScreen,
@@ -17,6 +17,7 @@ import { StopScreenShare } from './event/stopScreenShareEvent'
 import { ScreenShareReceiver } from './screenShareReceiver'
 import { ScreenShareSender } from './screenShareSender'
 import { ScreenShareUi } from './ui/screenShareUi'
+
 
 export class ScreenSharePlugin extends BasePlugin<IMainScene> {
   private webRtcPluginStore!: WebRtcPluginStore

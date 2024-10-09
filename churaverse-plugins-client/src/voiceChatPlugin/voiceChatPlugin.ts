@@ -1,9 +1,9 @@
 import { Scene } from 'phaser'
 import { EntitySpawnEvent, PhaserLoadAssets, IMainScene, BasePlugin, PhaserSceneInit } from 'churaverse-engine-client'
-import { NetworkPluginStore } from '../networkPlugin/store/defNetworkPluginStore'
-import { Player } from '../playerPlugin/domain/player'
-import { PlayerPluginStore } from '../playerPlugin/store/defPlayerPluginStore'
-import { WebRtcPluginStore } from '../webRtcPlugin/store/defWebRtcPluginStore'
+import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
+import { isPlayer } from '@churaverse/player-plugin-client/domain/player'
+import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
+import { WebRtcPluginStore } from '@churaverse/web-rtc-plugin-client/store/defWebRtcPluginStore'
 import { SocketController } from './controller/socketController'
 import { IVoiceChatSender } from './domain/IVoiceChatSender'
 import { JoinVoiceChatEvent } from './event/joinVoiceChatEvent'
@@ -20,15 +20,15 @@ import { VoiceChatUi } from './ui/voiceChatUi'
 import { VoiceChatReceiver } from './voiceChatReceiver'
 import { VoiceChatSender } from './voiceChatSender'
 import { VoiceChatVolumeController } from './voiceChatVolumeController'
-import { DebugScreenPluginStore } from '../debugScreenPlugin/store/defDebugScreenPluginStore'
+import { DebugScreenPluginStore } from '@churaverse/debug-screen-plugin-client/store/defDebugScreenPluginStore'
 import { MicrophoneMyStatusDebugDetailScreen } from './debugScreen/microphoneMyStatusDebugDetailScreen'
 import { MegaphoneMyStatusDebugDetailScreen } from './debugScreen/megaphoneMyStatusDebugDetailScreen'
-import { DebugDetailScreenSection } from '../debugScreenPlugin/debugScreen/debugDetailScreenSection'
+import { DebugDetailScreenSection } from '@churaverse/debug-screen-plugin-client/debugScreen/debugDetailScreenSection'
 import {
   IMegaphoneMyStatusDebugDetailScreen,
   IMicrophoneMyStatusDebugDetailScreen,
 } from './debugScreen/IDebugScreen/IVoiceChatInfoDebugDetailScreen'
-import { DumpDebugDataEvent } from '../debugScreenPlugin/event/dumpDebugDataEvent'
+import { DumpDebugDataEvent } from '@churaverse/debug-screen-plugin-client/event/dumpDebugDataEvent'
 
 export class VoiceChatPlugin extends BasePlugin<IMainScene> {
   private voiceChatPluginStore!: VoiceChatPluginStore
@@ -122,7 +122,8 @@ export class VoiceChatPlugin extends BasePlugin<IMainScene> {
   }
 
   private onJoinPlayer(ev: EntitySpawnEvent): void {
-    if (!(ev.entity instanceof Player)) return
+    // Check if ev.entity is capable of being a Player
+    if (!isPlayer(ev.entity)) return
     const playerId = ev.entity.id
     this.bus.post(new ToggleMegaphoneEvent(playerId, true))
     this.voiceChatVolumeController?.activateMegaphone(playerId)

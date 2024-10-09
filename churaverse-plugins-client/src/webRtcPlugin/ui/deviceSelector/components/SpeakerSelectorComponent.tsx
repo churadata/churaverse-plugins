@@ -1,6 +1,6 @@
 import { JSXFunc } from 'churaverse-engine-client'
 import { DeviceSelectorComponent } from './DeviceSelectorComponent'
-import dialogStyle from '../../../../../plugins/coreUiPlugin/settingDialog/style.module.scss'
+import dialogStyle from '@churaverse/core-ui-plugin-client/settingDialog/style.module.scss'
 import { Speaker } from '../../../domain/localDevice/speaker'
 import { SPEAKER_SELECT_TAG_ID } from '../speakerSelector'
 import style from './SpeakerSelectorComponent.module.scss'

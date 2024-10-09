@@ -8,25 +8,27 @@ import {
   EntitySpawnEvent,
   EntityDespawnEvent,
   GRID_SIZE,
+  Vector,
 } from 'churaverse-engine-client'
 import { KeyboardController } from './controller/keyboardController'
 import { SharkRendererFactory } from './renderer/sharkRendererFactory'
 import { SharkPluginStore } from './store/defSharkPluginStore'
-import { PlayerPluginStore } from '../playerPlugin/store/defPlayerPluginStore'
-import { NetworkPluginStore } from '../networkPlugin/store/defNetworkPluginStore'
+import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
+import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { initSharkPluginStore } from './store/initSharkPluginStore'
 import { SharkRenderer } from './renderer/sharkRenderer'
 import { Shark, SHARK_WALK_LIMIT_GRIDS } from './domain/shark'
 import { ISharkRenderer } from './domain/ISharkRenderer'
 import { SharkSpawnMessage } from './message/sharkSpawnMessage'
 import { SocketController } from './controller/socketController'
-import { KeyboardPluginStore } from '../keyboardPlugin/store/defKeyboardPluginStore'
-import { DeathLog } from '../playerPlugin/ui/deathLog/deathLog'
-import { DebugScreenPluginStore } from '../debugScreenPlugin/store/defDebugScreenPluginStore'
-import { DebugDetailScreenSection } from '../debugScreenPlugin/debugScreen/debugDetailScreenSection'
+import { KeyboardPluginStore } from '@churaverse/keyboard-plugin-client/store/defKeyboardPluginStore'
+import { DeathLog } from '@churaverse/player-plugin-client/ui/deathLog/deathLog'
+import { DebugScreenPluginStore } from '@churaverse/debug-screen-plugin-client/store/defDebugScreenPluginStore'
+import { DebugDetailScreenSection } from '@churaverse/debug-screen-plugin-client/debugScreen/debugDetailScreenSection'
 import { SharkCountDebugDetailScreen } from './debugScreen/sharkCountDebugDetailScreen'
-import { DumpDebugDataEvent } from '../debugScreenPlugin/event/dumpDebugDataEvent'
+import { DumpDebugDataEvent } from '@churaverse/debug-screen-plugin-client/event/dumpDebugDataEvent'
 import { ISharkCountDebugDetailScreen } from './debugScreen/IDebugScreen/ISharkCountDebugDetailScreen'
+import { Sendable } from '@churaverse/network-plugin-client/types/sendable'
 
 export class SharkPlugin extends BasePlugin<IMainScene> {
   private rendererFactory?: SharkRendererFactory
@@ -106,7 +108,7 @@ export class SharkPlugin extends BasePlugin<IMainScene> {
       this.networkStore.messageSender.send(
         new SharkSpawnMessage({
           sharkId: shark.sharkId,
-          startPos: shark.position.toVector(),
+          startPos: shark.position.toVector() as Vector & Sendable,
           direction: shark.direction,
           spawnTime: shark.spawnTime,
         })

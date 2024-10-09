@@ -3,7 +3,7 @@ import { ITitleArrowButtonRenderer } from '../../domain/ITitleArrowButtonRendere
 import { Scene } from 'phaser'
 import { TitlePlayerPluginStore } from '../../store/defTitlePlayerPlugin'
 import { TitlePlayerColorChangeEvent } from '../../event/titlePlayerColorChangeEvent'
-import { PLAYER_COLOR_NAMES, PlayerColor } from '../../../../playerPlugin/types/playerColor'
+import { PLAYER_COLOR_NAMES, PlayerColor } from '@churaverse/player-plugin-client/types/playerColor'
 import arrowRightImage from '../../assets/arrow_right.png'
 import arrowLeftImage from '../../assets/arrow_left.png'
 

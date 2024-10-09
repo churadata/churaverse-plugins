@@ -1,9 +1,9 @@
 import { Vector, IMainScene, Direction } from 'churaverse-engine-client'
-import { BaseMessage } from '../../networkPlugin/message/baseMessage'
-import { SendableObject } from '../../networkPlugin/types/sendable'
+import { BaseMessage } from '@churaverse/network-plugin-client/message/baseMessage'
+import { Sendable, SendableObject } from '@churaverse/network-plugin-client/types/sendable'
 
 export interface PlayerWalkData extends SendableObject {
-  startPos: Vector
+  startPos: Vector & Sendable
   direction: Direction
   speed: number
 }
@@ -14,7 +14,7 @@ export class PlayerWalkMessage extends BaseMessage<IMainScene> {
   }
 }
 
-declare module '../../networkPlugin/message/messages' {
+declare module '@churaverse/network-plugin-client/message/messages' {
   export interface MainMessageMap {
     playerWalk: PlayerWalkMessage
   }

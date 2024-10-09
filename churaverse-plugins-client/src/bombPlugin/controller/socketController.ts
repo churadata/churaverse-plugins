@@ -7,15 +7,15 @@ import {
   EntityDespawnEvent,
   LivingDamageEvent,
 } from 'churaverse-engine-client'
-import { RegisterMessageEvent } from '../../networkPlugin/event/registerMessageEvent'
-import { RegisterMessageListenerEvent } from '../../networkPlugin/event/registerMessageListenerEvent'
-import { BaseSocketController } from '../../networkPlugin/interface/baseSocketController'
+import { RegisterMessageEvent } from '@churaverse/network-plugin-client/event/registerMessageEvent'
+import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-client/event/registerMessageListenerEvent'
+import { BaseSocketController } from '@churaverse/network-plugin-client/interface/baseSocketController'
 import { Bomb } from '../domain/bomb'
 import { BombSpawnMessage } from '../message/bombSpawnMessage'
 import { BombPluginStore } from '../store/defBombPluginStore'
 import { BombExplosionMessage } from '../message/bombExplosionMessage'
-import { WeaponDamageMessage } from '../../playerPlugin/message/weaponDamageMessage'
-import { PlayerPluginStore } from '../../playerPlugin/store/defPlayerPluginStore'
+import { WeaponDamageMessage } from '@churaverse/player-plugin-client/message/weaponDamageMessage'
+import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { BombDamageCause } from '../domain/bombDamageCause'
 
 export class SocketController extends BaseSocketController<IMainScene> {

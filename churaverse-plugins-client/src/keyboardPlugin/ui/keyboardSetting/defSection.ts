@@ -1,6 +1,6 @@
-import { SettingSection } from '../../../coreUiPlugin/settingDialog/settingSection'
+import { SettingSection } from '@churaverse/core-ui-plugin-client/settingDialog/settingSection'
 
-declare module '../../../coreUiPlugin/settingDialog/settingDialog' {
+declare module '@churaverse/core-ui-plugin-client/settingDialog/settingDialog' {
   export interface SettingSectionMap {
     keyboardSetting: SettingSection
   }

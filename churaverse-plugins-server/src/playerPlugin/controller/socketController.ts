@@ -1,11 +1,11 @@
-import { IEventBus, IMainScene, Store, EntityDespawnEvent, EntitySpawnEvent, Position } from 'churaverse-engine-server'
+import { IEventBus, IMainScene, Store, EntityDespawnEvent, EntitySpawnEvent, Position, Vector } from 'churaverse-engine-server'
 import { Player } from '../domain/player'
-import { NetworkDisconnectEvent } from '../../networkPlugin/event/networkDisconnectEvent'
-import { RegisterMessageEvent } from '../../networkPlugin/event/registerMessageEvent'
-import { RegisterMessageListenerEvent } from '../../networkPlugin/event/registerMessageListenerEvent'
-import { BaseSocketController } from '../../networkPlugin/interface/baseSocketController'
-import { PriorDataRequestMessage } from '../../networkPlugin/message/priorDataMessage'
-import { NetworkPluginStore } from '../../networkPlugin/store/defNetworkPluginStore'
+import { NetworkDisconnectEvent } from '@churaverse/network-plugin-server/event/networkDisconnectEvent'
+import { RegisterMessageEvent } from '@churaverse/network-plugin-server/event/registerMessageEvent'
+import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-server/event/registerMessageListenerEvent'
+import { BaseSocketController } from '@churaverse/network-plugin-server/interface/baseSocketController'
+import { PriorDataRequestMessage } from '@churaverse/network-plugin-server/message/priorDataMessage'
+import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { PlayerColorChangeEvent } from '../event/playerColorChangeEvent'
 import { PlayerNameChangeEvent } from '../event/playerNameChangeEvent'
 import { PlayerStopEvent } from '../event/playerStopEvent'
@@ -23,6 +23,7 @@ import { PlayerPluginStore } from '../store/defPlayerPluginStore'
 import { WeaponDamageMessage } from '../message/weaponDamageMessage'
 import { PlayerDieMessage } from '../message/playerDieMessage'
 import { PlayerRespawnMessage } from '../message/playerRespawnMessage'
+import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private networkPluginStore!: NetworkPluginStore<IMainScene>
@@ -92,7 +93,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
   private playerDomainToSendableObject(player: Player): PlayerJoinData {
     const info: PlayerJoinData = {
       hp: player.hp,
-      position: player.position.toVector(),
+      position: player.position.toVector() as Vector & SendableObject,
       direction: player.direction,
       playerId: player.id,
       heroColor: player.color,

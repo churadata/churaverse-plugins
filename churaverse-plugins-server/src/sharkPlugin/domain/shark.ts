@@ -1,7 +1,7 @@
-import { ICollidableEntity } from '../../collisionDetectionPlugin/domain/collisionDetection/collidableEntity/ICollidableEntity'
-import { IRectangle } from '../../collisionDetectionPlugin/domain/collisionDetection/collidableEntity/IRectangle'
+import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/ICollidableEntity'
+import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
 import { Position, Direction, Vector, Entity, WeaponEntity } from 'churaverse-engine-server'
-import { WorldMap } from '../../mapPlugin/domain/worldMap'
+import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
 
 export const SHARK_WALK_LIMIT_GRIDS = 25
 export const SHARK_WALK_LIMIT_MS = 2400

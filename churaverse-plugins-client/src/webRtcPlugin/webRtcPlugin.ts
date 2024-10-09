@@ -1,15 +1,11 @@
-import { BasePlugin, IMainScene, getPluginConfig } from 'churaverse-engine-client'
+import { BasePlugin, IMainScene } from 'churaverse-engine-client'
 import { ChangeLocalDeviceEvent } from './event/changeLocalDeviceEvent'
 import { WebRtcPluginStore } from './store/defWebRtcPluginStore'
 import { initWebRtcPluginStore } from './store/initWebRtcPluginStore'
 import { WebRtcUi } from './ui/webRtcUi'
+import '@churaverse/transition-plugin-client/event/willSceneTransitionEvent'
 
 export class WebRtcPlugin extends BasePlugin<IMainScene> {
-  public static get backendLivekitUrl(): string {
-    const _backendLivekitUrl = getPluginConfig().options?.webRtcPlugin.backendLivekitUrl
-    return _backendLivekitUrl ?? 'ws://localhost:8080/livekit'
-  }
-
   private webRtcPluginStore!: WebRtcPluginStore
   private webRtcUi?: WebRtcUi
 

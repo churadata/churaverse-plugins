@@ -1,7 +1,7 @@
 import { PLAYER_COLOR_NAMES, PlayerColor } from '../../../types/playerColor'
 import { JSXFunc } from 'churaverse-engine-client'
 import { PLAYER_COLOR_BUTTON_ID } from '../playerColorButtons'
-import dialogStyle from '../../../../coreUiPlugin/settingDialog/style.module.scss'
+import dialogStyle from '@churaverse/core-ui-plugin-client/settingDialog/style.module.scss'
 import style from './PlayerColorButtonsComponent.module.scss'
 
 interface Props {
