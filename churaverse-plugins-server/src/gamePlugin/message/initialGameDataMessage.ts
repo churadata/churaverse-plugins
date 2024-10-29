@@ -3,21 +3,21 @@ import { BaseMessage } from '@churaverse/network-plugin-server/message/baseMessa
 import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
 import { GameIds } from '../interface/gameIds'
 
-export interface GameEndData extends SendableObject {
-  gameId: GameIds
+export interface InitialGameData extends SendableObject {
+  runningGameIds: GameIds[]
 }
 
 /**
- * ゲーム終了のメッセージ
+ * サーバーから送信される進行中のゲームデータを保存するメッセージ
  */
-export class GameEndMessage extends BaseMessage<IMainScene> {
-  public constructor(public readonly data: GameEndData) {
-    super('gameEnd', data)
+export class InitialGameDataMessage extends BaseMessage<IMainScene> {
+  public constructor(public readonly data: InitialGameData) {
+    super('initialGameData', data)
   }
 }
 
 declare module '@churaverse/network-plugin-server/message/messages' {
   export interface MainMessageMap {
-    gameEnd: GameEndMessage
+    initialGameData: InitialGameDataMessage
   }
 }

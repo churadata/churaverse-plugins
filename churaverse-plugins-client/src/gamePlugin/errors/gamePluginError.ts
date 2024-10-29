@@ -1,4 +1,4 @@
-import { CVError } from 'churaverse-engine-server'
+import { CVError } from 'churaverse-engine-client'
 
 /**
  * ゲームに関連するエラーを表すクラス

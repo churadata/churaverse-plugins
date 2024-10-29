@@ -1,5 +1,5 @@
 {
-  "name": "@churaverse/game-plugin-server",
+  "name": "@churaverse/synchro-break-plugin-server",
   "version": "0.1.0",
   "description": "",
   "main": "dist/index.js",
@@ -13,7 +13,6 @@
   "dependencies": {
     "churaverse-engine-server": "^0.1.0",
     "@churaverse/network-plugin-server": "^0.1.0",
-    "@churaverse/player-plugin-server": "^0.1.0",
-    "@churaverse/synchro-break-plugin-server": "file:../synchroBreakPlugin"
+    "@churaverse/game-plugin-server": "file:../gamePlugin"
   }
 }

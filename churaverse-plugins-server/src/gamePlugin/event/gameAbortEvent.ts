@@ -2,20 +2,20 @@ import { CVEvent, IMainScene } from 'churaverse-engine-server'
 import { GameIds } from '../interface/gameIds'
 
 /**
- * ゲーム開始時のイベント
- * @param playerId ゲームを開始したプレイヤーのID
+ * ゲーム中断時のイベント
+ * @param playerId ゲームを中断したプレイヤーのID
  */
-export class GameStartEvent extends CVEvent<IMainScene> {
+export class GameAbortEvent extends CVEvent<IMainScene> {
   public constructor(
     public readonly gameId: GameIds,
     public readonly playerId: string
   ) {
-    super('gameStart', true)
+    super('gameAbort', true)
   }
 }
 
 declare module 'churaverse-engine-server' {
   export interface CVMainEventMap {
-    gameStart: GameStartEvent
+    gameAbort: GameAbortEvent
   }
 }

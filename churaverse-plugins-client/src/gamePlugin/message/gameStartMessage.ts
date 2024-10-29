@@ -1,10 +1,11 @@
 import { IMainScene } from 'churaverse-engine-client'
 import { BaseMessage } from '@churaverse/network-plugin-client/message/baseMessage'
 import { SendableObject } from '@churaverse/network-plugin-client/types/sendable'
+import { GameIds } from '../interface/gameIds'
 
 export interface GameStartData extends SendableObject {
+  gameId: GameIds
   playerId: string
-  gameName: string
 }
 
 /**
@@ -16,7 +17,6 @@ export class GameStartMessage extends BaseMessage<IMainScene> {
   }
 }
 
-// モジュールの型拡張
 declare module '@churaverse/network-plugin-client/message/messages' {
   export interface MainMessageMap {
     gameStart: GameStartMessage

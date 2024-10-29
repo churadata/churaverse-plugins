@@ -1,5 +1,5 @@
 {
-  "name": "@churaverse/game-plugin-client",
+  "name": "@churaverse/synchro-break-plugin-client",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
@@ -45,7 +45,7 @@
     "@churaverse/title-plugin-client": "~0.1.0",
     "@churaverse/transition-plugin-client": "~0.1.0",
     "@churaverse/voice-chat-plugin-client": "~0.1.0",
-    "@churaverse/synchro-break-plugin-client": "file:../synchroBreakPlugin",
+    "@churaverse/game-plugin-client": "file:../gamePlugin",
     "churaverse-engine-client": "~0.1.0"
   }
 }

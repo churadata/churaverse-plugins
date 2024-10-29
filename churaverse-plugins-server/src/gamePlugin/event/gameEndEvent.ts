@@ -1,12 +1,11 @@
 import { CVEvent, IMainScene } from 'churaverse-engine-server'
-import { FinishState } from '../message/gameEndMessage'
+import { GameIds } from '../interface/gameIds'
 
+/**
+ * ゲーム終了時のイベント
+ */
 export class GameEndEvent extends CVEvent<IMainScene> {
-  public constructor(
-    public readonly playerId: string,
-    public readonly gameName: string,
-    public readonly finishStatus: FinishState
-  ) {
+  public constructor(public readonly gameId: GameIds) {
     super('gameEnd', true)
   }
 }
