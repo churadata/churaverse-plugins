@@ -22,11 +22,11 @@ export class GamePlugin extends BasePlugin<IMainScene> {
   public listenEvent(): void {
     this.bus.subscribeEvent('start', this.init.bind(this))
 
-    const socketcontroller = new SocketController(this.bus, this.store)
-    this.bus.subscribeEvent('registerMessage', socketcontroller.registerMessage.bind(socketcontroller))
-    this.bus.subscribeEvent('registerMessageListener', socketcontroller.registerMessageListener.bind(socketcontroller))
+    const socketController = new SocketController(this.bus, this.store)
+    this.bus.subscribeEvent('registerMessage', socketController.registerMessage.bind(socketController))
+    this.bus.subscribeEvent('registerMessageListener', socketController.registerMessageListener.bind(socketController))
 
-    this.bus.subscribeEvent('initialGameData', this.initilaGameData.bind(this))
+    this.bus.subscribeEvent('initialGameData', this.initialGameData.bind(this))
     this.bus.subscribeEvent('gameStart', this.gameStart.bind(this))
     this.bus.subscribeEvent('gameEnd', this.gameEnd.bind(this))
     this.bus.subscribeEvent('gameAbort', this.gameAbort.bind(this))
@@ -44,8 +44,8 @@ export class GamePlugin extends BasePlugin<IMainScene> {
   /**
    * ワールド入室時に進行中のゲームのダイアログアイコンのボタンを中断に変更する
    */
-  private initilaGameData(ev: InitialGameDataEvent): void {
-    for (const gameId of ev.runnigGameIds) {
+  private initialGameData(ev: InitialGameDataEvent): void {
+    for (const gameId of ev.runningGameIds) {
       if (!this.gamePluginStore.gameRepository.has(gameId)) {
         this.gameManager.createGame(gameId, true)
         this.gamePluginStore.gameDialogRepository.get(gameId)?.setGameAbortButtonText()

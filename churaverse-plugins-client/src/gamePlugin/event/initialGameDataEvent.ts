@@ -2,11 +2,11 @@ import { CVEvent, IMainScene } from 'churaverse-engine-client'
 import { GameIds } from '../interface/gameIds'
 
 /**
- * ゲーム中断時のイベント
- * @param playerId ゲームを中断したプレイヤーID
+ * サーバーから受け取る進行中のゲームデータを保存するイベント
+ * @param runningGameIds 進行中のゲームid
  */
 export class InitialGameDataEvent extends CVEvent<IMainScene> {
-  public constructor(public readonly runnigGameIds: GameIds[]) {
+  public constructor(public readonly runningGameIds: GameIds[]) {
     super('initialGameData', true)
   }
 }

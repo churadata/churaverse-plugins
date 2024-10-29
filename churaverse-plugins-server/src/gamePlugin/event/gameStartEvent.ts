@@ -3,7 +3,7 @@ import { GameIds } from '../interface/gameIds'
 
 /**
  * ゲーム開始時のイベント
- * @param playerId ゲームを開始したプレイヤーのID
+ * @param playerId ゲームを開始したプレイヤーid
  */
 export class GameStartEvent extends CVEvent<IMainScene> {
   public constructor(

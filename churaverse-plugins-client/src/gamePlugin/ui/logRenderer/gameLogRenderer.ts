@@ -10,7 +10,7 @@ export class GameLogRenderer implements IGameLogRenderer {
 
   /**
    * ゲーム開始をログで表示
-   * @param playerId ゲームを開始したプレイヤーID
+   * @param playerId ゲームを開始したプレイヤーid
    */
   public gameStartLog(gameId: GameIds, playerId: string): void {
     const playerName = this.getPlayerName(playerId)
@@ -39,7 +39,7 @@ export class GameLogRenderer implements IGameLogRenderer {
 
   /**
    * ゲーム中断をログで表示
-   * @param playerId ゲームを中断したプレイヤーID
+   * @param playerId ゲームを中断したプレイヤーid
    */
   public gameAbortLog(gameId: GameIds, playerId: string): void {
     const gameName = this.getGameName(gameId)
@@ -56,7 +56,7 @@ export class GameLogRenderer implements IGameLogRenderer {
   }
 
   /**
-   * プレイヤーIDからプレイヤー名を取得
+   * プレイヤーidからプレイヤー名を取得
    */
   private getPlayerName(playerId: string): string {
     const player: Player | undefined = this.store.of('playerPlugin').players.get(playerId)

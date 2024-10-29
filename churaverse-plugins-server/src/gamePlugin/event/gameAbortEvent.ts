@@ -3,7 +3,7 @@ import { GameIds } from '../interface/gameIds'
 
 /**
  * ゲーム中断時のイベント
- * @param playerId ゲームを中断したプレイヤーのID
+ * @param playerId ゲームを中断したプレイヤーid
  */
 export class GameAbortEvent extends CVEvent<IMainScene> {
   public constructor(
