@@ -204,7 +204,9 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     this.updateDebugScreenPlayerName()
     this.updateDebugScreenPlayerPosition()
     this.updateDebugScreenPlayerRole()
-    setInterval(() => this.updateDebugScreenPlayerPosition(), 100)
+    setInterval(() => {
+      this.updateDebugScreenPlayerPosition()
+    }, 100)
   }
 
   private willSceneTransition(): void {
@@ -222,7 +224,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     if (!(ev.entity instanceof Player)) {
       return
     }
-    const player = ev.entity as Player
+    const player = ev.entity
     this.playerPluginStore.players.set(player.id, player)
     const ownPlayerSpawnTime = this.playerPluginStore.players.get(this.playerPluginStore.ownPlayerId)?.spawnTime ?? 0
     if (ownPlayerSpawnTime <= player.spawnTime) {
@@ -356,7 +358,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
   }
 
   private onTurnPlayer(ev: PlayerTurnEvent): void {
-    this.stopPlayer(ev.id)
+    // this.stopPlayer(ev.id)
     if (this.isPlayerDead(ev.id)) return
 
     this.playerPluginStore.players.get(ev.id)?.turn(ev.direction)
