@@ -1,0 +1,27 @@
+.container {
+  position: fixed;
+  top: 14%; /* 画面の上部から中央に配置 */
+  left: 50%; /* 画面の左側から中央に配置 */
+  transform: translate(-50%, -50%); /* 中央揃え */
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent; /* 背景色を透明にする */
+  padding: 0; /* パディングを0にする */
+  width: 180px;
+  height: 60px;
+  font-family: 'Hannotate SC';
+}
+
+.timer {
+  font-size: 40px;
+  font-family: 'Hannotate SC';
+  color: black; /* 文字色を黒にする */
+  width: 180px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0; /* パディングを0にする */
+}

@@ -91,6 +91,7 @@ export class GamePlugin extends BasePlugin<IMainScene> {
    * ゲームの開始または中断のリクエストを処理する
    */
   private toggleGameState(ev: ToggleGameStateEvent): void {
+    console.log('gamePlugin toggleGameState')
     if (!this.gamePluginStore.gameRepository.has(ev.gameId)) {
       const gameStartMessage = new GameStartMessage({ gameId: ev.gameId, playerId: this.playerPluginStore.ownPlayerId })
       this.networkPluginStore.messageSender.send(gameStartMessage)
