@@ -1,58 +1,46 @@
 import { Store, IMainScene } from 'churaverse-engine-client'
+import '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
 import { Player } from '@churaverse/player-plugin-client/domain/player'
 import { PlayerNotExistsInPlayerRepositoryError } from '@churaverse/player-plugin-client/errors/playerNotExistsInPlayerRepositoryError'
-import { IGameLogRenderer } from '../../interface/IGameLogRenderer'
-import { GameIds } from '../../interface/gameIds'
-import { GameNotExitInGameRepositoryError } from '../../errors/gameNotExitInGameRepositoryError'
 
-export class GameLogRenderer implements IGameLogRenderer {
+export class GameLogRenderer {
   public constructor(private readonly store: Store<IMainScene>) {}
 
   /**
-   * ゲーム開始をログで表示
+   * ゲームが開始のログを表示
+   * @param gameName ゲーム名
    * @param playerId ゲームを開始したプレイヤーid
    */
-  public gameStartLog(gameId: GameIds, playerId: string): void {
+  public gameStartLog(gameName: string, playerId: string): void {
     const playerName = this.getPlayerName(playerId)
-    const gameName = this.getGameName(gameId)
-    const message = `${playerName}さんが${gameName}を開始しました！`
-    this.store.of('coreUiPlugin').fadeOutLogRenderer.add(message, 300)
+    this.store.of('coreUiPlugin').fadeOutLogRenderer.add(`${playerName}さんが、${gameName}を開始しました`)
   }
 
   /**
-   * 途中参加者向けのゲーム開始をログで表示
-   */
-  public gameMidwayJoinLog(gameId: GameIds): void {
-    const gameName = this.getGameName(gameId)
-    const message = `${gameName}に途中参加しました！`
-    this.store.of('coreUiPlugin').fadeOutLogRenderer.add(message, 300)
-  }
-
-  /**
-   * ゲーム終了をログで表示
-   */
-  public gameEndLog(gameId: GameIds): void {
-    const gameName = this.getGameName(gameId)
-    const message = `${gameName}が終了しました！`
-    this.store.of('coreUiPlugin').fadeOutLogRenderer.add(message, 300)
-  }
-
-  /**
-   * ゲーム中断をログで表示
+   * ゲームが中断のログを表示
+   * @param gameName ゲーム名
    * @param playerId ゲームを中断したプレイヤーid
    */
-  public gameAbortLog(gameId: GameIds, playerId: string): void {
-    const gameName = this.getGameName(gameId)
+  public gameAbortLog(gameName: string, playerId: string): void {
     const playerName = this.getPlayerName(playerId)
-    const message = `${playerName}さんが${gameName}を中断しました！`
-    this.store.of('coreUiPlugin').fadeOutLogRenderer.add(message, 300)
+    this.store.of('coreUiPlugin').fadeOutLogRenderer.add(`${playerName}さんが、${gameName}を中断しました`)
+  }
+
+  /**
+   * ゲームが終了のログを表示
+   * @param gameName ゲーム名
+   */
+  public gameEndLog(gameName: string): void {
+    this.store.of('coreUiPlugin').fadeOutLogRenderer.add(`${gameName}が終了しました`)
   }
 
   /**
    * ゲーム関係のログを表示
+   * @param message ログメッセージ
+   * @param x ログを表示するx座標
    */
-  public gameLog(message: string): void {
-    this.store.of('coreUiPlugin').fadeOutLogRenderer.add(message, 300)
+  public gameLog(message: string, x: number): void {
+    this.store.of('coreUiPlugin').fadeOutLogRenderer.add(message, x)
   }
 
   /**
@@ -64,16 +52,5 @@ export class GameLogRenderer implements IGameLogRenderer {
       throw new PlayerNotExistsInPlayerRepositoryError(playerId)
     }
     return player.name
-  }
-
-  /**
-   * gameIdからゲーム名を取得
-   */
-  private getGameName(gameId: GameIds): string {
-    const game = this.store.of('gamePlugin').gameRepository.get(gameId)
-    if (game === undefined) {
-      throw new GameNotExitInGameRepositoryError(gameId)
-    }
-    return game.getName()
   }
 }
