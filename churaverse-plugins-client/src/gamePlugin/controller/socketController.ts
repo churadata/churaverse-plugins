@@ -8,8 +8,9 @@ import { GameEndMessage } from '../message/gameEndMessage'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { GameAbortMessage } from '../message/gameAbortMessage'
 import { GameAbortEvent } from '../event/gameAbortEvent'
-import { InitialGameDataMessage } from '../message/initialGameDataMessage'
-import { InitialGameDataEvent } from '../event/initialGameDataEvent'
+import { PriorGameDataMessage } from '../message/priorGameDataMessage'
+import { PriorGameDataEvent } from '../event/priorGameDataEvent'
+import { UpdateGameStateMessage } from '../message/updateGameStateMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   public constructor(eventBus: IEventBus<IMainScene>, store: Store<IMainScene>) {
@@ -17,21 +18,26 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
-    ev.messageRegister.registerMessage('initialGameData', InitialGameDataMessage, 'queue')
+    ev.messageRegister.registerMessage('priorGameData', PriorGameDataMessage, 'queue')
+    ev.messageRegister.registerMessage('updateGameState', UpdateGameStateMessage, 'queue')
     ev.messageRegister.registerMessage('gameStart', GameStartMessage, 'queue')
     ev.messageRegister.registerMessage('gameEnd', GameEndMessage, 'queue')
     ev.messageRegister.registerMessage('gameAbort', GameAbortMessage, 'queue')
   }
 
   public registerMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
-    ev.messageListenerRegister.on('initialGameData', this.initialGameData.bind(this))
+    ev.messageListenerRegister.on('priorGameData', this.priorGameData.bind(this))
     ev.messageListenerRegister.on('gameStart', this.gameStart.bind(this))
     ev.messageListenerRegister.on('gameEnd', this.gameEnd.bind(this))
     ev.messageListenerRegister.on('gameAbort', this.gameAbort.bind(this))
   }
 
-  private initialGameData(msg: InitialGameDataMessage): void {
-    this.eventBus.post(new InitialGameDataEvent(msg.data.runningGameIds))
+  /**
+   * 途中参加のプレイヤーに進行中のゲームを通知する
+   * イベントを発火し、それぞれのゲームプラグインで処理を行う
+   */
+  private priorGameData(msg: PriorGameDataMessage): void {
+    this.eventBus.post(new PriorGameDataEvent(msg.data.runningGameId))
   }
 
   private gameStart(msg: GameStartMessage): void {

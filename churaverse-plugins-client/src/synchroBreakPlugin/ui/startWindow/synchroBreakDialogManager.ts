@@ -1,7 +1,7 @@
 import { IMainScene, IEventBus, Store, DomManager, domLayerSetting } from 'churaverse-engine-client'
 import { CoreUiPluginStore } from '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
-import { ToggleGameStateEvent } from '@churaverse/game-plugin-client/event/toggleGameStateEvent'
-import { IGameDialogManager } from '@churaverse/game-plugin-client/interface/IGameDialogManager'
+import { UpdateGameStateEvent } from '@churaverse/game-plugin-client/event/updateGameStateEvent'
+import { ToGameState } from '@churaverse/game-plugin-client/type/toGameState'
 import { SynchroBreakIcon } from './synchroBreakIcon'
 import { SynchroBreakSection } from '../dialog/synchroBreakSection'
 import { SynchroBreakDialog } from '../dialog/synchroBreakDialog'
@@ -11,10 +11,11 @@ import { RuleExplanationWindowComponent, GAME_START_BUTTON } from './component/R
 /**
  * 画面上部に並ぶアイコンにシンクロブレイクアイコンを追加するクラス
  */
-export class SynchroBreakDialogManager implements IGameDialogManager {
+export class SynchroBreakDialogManager {
   private readonly synchroBreakIcon?: SynchroBreakIcon
   private readonly coreUiPlugin: CoreUiPluginStore
   private readonly synchroBreakDialog: ISynchroBreakDialog
+  private currentButtonState!: ToGameState
   public constructor(store: Store<IMainScene>, bus: IEventBus<IMainScene>) {
     this.synchroBreakDialog = new SynchroBreakDialog()
     this.synchroBreakDialog.addSection(new SynchroBreakSection('synchroBreak', 'ルール説明'))
@@ -27,19 +28,22 @@ export class SynchroBreakDialogManager implements IGameDialogManager {
       this.synchroBreakDialog,
       this.coreUiPlugin.topBarIconContainer
     )
-    this.handleGameButtonClick(store, bus)
+    this.currentButtonState = 'start'
+    this.handleGameButtonClick(bus)
   }
 
   /**
    * ゲーム操作ボタンを押した時の処理
    */
-  private handleGameButtonClick(store: Store<IMainScene>, bus: IEventBus<IMainScene>): void {
+  private handleGameButtonClick(bus: IEventBus<IMainScene>): void {
     const startButton = DomManager.getElementById(GAME_START_BUTTON)
     startButton.onclick = () => {
       this.synchroBreakDialog.close()
       this.synchroBreakIcon?.onClick(true)
-      const gameStartEvent = new ToggleGameStateEvent('synchroBreak')
-      bus.post(gameStartEvent)
+      const updateGameState = new UpdateGameStateEvent('synchroBreak', this.currentButtonState)
+      bus.post(updateGameState)
+      if (this.currentButtonState === 'start') this.setGameStartButtonText()
+      else this.setGameAbortButtonText()
     }
   }
 
@@ -49,6 +53,7 @@ export class SynchroBreakDialogManager implements IGameDialogManager {
   public setGameStartButtonText(): void {
     const button = DomManager.getElementById(GAME_START_BUTTON)
     button.textContent = 'ゲームを開始する'
+    this.currentButtonState = 'start'
   }
 
   /**
@@ -57,5 +62,6 @@ export class SynchroBreakDialogManager implements IGameDialogManager {
   public setGameAbortButtonText(): void {
     const button = DomManager.getElementById(GAME_START_BUTTON)
     button.textContent = 'ゲームを中断する'
+    this.currentButtonState = 'abort'
   }
 }

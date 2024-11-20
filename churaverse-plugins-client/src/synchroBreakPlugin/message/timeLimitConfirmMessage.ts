@@ -7,6 +7,9 @@ export interface TimeLimitConfirmData extends SendableObject {
   timeLimit: string
 }
 
+/**
+ * タイムリミットが設定された際のメッセージ
+ */
 export class TimeLimitConfirmMessage extends BaseMessage<IMainScene> {
   public constructor(public readonly data: TimeLimitConfirmData) {
     super('timeLimitConfirm', data)

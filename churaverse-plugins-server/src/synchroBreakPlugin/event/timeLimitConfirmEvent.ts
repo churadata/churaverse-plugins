@@ -1,4 +1,4 @@
-import { CVEvent, IMainScene } from 'churaverse-engine-client'
+import { CVEvent, IMainScene } from 'churaverse-engine-server'
 
 /**
  * タイムリミットが設定された際のイベント
@@ -14,7 +14,7 @@ export class TimeLimitConfirmEvent extends CVEvent<IMainScene> {
   }
 }
 
-declare module 'churaverse-engine-client' {
+declare module 'churaverse-engine-server' {
   export interface CVMainEventMap {
     timeLimitConfirm: TimeLimitConfirmEvent
   }

@@ -1,36 +1,36 @@
 import { DomManager, domLayerSetting } from 'churaverse-engine-client'
 import { DescriptionWindowComponent } from './component/DescriptionWindowComponent'
+import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
 
-export class DescriptionWindow {
-  private readonly descriptionWindow: HTMLElement
-  private readonly descriptionText: string = ``
+export class DescriptionWindow implements IGameUiComponent {
+  public element!: HTMLElement
+  public visible: boolean = true
+  private descriptionText: string = ``
 
-  public constructor() {
-    this.descriptionWindow = DomManager.addJsxDom(DescriptionWindowComponent({ description: this.descriptionText }))
-    domLayerSetting(this.descriptionWindow, 'lowest')
-    this.close()
+  public initialize(): void {
+    this.element = DomManager.addJsxDom(DescriptionWindowComponent({ description: this.descriptionText }))
+    domLayerSetting(this.element, 'lowest')
+    this.element.innerHTML = 'シンクロブレイクゲームが開始されました！'
   }
 
   public open(text: string): void {
-    this.descriptionWindow.style.display = 'flex'
-    this.descriptionWindow.innerHTML = text
+    this.element.style.display = 'flex'
+    this.element.innerHTML = text
   }
 
   public close(): void {
-    this.descriptionWindow.style.display = 'none'
+    this.element.style.display = 'none'
   }
 
-  public remove(): void {
-    this.descriptionWindow.remove()
+  public delete(): void {
+    this.descriptionText = ''
   }
 
+  /**
+   * 説明ウィンドウの文章を更新する
+   * @param text 更新する文章
+   */
   public setDescriptionText(text: string): void {
-    this.descriptionWindow.innerHTML = text
-  }
-}
-
-declare module '../uiManager' {
-  export interface GameUiMap {
-    description: DescriptionWindow
+    this.element.innerHTML = text
   }
 }

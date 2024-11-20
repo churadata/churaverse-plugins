@@ -1,14 +1,8 @@
-import {
-  IMainScene,
-  Store,
-  IEventBus,
-  DomManager,
-  makeLayerHigherTemporary,
-  domLayerSetting,
-} from 'churaverse-engine-client'
+import { Store, IMainScene, DomManager, makeLayerHigherTemporary, domLayerSetting } from 'churaverse-engine-client'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
+import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
+import '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { TimeLimitForm } from './component/TimeLimitForm'
-import { TimeLimitConfirmEvent } from '../../event/timeLimitConfirmEvent'
 import { TimeLimitConfirmMessage } from '../../message/timeLimitConfirmMessage'
 
 // 制限時間入力部分
@@ -27,33 +21,23 @@ export const MAX_TIME_LIMIT = '15'
 
 export const MIN_TIME_LIMIT = '3'
 
-export class TimeLimitFormContainer {
-  private container!: HTMLElement
+export class TimeLimitFormContainer implements IGameUiComponent {
+  public element!: HTMLElement
+  public visible: boolean = true
   private timeLimitInputField!: HTMLInputElement
   private readonly networkPluginStore!: NetworkPluginStore<IMainScene>
 
-  public constructor(
-    private readonly eventBus: IEventBus<IMainScene>,
-    private readonly store: Store<IMainScene>
-  ) {
-    this.eventBus = eventBus
-    this.setTimeLimitFormContainer()
-    this.setUpInputFields()
+  public constructor(private readonly store: Store<IMainScene>) {
     this.networkPluginStore = this.store.of('networkPlugin')
-
-    // uiManagerにtimeLimitFormを追加
-    store.of('synchroBreakPlugin').uiManager.addUi('timeLimit', this)
-
-    // uiを非表示にする
-    this.close()
   }
 
-  public setTimeLimitFormContainer(): void {
-    this.container = DomManager.addJsxDom(TimeLimitForm())
-    domLayerSetting(this.container, 'lowest')
-    this.container.addEventListener('click', () => {
-      makeLayerHigherTemporary(this.container, 'lower')
+  public initialize(): void {
+    this.element = DomManager.addJsxDom(TimeLimitForm())
+    domLayerSetting(this.element, 'lowest')
+    this.element.addEventListener('click', () => {
+      makeLayerHigherTemporary(this.element, 'lower')
     })
+    this.setUpInputFields()
   }
 
   private setUpInputFields(): void {
@@ -64,12 +48,10 @@ export class TimeLimitFormContainer {
     const maxTimeLimit = 15
     sendButton.onclick = () => {
       const timelineInputFieldValue = this.timeLimitInputField.value
-      if (Number(timelineInputFieldValue) >= minTimeLimit && Number(timelineInputFieldValue) <= maxTimelimit) {
+      if (Number(timelineInputFieldValue) >= minTimeLimit && Number(timelineInputFieldValue) <= maxTimeLimit) {
         const playerId = this.store.of('playerPlugin').ownPlayerId
-        const timeLimitConfirmEvent = new TimeLimitConfirmEvent(playerId, timelineInputFieldValue)
-        this.eventBus.post(timeLimitConfirmEvent)
         this.networkPluginStore.messageSender.send(
-          new TimeLimitConfirmMessage({ playerId, timeLimit: timeLineInputFieldValue })
+          new TimeLimitConfirmMessage({ playerId, timeLimit: timelineInputFieldValue })
         )
         this.close()
       } else {
@@ -99,14 +81,14 @@ export class TimeLimitFormContainer {
 
   public open(): void {
     this.timeLimitInputField.value = '3'
-    this.container.style.display = 'flex'
+    this.element.style.display = 'flex'
   }
 
   public close(): void {
-    this.container.style.display = 'none'
+    this.element.style.display = 'none'
   }
 
-  public remove(): void {
-    this.container.remove()
+  public delete(): void {
+    this.timeLimitInputField.remove()
   }
 }

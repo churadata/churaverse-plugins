@@ -12,4 +12,14 @@ export interface IMessageListenerRegister<Scene extends Scenes> {
     type: MsgType,
     listener: IMessageListener<MessageMap<Scene>[MsgType]>
   ) => void
+
+  /**
+   * 受信時に実行するlistenerを解除する
+   * @param type 受信するMessageのtype
+   * @param listener 解除するcallback
+   */
+  off: <MsgType extends MessageType<Scene> & string>(
+    type: MsgType,
+    listener: IMessageListener<MessageMap<Scene>[MsgType]>
+  ) => void
 }

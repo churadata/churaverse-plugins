@@ -41,11 +41,11 @@
     "@churaverse/keyboard-plugin-client": "~0.1.0",
     "@churaverse/player-plugin-client": "~0.1.1",
     "@churaverse/map-plugin-client": "~0.1.0",
-    "@churaverse/network-plugin-client": "~0.1.0",
+    "@churaverse/network-plugin-client": "file:../networkPlugin",
     "@churaverse/title-plugin-client": "~0.1.0",
     "@churaverse/transition-plugin-client": "~0.1.0",
     "@churaverse/voice-chat-plugin-client": "~0.1.0",
     "@churaverse/synchro-break-plugin-client": "file:../synchroBreakPlugin",
-    "churaverse-engine-client": "~0.1.0"
+    "churaverse-engine-client": "file: ../../../../churaverse-engine/churaverse-engine-client"
   }
 }

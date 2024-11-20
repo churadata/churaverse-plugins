@@ -9,26 +9,38 @@ import { GameEndMessage } from '../message/gameEndMessage'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { GameAbortMessage } from '../message/gameAbortMessage'
 import { GameAbortEvent } from '../event/gameAbortEvent'
-import { InitialGameDataMessage } from '../message/initialGameDataMessage'
+import { PriorGameDataEvent } from '../event/priorGameDataEvent'
+import { PriorGameDataMessage } from '../message/priorGameDataMessage'
+import { UpdateGameStateMessage } from '../message/updateGameStateMessage'
+import { UpdateGameStateEvent } from '../event/updateGameStateEvent'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
-    ev.messageRegister.registerMessage('initialGameData', InitialGameDataMessage, 'others')
+    ev.messageRegister.registerMessage('priorGameData', PriorGameDataMessage, 'others')
+    ev.messageRegister.registerMessage('updateGameState', UpdateGameStateMessage, 'onlyServer')
     ev.messageRegister.registerMessage('gameStart', GameStartMessage, 'others')
     ev.messageRegister.registerMessage('gameEnd', GameEndMessage, 'others')
     ev.messageRegister.registerMessage('gameAbort', GameAbortMessage, 'others')
   }
 
   public registerMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
-    ev.messageListenerRegister.on('requestPriorData', this.sendInitialGameData.bind(this))
+    ev.messageListenerRegister.on('requestPriorData', this.sendPriorGameData.bind(this))
+    ev.messageListenerRegister.on('updateGameState', this.updateGameState.bind(this))
     ev.messageListenerRegister.on('gameStart', this.gameStart.bind(this))
     ev.messageListenerRegister.on('gameEnd', this.gameEnd.bind(this))
     ev.messageListenerRegister.on('gameAbort', this.gameAbort.bind(this))
   }
 
-  private sendInitialGameData(): void {
-    const runningGameIds = this.store.of('gamePlugin').gameRepository.getAllId()
-    this.store.of('networkPlugin').messageSender.send(new InitialGameDataMessage({ runningGameIds }))
+  /**
+   * 途中参加のプレイヤーに進行中のゲームを通知する
+   * イベントを発火し、それぞれのゲームプラグインで処理を行う
+   */
+  private sendPriorGameData(): void {
+    this.eventBus.post(new PriorGameDataEvent())
+  }
+
+  private updateGameState(msg: UpdateGameStateMessage): void {
+    this.eventBus.post(new UpdateGameStateEvent(msg.data.gameId, msg.data.playerId, msg.data.toState))
   }
 
   private gameStart(msg: GameStartMessage): void {

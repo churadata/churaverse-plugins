@@ -1,6 +1,5 @@
-import { GameRepository } from '../repository/gameRepository'
-import { GameDialogRepository } from '../repository/gameDialogRepository'
-import { IGameLogRenderer } from '../interface/IGameLogRenderer'
+import { GameUiManager } from '../gameUiManager'
+import { GameLogRenderer } from '../ui/logRenderer/gameLogRenderer'
 
 declare module 'churaverse-engine-client' {
   export interface StoreInMain {
@@ -9,7 +8,6 @@ declare module 'churaverse-engine-client' {
 }
 
 export interface GamePluginStore {
-  readonly gameRepository: GameRepository
-  readonly gameDialogRepository: GameDialogRepository
-  readonly gameLogRenderer: IGameLogRenderer
+  readonly gameUiManager: GameUiManager
+  readonly gameLogRenderer: GameLogRenderer
 }

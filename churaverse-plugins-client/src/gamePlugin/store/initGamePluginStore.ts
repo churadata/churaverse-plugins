@@ -1,13 +1,12 @@
 import { Store, IMainScene } from 'churaverse-engine-client'
 import { GamePluginStore } from './defGamePluginStore'
-import { GameRepository } from '../repository/gameRepository'
-import { GameDialogRepository } from '../repository/gameDialogRepository'
 import { GameLogRenderer } from '../ui/logRenderer/gameLogRenderer'
+import { GameUiRegister } from '../gameUiRegister'
+import { GameUiManager } from '../gameUiManager'
 
-export function initGamePluginStore(store: Store<IMainScene>): void {
+export function initGamePluginStore(store: Store<IMainScene>, gameUiRegister: GameUiRegister): void {
   const pluginStore: GamePluginStore = {
-    gameRepository: new GameRepository(),
-    gameDialogRepository: new GameDialogRepository(),
+    gameUiManager: new GameUiManager(gameUiRegister),
     gameLogRenderer: new GameLogRenderer(store),
   }
 
