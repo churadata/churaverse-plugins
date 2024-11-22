@@ -1,6 +1,6 @@
 import { IMainScene, BasePlugin } from 'churaverse-engine-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
-import '@churaverse/game-plugin-server/interface/gameIds'
+import { GameIds } from '@churaverse/game-plugin-server/interface/gameIds'
 import { PriorGameDataEvent } from '@churaverse/game-plugin-server/event/priorGameDataEvent'
 import { PriorGameDataMessage } from '@churaverse/game-plugin-server/message/priorGameDataMessage'
 import { GameStartEvent } from '@churaverse/game-plugin-server/event/gameStartEvent'
@@ -18,6 +18,8 @@ export class SynchroBreakPlugin extends BasePlugin<IMainScene> {
   private socketController!: SocketController
   /** ゲームの状態を保存する変数 */
   private isActive: boolean = false
+  /** シンクロブレイクのゲームid */
+  private readonly synchroBreakGameId: GameIds = 'synchroBreak'
 
   /** イベントリスナーの登録・削除に使用する関数をbindしておく */
   private readonly boundGameAbort = this.gameAbort.bind(this)
@@ -104,7 +106,7 @@ export class SynchroBreakPlugin extends BasePlugin<IMainScene> {
    */
   private priorGameData(ev: PriorGameDataEvent): void {
     if (this.isActive) {
-      this.networkPluginStore.messageSender.send(new PriorGameDataMessage({ runningGameId: 'synchroBreak' }))
+      this.networkPluginStore.messageSender.send(new PriorGameDataMessage({ runningGameId: this.synchroBreakGameId }))
     }
   }
 

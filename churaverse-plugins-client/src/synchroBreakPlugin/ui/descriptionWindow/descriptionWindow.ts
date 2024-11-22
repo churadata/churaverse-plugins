@@ -1,11 +1,12 @@
 import { DomManager, domLayerSetting } from 'churaverse-engine-client'
 import { DescriptionWindowComponent } from './component/DescriptionWindowComponent'
-import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
+import '@churaverse/game-plugin-client/gameUiManager'
+import { IDescriptionWindow } from '../../interface/IDescriptionWindow'
 
-export class DescriptionWindow implements IGameUiComponent {
+export class DescriptionWindow implements IDescriptionWindow {
   public element!: HTMLElement
   public visible: boolean = true
-  private descriptionText: string = ``
+  private descriptionText: string = ''
 
   public initialize(): void {
     this.element = DomManager.addJsxDom(DescriptionWindowComponent({ description: this.descriptionText }))
@@ -13,16 +14,7 @@ export class DescriptionWindow implements IGameUiComponent {
     this.element.innerHTML = 'シンクロブレイクゲームが開始されました！'
   }
 
-  public open(text: string): void {
-    this.element.style.display = 'flex'
-    this.element.innerHTML = text
-  }
-
-  public close(): void {
-    this.element.style.display = 'none'
-  }
-
-  public delete(): void {
+  public remove(): void {
     this.descriptionText = ''
   }
 
@@ -32,5 +24,11 @@ export class DescriptionWindow implements IGameUiComponent {
    */
   public setDescriptionText(text: string): void {
     this.element.innerHTML = text
+  }
+}
+
+declare module '@churaverse/game-plugin-client/gameUiManager' {
+  export interface GameUiMap {
+    descriptionWindow: DescriptionWindow
   }
 }

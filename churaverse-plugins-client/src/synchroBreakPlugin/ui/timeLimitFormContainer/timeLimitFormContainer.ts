@@ -2,6 +2,7 @@ import { Store, IMainScene, DomManager, makeLayerHigherTemporary, domLayerSettin
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
 import '@churaverse/player-plugin-client/store/defPlayerPluginStore'
+import '@churaverse/game-plugin-client/gameUiManager'
 import { TimeLimitForm } from './component/TimeLimitForm'
 import { TimeLimitConfirmMessage } from '../../message/timeLimitConfirmMessage'
 
@@ -88,7 +89,13 @@ export class TimeLimitFormContainer implements IGameUiComponent {
     this.element.style.display = 'none'
   }
 
-  public delete(): void {
+  public remove(): void {
     this.timeLimitInputField.remove()
+  }
+}
+
+declare module '@churaverse/game-plugin-client/gameUiManager' {
+  export interface GameUiMap {
+    timeLimitConfirm: TimeLimitFormContainer
   }
 }
