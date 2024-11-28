@@ -28,7 +28,7 @@ export class GameUiManager implements IGameUiManager {
    * @param gameId ゲームid
    * @param uiName UI名
    */
-  public getUi<K extends GameUiName>(gameId: GameIds, uiName: K): GameUiMap[GameIds][K] | undefined {
+  public getUi<K extends GameUiName>(gameId: GameIds, uiName: K): CompleteGameUiMap[GameIds][K] | undefined {
     return this.gameUiRegister.getUiComponent(gameId, uiName)
   }
 
@@ -56,4 +56,4 @@ export interface GameUiMap {}
 export type CompleteGameUiMap = GameUiMap & {
   [gameId in GameIds]: Record<string, IGameUiComponent>
 }
-export type GameUiName = keyof GameUiMap[GameIds]
+export type GameUiName = keyof CompleteGameUiMap[GameIds]
