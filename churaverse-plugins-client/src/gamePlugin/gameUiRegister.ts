@@ -27,7 +27,14 @@ export class GameUiRegister {
    * @param uiName UI名
    */
   public getUiComponent<K extends GameUiName>(gameId: GameIds, uiName: K): GameUiMap[GameIds][K] | undefined {
-    return this.gameUiRegister.get(gameId)?.get(uiName) as GameUiMap[GameIds][K]
+    const uiMap = this.gameUiRegister.get(gameId)
+    if (uiMap !== undefined) {
+      const component = uiMap.get(uiName)
+      if (component !== undefined) {
+        return component as GameUiMap[GameIds][K]
+      }
+    }
+    return undefined
   }
 
   /**
