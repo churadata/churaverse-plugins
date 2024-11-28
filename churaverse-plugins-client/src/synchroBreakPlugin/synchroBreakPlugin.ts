@@ -7,11 +7,10 @@ import { GameAbortEvent } from '@churaverse/game-plugin-client/event/gameAbortEv
 import { GameEndEvent } from '@churaverse/game-plugin-client/event/gameEndEvent'
 import { GameIds } from '@churaverse/game-plugin-client/interface/gameIds'
 import { SynchroBreakDialogManager } from './ui/startWindow/synchroBreakDialogManager'
-import { DescriptionWindow } from './ui/descriptionWindow/descriptionWindow'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
-import { TimeLimitFormContainer } from './ui/timeLimitFormContainer/timeLimitFormContainer'
 import { SocketController } from './controller/socketController'
 import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
+import { registerSynchroBreakUi } from './ui/registerSynchroBreakUi'
 
 export class SynchroBreakPlugin extends BasePlugin<IMainScene> {
   private gamePluginStore!: GamePluginStore
@@ -70,15 +69,10 @@ export class SynchroBreakPlugin extends BasePlugin<IMainScene> {
   }
 
   /**
-   * ゲームUIの登録を行う
+   * ゲームUI登録のイベントを受け取った時の処理
    */
   private registerGameUi(ev: RegisterGameUiEvent): void {
-    ev.gameUiRegister.registerGameUi(this.synchroBreakGameId, 'descriptionWindow', new DescriptionWindow())
-    ev.gameUiRegister.registerGameUi(
-      this.synchroBreakGameId,
-      'timeLimitConfirm',
-      new TimeLimitFormContainer(this.store)
-    )
+    registerSynchroBreakUi(this.store, this.synchroBreakGameId, ev.gameUiRegister)
   }
 
   /**

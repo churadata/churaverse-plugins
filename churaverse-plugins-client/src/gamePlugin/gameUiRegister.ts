@@ -1,6 +1,6 @@
 import { GameIds } from './interface/gameIds'
 import { IGameUiComponent } from './interface/IGameUiComponent'
-import { GameUiName, CompleteGameUiMap } from './gameUiManager'
+import { GameUiName, GameUiMap } from './gameUiManager'
 import { GameUiComponentNotFoundError } from './errors/gameUiComponentNotFoundError'
 
 export class GameUiRegister {
@@ -14,7 +14,7 @@ export class GameUiRegister {
    */
   public registerGameUi(gameId: GameIds, uiName: GameUiName, gameUiComponent: IGameUiComponent): void {
     if (!this.gameUiRegister.has(gameId)) {
-      this.gameUiRegister.set(gameId, new Map())
+      this.gameUiRegister.set(gameId, new Map<GameUiName, IGameUiComponent>())
     }
     const uiMap = this.gameUiRegister.get(gameId)
     if (uiMap === undefined) throw new GameUiComponentNotFoundError(gameId)
@@ -26,8 +26,8 @@ export class GameUiRegister {
    * @param gameId ゲームID
    * @param uiName UI名
    */
-  public getUiComponent<K extends GameUiName>(gameId: GameIds, uiName: K): CompleteGameUiMap[K] | undefined {
-    return this.gameUiRegister.get(gameId)?.get(uiName)
+  public getUiComponent<K extends GameUiName>(gameId: GameIds, uiName: K): GameUiMap[GameIds][K] | undefined {
+    return this.gameUiRegister.get(gameId)?.get(uiName) as GameUiMap[GameIds][K]
   }
 
   /**

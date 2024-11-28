@@ -26,9 +26,3 @@ export class DescriptionWindow implements IDescriptionWindow {
     this.element.innerHTML = text
   }
 }
-
-declare module '@churaverse/game-plugin-client/gameUiManager' {
-  export interface GameUiMap {
-    descriptionWindow: DescriptionWindow
-  }
-}

@@ -93,9 +93,3 @@ export class TimeLimitFormContainer implements IGameUiComponent {
     this.timeLimitInputField.remove()
   }
 }
-
-declare module '@churaverse/game-plugin-client/gameUiManager' {
-  export interface GameUiMap {
-    timeLimitConfirm: TimeLimitFormContainer
-  }
-}

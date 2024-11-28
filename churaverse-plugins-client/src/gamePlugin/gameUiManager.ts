@@ -28,7 +28,7 @@ export class GameUiManager implements IGameUiManager {
    * @param gameId ゲームid
    * @param uiName UI名
    */
-  public getUi<K extends GameUiName>(gameId: GameIds, uiName: K): CompleteGameUiMap[K] | undefined {
+  public getUi<K extends GameUiName>(gameId: GameIds, uiName: K): GameUiMap[GameIds][K] | undefined {
     return this.gameUiRegister.getUiComponent(gameId, uiName)
   }
 
@@ -53,5 +53,7 @@ export class GameUiManager implements IGameUiManager {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface GameUiMap {}
-export type CompleteGameUiMap = GameUiMap & Record<string, IGameUiComponent>
-export type GameUiName = keyof CompleteGameUiMap
+export type CompleteGameUiMap = GameUiMap & {
+  [gameId in GameIds]: Record<string, IGameUiComponent>
+}
+export type GameUiName = keyof GameUiMap[GameIds]
