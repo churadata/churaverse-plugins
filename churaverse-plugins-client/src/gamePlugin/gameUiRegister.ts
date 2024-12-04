@@ -1,29 +1,48 @@
 import { GameIds } from './interface/gameIds'
 import { IGameUiComponent } from './interface/IGameUiComponent'
+import { GameUiName, GameUiMap } from './gameUiManager'
+import { GameUiComponentNotFoundError } from './errors/gameUiComponentNotFoundError'
 
 export class GameUiRegister {
-  private readonly gameUiRegister = new Map<GameIds, IGameUiComponent[]>()
+  private readonly gameUiRegister = new Map<GameIds, Map<GameUiName, IGameUiComponent>>()
 
   /**
    * gameUiComponentを登録する
+   * @param gameId ゲームID
+   * @param uiName UI名
+   * @param gameUiComponent 登録するUIコンポーネント
    */
-  public registerGameUi(gameId: GameIds, gameUiComponent: IGameUiComponent): void {
-    // すでにgameIdが登録されている場合、配列に追加する
-    if (this.gameUiRegister.has(gameId)) {
-      const existingComponents = this.gameUiRegister.get(gameId)
-      existingComponents?.push(gameUiComponent)
-    } else {
-      // まだgameIdが登録されていない場合、新しく配列を作成する
-      this.gameUiRegister.set(gameId, [gameUiComponent])
+  public registerGameUi(gameId: GameIds, uiName: GameUiName, gameUiComponent: IGameUiComponent): void {
+    if (!this.gameUiRegister.has(gameId)) {
+      this.gameUiRegister.set(gameId, new Map<GameUiName, IGameUiComponent>())
     }
+    const uiMap = this.gameUiRegister.get(gameId)
+    if (uiMap === undefined) throw new GameUiComponentNotFoundError(gameId)
+    uiMap.set(uiName, gameUiComponent)
   }
 
   /**
    * 登録されたgameUiComponentを取得する
+   * @param gameId ゲームID
+   * @param uiName UI名
    */
-  public getRegistered(gameId: GameIds): IGameUiComponent[] {
-    const gameUiComponents = this.gameUiRegister.get(gameId)
-    if (gameUiComponents === undefined) throw new Error('Not exists gameUiComponent')
-    return gameUiComponents
+  public getUiComponent<K extends GameUiName>(gameId: GameIds, uiName: K): GameUiMap[GameIds][K] | undefined {
+    const uiMap = this.gameUiRegister.get(gameId)
+    if (uiMap !== undefined) {
+      const component = uiMap.get(uiName)
+      if (component !== undefined) {
+        return component as GameUiMap[GameIds][K]
+      }
+    }
+    return undefined
+  }
+
+  /**
+   * GameIdに紐づく全コンポーネントを取得
+   */
+  public getAllUiComponents(gameId: GameIds): IGameUiComponent[] {
+    const uiMap = this.gameUiRegister.get(gameId)
+    if (uiMap === undefined) throw new GameUiComponentNotFoundError(gameId)
+    return Array.from(uiMap.values())
   }
 }

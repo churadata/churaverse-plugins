@@ -1,8 +1,6 @@
-import { GameIds } from './gameIds'
-
 export interface IGameLogRenderer {
-  gameStartLog: (gameId: GameIds, playerId: string) => void
-  gameMidwayJoinLog: (gameId: GameIds) => void
-  gameEndLog: (gameId: GameIds) => void
-  gameAbortLog: (gameId: GameIds, playerId: string) => void
+  gameStartLog: (gameName: string, playerId: string) => void
+  gameAbortLog: (gameName: string, playerId: string) => void
+  gameEndLog: (gameName: string) => void
+  gameLog: (message: string, x: number) => void
 }
