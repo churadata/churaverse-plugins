@@ -9,16 +9,26 @@ export interface GameAbortData extends SendableObject {
 }
 
 /**
- * ゲーム中断のメッセージ
+ * サーバーからクライアントへのゲーム中断リクエストメッセージ
  */
-export class GameAbortMessage extends BaseMessage<IMainScene> {
+export class RequestGameAbortMessage extends BaseMessage<IMainScene> {
   public constructor(public readonly data: GameAbortData) {
-    super('gameAbort', data)
+    super('requestGameAbort', data)
+  }
+}
+
+/**
+ * クライアントからサーバーへのゲーム中断レスポンスメッセージ
+ */
+export class ResponseGameAbortMessage extends BaseMessage<IMainScene> {
+  public constructor(public readonly data: GameAbortData) {
+    super('responseGameAbort', data)
   }
 }
 
 declare module '@churaverse/network-plugin-client/message/messages' {
   export interface MainMessageMap {
-    gameAbort: GameAbortMessage
+    requestGameAbort: RequestGameAbortMessage
+    responseGameAbort: ResponseGameAbortMessage
   }
 }

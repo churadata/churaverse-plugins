@@ -8,7 +8,7 @@ export interface PriorGameData extends SendableObject {
 }
 
 /**
- * サーバーから送信される進行中のゲームデータを保存するメッセージ
+ * サーバーから進行中のゲームデータを受け取るメッセージ
  */
 export class PriorGameDataMessage extends BaseMessage<IMainScene> {
   public constructor(public readonly data: PriorGameData) {

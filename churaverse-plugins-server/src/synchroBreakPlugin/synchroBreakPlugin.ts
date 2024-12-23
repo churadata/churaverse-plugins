@@ -1,6 +1,6 @@
-import { IMainScene, BasePlugin } from 'churaverse-engine-server'
+import { IMainScene } from 'churaverse-engine-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
-import { GameIds } from '@churaverse/game-plugin-server/interface/gameIds'
+import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
 import { PriorGameDataEvent } from '@churaverse/game-plugin-server/event/priorGameDataEvent'
 import { PriorGameDataMessage } from '@churaverse/game-plugin-server/message/priorGameDataMessage'
 import { GameStartEvent } from '@churaverse/game-plugin-server/event/gameStartEvent'
@@ -9,23 +9,14 @@ import { GameAbortEvent } from '@churaverse/game-plugin-server/event/gameAbortEv
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
 import { SocketController } from './controller/socketController'
-import { TimeLimitConfirmMessage } from './message/timeLimitConfirmMessage'
 import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
 
-export class SynchroBreakPlugin extends BasePlugin<IMainScene> {
+export class SynchroBreakPlugin extends BaseGamePlugin {
+  protected readonly gameId = 'synchroBreak'
+
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private synchroBreakPluginStore!: SynchroBreakPluginStore
   private socketController!: SocketController
-  /** ゲームの状態を保存する変数 */
-  private isActive: boolean = false
-  /** シンクロブレイクのゲームid */
-  private readonly synchroBreakGameId: GameIds = 'synchroBreak'
-
-  /** イベントリスナーの登録・削除に使用する関数をbindしておく */
-  private readonly boundGameAbort = this.gameAbort.bind(this)
-  private readonly boundGameEnd = this.gameEnd.bind(this)
-  private readonly boundPriorGameData = this.priorGameData.bind(this)
-  private readonly boundTimeLimitConfirm = this.timeLimitConfirm.bind(this)
 
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.init.bind(this))
@@ -36,27 +27,27 @@ export class SynchroBreakPlugin extends BasePlugin<IMainScene> {
       'registerMessageListener',
       this.socketController.setupMessageListenerRegister.bind(this.socketController)
     )
-    this.bus.subscribeEvent('gameStart', this.gameStart.bind(this))
+    this.bus.subscribeEvent('gameStart', this.gameStartSynchroBreak.bind(this))
   }
 
   /**
    * ゲームが開始された時に登録されるイベントリスナー
    */
-  public addListenEvent(): void {
-    this.bus.subscribeEvent('gameAbort', this.boundGameAbort)
-    this.bus.subscribeEvent('gameEnd', this.boundGameEnd)
-    this.bus.subscribeEvent('priorGameData', this.boundPriorGameData)
-    this.bus.subscribeEvent('timeLimitConfirm', this.boundTimeLimitConfirm)
+  private addListenEvent(): void {
+    this.bus.subscribeEvent('gameAbort', this.gameAbortSynchroBreak)
+    this.bus.subscribeEvent('gameEnd', this.gameEndSynchroBreak)
+    this.bus.subscribeEvent('priorGameData', this.priorGameData)
+    this.bus.subscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
   }
 
   /**
    * ゲームが終了・中断された時に削除されるイベントリスナー
    */
-  public deleteListenEvent(): void {
-    this.bus.unsubscribeEvent('gameAbort', this.boundGameAbort)
-    this.bus.unsubscribeEvent('gameEnd', this.boundGameEnd)
-    this.bus.unsubscribeEvent('priorGameData', this.boundPriorGameData)
-    this.bus.unsubscribeEvent('timeLimitConfirm', this.boundTimeLimitConfirm)
+  private deleteListenEvent(): void {
+    this.bus.unsubscribeEvent('gameAbort', this.gameAbortSynchroBreak)
+    this.bus.unsubscribeEvent('gameEnd', this.gameEndSynchroBreak)
+    this.bus.unsubscribeEvent('priorGameData', this.priorGameData)
+    this.bus.unsubscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
   }
 
   private init(): void {
@@ -66,9 +57,9 @@ export class SynchroBreakPlugin extends BasePlugin<IMainScene> {
   /**
    * ゲームが開始された時の処理
    */
-  private gameStart(ev: GameStartEvent): void {
-    if (this.isActive) return
-    this.isActive = true
+  private gameStartSynchroBreak(ev: GameStartEvent): void {
+    if (ev.gameId !== this.gameId || this.isActive) return
+    this.gameStart(ev.playerId)
     this.addListenEvent()
     initSynchroBreakPluginStore(this.store)
     this.socketController.registerMessageListener()
@@ -78,16 +69,18 @@ export class SynchroBreakPlugin extends BasePlugin<IMainScene> {
   /**
    * ゲームが中断された時の処理
    */
-  private gameAbort(ev: GameAbortEvent): void {
-    if (!this.isActive) return
+  private readonly gameAbortSynchroBreak = (ev: GameAbortEvent): void => {
+    if (ev.gameId !== this.gameId) return
+    this.gameAbort(ev.playerId)
     this.handleGameTermination()
   }
 
   /**
    * ゲームが終了した時の処理
    */
-  private gameEnd(ev: GameEndEvent): void {
-    if (!this.isActive) return
+  private readonly gameEndSynchroBreak = (ev: GameEndEvent): void => {
+    if (ev.gameId !== this.gameId) return
+    this.gameEnd()
     this.handleGameTermination()
   }
 
@@ -95,7 +88,6 @@ export class SynchroBreakPlugin extends BasePlugin<IMainScene> {
    * ゲームの終了・中断時の共通処理
    */
   private handleGameTermination(): void {
-    this.isActive = false
     this.deleteListenEvent()
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
@@ -104,21 +96,17 @@ export class SynchroBreakPlugin extends BasePlugin<IMainScene> {
   /**
    * プレイヤーが途中参加した際の処理。シンクロブレイクゲームが開始されている場合、メッセージを送信する
    */
-  private priorGameData(ev: PriorGameDataEvent): void {
-    if (this.isActive) {
-      this.networkPluginStore.messageSender.send(new PriorGameDataMessage({ runningGameId: this.synchroBreakGameId }))
-    }
+  private readonly priorGameData = (ev: PriorGameDataEvent): void => {
+    if (!this.isActive) return
+    this.networkPluginStore.messageSender.send(new PriorGameDataMessage({ runningGameId: this.gameId }))
   }
 
   /**
    * タイムリミットが設定された時の処理
    */
-  private timeLimitConfirm(ev: TimeLimitConfirmEvent): void {
+  private readonly timeLimitConfirm = (ev: TimeLimitConfirmEvent): void => {
     if (!this.isActive) return
     this.synchroBreakPluginStore.timeLimit = Number(ev.timeLimit)
-    this.networkPluginStore.messageSender.send(
-      new TimeLimitConfirmMessage({ playerId: ev.playerId, timeLimit: ev.timeLimit })
-    )
   }
 }
 

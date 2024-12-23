@@ -8,16 +8,26 @@ export interface GameEndData extends SendableObject {
 }
 
 /**
- * ゲーム終了のメッセージ
+ * クライアントからサーバーへのゲーム終了リクエストメッセージ
  */
-export class GameEndMessage extends BaseMessage<IMainScene> {
+export class RequestGameEndMessage extends BaseMessage<IMainScene> {
   public constructor(public readonly data: GameEndData) {
-    super('gameEnd', data)
+    super('requestGameEnd', data)
+  }
+}
+
+/**
+ * サーバーからクライアントへのゲーム終了レスポンスメッセージ
+ */
+export class ResponseGameEndMessage extends BaseMessage<IMainScene> {
+  public constructor(public readonly data: GameEndData) {
+    super('responseGameEnd', data)
   }
 }
 
 declare module '@churaverse/network-plugin-server/message/messages' {
   export interface MainMessageMap {
-    gameEnd: GameEndMessage
+    requestGameEnd: RequestGameEndMessage
+    responseGameEnd: ResponseGameEndMessage
   }
 }

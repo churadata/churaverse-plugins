@@ -9,16 +9,26 @@ export interface GameStartData extends SendableObject {
 }
 
 /**
- * ゲーム開始のメッセージ
+ * クライアントからサーバーへのゲーム開始リクエストメッセージ
  */
-export class GameStartMessage extends BaseMessage<IMainScene> {
+export class RequestGameStartMessage extends BaseMessage<IMainScene> {
   public constructor(public readonly data: GameStartData) {
-    super('gameStart', data)
+    super('requestGameStart', data)
+  }
+}
+
+/**
+ * サーバーからクライアントへのゲーム開始レスポンスメッセージ
+ */
+export class ResponseGameStartMessage extends BaseMessage<IMainScene> {
+  public constructor(public readonly data: GameStartData) {
+    super('responseGameStart', data)
   }
 }
 
 declare module '@churaverse/network-plugin-client/message/messages' {
   export interface MainMessageMap {
-    gameStart: GameStartMessage
+    requestGameStart: RequestGameStartMessage
+    responseGameStart: ResponseGameStartMessage
   }
 }
