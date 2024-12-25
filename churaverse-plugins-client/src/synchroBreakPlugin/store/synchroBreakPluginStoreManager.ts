@@ -16,5 +16,5 @@ export function initSynchroBreakPluginStore(store: Store<IMainScene>): void {
  * SynchroBreakPluginStoreをリセットする関数
  */
 export function resetSynchroBreakPluginStore(store: Store<IMainScene>): void {
-  store.reset('synchroBreakPlugin')
+  store.deleteStoreOf('synchroBreakPlugin')
 }

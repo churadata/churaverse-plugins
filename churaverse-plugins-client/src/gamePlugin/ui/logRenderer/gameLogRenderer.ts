@@ -1,5 +1,6 @@
 import { Store, IMainScene } from 'churaverse-engine-client'
 import '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
+import '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { Player } from '@churaverse/player-plugin-client/domain/player'
 import { PlayerNotExistsInPlayerRepositoryError } from '@churaverse/player-plugin-client/errors/playerNotExistsInPlayerRepositoryError'
 

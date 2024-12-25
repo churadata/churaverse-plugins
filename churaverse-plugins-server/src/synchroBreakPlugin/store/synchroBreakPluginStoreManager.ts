@@ -1,7 +1,9 @@
 import { Store, IMainScene } from 'churaverse-engine-server'
 import { SynchroBreakPluginStore } from './defSynchroBreakPluginStore'
 
-/** SynchroBreakPluginStoreを初期化する関数 */
+/**
+ * SynchroBreakPluginStoreを初期化する関数
+ */
 export function initSynchroBreakPluginStore(store: Store<IMainScene>): void {
   const synchroBreakPluginStore: SynchroBreakPluginStore = {
     timeLimit: 0,
@@ -10,7 +12,9 @@ export function initSynchroBreakPluginStore(store: Store<IMainScene>): void {
   store.setInit('synchroBreakPlugin', synchroBreakPluginStore)
 }
 
-/** SynchroBreakPluginStoreをリセットする関数 */
+/**
+ * SynchroBreakPluginStoreをリセットする関数
+ */
 export function resetSynchroBreakPluginStore(store: Store<IMainScene>): void {
-  store.reset('synchroBreakPlugin')
+  store.deleteStoreOf('synchroBreakPlugin')
 }

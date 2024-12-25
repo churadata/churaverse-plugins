@@ -9,9 +9,6 @@ import { TimeLimitConfirmEvent } from '../event/timeLimitConfirmEvent'
 export class SocketController extends BaseSocketController<IMainScene> {
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
 
-  /** メッセージリスナーの登録・削除に使用する関数をbindしておく */
-  private readonly boundTimeLimitConfirm = this.timeLimitConfirm.bind(this)
-
   public constructor(eventBus: IEventBus<IMainScene>, store: Store<IMainScene>) {
     super(eventBus, store)
   }
@@ -31,17 +28,17 @@ export class SocketController extends BaseSocketController<IMainScene> {
    * メッセージリスナーを登録する
    */
   public registerMessageListener(): void {
-    this.messageListenerRegister.on('timeLimitConfirm', this.boundTimeLimitConfirm)
+    this.messageListenerRegister.on('timeLimitConfirm', this.timeLimitConfirm)
   }
 
   /**
    * メッセージリスナーを解除する
    */
   public unregisterMessageListener(): void {
-    this.messageListenerRegister.off('timeLimitConfirm', this.boundTimeLimitConfirm)
+    this.messageListenerRegister.off('timeLimitConfirm', this.timeLimitConfirm)
   }
 
-  private timeLimitConfirm(msg: TimeLimitConfirmMessage): void {
+  private readonly timeLimitConfirm = (msg: TimeLimitConfirmMessage): void => {
     this.eventBus.post(new TimeLimitConfirmEvent(msg.data.playerId, msg.data.timeLimit))
   }
 }

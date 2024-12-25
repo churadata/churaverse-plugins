@@ -1,34 +1,26 @@
-import { IMainScene, BasePlugin } from 'churaverse-engine-client'
+import { BaseGamePlugin } from '@churaverse/game-plugin-client/domain/baseGamePlugin'
 import { GamePluginStore } from '@churaverse/game-plugin-client/store/defGamePluginStore'
 import { PriorGameDataEvent } from '@churaverse/game-plugin-client/event/priorGameDataEvent'
 import { RegisterGameUiEvent } from '@churaverse/game-plugin-client/event/registerGameUiEvent'
 import { GameStartEvent } from '@churaverse/game-plugin-client/event/gameStartEvent'
 import { GameAbortEvent } from '@churaverse/game-plugin-client/event/gameAbortEvent'
 import { GameEndEvent } from '@churaverse/game-plugin-client/event/gameEndEvent'
-import { GameIds } from '@churaverse/game-plugin-client/interface/gameIds'
+import { GameParticipantEvent } from '@churaverse/game-plugin-client/event/gameParticipantEvent'
+import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { SynchroBreakDialogManager } from './ui/startWindow/synchroBreakDialogManager'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
 import { SocketController } from './controller/socketController'
 import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
 import { registerSynchroBreakUi } from './ui/registerSynchroBreakUi'
 
-export class SynchroBreakPlugin extends BasePlugin<IMainScene> {
+export class SynchroBreakPlugin extends BaseGamePlugin {
+  protected readonly gameId = 'synchroBreak'
+  protected readonly gameName = 'シンクロブレイク'
+
+  private synchroBreakPluginStore!: SynchroBreakPluginStore
   private gamePluginStore!: GamePluginStore
   private synchroBreakDialogManager!: SynchroBreakDialogManager
   private socketController!: SocketController
-  /** ゲームの状態を保存する変数 */
-  private isActive: boolean = false
-  /** 自プレイヤーが途中参加かどうかを示すフラグ */
-  private isMidwayParticipate: boolean = false
-  /** シンクロブレイクのゲームId */
-  private readonly synchroBreakGameId: GameIds = 'synchroBreak'
-  /** シンクロブレイクのゲーム名を保持する変数 */
-  private readonly synchroBreakGameName: string = 'シンクロブレイク'
-
-  /** イベントリスナーの登録・削除に使用する関数をbindしておく */
-  private readonly boundGameAbort = this.gameAbort.bind(this)
-  private readonly boundGameEnd = this.gameEnd.bind(this)
-  private readonly boundTimeLimitConfirm = this.timeLimitConfirm.bind(this)
 
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.init.bind(this))
@@ -41,26 +33,28 @@ export class SynchroBreakPlugin extends BasePlugin<IMainScene> {
     )
 
     this.bus.subscribeEvent('registerGameUi', this.registerGameUi.bind(this))
-    this.bus.subscribeEvent('gameStart', this.gameStart.bind(this))
+    this.bus.subscribeEvent('gameStart', this.gameStartSynchroBreak.bind(this))
     this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this))
   }
 
   /**
    * ゲームが開始された時に登録されるイベントリスナー
    */
-  public addListenEvent(): void {
-    this.bus.subscribeEvent('gameAbort', this.boundGameAbort)
-    this.bus.subscribeEvent('gameEnd', this.boundGameEnd)
-    this.bus.subscribeEvent('timeLimitConfirm', this.boundTimeLimitConfirm)
+  private addListenEvent(): void {
+    this.bus.subscribeEvent('gameAbort', this.gameAbortSynchroBreak)
+    this.bus.subscribeEvent('gameEnd', this.gameEndSynchroBreak)
+    this.bus.subscribeEvent('gameParticipant', this.gameParticipant)
+    this.bus.subscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
   }
 
   /**
    * ゲームが終了・中断された時に削除されるイベントリスナー
    */
-  public deleteListenEvent(): void {
-    this.bus.unsubscribeEvent('gameAbort', this.boundGameAbort)
-    this.bus.unsubscribeEvent('gameEnd', this.boundGameEnd)
-    this.bus.unsubscribeEvent('timeLimitConfirm', this.boundTimeLimitConfirm)
+  private deleteListenEvent(): void {
+    this.bus.unsubscribeEvent('gameAbort', this.gameAbortSynchroBreak)
+    this.bus.unsubscribeEvent('gameEnd', this.gameEndSynchroBreak)
+    this.bus.unsubscribeEvent('gameParticipant', this.gameParticipant)
+    this.bus.unsubscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
   }
 
   private init(): void {
@@ -72,83 +66,78 @@ export class SynchroBreakPlugin extends BasePlugin<IMainScene> {
    * ゲームUI登録のイベントを受け取った時の処理
    */
   private registerGameUi(ev: RegisterGameUiEvent): void {
-    registerSynchroBreakUi(this.store, this.synchroBreakGameId, ev.gameUiRegister)
+    registerSynchroBreakUi(this.store, this.gameId, ev.gameUiRegister)
   }
 
   /**
    * ゲームが開始された時の処理
    */
-  private gameStart(ev: GameStartEvent): void {
-    if (ev.gameId === this.synchroBreakGameId) {
-      this.isActive = true
-      this.addListenEvent()
-      initSynchroBreakPluginStore(this.store)
-      this.socketController.registerMessageListener()
-      this.synchroBreakDialogManager.setGameAbortButtonText()
-      this.gamePluginStore.gameUiManager.initializeAllUis(ev.gameId)
-      this.gamePluginStore.gameLogRenderer.gameStartLog(this.synchroBreakGameName, ev.playerId)
-    }
+  private gameStartSynchroBreak(ev: GameStartEvent): void {
+    if (ev.gameId !== this.gameId || this.isActive) return
+    this.gameStart(ev.playerId)
+    this.addListenEvent()
+    initSynchroBreakPluginStore(this.store)
+    this.socketController.registerMessageListener()
+    this.synchroBreakDialogManager.setGameAbortButtonText()
+    this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
   }
 
   /**
    * ゲームが中断された時の処理
    */
-  private gameAbort(ev: GameAbortEvent): void {
-    if (ev.gameId === this.synchroBreakGameId) {
-      this.gamePluginStore.gameLogRenderer.gameAbortLog(this.synchroBreakGameName, ev.playerId)
-      this.handleGameTermination(ev.gameId)
-    }
+  private readonly gameAbortSynchroBreak = (ev: GameAbortEvent): void => {
+    if (ev.gameId !== this.gameId) return
+    this.gameAbort(ev.playerId)
+    this.handleGameTermination()
   }
 
   /**
    * ゲームが終了した時の処理
    */
-  private gameEnd(ev: GameEndEvent): void {
-    if (ev.gameId === this.synchroBreakGameId) {
-      this.gamePluginStore.gameLogRenderer.gameEndLog(this.synchroBreakGameName)
-      this.handleGameTermination(ev.gameId)
-    }
+  private readonly gameEndSynchroBreak = (ev: GameEndEvent): void => {
+    if (ev.gameId !== this.gameId) return
+    this.gameEnd()
+    this.handleGameTermination()
   }
 
   /**
    * ゲームの終了・中断時の共通処理
    */
-  private handleGameTermination(gameId: GameIds): void {
-    this.isActive = false
+  private handleGameTermination(): void {
     this.deleteListenEvent()
     this.socketController.unregisterMessageListener()
     this.synchroBreakDialogManager.setGameStartButtonText()
     resetSynchroBreakPluginStore(this.store)
-    if (!this.isMidwayParticipate) {
-      this.gamePluginStore.gameUiManager.removeAllUis(gameId)
-    } else {
-      this.isMidwayParticipate = false
-    }
+  }
+
+  /**
+   * ゲーム参加者のidリストを受け取り、ゲーム参加者リストを更新する
+   */
+  private readonly gameParticipant = (ev: GameParticipantEvent): void => {
+    if (ev.gameId !== this.gameId) return
+    this.updateParticipantIds(ev.participantIds)
   }
 
   /**
    * プレイヤーが参加した際に、シンクロブレイクが開始されているかを確認する
    */
   private priorGameData(ev: PriorGameDataEvent): void {
-    if (ev.runningGameId === this.synchroBreakGameId && !this.isActive) {
-      this.isMidwayParticipate = true
-      this.isActive = true
-      this.addListenEvent()
-      this.socketController.registerMessageListener()
-      this.synchroBreakDialogManager.setGameAbortButtonText()
-      this.gamePluginStore.gameLogRenderer.gameLog(`${this.synchroBreakGameName}が開始されています。`, 400)
-    }
+    if (ev.runningGameId !== this.gameId || this.isActive) return
+    this.addListenEvent()
+    this.socketController.registerMessageListener()
+    this.synchroBreakDialogManager.setGameAbortButtonText()
+    this.processMidwayParticipant()
   }
 
   /**
    * タイムリミットが設定された際の処理
    */
-  private timeLimitConfirm(ev: TimeLimitConfirmEvent): void {
-    if (this.isMidwayParticipate) return
-    this.store.of('synchroBreakPlugin').timeLimit = Number(ev.timeLimit)
+  private readonly timeLimitConfirm = (ev: TimeLimitConfirmEvent): void => {
+    if (this.isMidwayParticipant) return
+    this.synchroBreakPluginStore.timeLimit = Number(ev.timeLimit)
     const message = `タイムリミットが${ev.timeLimit}秒に設定されました。`
     this.gamePluginStore.gameLogRenderer.gameLog(message, 400)
-    const descriptionWindow = this.gamePluginStore.gameUiManager.getUi(this.synchroBreakGameId, 'descriptionWindow')
+    const descriptionWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')
     if (descriptionWindow !== undefined) {
       descriptionWindow.setDescriptionText(message)
     }
