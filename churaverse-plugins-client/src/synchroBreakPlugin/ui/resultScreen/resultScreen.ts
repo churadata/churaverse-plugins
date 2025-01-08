@@ -86,7 +86,7 @@ export class ResultScreen {
     this.resultScreenContainer.appendChild(exitButton)
     exitButton.addEventListener('click', () => {
       this.deleteResultScreen()
-      this.synchroBreakPluginStore.descriptionWindow.close()
+      // this.synchroBreakPluginStore.descriptionWindow.close()
     })
   }
 

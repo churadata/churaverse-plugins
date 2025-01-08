@@ -1,14 +1,7 @@
-import style from '../style.module.scss'
+import style from './RankingOpenButtonComponent.module.scss'
 import { JSXFunc } from 'churaverse-engine-client'
-import {
-  BOARD_ELEMENT_ID,
-  PLAYER_NAME_ID,
-  NYOKKI_STATUS_ID,
-  PLAYER_COINS_ID,
-  PLAYER_RANK_ID,
-} from '../rankingBoard/rankingBoard'
-
-export type NyokkiStatus = 'yet' | 'success' | 'nyokki'
+import { BOARD_ELEMENT_ID, PLAYER_NAME_ID, NYOKKI_STATUS_ID, PLAYER_COINS_ID, PLAYER_RANK_ID } from '../rankingBoard'
+import { NyokkiStatus } from '../../../type/nyokkiStatus'
 
 export interface boardProps {
   readonly playerId: string

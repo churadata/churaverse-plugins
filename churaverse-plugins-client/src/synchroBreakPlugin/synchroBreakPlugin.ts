@@ -6,12 +6,17 @@ import { GameStartEvent } from '@churaverse/game-plugin-client/event/gameStartEv
 import { GameAbortEvent } from '@churaverse/game-plugin-client/event/gameAbortEvent'
 import { GameEndEvent } from '@churaverse/game-plugin-client/event/gameEndEvent'
 import { GameParticipantEvent } from '@churaverse/game-plugin-client/event/gameParticipantEvent'
+import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { SynchroBreakDialogManager } from './ui/startWindow/synchroBreakDialogManager'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
 import { SocketController } from './controller/socketController'
+import { NyokkiTurnSelectEvent } from './event/nyokkiTurnSelectEvent'
 import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
+import { SendBetCoinEvent } from './event/sendBetCoinEvent'
+// import { CoinViewerIcon } from './ui/coinViewer/coinViewerIcon'
 import { registerSynchroBreakUi } from './ui/registerSynchroBreakUi'
+import { IDescriptionWindow } from './interface/IDescriptionWindow'
 
 export class SynchroBreakPlugin extends BaseGamePlugin {
   protected readonly gameId = 'synchroBreak'
@@ -19,6 +24,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
 
   private synchroBreakPluginStore!: SynchroBreakPluginStore
   private gamePluginStore!: GamePluginStore
+  private playerPluginStore!: PlayerPluginStore
   private synchroBreakDialogManager!: SynchroBreakDialogManager
   private socketController!: SocketController
 
@@ -44,7 +50,9 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('gameAbort', this.gameAbortSynchroBreak)
     this.bus.subscribeEvent('gameEnd', this.gameEndSynchroBreak)
     this.bus.subscribeEvent('gameParticipant', this.gameParticipant)
+    this.bus.subscribeEvent('nyokkiTurnSelect', this.nyokkiTurnSelect)
     this.bus.subscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
+    this.bus.subscribeEvent('sendBetCoin', this.sendBetCoin)
   }
 
   /**
@@ -54,12 +62,15 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     this.bus.unsubscribeEvent('gameAbort', this.gameAbortSynchroBreak)
     this.bus.unsubscribeEvent('gameEnd', this.gameEndSynchroBreak)
     this.bus.unsubscribeEvent('gameParticipant', this.gameParticipant)
+    this.bus.unsubscribeEvent('nyokkiTurnSelect', this.nyokkiTurnSelect)
     this.bus.unsubscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
+    this.bus.unsubscribeEvent('sendBetCoin', this.sendBetCoin)
   }
 
   private init(): void {
     this.synchroBreakDialogManager = new SynchroBreakDialogManager(this.store, this.bus)
     this.gamePluginStore = this.store.of('gamePlugin')
+    this.playerPluginStore = this.store.of('playerPlugin')
   }
 
   /**
@@ -80,6 +91,18 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     this.socketController.registerMessageListener()
     this.synchroBreakDialogManager.setGameAbortButtonText()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
+
+    if (this.gameOwnerId === undefined) return
+    const gameOwnerName = this.playerPluginStore.players.get(this.gameOwnerId)?.name
+    const descriptionWindow = this.getDescriptionWindow()
+    if (this.gameOwnerId === this.playerPluginStore.ownPlayerId) {
+      descriptionWindow.open(
+        `ニョッキゲームを開始しました。<br>あなたはゲームの管理者です。 <br>ターン数(1~10)を選択してください。`
+      )
+      this.gamePluginStore.gameUiManager.getUi(this.gameId, 'turnSelectConfirm')?.open()
+    } else {
+      descriptionWindow.open(`シンクロブレイクが開始されました！<br>${gameOwnerName}さんがターンを入力中です。`)
+    }
   }
 
   /**
@@ -130,17 +153,64 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   }
 
   /**
+   * ターンが設定された時の処理
+   */
+  private readonly nyokkiTurnSelect = (ev: NyokkiTurnSelectEvent): void => {
+    if (this.isMidwayParticipant) return
+
+    const gameOwnerName = this.playerPluginStore.players.get(ev.playerId)?.name
+
+    const descriptionWindow = this.getDescriptionWindow()
+    if (this.gameOwnerId === this.playerPluginStore.ownPlayerId) {
+      descriptionWindow.setDescriptionText(`${ev.allTurn}ターン選択しました。<br>制限時間(3~15)を選択してください。`)
+      this.gamePluginStore.gameUiManager.getUi(this.gameId, 'timeLimitConfirm')?.open()
+    } else {
+      descriptionWindow.setDescriptionText(
+        `${ev.allTurn}ターン選択されました。<br>${gameOwnerName}さんが制限時間を入力中です。`
+      )
+    }
+  }
+
+  /**
    * タイムリミットが設定された際の処理
    */
   private readonly timeLimitConfirm = (ev: TimeLimitConfirmEvent): void => {
     if (this.isMidwayParticipant) return
     this.synchroBreakPluginStore.timeLimit = Number(ev.timeLimit)
-    const message = `タイムリミットが${ev.timeLimit}秒に設定されました。`
-    this.gamePluginStore.gameLogRenderer.gameLog(message, 400)
-    const descriptionWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')
-    if (descriptionWindow !== undefined) {
-      descriptionWindow.setDescriptionText(message)
+
+    const descriptionWindow = this.getDescriptionWindow()
+    if (this.gameOwnerId === this.playerPluginStore.ownPlayerId) {
+      descriptionWindow.setDescriptionText(
+        `制限時間を${ev.timeLimit}秒選択しました。<br>ベットコインを入力してください。`
+      )
+      this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betCoinConfirm')?.open()
+    } else {
+      descriptionWindow.setDescriptionText(
+        `制限時間が${ev.timeLimit}秒選択されました。<br>ベットコインを入力してください。`
+      )
     }
+
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betCoinConfirm')?.open()
+  }
+
+  /**
+   * ベットコインが設定された際の処理
+   */
+  private readonly sendBetCoin = (ev: SendBetCoinEvent): void => {
+    if (this.isMidwayParticipant) return
+
+    const descriptionWindow = this.getDescriptionWindow()
+    if (ev.playerId === this.playerPluginStore.ownPlayerId) {
+      descriptionWindow.setDescriptionText(
+        `ベットコインを${ev.betCoins}枚選択しました。<br>相手のベットコインを待っています。`
+      )
+    }
+  }
+
+  private getDescriptionWindow(): IDescriptionWindow {
+    const descriptionWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')
+    if (descriptionWindow === undefined) throw new Error('descriptionWindow is not found')
+    return descriptionWindow
   }
 }
 

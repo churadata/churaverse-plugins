@@ -6,7 +6,7 @@ const PLAYER_NYOKKI_ORDER = `src/game/plugins/synchroBreakPlugin/assets/nyokkiOr
 const RANK_FRAME = `src/game/plugins/synchroBreakPlugin/assets/nyokkiOrderIcons/rankFrame.png`
 const MISS = `src/game/plugins/synchroBreakPlugin/assets/nyokkiOrderIcons/miss.png`
 
-export class PlayerRankDisplay {
+export class PlayerNyokkiStatusIcon {
   private successIconActive!: Phaser.GameObjects.Image
   private successRankFrame!: Phaser.GameObjects.Image
   private nyokkiIconActive!: Phaser.GameObjects.Image

@@ -1,13 +1,7 @@
-import {
-  IMainScene,
-  Store,
-  DomManager,
-  makeLayerHigherTemporary,
-  AbstractDOMLayerNames,
-  domLayerSetting,
-} from 'churaverse-engine-client'
-import style from '../style.module.scss'
-import { BoardElement, NyokkiStatus, boardProps, getRankColorClass } from '../component/BoardElement'
+import { DomManager, makeLayerHigherTemporary, AbstractDOMLayerNames, domLayerSetting } from 'churaverse-engine-client'
+import style from './component/RankingOpenButtonComponent.module.scss'
+import { BoardElement, boardProps, getRankColorClass } from './component/BoardElement'
+import { NyokkiStatus } from '../../type/nyokkiStatus'
 import { generateId } from '../util/idGenerator'
 import { RankingOpenButtonComponent } from './component/RankingOpenButtonComponent'
 import { IRankingBoard } from '../../interface/IRankingBoard'
@@ -28,8 +22,9 @@ export const RANKING_OPEN_BUTTON_ID = 'ranking-open-button'
 export const RANKING_CLOSE_BUTTON_ID = 'ranking-close-button'
 
 export class RankingBoard implements IRankingBoard {
-  private boardContainer!: HTMLElement
-  private boardElementContainer!: HTMLElement
+  public element!: HTMLElement
+  public readonly visible = true
+  private elementContainer!: HTMLElement
   private rankingOpenButton!: HTMLElement
   private readonly playersElements = new Map<string, { boardElement: HTMLElement; visible: boolean }>()
   private turn!: HTMLDivElement
@@ -37,19 +32,15 @@ export class RankingBoard implements IRankingBoard {
   private playerOrders: string[] = []
   private isActive!: boolean
 
-  public constructor(private readonly store: Store<IMainScene>) {
+  public initialize(): void {
     this.setBoard()
-    domLayerSetting(this.boardContainer, 'lowest')
-    this.boardContainer.addEventListener('click', () => {
-      makeLayerHigherTemporary(this.boardContainer, 'lower')
+    domLayerSetting(this.element, 'lowest')
+    this.element.addEventListener('click', () => {
+      makeLayerHigherTemporary(this.element, 'lower')
     })
     this.setupPopupButton()
-
-    // UiManagerにランキングボードを追加
-    store.of('synchroBreakPlugin').uiManager.addUi('rankingBoard', this)
-
-    // uiを非表示にする
-    this.close()
+    this.open()
+    console.log('rankingBoard initialized')
   }
 
   private setBoard(): void {
@@ -72,10 +63,10 @@ export class RankingBoard implements IRankingBoard {
     title.className = style.title
     title.textContent = 'ランキングボード'
     container.appendChild(title)
-    this.boardContainer = container
-    this.boardElementContainer = document.createElement('div')
-    this.boardElementContainer.id = RANKING_BOARD_ELEMENT_CONTAINER_ID
-    container.appendChild(this.boardElementContainer)
+    this.element = container
+    this.elementContainer = document.createElement('div')
+    this.elementContainer.id = RANKING_BOARD_ELEMENT_CONTAINER_ID
+    container.appendChild(this.elementContainer)
 
     // 閉じるボタンを生成
     const closeButton = document.createElement('button')
@@ -91,7 +82,7 @@ export class RankingBoard implements IRankingBoard {
   }
 
   public removeBoard(): void {
-    this.boardContainer.parentNode?.removeChild(this.boardContainer)
+    this.element.parentNode?.removeChild(this.element)
     this.rankingOpenButton.parentNode?.removeChild(this.rankingOpenButton)
   }
 
@@ -105,13 +96,13 @@ export class RankingBoard implements IRankingBoard {
     if (isActive) {
       boardElement.style.display = 'none'
     }
-    this.boardElementContainer.appendChild(boardElement)
+    this.elementContainer.appendChild(boardElement)
   }
 
   public removeBoardElement(playerId: string): void {
     const boardElement = this.playersElements.get(playerId)?.boardElement
     if (boardElement === undefined) return
-    this.boardElementContainer.removeChild(boardElement)
+    this.elementContainer.removeChild(boardElement)
 
     this.playersElements.delete(playerId)
   }
@@ -121,7 +112,7 @@ export class RankingBoard implements IRankingBoard {
       if (!value.visible) {
         value.visible = true
         value.boardElement.style.display = 'flex'
-        this.boardElementContainer.appendChild(value.boardElement)
+        this.elementContainer.appendChild(value.boardElement)
       }
     })
 
@@ -129,41 +120,33 @@ export class RankingBoard implements IRankingBoard {
   }
 
   public updateRanking(): void {
-    const playerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.getPlayersSortedByCoins()
-
-    this.boardElementContainer.innerHTML = ''
-
-    let offset = 0
-    let beforeCoins = -1
-
+    // const playerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.getPlayersSortedByCoins()
+    // this.elementContainer.innerHTML = ''
+    // let offset = 0
+    // let beforeCoins = -1
     // playerCoinsからゲーム参加中のプレイヤーのみを取得する
-    const visiblePlayerCoins = playerCoins.filter((playerData) => {
-      const playerVisible = this.playersElements.get(playerData.playerId)?.visible
-      return playerVisible !== undefined && playerVisible
-    })
-
-    visiblePlayerCoins.forEach((playerData, index) => {
-      const { playerId, coins } = playerData
-      const playerVisible = this.playersElements.get(playerId)?.visible
-      if (playerVisible === undefined || !playerVisible) return
-
-      const playerElement = this.playersElements.get(playerId)?.boardElement
-
-      if (playerElement !== undefined) {
-        this.boardElementContainer.appendChild(playerElement)
-
-        let newRank = index + 1
-        if (beforeCoins === coins) {
-          offset++
-          newRank -= offset
-        } else {
-          offset = 0
-        }
-        beforeCoins = coins
-
-        this.changePlayerRank(playerId, newRank)
-      }
-    })
+    // const visiblePlayerCoins = playerCoins.filter((playerData) => {
+    //   const playerVisible = this.playersElements.get(playerData.playerId)?.visible
+    //   return playerVisible !== undefined && playerVisible
+    // })
+    // visiblePlayerCoins.forEach((playerData, index) => {
+    //   const { playerId, coins } = playerData
+    //   const playerVisible = this.playersElements.get(playerId)?.visible
+    //   if (playerVisible === undefined || !playerVisible) return
+    //   const playerElement = this.playersElements.get(playerId)?.boardElement
+    //   if (playerElement !== undefined) {
+    //     this.elementContainer.appendChild(playerElement)
+    //     let newRank = index + 1
+    //     if (beforeCoins === coins) {
+    //       offset++
+    //       newRank -= offset
+    //     } else {
+    //       offset = 0
+    //     }
+    //     beforeCoins = coins
+    //     this.changePlayerRank(playerId, newRank)
+    //   }
+    // })
   }
 
   public changeNyokkiStatus(playerId: string, status: NyokkiStatus): void {
@@ -311,11 +294,11 @@ export class RankingBoard implements IRankingBoard {
     if (this.isActive) this.closeRankingBoard()
     this.turn.textContent = ''
     this.rankingOpenButton.style.display = 'none'
-    this.boardContainer.style.display = 'none'
+    this.element.style.display = 'none'
   }
 
   public remove(): void {
-    this.boardContainer.parentNode?.removeChild(this.boardContainer)
+    this.element.parentNode?.removeChild(this.element)
     this.rankingOpenButton.parentNode?.removeChild(this.rankingOpenButton)
   }
 
@@ -365,11 +348,5 @@ export class RankingBoard implements IRankingBoard {
         this.changeNyokkiStatus(playerId, 'nyokki')
       }
     }
-  }
-}
-
-declare module '../uiManager' {
-  export interface GameUiMap {
-    rankingBoard: RankingBoard
   }
 }

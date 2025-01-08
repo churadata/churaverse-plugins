@@ -1,6 +1,7 @@
 import { IMainScene, IEventBus, Store } from 'churaverse-engine-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
-import { GameEndMessage } from '@churaverse/game-plugin-server/message/gameEndMessage'
+import { ResponseGameEndMessage } from '@churaverse/game-plugin-server/message/gameEndMessage'
+// import { GameEndMessage } from '@churaverse/game-plugin-server/message/gameEndMessage'
 // import { GameAbortMessage } from '@churaverse/game-plugin-server/message/gameAbortMessage'
 import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 import { IGame } from '../interface/IGame'
@@ -277,7 +278,7 @@ export class Game implements IGame {
 
   // nyokki終了イベントを通知する
   private nyokkiGameEnd(): void {
-    const nyokkiGameEndMessage = new GameEndMessage({ gameId: 'synchroBreak' })
+    const nyokkiGameEndMessage = new ResponseGameEndMessage({ gameId: 'synchroBreak' })
     this.networkPluginStore.messageSender.send(nyokkiGameEndMessage)
   }
 

@@ -1,7 +1,8 @@
-import { IGameUi } from './IGameUi'
-import { boardProps, NyokkiStatus } from '../ui/component/BoardElement'
+import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
+import { boardProps } from '../ui/rankingBoard/component/BoardElement'
+import { NyokkiStatus } from '../type/nyokkiStatus'
 
-export interface IRankingBoard extends IGameUi {
+export interface IRankingBoard extends IGameUiComponent {
   removeBoardElement: (playerId: string) => void
   changeNyokkiStatus: (playerId: string, status: NyokkiStatus) => void
   changePlayersCoin: (playerId: string, coins: number) => Promise<void>

@@ -5,13 +5,17 @@ import { IDescriptionWindow } from '../../interface/IDescriptionWindow'
 
 export class DescriptionWindow implements IDescriptionWindow {
   public element!: HTMLElement
-  public visible: boolean = true
+  public visible: boolean = false
   private descriptionText: string = ''
 
   public initialize(): void {
     this.element = DomManager.addJsxDom(DescriptionWindowComponent({ description: this.descriptionText }))
     domLayerSetting(this.element, 'lowest')
-    this.element.innerHTML = 'シンクロブレイクゲームが開始されました！'
+  }
+
+  public open(text: string): void {
+    this.element.style.display = 'flex'
+    this.element.innerHTML = text
   }
 
   public remove(): void {
@@ -24,5 +28,6 @@ export class DescriptionWindow implements IDescriptionWindow {
    */
   public setDescriptionText(text: string): void {
     this.element.innerHTML = text
+    console.log('setDescriptionText')
   }
 }

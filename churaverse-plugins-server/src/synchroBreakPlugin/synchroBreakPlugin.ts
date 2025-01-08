@@ -9,7 +9,9 @@ import { GameAbortEvent } from '@churaverse/game-plugin-server/event/gameAbortEv
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
 import { SocketController } from './controller/socketController'
+import { NyokkiTurnSelectEvent } from './event/nyokkiTurnSelectEvent'
 import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
+import { SendBetCoinEvent } from './event/sendBetCoinEvent'
 
 export class SynchroBreakPlugin extends BaseGamePlugin {
   protected readonly gameId = 'synchroBreak'
@@ -37,7 +39,9 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('gameAbort', this.gameAbortSynchroBreak)
     this.bus.subscribeEvent('gameEnd', this.gameEndSynchroBreak)
     this.bus.subscribeEvent('priorGameData', this.priorGameData)
+    this.bus.subscribeEvent('nyokkiTurnSelect', this.nyokkiTurnSelect)
     this.bus.subscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
+    this.bus.subscribeEvent('sendBetCoin', this.sendBetCoin)
   }
 
   /**
@@ -47,7 +51,9 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     this.bus.unsubscribeEvent('gameAbort', this.gameAbortSynchroBreak)
     this.bus.unsubscribeEvent('gameEnd', this.gameEndSynchroBreak)
     this.bus.unsubscribeEvent('priorGameData', this.priorGameData)
+    this.bus.unsubscribeEvent('nyokkiTurnSelect', this.nyokkiTurnSelect)
     this.bus.unsubscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
+    this.bus.unsubscribeEvent('sendBetCoin', this.sendBetCoin)
   }
 
   private init(): void {
@@ -61,7 +67,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     if (ev.gameId !== this.gameId || this.isActive) return
     this.gameStart(ev.playerId)
     this.addListenEvent()
-    initSynchroBreakPluginStore(this.store)
+    initSynchroBreakPluginStore(this.bus, this.store)
     this.socketController.registerMessageListener()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
   }
@@ -102,12 +108,23 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   }
 
   /**
+   * ターンが設定された時の処理
+   */
+  private readonly nyokkiTurnSelect = (ev: NyokkiTurnSelectEvent): void => {
+    this.synchroBreakPluginStore.turnSelect = ev.allTurn
+  }
+
+  /**
    * タイムリミットが設定された時の処理
    */
   private readonly timeLimitConfirm = (ev: TimeLimitConfirmEvent): void => {
-    if (!this.isActive) return
     this.synchroBreakPluginStore.timeLimit = Number(ev.timeLimit)
   }
+
+  /**
+   * ベットコインが設定された時の処理
+   */
+  private readonly sendBetCoin = (ev: SendBetCoinEvent): void => {}
 }
 
 declare module '@churaverse/game-plugin-server/interface/gameIds' {

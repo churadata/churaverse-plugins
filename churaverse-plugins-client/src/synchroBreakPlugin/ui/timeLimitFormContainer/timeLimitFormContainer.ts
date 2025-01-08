@@ -24,7 +24,7 @@ export const MIN_TIME_LIMIT = '3'
 
 export class TimeLimitFormContainer implements IGameUiComponent {
   public element!: HTMLElement
-  public visible: boolean = true
+  public visible: boolean = false
   private timeLimitInputField!: HTMLInputElement
   private readonly networkPluginStore!: NetworkPluginStore<IMainScene>
 

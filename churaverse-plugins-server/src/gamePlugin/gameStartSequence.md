@@ -11,10 +11,10 @@ sequenceDiagram
     Note over client, server: from SynchroBreakPlugin, <br> to GamePlugin
 
     server ->> server: GameStartEvent
-    Note over server,server: from gamePlugin, <br> to SynchroBreakPlugin
+    Note over server,server: from GamePlugin, <br> to SynchroBreakPlugin
 
     server ->> client: ResponseGameStartMessage
-    Note over server,client: from synchroBreakPlugin, <br>to GamePlugin
+    Note over server,client: from SynchroBreakPlugin, <br>to GamePlugin
 
 
     client ->> client: GameStartEvent

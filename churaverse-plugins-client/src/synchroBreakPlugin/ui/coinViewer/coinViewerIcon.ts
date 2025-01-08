@@ -1,7 +1,7 @@
 import { Scene } from 'phaser'
 import { IMainScene, Store } from 'churaverse-engine-client'
 import '@churaverse/player-plugin-client/store/defPlayerPluginStore'
-import { CoinViewer } from './betCoinDisplay'
+import { CoinViewer } from './coinViewer'
 
 /**
  * 各プレイヤーの周りにボイスチャット関連のアイコンを配置するクラス

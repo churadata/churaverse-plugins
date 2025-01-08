@@ -1,7 +1,7 @@
 import { IMainScene } from 'churaverse-engine-client'
 import { BaseMessage } from '@churaverse/network-plugin-client/message/baseMessage'
 import { SendableObject } from '@churaverse/network-plugin-client/types/sendable'
-import { NyokkiStatus } from '../ui/component/BoardElement'
+import { NyokkiStatus } from '../type/nyokkiStatus'
 
 export interface InitUiData extends SendableObject {
   playersCoinArray: Array<[string, number]>
