@@ -8,8 +8,8 @@ import { RequestGameEndMessage, ResponseGameEndMessage } from '../message/gameEn
 import { GameEndEvent } from '../event/gameEndEvent'
 import { RequestGameAbortMessage, ResponseGameAbortMessage } from '../message/gameAbortMessage'
 import { GameAbortEvent } from '../event/gameAbortEvent'
-import { GameParticipantMessage } from '../message/gameParticipantMessage'
-import { GameParticipantEvent } from '../event/gameParticipantEvent'
+import { UpdateGameParticipantMessage } from '../message/updateGameParticipantMessage'
+import { UpdateGameParticipantEvent } from '../event/updateGameParticipantEvent'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
 
@@ -26,7 +26,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('responseGameEnd', ResponseGameEndMessage, 'dest=onlySelf')
     ev.messageRegister.registerMessage('requestGameAbort', RequestGameAbortMessage, 'lastOnly')
     ev.messageRegister.registerMessage('responseGameAbort', ResponseGameAbortMessage, 'dest=onlySelf')
-    ev.messageRegister.registerMessage('gameParticipant', GameParticipantMessage, 'queue')
+    ev.messageRegister.registerMessage('updateGameParticipant', UpdateGameParticipantMessage, 'queue')
   }
 
   public registerMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
@@ -34,7 +34,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageListenerRegister.on('responseGameStart', this.gameStart.bind(this))
     ev.messageListenerRegister.on('responseGameEnd', this.gameEnd.bind(this))
     ev.messageListenerRegister.on('responseGameAbort', this.gameAbort.bind(this))
-    ev.messageListenerRegister.on('gameParticipant', this.gameParticipant.bind(this))
+    ev.messageListenerRegister.on('updateGameParticipant', this.gameParticipant.bind(this))
   }
 
   /**
@@ -57,7 +57,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.eventBus.post(new GameAbortEvent(msg.data.gameId, msg.data.playerId))
   }
 
-  private gameParticipant(msg: GameParticipantMessage): void {
-    this.eventBus.post(new GameParticipantEvent(msg.data.gameId, msg.data.participantIds))
+  private gameParticipant(msg: UpdateGameParticipantMessage): void {
+    this.eventBus.post(new UpdateGameParticipantEvent(msg.data.gameId, msg.data.participantIds))
   }
 }

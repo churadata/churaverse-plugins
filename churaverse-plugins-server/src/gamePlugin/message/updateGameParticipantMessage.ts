@@ -3,7 +3,7 @@ import { BaseMessage } from '@churaverse/network-plugin-server/message/baseMessa
 import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
 import { GameIds } from '../interface/gameIds'
 
-export interface GameParticipantData extends SendableObject {
+export interface UpdateGameParticipantData extends SendableObject {
   gameId: GameIds
   participantIds: string[]
 }
@@ -11,14 +11,14 @@ export interface GameParticipantData extends SendableObject {
 /**
  * ゲーム参加者のプレイヤーidリストを通知するメッセージ
  */
-export class GameParticipantMessage extends BaseMessage<IMainScene> {
-  public constructor(public readonly data: GameParticipantData) {
-    super('gameParticipant', data)
+export class UpdateGameParticipantMessage extends BaseMessage<IMainScene> {
+  public constructor(public readonly data: UpdateGameParticipantData) {
+    super('updateGameParticipant', data)
   }
 }
 
 declare module '@churaverse/network-plugin-server/message/messages' {
   export interface MainMessageMap {
-    gameParticipant: GameParticipantMessage
+    updateGameParticipant: UpdateGameParticipantMessage
   }
 }

@@ -4,14 +4,10 @@ import { GameUiRegister } from './gameUiRegister'
 import { IGameUiManager } from './interface/IGameUiManager'
 
 export class GameUiManager implements IGameUiManager {
-  private readonly gameUiRegister: GameUiRegister
-
-  public constructor(gameUiRegister: GameUiRegister) {
-    this.gameUiRegister = gameUiRegister
-  }
+  public constructor(private readonly gameUiRegister: GameUiRegister) {}
 
   /**
-   * 特定のGameIdのUIを初期化する
+   * 引数で指定したGameIdのUIを初期化する
    */
   public initializeAllUis(gameId: GameIds): void {
     const components = this.getAllUiComponents(gameId)
@@ -24,9 +20,7 @@ export class GameUiManager implements IGameUiManager {
   }
 
   /**
-   * 指定されたゲームidとUI名に対応するUIを取得する
-   * @param gameId ゲームid
-   * @param uiName UI名
+   * 引数で指定したGameIdとUiNameに対応するUIを取得する
    */
   public getUi<K extends GameUiName>(gameId: GameIds, uiName: K): GameUiMap[GameIds][K] | undefined {
     return this.gameUiRegister.getUiComponent(gameId, uiName)

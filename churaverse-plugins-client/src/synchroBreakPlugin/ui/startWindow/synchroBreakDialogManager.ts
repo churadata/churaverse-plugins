@@ -36,13 +36,13 @@ export class SynchroBreakDialogManager {
       this.coreUiPlugin.topBarIconContainer
     )
     this.currentButtonState = 'start'
-    this.handleGameButtonClick(bus)
+    this.setupGameStartButton(bus)
   }
 
   /**
    * ゲーム操作ボタンを押した時の処理
    */
-  private handleGameButtonClick(bus: IEventBus<IMainScene>): void {
+  private setupGameStartButton(bus: IEventBus<IMainScene>): void {
     const startButton = DomManager.getElementById(GAME_START_BUTTON)
     startButton.onclick = () => {
       this.synchroBreakDialog.close()

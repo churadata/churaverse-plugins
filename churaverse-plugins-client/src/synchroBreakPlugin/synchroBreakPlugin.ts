@@ -5,7 +5,7 @@ import { RegisterGameUiEvent } from '@churaverse/game-plugin-client/event/regist
 import { GameStartEvent } from '@churaverse/game-plugin-client/event/gameStartEvent'
 import { GameAbortEvent } from '@churaverse/game-plugin-client/event/gameAbortEvent'
 import { GameEndEvent } from '@churaverse/game-plugin-client/event/gameEndEvent'
-import { GameParticipantEvent } from '@churaverse/game-plugin-client/event/gameParticipantEvent'
+import { UpdateGameParticipantEvent } from '@churaverse/game-plugin-client/event/updateGameParticipantEvent'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { SynchroBreakDialogManager } from './ui/startWindow/synchroBreakDialogManager'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
@@ -43,7 +43,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   private addListenEvent(): void {
     this.bus.subscribeEvent('gameAbort', this.gameAbortSynchroBreak)
     this.bus.subscribeEvent('gameEnd', this.gameEndSynchroBreak)
-    this.bus.subscribeEvent('gameParticipant', this.gameParticipant)
+    this.bus.subscribeEvent('updateGameParticipant', this.gameParticipant)
     this.bus.subscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
   }
 
@@ -53,7 +53,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   private deleteListenEvent(): void {
     this.bus.unsubscribeEvent('gameAbort', this.gameAbortSynchroBreak)
     this.bus.unsubscribeEvent('gameEnd', this.gameEndSynchroBreak)
-    this.bus.unsubscribeEvent('gameParticipant', this.gameParticipant)
+    this.bus.unsubscribeEvent('updateGameParticipant', this.gameParticipant)
     this.bus.unsubscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
   }
 
@@ -113,7 +113,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   /**
    * ゲーム参加者のidリストを受け取り、ゲーム参加者リストを更新する
    */
-  private readonly gameParticipant = (ev: GameParticipantEvent): void => {
+  private readonly gameParticipant = (ev: UpdateGameParticipantEvent): void => {
     if (ev.gameId !== this.gameId) return
     this.updateParticipantIds(ev.participantIds)
   }
@@ -133,7 +133,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    * タイムリミットが設定された際の処理
    */
   private readonly timeLimitConfirm = (ev: TimeLimitConfirmEvent): void => {
-    if (this.isMidwayParticipant) return
+    if (this.isOwnPlayerMidwayParticipant) return
     this.synchroBreakPluginStore.timeLimit = Number(ev.timeLimit)
     const message = `タイムリミットが${ev.timeLimit}秒に設定されました。`
     this.gamePluginStore.gameLogRenderer.gameLog(message, 400)
