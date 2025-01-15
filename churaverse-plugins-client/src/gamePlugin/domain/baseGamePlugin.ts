@@ -13,14 +13,14 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   /** ゲーム参加者のプレイヤーid */
   private _participantIds: string[]
   /** 自プレイヤーが途中参加かどうかを示すフラグ */
-  private _isMidwayParticipant: boolean
+  private _isOwnPlayerMidwayParticipant: boolean
 
   public constructor(store: Store<IMainScene>, bus: IEventBus<IMainScene>, sceneName: IMainScene['sceneName']) {
     super(store, bus, sceneName)
     this._isActive = false
     this._gameOwnerId = undefined
     this._participantIds = []
-    this._isMidwayParticipant = false
+    this._isOwnPlayerMidwayParticipant = false
   }
 
   /**
@@ -47,8 +47,8 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   /**
    * 自プレイヤーが途中参加かの有無を取得する
    */
-  protected get isMidwayParticipant(): boolean {
-    return this._isMidwayParticipant
+  protected get isOwnPlayerMidwayParticipant(): boolean {
+    return this._isOwnPlayerMidwayParticipant
   }
 
   /**
@@ -73,10 +73,10 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     const gamePluginStore = this.store.of('gamePlugin')
     gamePluginStore.gameLogRenderer.gameAbortLog(this.gameName, playerId)
     this.clearParticipantIds()
-    if (!this.isMidwayParticipant) {
+    if (!this.isOwnPlayerMidwayParticipant) {
       gamePluginStore.gameUiManager.removeAllUis(this.gameId)
     } else {
-      this._isMidwayParticipant = false
+      this._isOwnPlayerMidwayParticipant = false
     }
   }
 
@@ -89,10 +89,10 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     const gamePluginStore = this.store.of('gamePlugin')
     gamePluginStore.gameLogRenderer.gameEndLog(this.gameName)
     this.clearParticipantIds()
-    if (!this.isMidwayParticipant) {
+    if (!this.isOwnPlayerMidwayParticipant) {
       gamePluginStore.gameUiManager.removeAllUis(this.gameId)
     } else {
-      this._isMidwayParticipant = false
+      this._isOwnPlayerMidwayParticipant = false
     }
   }
 
@@ -115,7 +115,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
    * 途中参加したプレイヤーの処理を行う
    */
   protected processMidwayParticipant(): void {
-    this._isMidwayParticipant = true
+    this._isOwnPlayerMidwayParticipant = true
     const gamePluginStore = this.store.of('gamePlugin')
     gamePluginStore.gameLogRenderer.gameLog(`${this.gameName}が開始されています。`, 400)
   }

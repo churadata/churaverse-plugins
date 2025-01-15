@@ -5,8 +5,8 @@ import { RegisterGameUiEvent } from '@churaverse/game-plugin-client/event/regist
 import { GameStartEvent } from '@churaverse/game-plugin-client/event/gameStartEvent'
 import { GameAbortEvent } from '@churaverse/game-plugin-client/event/gameAbortEvent'
 import { GameEndEvent } from '@churaverse/game-plugin-client/event/gameEndEvent'
-import { GameParticipantEvent } from '@churaverse/game-plugin-client/event/gameParticipantEvent'
 import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
+import { UpdateGameParticipantEvent } from '@churaverse/game-plugin-client/event/updateGameParticipantEvent'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { SynchroBreakDialogManager } from './ui/startWindow/synchroBreakDialogManager'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
@@ -49,8 +49,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   private addListenEvent(): void {
     this.bus.subscribeEvent('gameAbort', this.gameAbortSynchroBreak)
     this.bus.subscribeEvent('gameEnd', this.gameEndSynchroBreak)
-    this.bus.subscribeEvent('gameParticipant', this.gameParticipant)
     this.bus.subscribeEvent('nyokkiTurnSelect', this.nyokkiTurnSelect)
+    this.bus.subscribeEvent('updateGameParticipant', this.gameParticipant)
     this.bus.subscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
     this.bus.subscribeEvent('sendBetCoin', this.sendBetCoin)
   }
@@ -61,8 +61,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   private deleteListenEvent(): void {
     this.bus.unsubscribeEvent('gameAbort', this.gameAbortSynchroBreak)
     this.bus.unsubscribeEvent('gameEnd', this.gameEndSynchroBreak)
-    this.bus.unsubscribeEvent('gameParticipant', this.gameParticipant)
     this.bus.unsubscribeEvent('nyokkiTurnSelect', this.nyokkiTurnSelect)
+    this.bus.unsubscribeEvent('updateGameParticipant', this.gameParticipant)
     this.bus.unsubscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
     this.bus.unsubscribeEvent('sendBetCoin', this.sendBetCoin)
   }
@@ -136,7 +136,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   /**
    * ゲーム参加者のidリストを受け取り、ゲーム参加者リストを更新する
    */
-  private readonly gameParticipant = (ev: GameParticipantEvent): void => {
+  private readonly gameParticipant = (ev: UpdateGameParticipantEvent): void => {
     if (ev.gameId !== this.gameId) return
     this.updateParticipantIds(ev.participantIds)
   }
@@ -156,7 +156,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    * ターンが設定された時の処理
    */
   private readonly nyokkiTurnSelect = (ev: NyokkiTurnSelectEvent): void => {
-    if (this.isMidwayParticipant) return
+    if (this.isOwnPlayerMidwayParticipant) return
 
     const gameOwnerName = this.playerPluginStore.players.get(ev.playerId)?.name
 
@@ -175,7 +175,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    * タイムリミットが設定された際の処理
    */
   private readonly timeLimitConfirm = (ev: TimeLimitConfirmEvent): void => {
-    if (this.isMidwayParticipant) return
+    if (this.isOwnPlayerMidwayParticipant) return
     this.synchroBreakPluginStore.timeLimit = Number(ev.timeLimit)
 
     const descriptionWindow = this.getDescriptionWindow()
@@ -197,7 +197,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    * ベットコインが設定された際の処理
    */
   private readonly sendBetCoin = (ev: SendBetCoinEvent): void => {
-    if (this.isMidwayParticipant) return
+    if (this.isOwnPlayerMidwayParticipant) return
 
     const descriptionWindow = this.getDescriptionWindow()
     if (ev.playerId === this.playerPluginStore.ownPlayerId) {

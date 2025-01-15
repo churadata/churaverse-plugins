@@ -9,7 +9,7 @@ import { RequestGameEndMessage, ResponseGameEndMessage } from '../message/gameEn
 import { GameEndEvent } from '../event/gameEndEvent'
 import { RequestGameAbortMessage, ResponseGameAbortMessage } from '../message/gameAbortMessage'
 import { GameAbortEvent } from '../event/gameAbortEvent'
-import { GameParticipantMessage } from '../message/gameParticipantMessage'
+import { UpdateGameParticipantMessage } from '../message/updateGameParticipantMessage'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
 
@@ -22,7 +22,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('responseGameEnd', ResponseGameEndMessage, 'allClients')
     ev.messageRegister.registerMessage('requestGameAbort', RequestGameAbortMessage, 'onlySelf')
     ev.messageRegister.registerMessage('responseGameAbort', ResponseGameAbortMessage, 'allClients')
-    ev.messageRegister.registerMessage('gameParticipant', GameParticipantMessage, 'allClients')
+    ev.messageRegister.registerMessage('updateGameParticipant', UpdateGameParticipantMessage, 'allClients')
   }
 
   public registerMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {

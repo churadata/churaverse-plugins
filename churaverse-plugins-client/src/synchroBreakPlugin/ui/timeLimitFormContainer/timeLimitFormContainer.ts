@@ -7,20 +7,20 @@ import { TimeLimitForm } from './component/TimeLimitForm'
 import { TimeLimitConfirmMessage } from '../../message/timeLimitConfirmMessage'
 
 // 制限時間入力部分
-export const TIME_LIMIT_INPUT_FIELD_ID = 'time-limit-input-field'
+export const TIME_LIMIT_INPUT_FIELD_ID = 'synchro-break-time-limit-input-field'
 
 // 制限時間増加ボタン
-export const TIME_LIMIT_INCREMENT_BUTTON_ID = 'time-limit-increment'
+export const TIME_LIMIT_INCREMENT_BUTTON_ID = 'synchro-break-time-limit-increment'
 
 // 制限時間減少ボタン
-export const TIME_LIMIT_DECREMENT_BUTTON_ID = 'time-limit-decrement'
+export const TIME_LIMIT_DECREMENT_BUTTON_ID = 'synchro-break-time-limit-decrement'
 
 // 制限時間確定ボタン
-export const TIME_LIMIT_SEND_BUTTON_ID = 'time-limit-send-button'
+export const TIME_LIMIT_SEND_BUTTON_ID = 'synchro-break-time-limit-send-button'
 
-export const MAX_TIME_LIMIT = '15'
-
-export const MIN_TIME_LIMIT = '3'
+// 制限時間の最大値と最小値
+export const SYNCHRO_BREAK_MAX_TIME_LIMIT: number = 15
+export const SYNCHRO_BREAK_MIN_TIME_LIMIT: number = 3
 
 export class TimeLimitFormContainer implements IGameUiComponent {
   public element!: HTMLElement
@@ -45,25 +45,26 @@ export class TimeLimitFormContainer implements IGameUiComponent {
     this.timeLimitInputField = DomManager.getElementById<HTMLInputElement>(TIME_LIMIT_INPUT_FIELD_ID)
 
     const sendButton = DomManager.getElementById(TIME_LIMIT_SEND_BUTTON_ID)
-    const minTimeLimit = 3
-    const maxTimeLimit = 15
     sendButton.onclick = () => {
       const timelineInputFieldValue = this.timeLimitInputField.value
-      if (Number(timelineInputFieldValue) >= minTimeLimit && Number(timelineInputFieldValue) <= maxTimeLimit) {
+      if (
+        Number(timelineInputFieldValue) >= SYNCHRO_BREAK_MIN_TIME_LIMIT &&
+        Number(timelineInputFieldValue) <= SYNCHRO_BREAK_MAX_TIME_LIMIT
+      ) {
         const playerId = this.store.of('playerPlugin').ownPlayerId
         this.networkPluginStore.messageSender.send(
           new TimeLimitConfirmMessage({ playerId, timeLimit: timelineInputFieldValue })
         )
         this.close()
       } else {
-        this.timeLimitInputField.value = MIN_TIME_LIMIT
+        this.timeLimitInputField.value = SYNCHRO_BREAK_MIN_TIME_LIMIT.toString()
       }
     }
 
     const plusButton = DomManager.getElementById(TIME_LIMIT_INCREMENT_BUTTON_ID)
     plusButton.onclick = () => {
       const value: number = Number(this.timeLimitInputField.value)
-      if (value < Number(MAX_TIME_LIMIT)) {
+      if (value < SYNCHRO_BREAK_MAX_TIME_LIMIT) {
         const incrementedNum: string = (value + 1).toString()
         this.timeLimitInputField.value = incrementedNum
       }
@@ -73,7 +74,7 @@ export class TimeLimitFormContainer implements IGameUiComponent {
     minusButton.onclick = () => {
       if (Number(this.timeLimitInputField.value) <= 0) return
       const value: number = Number(this.timeLimitInputField.value)
-      if (value > Number(MIN_TIME_LIMIT)) {
+      if (value > SYNCHRO_BREAK_MIN_TIME_LIMIT) {
         const decrementedNum: string = (value - 1).toString()
         this.timeLimitInputField.value = decrementedNum
       }
@@ -81,7 +82,7 @@ export class TimeLimitFormContainer implements IGameUiComponent {
   }
 
   public open(): void {
-    this.timeLimitInputField.value = '3'
+    this.timeLimitInputField.value = SYNCHRO_BREAK_MIN_TIME_LIMIT.toString()
     this.element.style.display = 'flex'
   }
 

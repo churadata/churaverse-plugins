@@ -4,7 +4,7 @@ import {
   TIME_LIMIT_INCREMENT_BUTTON_ID,
   TIME_LIMIT_INPUT_FIELD_ID,
   TIME_LIMIT_SEND_BUTTON_ID,
-  MIN_TIME_LIMIT,
+  SYNCHRO_BREAK_MIN_TIME_LIMIT,
 } from '../timeLimitFormContainer'
 import style from './timeLimitForm.module.scss'
 
@@ -18,8 +18,8 @@ export const TimeLimitForm: JSXFunc = () => {
       <input
         type="text"
         className={style.timeLimitInput}
-        defaultValue={MIN_TIME_LIMIT}
-        min={MIN_TIME_LIMIT}
+        defaultValue={SYNCHRO_BREAK_MIN_TIME_LIMIT}
+        min={SYNCHRO_BREAK_MIN_TIME_LIMIT}
         id={TIME_LIMIT_INPUT_FIELD_ID}
       />
       <button className={style.incrementButton} id={TIME_LIMIT_INCREMENT_BUTTON_ID} />

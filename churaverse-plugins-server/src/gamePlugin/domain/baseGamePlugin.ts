@@ -3,7 +3,7 @@ import '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 import { GameIds } from '../interface/gameIds'
 import { ResponseGameStartMessage } from '../message/gameStartMessage'
-import { GameParticipantMessage } from '../message/gameParticipantMessage'
+import { UpdateGameParticipantMessage } from '../message/updateGameParticipantMessage'
 import { ResponseGameAbortMessage } from '../message/gameAbortMessage'
 import { ResponseGameEndMessage } from '../message/gameEndMessage'
 
@@ -56,7 +56,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     const responseGameStartMessage = new ResponseGameStartMessage({ gameId: this.gameId, playerId })
     const networkPluginStore = this.store.of('networkPlugin')
     networkPluginStore.messageSender.send(responseGameStartMessage)
-    const gameParticipantMessage = new GameParticipantMessage({ gameId: this.gameId, participantIds })
+    const gameParticipantMessage = new UpdateGameParticipantMessage({ gameId: this.gameId, participantIds })
     networkPluginStore.messageSender.send(gameParticipantMessage)
   }
 

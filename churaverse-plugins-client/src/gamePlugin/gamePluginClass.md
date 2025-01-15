@@ -30,12 +30,12 @@ classDiagram
         -_isActive: boolean
         -_gameOwnerId: string | undefined
         -_participantIds: string[]
-        -_isMidwayParticipant: boolean
+        -_isOwnPlayerMidwayParticipant: boolean
 
         #isActive: boolean
         #gameOwnerId: string | undefined
         #participantIds: string[]
-        #isMidwayParticipant: boolean
+        #isOwnPlayerMidwayParticipant: boolean
 
         #gameStart(playerId: string): void
         #gameAbort(playerId: string): void
