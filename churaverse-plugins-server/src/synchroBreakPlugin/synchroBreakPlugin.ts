@@ -31,8 +31,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   /**
    * ゲームが開始された時に登録されるイベントリスナー
    */
-  protected addListenEvent(): void {
-    super.addListenEvent()
+  protected subscribeGameStartEvent(): void {
+    super.subscribeGameStartEvent()
     this.bus.subscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
     this.bus.subscribeEvent('sendBetCoin', this.sendBetCoin)
   }
@@ -40,8 +40,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   /**
    * ゲームが終了・中断された時に削除されるイベントリスナー
    */
-  protected deleteListenEvent(): void {
-    super.deleteListenEvent()
+  protected unsubscribeGameTerminationEvent(): void {
+    super.unsubscribeGameTerminationEvent()
     this.bus.unsubscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
     this.bus.unsubscribeEvent('sendBetCoin', this.sendBetCoin)
   }
@@ -56,8 +56,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   private gameStartSynchroBreak(ev: GameStartEvent): void {
     if (ev.gameId !== this.gameId || this.isActive) return
     this.gameStart(ev.playerId)
-    this.addListenEvent()
     initSynchroBreakPluginStore(this.bus, this.store)
+    this.subscribeGameStartEvent()
     this.socketController.registerMessageListener()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
   }
@@ -66,7 +66,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    * シンクロブレイク特有の中断・終了時に実行される処理
    */
   protected handleGameTermination(): void {
-    this.deleteListenEvent()
+    this.unsubscribeGameTerminationEvent()
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
   }

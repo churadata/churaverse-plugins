@@ -63,7 +63,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   /**
    * ゲーム開始時に共通して登録されるイベントリスナー
    */
-  protected addListenEvent(): void {
+  protected subscribeGameStartEvent(): void {
     this.bus.subscribeEvent('gameAbort', this.gameAbort)
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
     this.bus.subscribeEvent('updateGameParticipant', this.updateGameParticipant)
@@ -72,7 +72,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   /**
    * ゲームが中断・終了時に共通して削除されるイベントリスナー
    */
-  protected deleteListenEvent(): void {
+  protected unsubscribeGameTerminationEvent(): void {
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
     this.bus.unsubscribeEvent('updateGameParticipant', this.updateGameParticipant)
