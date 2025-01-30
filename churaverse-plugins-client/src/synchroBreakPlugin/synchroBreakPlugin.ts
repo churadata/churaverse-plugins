@@ -36,16 +36,16 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   /**
    * ゲームが開始された時に登録されるイベントリスナー
    */
-  protected addListenEvent(): void {
-    super.addListenEvent()
+  protected subscribeGameStartEvent(): void {
+    super.subscribeGameStartEvent()
     this.bus.subscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
   }
 
   /**
    * ゲームが終了・中断された時に削除されるイベントリスナー
    */
-  protected deleteListenEvent(): void {
-    super.deleteListenEvent()
+  protected unsubscribeGameTerminationEvent(): void {
+    super.unsubscribeGameTerminationEvent()
     this.bus.unsubscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
   }
 
@@ -67,7 +67,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   private gameStartSynchroBreak(ev: GameStartEvent): void {
     if (ev.gameId !== this.gameId || this.isActive) return
     this.gameStart(ev.playerId)
-    this.addListenEvent()
+    this.subscribeGameStartEvent()
     initSynchroBreakPluginStore(this.store)
     this.socketController.registerMessageListener()
     this.synchroBreakDialogManager.setGameAbortButtonText()
@@ -78,7 +78,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    * シンクロブレイク特有の中断・終了時に実行される処理
    */
   protected handleGameTermination(): void {
-    this.deleteListenEvent()
+    this.unsubscribeGameTerminationEvent()
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
     this.synchroBreakDialogManager.setGameStartButtonText()
@@ -88,7 +88,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    * シンクロブレイク特有の途中参加時の処理
    */
   protected handleMidwayParticipant(): void {
-    this.addListenEvent()
+    this.subscribeGameStartEvent()
     this.socketController.registerMessageListener()
     this.synchroBreakDialogManager.setGameAbortButtonText()
   }
