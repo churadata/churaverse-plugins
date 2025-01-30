@@ -1,12 +1,7 @@
 import { BaseGamePlugin } from '@churaverse/game-plugin-client/domain/baseGamePlugin'
 import { GamePluginStore } from '@churaverse/game-plugin-client/store/defGamePluginStore'
-import { PriorGameDataEvent } from '@churaverse/game-plugin-client/event/priorGameDataEvent'
 import { RegisterGameUiEvent } from '@churaverse/game-plugin-client/event/registerGameUiEvent'
 import { GameStartEvent } from '@churaverse/game-plugin-client/event/gameStartEvent'
-import { GameAbortEvent } from '@churaverse/game-plugin-client/event/gameAbortEvent'
-import { GameEndEvent } from '@churaverse/game-plugin-client/event/gameEndEvent'
-import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
-import { UpdateGameParticipantEvent } from '@churaverse/game-plugin-client/event/updateGameParticipantEvent'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { SynchroBreakDialogManager } from './ui/startWindow/synchroBreakDialogManager'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
@@ -29,6 +24,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   private socketController!: SocketController
 
   public listenEvent(): void {
+    super.listenEvent()
     this.bus.subscribeEvent('init', this.init.bind(this))
 
     this.socketController = new SocketController(this.bus, this.store)
@@ -40,17 +36,13 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
 
     this.bus.subscribeEvent('registerGameUi', this.registerGameUi.bind(this))
     this.bus.subscribeEvent('gameStart', this.gameStartSynchroBreak.bind(this))
-    this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this))
   }
 
   /**
    * ゲームが開始された時に登録されるイベントリスナー
    */
-  private addListenEvent(): void {
-    this.bus.subscribeEvent('gameAbort', this.gameAbortSynchroBreak)
-    this.bus.subscribeEvent('gameEnd', this.gameEndSynchroBreak)
-    this.bus.subscribeEvent('nyokkiTurnSelect', this.nyokkiTurnSelect)
-    this.bus.subscribeEvent('updateGameParticipant', this.gameParticipant)
+  protected addListenEvent(): void {
+    super.addListenEvent()
     this.bus.subscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
     this.bus.subscribeEvent('sendBetCoin', this.sendBetCoin)
   }
@@ -58,11 +50,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   /**
    * ゲームが終了・中断された時に削除されるイベントリスナー
    */
-  private deleteListenEvent(): void {
-    this.bus.unsubscribeEvent('gameAbort', this.gameAbortSynchroBreak)
-    this.bus.unsubscribeEvent('gameEnd', this.gameEndSynchroBreak)
-    this.bus.unsubscribeEvent('nyokkiTurnSelect', this.nyokkiTurnSelect)
-    this.bus.unsubscribeEvent('updateGameParticipant', this.gameParticipant)
+  protected deleteListenEvent(): void {
+    super.deleteListenEvent()
     this.bus.unsubscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
     this.bus.unsubscribeEvent('sendBetCoin', this.sendBetCoin)
   }
@@ -106,50 +95,22 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   }
 
   /**
-   * ゲームが中断された時の処理
+   * シンクロブレイク特有の中断・終了時に実行される処理
    */
-  private readonly gameAbortSynchroBreak = (ev: GameAbortEvent): void => {
-    if (ev.gameId !== this.gameId) return
-    this.gameAbort(ev.playerId)
-    this.handleGameTermination()
-  }
-
-  /**
-   * ゲームが終了した時の処理
-   */
-  private readonly gameEndSynchroBreak = (ev: GameEndEvent): void => {
-    if (ev.gameId !== this.gameId) return
-    this.gameEnd()
-    this.handleGameTermination()
-  }
-
-  /**
-   * ゲームの終了・中断時の共通処理
-   */
-  private handleGameTermination(): void {
+  protected handleGameTermination(): void {
     this.deleteListenEvent()
+    resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
     this.synchroBreakDialogManager.setGameStartButtonText()
-    resetSynchroBreakPluginStore(this.store)
   }
 
   /**
-   * ゲーム参加者のidリストを受け取り、ゲーム参加者リストを更新する
+   * シンクロブレイク特有の途中参加時の処理
    */
-  private readonly gameParticipant = (ev: UpdateGameParticipantEvent): void => {
-    if (ev.gameId !== this.gameId) return
-    this.updateParticipantIds(ev.participantIds)
-  }
-
-  /**
-   * プレイヤーが参加した際に、シンクロブレイクが開始されているかを確認する
-   */
-  private priorGameData(ev: PriorGameDataEvent): void {
-    if (ev.runningGameId !== this.gameId || this.isActive) return
+  protected handleMidwayParticipant(): void {
     this.addListenEvent()
     this.socketController.registerMessageListener()
     this.synchroBreakDialogManager.setGameAbortButtonText()
-    this.processMidwayParticipant()
   }
 
   /**

@@ -1,5 +1,10 @@
 import { BasePlugin, IMainScene, Store, IEventBus } from 'churaverse-engine-client'
 import { GameIds } from '../interface/gameIds'
+import { GameAbortEvent } from '../event/gameAbortEvent'
+import { GameEndEvent } from '../event/gameEndEvent'
+import { UpdateGameParticipantEvent } from '../event/updateGameParticipantEvent'
+import { PriorGameDataEvent } from '../event/priorGameDataEvent'
+import { GamePluginStore } from '../store/defGamePluginStore'
 
 export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   /** ゲーム一意のid */
@@ -51,6 +56,46 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     return this._isOwnPlayerMidwayParticipant
   }
 
+  public listenEvent(): void {
+    this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this))
+  }
+
+  /**
+   * ゲーム開始時に共通して登録されるイベントリスナー
+   */
+  protected addListenEvent(): void {
+    this.bus.subscribeEvent('gameAbort', this.gameAbort)
+    this.bus.subscribeEvent('gameEnd', this.gameEnd)
+    this.bus.subscribeEvent('updateGameParticipant', this.updateGameParticipant)
+  }
+
+  /**
+   * ゲームが中断・終了時に共通して削除されるイベントリスナー
+   */
+  protected deleteListenEvent(): void {
+    this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
+    this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
+    this.bus.unsubscribeEvent('updateGameParticipant', this.updateGameParticipant)
+  }
+
+  /**
+   * プレイヤーが参加した時に、ゲームが開始されているかを確認する。開始されている場合、必要な処理を実行する
+   */
+  private priorGameData(ev: PriorGameDataEvent): void {
+    if (ev.runningGameId !== this.gameId || this.isActive) return
+    this._isActive = true
+    this._isOwnPlayerMidwayParticipant = true
+    const gamePluginStore = this.store.of('gamePlugin')
+    gamePluginStore.gameLogRenderer.gameLog(`${this.gameName}が開始されています。`, 400)
+    this.handleMidwayParticipant()
+  }
+
+  /**
+   * ゲーム特有の途中入室時の処理を実装するための抽象メソッド
+   * 各ゲームプラグインでオーバーライドし、具体的なロジックを定義する
+   */
+  protected abstract handleMidwayParticipant(): void
+
   /**
    * ゲームの状態をアクティブにし、UI初期化と開始ログを表示する
    * @param playerId ゲームを開始したプレイヤーid
@@ -64,44 +109,53 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   }
 
   /**
-   * ゲームの状態を非アクティブにし、UI削除と中断ログを表示する
-   * @param playerId ゲームを中断したプレイヤーid
+   * ゲームが中断した時の処理
    */
-  protected gameAbort(playerId: string): void {
-    this._isActive = false
-    this._gameOwnerId = undefined
+  private readonly gameAbort = (ev: GameAbortEvent): void => {
+    if (ev.gameId !== this.gameId) return
     const gamePluginStore = this.store.of('gamePlugin')
-    gamePluginStore.gameLogRenderer.gameAbortLog(this.gameName, playerId)
-    this.clearParticipantIds()
-    if (!this.isOwnPlayerMidwayParticipant) {
-      gamePluginStore.gameUiManager.removeAllUis(this.gameId)
-    } else {
-      this._isOwnPlayerMidwayParticipant = false
-    }
+    gamePluginStore.gameLogRenderer.gameAbortLog(this.gameName, ev.playerId)
+    this.terminateGame(gamePluginStore)
   }
 
   /**
-   * ゲームの状態を非アクティブにし、UI削除と終了ログを表示する
+   * ゲームが終了した時の処理
    */
-  protected gameEnd(): void {
-    this._isActive = false
-    this._gameOwnerId = undefined
+  private readonly gameEnd = (ev: GameEndEvent): void => {
+    if (ev.gameId !== this.gameId) return
     const gamePluginStore = this.store.of('gamePlugin')
     gamePluginStore.gameLogRenderer.gameEndLog(this.gameName)
+    this.terminateGame(gamePluginStore)
+  }
+
+  /**
+   * ゲームが中断・終了された時の共通処理を実行する
+   * ゲームの状態を非アクティブにする
+   */
+  private terminateGame(gamePluginStore: GamePluginStore): void {
+    this._isActive = false
+    this._gameOwnerId = undefined
     this.clearParticipantIds()
     if (!this.isOwnPlayerMidwayParticipant) {
       gamePluginStore.gameUiManager.removeAllUis(this.gameId)
     } else {
       this._isOwnPlayerMidwayParticipant = false
     }
+    this.handleGameTermination()
   }
 
   /**
-   * ゲーム参加者のプレイヤーidを登録する
-   * @param participantIds ゲーム参加者のプレイヤーidリスト
+   * ゲーム特有の中断・終了時の処理を実装するための抽象メソッド
+   * 各ゲームプラグインでオーバーライドし、具体的なロジックを定義する
    */
-  protected updateParticipantIds(participantIds: string[]): void {
-    this._participantIds = participantIds
+  protected abstract handleGameTermination(): void
+
+  /**
+   * ゲーム参加者のidリストを受け取り、ゲーム参加者リストを更新する
+   */
+  private readonly updateGameParticipant = (ev: UpdateGameParticipantEvent): void => {
+    if (ev.gameId !== this.gameId) return
+    this._participantIds = ev.participantIds
   }
 
   /**
@@ -109,14 +163,5 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
    */
   private clearParticipantIds(): void {
     this._participantIds = []
-  }
-
-  /**
-   * 途中参加したプレイヤーの処理を行う
-   */
-  protected processMidwayParticipant(): void {
-    this._isOwnPlayerMidwayParticipant = true
-    const gamePluginStore = this.store.of('gamePlugin')
-    gamePluginStore.gameLogRenderer.gameLog(`${this.gameName}が開始されています。`, 400)
   }
 }
