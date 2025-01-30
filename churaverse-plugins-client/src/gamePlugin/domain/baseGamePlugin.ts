@@ -157,6 +157,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     if (ev.gameId !== this.gameId) return
     this._participantIds = ev.participantIds
   }
+
   /**
    * ゲーム参加者のプレイヤーidリストをクリアする
    */
