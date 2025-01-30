@@ -61,6 +61,13 @@ export class MessageManager<Scene extends Scenes>
     this.messageReceiver.on(type, listener)
   }
 
+  public off<MsgType extends MessageType<Scene> & string>(
+    type: MsgType,
+    listener: IMessageListener<MessageMap<Scene>[MsgType]>
+  ): void {
+    this.messageReceiver.off(type, listener)
+  }
+
   public send<MsgType extends MessageType<Scene> & string>(message: MessageMap<Scene>[MsgType]): void {
     // 実際の処理ではすぐに送信はせずにbufferに追加, 一定時間経過後にパケット化されて送信
     // ただし前回send時から時間がthis.sendIntervalMs以上経過している場合は即送信する
