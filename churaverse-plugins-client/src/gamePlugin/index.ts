@@ -1,0 +1,1 @@
+export { GamePlugin } from './gamePlugin'
