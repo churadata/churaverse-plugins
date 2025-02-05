@@ -108,6 +108,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     this._isActive = false
     this._gameOwnerId = undefined
     this.clearParticipantIds()
+    this.handleGameTermination()
   }
 
   /**
