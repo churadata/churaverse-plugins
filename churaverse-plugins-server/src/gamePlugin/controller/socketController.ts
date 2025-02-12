@@ -2,7 +2,7 @@ import { IMainScene } from 'churaverse-engine-server'
 import { BaseSocketController } from '@churaverse/network-plugin-server/interface/baseSocketController'
 import { RegisterMessageEvent } from '@churaverse/network-plugin-server/event/registerMessageEvent'
 import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-server/event/registerMessageListenerEvent'
-import '@churaverse/network-plugin-server/message/priorDataMessage'
+import { PriorDataRequestMessage } from '@churaverse/network-plugin-server/message/priorDataMessage'
 import { RequestGameStartMessage, ResponseGameStartMessage } from '../message/gameStartMessage'
 import { GameStartEvent } from '../event/gameStartEvent'
 import { RequestGameEndMessage, ResponseGameEndMessage } from '../message/gameEndMessage'
@@ -15,7 +15,7 @@ import { PriorGameDataMessage } from '../message/priorGameDataMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
-    ev.messageRegister.registerMessage('priorGameData', PriorGameDataMessage, 'others')
+    ev.messageRegister.registerMessage('priorGameData', PriorGameDataMessage, 'onlySelf')
     ev.messageRegister.registerMessage('requestGameStart', RequestGameStartMessage, 'onlySelf')
     ev.messageRegister.registerMessage('responseGameStart', ResponseGameStartMessage, 'allClients')
     ev.messageRegister.registerMessage('requestGameEnd', RequestGameEndMessage, 'onlySelf')
@@ -36,8 +36,8 @@ export class SocketController extends BaseSocketController<IMainScene> {
    * 途中参加のプレイヤーに進行中のゲームを通知する
    * イベントを発火し、それぞれのゲームプラグインで処理を行う
    */
-  private sendPriorGameData(): void {
-    this.eventBus.post(new PriorGameDataEvent())
+  private sendPriorGameData(msg: PriorDataRequestMessage, senderId: string): void {
+    this.eventBus.post(new PriorGameDataEvent(senderId))
   }
 
   private gameStart(msg: RequestGameStartMessage): void {

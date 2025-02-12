@@ -6,6 +6,7 @@ import { ResponseGameStartMessage } from '../message/gameStartMessage'
 import { UpdateGameParticipantMessage } from '../message/updateGameParticipantMessage'
 import { ResponseGameAbortMessage } from '../message/gameAbortMessage'
 import { ResponseGameEndMessage } from '../message/gameEndMessage'
+import { GameStartEvent } from '../event/gameStartEvent'
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
@@ -48,10 +49,14 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     return this._participantIds
   }
 
+  public listenEvent(): void {
+    this.bus.subscribeEvent('gameStart', this.gameStart.bind(this))
+  }
+
   /**
    * ゲーム開始時に共通して登録されるイベントリスナー
    */
-  protected subscribeGameStartEvent(): void {
+  protected subscribeGameEvent(): void {
     this.bus.subscribeEvent('gameAbort', this.gameAbort)
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
     this.bus.subscribeEvent('priorGameData', this.priorGameData)
@@ -60,32 +65,41 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   /**
    * ゲームが中断・終了時に共通して削除されるイベントリスナー
    */
-  protected unsubscribeGameTerminationEvent(): void {
+  protected unsubscribeGameEvent(): void {
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
     this.bus.unsubscribeEvent('priorGameData', this.priorGameData)
   }
 
   /**
-   * ゲームの状態をアクティブにし、ゲーム開始と参加者を通知する
-   * @param playerId ゲームを開始したプレイヤーid
+   * ゲームが開始した時の処理
    */
-  protected gameStart(playerId: string): void {
+  private gameStart(ev: GameStartEvent): void {
+    if (ev.gameId !== this.gameId || this.isActive) return
     this._isActive = true
-    this._gameOwnerId = playerId
+    const gameOwnerId = ev.playerId
+    this._gameOwnerId = gameOwnerId
     const participantIds = this.store.of('playerPlugin').players.getAllId()
     this._participantIds = participantIds
-    const responseGameStartMessage = new ResponseGameStartMessage({ gameId: this.gameId, playerId })
+    const responseGameStartMessage = new ResponseGameStartMessage({ gameId: this.gameId, playerId: gameOwnerId })
     const networkPluginStore = this.store.of('networkPlugin')
     networkPluginStore.messageSender.send(responseGameStartMessage)
     const gameParticipantMessage = new UpdateGameParticipantMessage({ gameId: this.gameId, participantIds })
     networkPluginStore.messageSender.send(gameParticipantMessage)
+    this.handleGameStart()
   }
+
+  /**
+   * ゲーム特有の開始時の処理を実装するための抽象メソッド
+   * 各ゲームプラグインでオーバーライドし、具体的なロジックを定義する
+   */
+  protected abstract handleGameStart(): void
 
   /**
    * ゲームが中断した時の処理
    */
   private readonly gameAbort = (ev: GameAbortEvent): void => {
+    if (ev.gameId !== this.gameId) return
     this.terminateGame()
     const gameAbortMessage = new ResponseGameAbortMessage({ gameId: this.gameId, playerId: ev.playerId })
     this.store.of('networkPlugin').messageSender.send(gameAbortMessage)
@@ -95,6 +109,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
    * ゲームが終了した時の処理
    */
   private readonly gameEnd = (ev: GameEndEvent): void => {
+    if (ev.gameId !== this.gameId) return
     this.terminateGame()
     const gameEndMessage = new ResponseGameEndMessage({ gameId: this.gameId })
     this.store.of('networkPlugin').messageSender.send(gameEndMessage)
@@ -122,7 +137,9 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
    */
   private readonly priorGameData = (ev: PriorGameDataEvent): void => {
     if (!this.isActive) return
-    this.store.of('networkPlugin').messageSender.send(new PriorGameDataMessage({ runningGameId: this.gameId }))
+    this.store
+      .of('networkPlugin')
+      .messageSender.send(new PriorGameDataMessage({ runningGameId: this.gameId }), ev.senderId)
   }
 
   /**
