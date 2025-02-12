@@ -5,7 +5,7 @@ import { CVEvent, IMainScene } from 'churaverse-engine-server'
  * 進行中のゲームがないかを確認するために使用
  */
 export class PriorGameDataEvent extends CVEvent<IMainScene> {
-  public constructor() {
+  public constructor(public readonly senderId: string) {
     super('priorGameData', true)
   }
 }

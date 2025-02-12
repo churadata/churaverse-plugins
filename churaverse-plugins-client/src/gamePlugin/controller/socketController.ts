@@ -19,7 +19,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
-    ev.messageRegister.registerMessage('priorGameData', PriorGameDataMessage, 'queue')
+    ev.messageRegister.registerMessage('priorGameData', PriorGameDataMessage, 'dest=onlySelf')
     ev.messageRegister.registerMessage('requestGameStart', RequestGameStartMessage, 'lastOnly')
     ev.messageRegister.registerMessage('responseGameStart', ResponseGameStartMessage, 'dest=onlySelf')
     ev.messageRegister.registerMessage('requestGameEnd', RequestGameEndMessage, 'lastOnly')

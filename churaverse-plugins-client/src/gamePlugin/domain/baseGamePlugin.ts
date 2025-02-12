@@ -1,5 +1,6 @@
 import { BasePlugin, IMainScene, Store, IEventBus } from 'churaverse-engine-client'
 import { GameIds } from '../interface/gameIds'
+import { GameStartEvent } from '../event/gameStartEvent'
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { UpdateGameParticipantEvent } from '../event/updateGameParticipantEvent'
@@ -57,13 +58,14 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   }
 
   public listenEvent(): void {
+    this.bus.subscribeEvent('gameStart', this.gameStart.bind(this))
     this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this))
   }
 
   /**
    * ゲーム開始時に共通して登録されるイベントリスナー
    */
-  protected subscribeGameStartEvent(): void {
+  protected subscribeGameEvent(): void {
     this.bus.subscribeEvent('gameAbort', this.gameAbort)
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
     this.bus.subscribeEvent('updateGameParticipant', this.updateGameParticipant)
@@ -72,7 +74,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   /**
    * ゲームが中断・終了時に共通して削除されるイベントリスナー
    */
-  protected unsubscribeGameTerminationEvent(): void {
+  protected unsubscribeGameEvent(): void {
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
     this.bus.unsubscribeEvent('updateGameParticipant', this.updateGameParticipant)
@@ -82,8 +84,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
    * プレイヤーが参加した時に、ゲームが開始されているかを確認する。開始されている場合、必要な処理を実行する
    */
   private priorGameData(ev: PriorGameDataEvent): void {
-    if (ev.runningGameId !== this.gameId || this.isActive) return
-    this._isActive = true
+    this._isActive = ev.runningGameId === this.gameId
     this._isOwnPlayerMidwayParticipant = true
     const gamePluginStore = this.store.of('gamePlugin')
     gamePluginStore.gameLogRenderer.gameLog(`${this.gameName}が開始されています。`, 400)
@@ -97,16 +98,24 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   protected abstract handleMidwayParticipant(): void
 
   /**
-   * ゲームの状態をアクティブにし、UI初期化と開始ログを表示する
-   * @param playerId ゲームを開始したプレイヤーid
+   * ゲームが開始した時の処理
    */
-  protected gameStart(playerId: string): void {
+  private gameStart(ev: GameStartEvent): void {
+    if (ev.gameId !== this.gameId || this.isActive) return
     this._isActive = true
-    this._gameOwnerId = playerId
+    const gameOwnerId = ev.playerId
+    this._gameOwnerId = gameOwnerId
     const gamePluginStore = this.store.of('gamePlugin')
     gamePluginStore.gameUiManager.initializeAllUis(this.gameId)
-    gamePluginStore.gameLogRenderer.gameStartLog(this.gameName, playerId)
+    gamePluginStore.gameLogRenderer.gameStartLog(this.gameName, gameOwnerId)
+    this.handleGameStart()
   }
+
+  /**
+   * ゲーム特有の開始時の処理を実装するための抽象メソッド
+   * 各ゲームプラグインでオーバーライドし、具体的なロジックを定義する
+   */
+  protected abstract handleGameStart(): void
 
   /**
    * ゲームが中断した時の処理
