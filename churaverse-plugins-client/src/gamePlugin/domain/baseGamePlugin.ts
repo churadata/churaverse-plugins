@@ -85,10 +85,12 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
    */
   private priorGameData(ev: PriorGameDataEvent): void {
     this._isActive = ev.runningGameId === this.gameId
-    this._isOwnPlayerMidwayParticipant = true
-    const gamePluginStore = this.store.of('gamePlugin')
-    gamePluginStore.gameLogRenderer.gameLog(`${this.gameName}が開始されています。`, 400)
-    this.handleMidwayParticipant()
+    if (this.isActive) {
+      this._isOwnPlayerMidwayParticipant = true
+      const gamePluginStore = this.store.of('gamePlugin')
+      gamePluginStore.gameLogRenderer.gameLog(`${this.gameName}が開始されています。`, 400)
+      this.handleMidwayParticipant()
+    }
   }
 
   /**
