@@ -5,6 +5,7 @@ export interface SynchroBreakPluginStore {
   readonly synchroBreakIcons: Map<string, PlayerNyokkiStatusIcon>
   readonly playersCoinRepository: IPlayersCoinRepository
   timeLimit: number | undefined
+  gameTurn: number | undefined
 }
 
 declare module 'churaverse-engine-client' {

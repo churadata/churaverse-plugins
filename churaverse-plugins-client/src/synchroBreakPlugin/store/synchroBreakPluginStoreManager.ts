@@ -11,6 +11,7 @@ export function initSynchroBreakPluginStore(store: Store<IMainScene>): void {
     synchroBreakIcons: new Map<string, PlayerNyokkiStatusIcon>(),
     playersCoinRepository: new PlayersCoinRepository(),
     timeLimit: undefined,
+    gameTurn: undefined,
   }
 
   store.setInit('synchroBreakPlugin', synchroBreakPluginStore)
