@@ -80,15 +80,18 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> implements I
     this._isActive = true
     const gameOwnerId = ev.playerId
     this._gameOwnerId = gameOwnerId
-    const participantIds = this.store.of('playerPlugin').players.getAllId()
-    this._participantIds = participantIds
-    const responseGameStartMessage = new ResponseGameStartMessage({ gameId: this.gameId, playerId: gameOwnerId })
+    this._participantIds =  this.store.of('playerPlugin').players.getAllId()
+
     const networkPluginStore = this.store.of('networkPlugin')
+    const responseGameStartMessage = new ResponseGameStartMessage({ gameId: this.gameId, playerId: gameOwnerId })
     networkPluginStore.messageSender.send(responseGameStartMessage)
-    const gameParticipantMessage = new UpdateGameParticipantMessage({ gameId: this.gameId, participantIds })
+
+    const gameParticipantMessage = new UpdateGameParticipantMessage({ gameId: this.gameId, participantIds: this.participantIds })
     networkPluginStore.messageSender.send(gameParticipantMessage)
+
     const gamePluginStore = this.store.of('gamePlugin')
     gamePluginStore.games.set(this.gameId, this)
+
     this.handleGameStart()
   }
 
