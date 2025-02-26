@@ -2,21 +2,18 @@ import { IMainScene } from 'churaverse-engine-client'
 import { BaseMessage } from '@churaverse/network-plugin-client/message/baseMessage'
 import { SendableObject } from '@churaverse/network-plugin-client/types/sendable'
 
-export interface NyokkiTurnEndData extends SendableObject {
-  noNyokkiPlayerIds: string[]
+export interface NyokkiTurnTimerMessageData extends SendableObject {
+  countdown: number
 }
 
-/**
- * ゲームターン終了を知らせる
- */
-export class NyokkiTurnEndMessage extends BaseMessage<IMainScene> {
-  public constructor(public readonly data: NyokkiTurnEndData) {
-    super('nyokkiTurnEnd')
+export class NyokkiTurnTimerMessage extends BaseMessage<IMainScene> {
+  public constructor(public readonly data: NyokkiTurnTimerMessageData) {
+    super('nyokkiTurnTimer', data)
   }
 }
 
 declare module '@churaverse/network-plugin-client/message/messages' {
   export interface MainMessageMap {
-    nyokkiTurnEnd: NyokkiTurnEndMessage
+    nyokkiTurnTimer: NyokkiTurnTimerMessage
   }
 }
