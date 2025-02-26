@@ -167,7 +167,14 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   private readonly updateGameParticipant = (ev: UpdateGameParticipantEvent): void => {
     if (ev.gameId !== this.gameId) return
     this._participantIds = ev.participantIds
+    this.handleGameParticipant()
   }
+
+  /**
+   * ゲーム特有の参加者の処理を実装するための抽象メソッド
+   * 各ゲームプラグインでオーバーライドし、具体的なロジックを定義する
+   */
+  protected abstract handleGameParticipant(): void
 
   /**
    * ゲーム参加者のプレイヤーidリストをクリアする
