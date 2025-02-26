@@ -18,6 +18,13 @@ export class BetCoinRepository {
     this.playerBetCoins.clear()
   }
 
+  /**
+   * ベットコインを入力したプレイヤーの数を取得する
+   */
+  public getBetCoinPlayerCount(): number {
+    return this.playerBetCoins.size
+  }
+
   public calculateMultiplier(betCoins: number, totalPlayerNum: number, playerOrder: number): number {
     // playerOrderが-1ということはnyokkiしていないことを意味するため、増加分はなし
     if (playerOrder === -1) return 0

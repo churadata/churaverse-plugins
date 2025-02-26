@@ -4,16 +4,24 @@
 export class PlayersCoinRepository {
   private readonly playerCoins = new Map<string, number>()
 
-  public set(id: string, coinNumber: number): void {
-    this.playerCoins.set(id, coinNumber)
+  public set(playerId: string, coinNumber: number): void {
+    this.playerCoins.set(playerId, coinNumber)
   }
 
-  public get(id: string): number | undefined {
-    return this.playerCoins.get(id)
+  public change(playerId: string, coins: number): void {
+    if (this.playerCoins.has(playerId)) {
+      this.playerCoins.set(playerId, coins)
+    } else {
+      throw new Error('playerIdがplayersCoinRepositoryに存在しません')
+    }
   }
 
-  public delete(id: string): void {
-    this.playerCoins.delete(id)
+  public get(playerId: string): number | undefined {
+    return this.playerCoins.get(playerId)
+  }
+
+  public delete(playerId: string): void {
+    this.playerCoins.delete(playerId)
   }
 
   public getAllPlayerIds(): string[] {
@@ -36,14 +44,10 @@ export class PlayersCoinRepository {
     return players
   }
 
-  public sortedPlayerCoins(): Array<[string, number]> {
-    const sortedCoins = Array.from(this.playerCoins.entries()).sort((a, b) => {
-      const coinA = a[1]
-      const coinB = b[1]
-      return coinB - coinA
-    })
-
-    return sortedCoins
+  public sortedPlayerCoins(): Array<{ playerId: string; coins: number }> {
+    return Array.from(this.playerCoins.entries())
+      .map(([playerId, coins]) => ({ playerId, coins }))
+      .sort((a, b) => b.coins - a.coins)
   }
 
   public sortPlayerCoinsDesc(): Map<string, number> {
