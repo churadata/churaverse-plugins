@@ -1,18 +1,18 @@
 import { IMainScene, IEventBus, Store } from 'churaverse-engine-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
-import { ResponseGameEndMessage } from '@churaverse/game-plugin-server/message/gameEndMessage'
-// import { GameEndMessage } from '@churaverse/game-plugin-server/message/gameEndMessage'
-// import { GameAbortMessage } from '@churaverse/game-plugin-server/message/gameAbortMessage'
 import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 import { IGame } from '../interface/IGame'
 import { NyokkiGameTurnEnd } from '../event/nyokkiGameTurnEnd'
-import { NyokkiTurnEndMessage } from '../message/nyokkiTurnEndMessage'
+import { NyokkiGameTurnStartEvent } from '../event/nyokkiGameTurnStartEvent'
 import {
   NyokkiTurnSelectResponseData,
   NyokkiTurnSelectResponseMessage,
 } from '../message/nyokkiTurnSelectResponseMessage'
-import { ShowUiData, ShowUiMessage, UiName } from '../message/showUiMessage'
+// import { ShowUiData, ShowUiMessage, UiName } from '../message/showUiMessage'
 import { SynchroBreakPluginStore } from '../store/defSynchroBreakPluginStore'
+import { NyokkiGameStartCountMessage } from '../message/nyokkiGameStartCountMessage'
+import { NyokkiTurnTimerMessage } from '../message/nyokkiTurnTimerMessage'
+import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
 
 const TIME_OUT = 120000
 
@@ -30,12 +30,16 @@ export class Game implements IGame {
     private readonly eventBus: IEventBus<IMainScene>,
     private readonly store: Store<IMainScene>
   ) {
-    eventBus.subscribeEvent('start', this.getStores.bind(this))
+    this.getStores()
   }
 
   private getStores(): void {
-    this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
+    // this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
     this.networkPluginStore = this.store.of('networkPlugin')
+  }
+
+  public getSynchroBreakPluginStore(synchroBreakPluginStore: SynchroBreakPluginStore): void {
+    this.synchroBreakPluginStore = synchroBreakPluginStore
   }
 
   public get isActive(): boolean {
@@ -52,7 +56,7 @@ export class Game implements IGame {
     this._isActive = true
     this.gameOwner = gameOwner
     // ランキングボードの表示
-    this.sendShowUiMessage('rankingBoard')
+    // this.sendShowUiMessage('rankingBoard')
     await this.gameLoop()
   }
 
@@ -71,7 +75,7 @@ export class Game implements IGame {
       if (!this._isActive) return
       await this.checkTurnCount()
       if (!this._isActive) return
-      await this.turnResult()
+      // await this.turnResult()
     }
 
     await this.showResult()
@@ -80,9 +84,9 @@ export class Game implements IGame {
   // ゲームターンを通知する
   private async inputTurnSelect(): Promise<void> {
     if (!this._isActive) return
-
+    console.log('inputTurnSelectが実行されている。')
     // ターン入力に関する処理
-    this.sendShowUiMessage('turnSelect')
+    // this.sendShowUiMessage('turnSelect')
     this.turnCountNumber = 1
     this.turnSelectNumber = await this.waitForPlayerInput('turnSelect')
     if (this.gameOwner === undefined) return
@@ -99,7 +103,7 @@ export class Game implements IGame {
     if (!this._isActive) return
 
     // 制限時間の入力に関する処理
-    this.sendShowUiMessage('timeLimit')
+    // this.sendShowUiMessage('timeLimit')
     this.timeLimit = await this.waitForPlayerInput('timeLimit')
   }
 
@@ -107,7 +111,7 @@ export class Game implements IGame {
     if (!this._isActive) return
 
     // ベットコインの入力に関する処理
-    this.sendShowUiMessage('betCoin')
+    // this.sendShowUiMessage('betCoin')
     let timeOut: number = TIME_OUT
 
     await new Promise<void>((resolve) => {
@@ -143,7 +147,7 @@ export class Game implements IGame {
     if (!this._isActive) return
 
     // カウントダウンの処理
-    this.sendShowUiMessage('startCountDown')
+    // this.sendShowUiMessage('startCountDown')
 
     for (let i = 3; i > 0; i--) {
       this.abortGameIfNoGameOwner()
@@ -155,8 +159,8 @@ export class Game implements IGame {
     if (!this._isActive) return
 
     // ゲーム中
-    this.sendShowUiMessage('countdownTimer')
-    this.sendShowUiMessage('nyokkiButton')
+    // this.sendShowUiMessage('countdownTimer')
+    // this.sendShowUiMessage('nyokkiButton')
 
     let remainingTime = this.timeLimit
 
@@ -172,23 +176,11 @@ export class Game implements IGame {
     this.abortGameIfNoGameOwner()
   }
 
-  private async turnResult(): Promise<void> {
-    if (!this._isActive) return
-    this.abortGameIfNoGameOwner()
-
-    // 残りターンの計算とターン終了の通知
-    const allTurn = this.turnSelectNumber
-    this.turnCountNumber++
-    const turnNumber = this.turnCountNumber
-    this.nyokkiTurnEnd(turnNumber, allTurn)
-    this.nyokkiCollectionClear()
-  }
-
   private async showResult(): Promise<void> {
     if (!this._isActive) return
-    this.nyokkiGameEnd()
+    // this.nyokkiGameEnd()
     this.nyokkiCollectionClear()
-    this.sendShowUiMessage('result')
+    // this.sendShowUiMessage('result')
     this.reset()
   }
 
@@ -229,57 +221,9 @@ export class Game implements IGame {
     })
   }
 
-  // 一旦コメントアウトする
   private abortGameIfNoGameOwner(): void {
     const gameOwner = this.gameOwner
     console.log(gameOwner)
-    // if (gameOwner === undefined || this.store.of('playerPlugin').players.get(gameOwner) === undefined) {
-    //   this.abort()
-    // }
-  }
-
-  // frontendでUIを表示するためのmsgを送信
-  private sendShowUiMessage(uiName: UiName): void {
-    if (this.gameOwner === undefined) throw new Error('gameOwner is undefined')
-    const data: ShowUiData = { showUi: uiName, gameOwner: this.gameOwner }
-    const showUiMessage = new ShowUiMessage(data)
-    this.networkPluginStore.messageSender.send(showUiMessage)
-  }
-
-  // nyokkiターン終了イベントを通知する
-  private nyokkiTurnEnd(turnNumber: number, allTurn: number): void {
-    // ニョッキゲームに参加している全プレイヤーを取得
-
-    const playerCoinArray = Array.from(this.synchroBreakPluginStore.participants.entries())
-      .filter(([playerId, status]) => !status)
-      .map(([playerId, status]) => playerId)
-
-    // ニョッキアクションを実行したプレイヤーを取得
-    const nyokkiCollection = this.synchroBreakPluginStore.nyokkiCollection.getAllPlayerId()
-    // ニョッキアクションを実行していないプレイヤーIDを取得
-    const noNyokkiPlayerIds = playerCoinArray.filter((playerId) => !nyokkiCollection.includes(playerId))
-    const nyokkiTurnEndData = { turnNumber, allTurn, noNyokkiPlayerIds }
-    const nyokkiTurnEndMessage = new NyokkiTurnEndMessage(nyokkiTurnEndData)
-    this.networkPluginStore.messageSender.send(nyokkiTurnEndMessage)
-
-    const nyokkiGameTurnEndEvent = new NyokkiGameTurnEnd()
-    this.eventBus.post(nyokkiGameTurnEndEvent)
-  }
-
-  /*
-  // ゲームの途中終了
-  public abort(): void {
-    if (!this._isActive) return
-    this.reset()
-    const nyokkiGameFinishMessage = new GameAbortMessage({ gameId: 'synchroBreak', playerId: this.gameOwner })
-    this.networkPluginStore.messageSender.send(nyokkiGameFinishMessage)
-  }
-*/
-
-  // nyokki終了イベントを通知する
-  private nyokkiGameEnd(): void {
-    const nyokkiGameEndMessage = new ResponseGameEndMessage({ gameId: 'synchroBreak' })
-    this.networkPluginStore.messageSender.send(nyokkiGameEndMessage)
   }
 
   private reset(): void {
@@ -290,5 +234,61 @@ export class Game implements IGame {
     this.synchroBreakPluginStore.participants.forEach((value, key) => {
       this.synchroBreakPluginStore.participants.set(key, false)
     })
+  }
+
+  /**
+   * ターンが開始する際のカウントダウン処理。ターンが開始するカウントダウンは3秒。
+   */
+  public async gameStartCount(): Promise<void> {
+    // 最後に入力したプレイヤーにもカウントダウンが3秒から開始されるように1秒待機
+    await this.delay(1000)
+    for (let countdownSeconds = 3; countdownSeconds > 0; countdownSeconds--) {
+      console.log(countdownSeconds)
+      const nyokkiGameStartCountMessage = new NyokkiGameStartCountMessage({ countdown: countdownSeconds })
+      this.networkPluginStore.messageSender.send(nyokkiGameStartCountMessage)
+      await this.delay(1000)
+    }
+    console.log('ゲームスタート')
+    await this.countdownTurnTimer()
+  }
+
+  /**
+   * ゲームターンの残り秒数をカウントする処理。ターンの残り秒数はオーナーがターンタイマーに設定された秒数。
+   */
+  public async countdownTurnTimer(): Promise<void> {
+    const turnTimer = this.synchroBreakPluginStore.timeLimit
+    if (turnTimer === undefined) return
+    for (let remainingSeconds = turnTimer; remainingSeconds > 0; remainingSeconds--) {
+      const nyokkiTurnTimerMessage = new NyokkiTurnTimerMessage({ countdown: remainingSeconds })
+      this.networkPluginStore.messageSender.send(nyokkiTurnTimerMessage)
+      await this.delay(1000)
+      console.log('remainingSeconds: ', remainingSeconds)
+    }
+    await this.gameTurnEnd()
+  }
+
+  /**
+   * ゲームのターンが終了した際の処理。
+   */
+  public async gameTurnEnd(): Promise<void> {
+    const turnSelect = this.synchroBreakPluginStore.turnSelect
+    if (turnSelect === undefined) return
+    if (turnSelect <= this.turnCountNumber) {
+      this.turnCountNumber = 1
+      // const nyokkiResultEvent = new NyokkiResultEvent()
+      // this.eventBus.post(nyokkiResultEvent)
+      const nyokkiGameEndEvent = new GameEndEvent('synchroBreak')
+      this.eventBus.post(nyokkiGameEndEvent)
+    } else {
+      this.turnCountNumber++
+      const nyokkiTurnEnd = new NyokkiGameTurnEnd()
+      this.eventBus.post(nyokkiTurnEnd)
+      console.log('ターン終了')
+
+      await this.delay(1000)
+
+      const nyokkiTurnStart = new NyokkiGameTurnStartEvent(this.turnCountNumber)
+      this.eventBus.post(nyokkiTurnStart)
+    }
   }
 }
