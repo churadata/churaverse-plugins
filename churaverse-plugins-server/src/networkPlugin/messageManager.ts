@@ -25,7 +25,10 @@ export class MessageManager<Scene extends Scenes>
   private readonly transmitQueue: ITransmitQueue<Scene>
   private readonly messageManagerHelper: MessageManagerHelper<Scene>
 
-  public constructor(server: http.Server, private readonly isMessageSenderScene: boolean) {
+  public constructor(
+    server: http.Server,
+    private readonly isMessageSenderScene: boolean
+  ) {
     this.messageReceiver = new MessageReceiver()
     this.messageRegistry = MessageRegistry.getInstance()
     this.receiveQueue = new ReceiveQueue()
@@ -48,6 +51,13 @@ export class MessageManager<Scene extends Scenes>
     listener: IMessageListener<MessageMap<Scene>[MsgType]>
   ): void {
     this.messageReceiver.on(type, listener)
+  }
+
+  public off<MsgType extends MessageType<Scene> & string>(
+    type: MsgType,
+    listener: IMessageListener<MessageMap<Scene>[MsgType]>
+  ): void {
+    this.messageReceiver.off(type, listener)
   }
 
   public send(message: BaseMessage<Scene>, senderId: string = 'server'): void {
