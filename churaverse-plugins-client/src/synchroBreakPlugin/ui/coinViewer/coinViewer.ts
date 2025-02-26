@@ -1,17 +1,17 @@
 import { Scene } from 'phaser'
 import { IPlayerRenderer } from '@churaverse/player-plugin-client/domain/IPlayerRenderer'
 
-const BET_ICON_PATH = 'src/game/plugins/synchroBreakPlugin/assets/betCoin/bet.png'
-const NUMBER_HEL0_PATH = 'src/game/plugins/synchroBreakPlugin/assets/betCoin/number_hel0.png'
-const NUMBER_HEL1_PATH = 'src/game/plugins/synchroBreakPlugin/assets/betCoin/number_hel1.png'
-const NUMBER_HEL2_PATH = 'src/game/plugins/synchroBreakPlugin/assets/betCoin/number_hel2.png'
-const NUMBER_HEL3_PATH = 'src/game/plugins/synchroBreakPlugin/assets/betCoin/number_hel3.png'
-const NUMBER_HEL4_PATH = 'src/game/plugins/synchroBreakPlugin/assets/betCoin/number_hel4.png'
-const NUMBER_HEL5_PATH = 'src/game/plugins/synchroBreakPlugin/assets/betCoin/number_hel5.png'
-const NUMBER_HEL6_PATH = 'src/game/plugins/synchroBreakPlugin/assets/betCoin/number_hel6.png'
-const NUMBER_HEL7_PATH = 'src/game/plugins/synchroBreakPlugin/assets/betCoin/number_hel7.png'
-const NUMBER_HEL8_PATH = 'src/game/plugins/synchroBreakPlugin/assets/betCoin/number_hel8.png'
-const NUMBER_HEL9_PATH = 'src/game/plugins/synchroBreakPlugin/assets/betCoin/number_hel9.png'
+import BET_ICON_PATH from '../../assets/betCoin/bet.png'
+import NUMBER_HEL0_PATH from '../../assets/betCoin/number_hel0.png'
+import NUMBER_HEL1_PATH from '../../assets/betCoin/number_hel1.png'
+import NUMBER_HEL2_PATH from '../../assets/betCoin/number_hel2.png'
+import NUMBER_HEL3_PATH from '../../assets/betCoin/number_hel3.png'
+import NUMBER_HEL4_PATH from '../../assets/betCoin/number_hel4.png'
+import NUMBER_HEL5_PATH from '../../assets/betCoin/number_hel5.png'
+import NUMBER_HEL6_PATH from '../../assets/betCoin/number_hel6.png'
+import NUMBER_HEL7_PATH from '../../assets/betCoin/number_hel7.png'
+import NUMBER_HEL8_PATH from '../../assets/betCoin/number_hel8.png'
+import NUMBER_HEL9_PATH from '../../assets/betCoin/number_hel9.png'
 
 const BET_ICON_NAME = 'bet_icon'
 const NUMBER_HEL0_NAME = 'number_hel0'
@@ -26,8 +26,8 @@ const NUMBER_HEL8_NAME = 'number_hel8'
 const NUMBER_HEL9_NAME = 'number_hel9'
 
 const betUiPosX = 75
-const betUiPosY = 23
-const numberIconPoxX = 9
+const betUiPosY = 25 // 初期値23
+const numberIconPoxX = 11 // 初期値10
 const numberIconPoxY = 12
 
 export class CoinViewer {
@@ -49,8 +49,6 @@ export class CoinViewer {
   public setBetCoins(playerId: string, betCoins: number): void {
     this.betUi = this.scene.add.image(0, 35, BET_ICON_NAME).setDisplaySize(betUiPosX, betUiPosY).setAlpha(1).setDepth(0)
     this.playerRenderer.addToPlayerContainer(this.betUi)
-    // 既存のUIをすべて削除
-    this.coinUi = []
 
     // betCoinsを文字列に変換し、桁ごとに画像を表示する
     const betCoinsStr = betCoins.toString()
@@ -86,6 +84,7 @@ export class CoinViewer {
     this.coinUi.forEach((coin) => {
       coin.destroy()
     })
+    this.coinUi = [] // coinUi配列をクリア
   }
 
   public static loadAssets(scene: Scene): void {

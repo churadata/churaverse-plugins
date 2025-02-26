@@ -9,11 +9,13 @@ import {
 } from 'churaverse-engine-client'
 import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
 import { NyokkiButtonComponent } from './component/NyokkiButtonComponent'
-import { NyokkiEvent } from '../../event/nyokkiEvent'
+// import { NyokkiEvent } from '../../event/nyokkiEvent'
 import { PlayerWalkEvent } from '@churaverse/player-plugin-client/event/playerWalkEvent'
+import { NyokkiMessage } from '../../message/nyokkiMessage'
 import { Scene } from 'phaser'
 
 export const NYOKKI_BUTTON_ID = 'nyokki-button'
+
 export class NyokkiButton implements IGameUiComponent {
   //   private uiStore!: CoreUiPluginStore
   public element!: HTMLElement
@@ -21,8 +23,8 @@ export class NyokkiButton implements IGameUiComponent {
   private button!: HTMLElement
 
   public constructor(
-    private readonly eventBus: IEventBus<IMainScene>,
     private readonly store: Store<IMainScene>,
+    private readonly eventBus: IEventBus<IMainScene>,
     private readonly scene: Scene
   ) {}
 
@@ -47,8 +49,10 @@ export class NyokkiButton implements IGameUiComponent {
   public nyokki(): void {
     const playerPluginStore = this.store.of('playerPlugin')
     const playerId = playerPluginStore.ownPlayerId
-    const nyokkiEvent = new NyokkiEvent(playerId)
-    this.eventBus.post(nyokkiEvent)
+    // const nyokkiEvent = new NyokkiEvent(playerId)
+    // this.eventBus.post(nyokkiEvent)
+    const nyokkiMessage = new NyokkiMessage({ playerId })
+    this.store.of('networkPlugin').messageSender.send(nyokkiMessage)
     this.jump()
   }
 

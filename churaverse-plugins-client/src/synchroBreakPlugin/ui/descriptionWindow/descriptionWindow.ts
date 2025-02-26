@@ -28,6 +28,5 @@ export class DescriptionWindow implements IDescriptionWindow {
    */
   public setDescriptionText(text: string): void {
     this.element.innerHTML = text
-    console.log('setDescriptionText')
   }
 }

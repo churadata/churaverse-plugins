@@ -1,4 +1,4 @@
-import style from './RankingOpenButtonComponent.module.scss'
+import style from './PlayerRankingElement.module.scss'
 import { JSXFunc } from 'churaverse-engine-client'
 import { BOARD_ELEMENT_ID, PLAYER_NAME_ID, NYOKKI_STATUS_ID, PLAYER_COINS_ID, PLAYER_RANK_ID } from '../rankingBoard'
 import { NyokkiStatus } from '../../../type/nyokkiStatus'
@@ -24,9 +24,19 @@ export const getRankColorClass = (rank: number): string => {
   }
 }
 
-export const BoardElement: JSXFunc<boardProps> = (props: boardProps) => {
-  const playerId: string = props.playerId
+export const getNyokkiStatusClass = (status: NyokkiStatus): string => {
+  switch (status) {
+    case 'yet':
+      return style.yet
+    case 'success':
+      return style.success
+    case 'nyokki':
+      return style.nyokki
+  }
+}
 
+export const PlayerRankingElement: JSXFunc<boardProps> = (props: boardProps) => {
+  const playerId: string = props.playerId
   return (
     <div id={BOARD_ELEMENT_ID(playerId)} className={style.boardElementContainer}>
       <div id={PLAYER_RANK_ID(playerId)} className={getRankColorClass(props.rank)}>{`${props.rank}位`}</div>
@@ -34,7 +44,7 @@ export const BoardElement: JSXFunc<boardProps> = (props: boardProps) => {
         {props.playerName}
       </div>
       <div id={PLAYER_COINS_ID(playerId)}>{`${props.coins}コイン`}</div>
-      <div id={NYOKKI_STATUS_ID(playerId)} className={`${style.status} ${style[props.status]}`}>
+      <div id={NYOKKI_STATUS_ID(playerId)} className={`${style.status}`} data-status={props.status}>
         {props.status}
       </div>
     </div>

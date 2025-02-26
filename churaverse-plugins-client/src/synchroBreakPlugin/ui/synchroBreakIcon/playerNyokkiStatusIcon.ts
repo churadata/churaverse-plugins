@@ -2,9 +2,36 @@ import { Scene } from 'phaser'
 import { IPlayerRenderer } from '@churaverse/player-plugin-client/domain/IPlayerRenderer'
 import { NyokkiStatus } from '../../type/nyokkiStatus'
 
-const PLAYER_NYOKKI_ORDER = `src/game/plugins/synchroBreakPlugin/assets/nyokkiOrderIcons/number_din${1}.png`
-const RANK_FRAME = `src/game/plugins/synchroBreakPlugin/assets/nyokkiOrderIcons/rankFrame.png`
-const MISS = `src/game/plugins/synchroBreakPlugin/assets/nyokkiOrderIcons/miss.png`
+import RANK_FRAME from '../../assets/nyokkiOrderIcons/rankFrame.png'
+import MISS from '../../assets/nyokkiOrderIcons/miss.png'
+import RANK1 from '../../assets/nyokkiOrderIcons/rank1.png'
+import RANK2 from '../../assets/nyokkiOrderIcons/rank2.png'
+import RANK3 from '../../assets/nyokkiOrderIcons/rank3.png'
+import NUMBER_DIN0 from '../../assets/nyokkiOrderIcons/number_din0.png'
+import NUMBER_DIN1 from '../../assets/nyokkiOrderIcons/number_din1.png'
+import NUMBER_DIN2 from '../../assets/nyokkiOrderIcons/number_din2.png'
+import NUMBER_DIN3 from '../../assets/nyokkiOrderIcons/number_din3.png'
+import NUMBER_DIN4 from '../../assets/nyokkiOrderIcons/number_din4.png'
+import NUMBER_DIN5 from '../../assets/nyokkiOrderIcons/number_din5.png'
+import NUMBER_DIN6 from '../../assets/nyokkiOrderIcons/number_din6.png'
+import NUMBER_DIN7 from '../../assets/nyokkiOrderIcons/number_din7.png'
+import NUMBER_DIN8 from '../../assets/nyokkiOrderIcons/number_din8.png'
+import NUMBER_DIN9 from '../../assets/nyokkiOrderIcons/number_din9.png'
+
+const numberPaths = [
+  NUMBER_DIN0,
+  NUMBER_DIN1,
+  NUMBER_DIN2,
+  NUMBER_DIN3,
+  NUMBER_DIN4,
+  NUMBER_DIN5,
+  NUMBER_DIN6,
+  NUMBER_DIN7,
+  NUMBER_DIN8,
+  NUMBER_DIN9,
+]
+
+const rankPaths = [RANK1, RANK2, RANK3]
 
 export class PlayerNyokkiStatusIcon {
   private successIconActive!: Phaser.GameObjects.Image
@@ -18,24 +45,26 @@ export class PlayerNyokkiStatusIcon {
   private init(scene: Scene, playerRenderer: IPlayerRenderer): void {
     const iconPosX = 0
     const iconPosY = -85
-    const iconSizeX = 35
-    const iconSizeY = 35
+    const iconSizeX = 19 // 21
+    const iconSizeY = 19 // 21
+    const missSizeX = 42
+    const missSizeY = 28
 
     this.successRankFrame = scene.add
-      .image(iconPosX, iconPosY, RANK_FRAME)
+      .image(iconPosX, iconPosY, 'rankFrame')
       .setDisplaySize(iconSizeX, iconSizeY)
       .setAlpha(0)
       .setDepth(1) // 背景の深度を1に設定
 
     this.successIconActive = scene.add
-      .image(iconPosX, iconPosY, PLAYER_NYOKKI_ORDER)
+      .image(iconPosX, iconPosY, 'number_din1')
       .setDisplaySize(iconSizeX, iconSizeY)
       .setAlpha(0)
       .setDepth(2) // 順位画像の深度を2に設定
 
     this.nyokkiIconActive = scene.add
-      .image(iconPosX, iconPosY, MISS)
-      .setDisplaySize(iconSizeX, iconSizeY)
+      .image(iconPosX, iconPosY, 'miss')
+      .setDisplaySize(missSizeX, missSizeY)
       .setAlpha(0)
       .setDepth(3)
 
@@ -50,13 +79,13 @@ export class PlayerNyokkiStatusIcon {
 
     for (let order = 1; order <= 3; order++) {
       const rankKey = `rank${order}`
-      const rankPath = `src/game/plugins/synchroBreakPlugin/assets/nyokkiOrderIcons/rank${order}.png`
+      const rankPath = rankPaths[order - 1]
       scene.load.image(rankKey, rankPath)
     }
 
     for (let order = 0; order <= 9; order++) {
-      const numberKey = `number${order}`
-      const numberPath = `src/game/plugins/synchroBreakPlugin/assets/nyokkiOrderIcons/number_din${order}.png`
+      const numberKey = `number_din${order}`
+      const numberPath = numberPaths[order]
       scene.load.image(numberKey, numberPath)
     }
   }
@@ -81,7 +110,7 @@ export class PlayerNyokkiStatusIcon {
       this.successRankFrame.setAlpha(status === 'success' ? 1 : 0)
     }
 
-    const iconKey = order <= 3 ? `rank${order}` : `number${order}`
+    const iconKey = order <= 3 ? `rank${order}` : `number_din${order}`
     this.successIconActive.setTexture(iconKey)
     this.successIconActive.setAlpha(status === 'success' ? 1 : 0)
   }

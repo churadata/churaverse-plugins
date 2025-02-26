@@ -1,5 +1,5 @@
 import { JSXFunc } from 'churaverse-engine-client'
-import { ROW_CONTENT_CONTAINER_CLASS_NAME } from '../../rankingList/rankingList'
+import { ROW_CONTENT_CONTAINER_CLASS_NAME } from '../resultScreen'
 import style from './ResultRankingListItem.module.scss'
 
 interface Props {
