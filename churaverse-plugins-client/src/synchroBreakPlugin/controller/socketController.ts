@@ -9,6 +9,25 @@ import { TimeLimitConfirmMessage } from '../message/timeLimitConfirmMessage'
 import { TimeLimitConfirmEvent } from '../event/timeLimitConfirmEvent'
 import { SendBetCoinMessage } from '../message/sendBetCoinMessage'
 import { SendBetCoinEvent } from '../event/sendBetCoinEvent'
+import { SendBetCoinResponseMessage } from '../message/sendBetCoinResponseMessage'
+import { SendBetCoinResponseEvent } from '../event/sendBetCoinResponseEvent'
+import { NyokkiGameStartCountMessage } from '../message/nyokkiGameStartCountMessage'
+import { NyokkiGameStartCountEvent } from '../event/nyokkiGameStartCountEvent'
+import { NyokkiTurnTimerMessage } from '../message/nyokkiTurnTimerMessage'
+import { NyokkiTurnTimerEvent } from '../event/nyokkiTurnTimerEvent'
+import { NyokkiMessage } from '../message/nyokkiMessage'
+import { NyokkiActionResponseMessage } from '../message/nyokkiActionResponseMessage'
+import { NyokkiActionResponseEvent } from '../event/nyokkiActionResponseEvent'
+import { NyokkiTurnEndMessage } from '../message/nyokkiTurnEndMessage'
+import { NyokkiTurnEndEvent } from '../event/nyokkiTurnEndEvent'
+import { NyokkiTurnStartMessage } from '../message/nyokkiTurnStartMessage'
+import { NyokkiTurnStartEvent } from '../event/nyokkiTurnStartEvent'
+import { UpdatePlayersCoinMessage } from '../message/updatePlayersCoinMessage'
+import { UpdatePlayersCoinEvent } from '../event/updatePlayersCoinEvent'
+import { ChangePlayersCoinMessage } from '../message/changePlayersCoinMessage'
+import { ChangePlayersCoinEvent } from '../event/changePlayersCoinEvent'
+import { NyokkiResultMessage } from '../message/nyokkiResultMessage'
+import { NyokkiResultEvent } from '../event/nyokkiResultEvent'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
@@ -21,6 +40,16 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('nyokkiTurnSelect', NyokkiTurnSelectMessage, 'queue')
     ev.messageRegister.registerMessage('timeLimitConfirm', TimeLimitConfirmMessage, 'queue')
     ev.messageRegister.registerMessage('sendBetCoin', SendBetCoinMessage, 'queue')
+    ev.messageRegister.registerMessage('sendBetCoinResponse', SendBetCoinResponseMessage, 'queue')
+    ev.messageRegister.registerMessage('nyokkiGameStartCount', NyokkiGameStartCountMessage, 'queue')
+    ev.messageRegister.registerMessage('nyokkiTurnTimer', NyokkiTurnTimerMessage, 'queue')
+    ev.messageRegister.registerMessage('nyokki', NyokkiMessage, 'queue')
+    ev.messageRegister.registerMessage('nyokkiActionResponse', NyokkiActionResponseMessage, 'queue')
+    ev.messageRegister.registerMessage('nyokkiTurnEnd', NyokkiTurnEndMessage, 'queue')
+    ev.messageRegister.registerMessage('nyokkiTurnStart', NyokkiTurnStartMessage, 'queue')
+    ev.messageRegister.registerMessage('updatePlayersCoin', UpdatePlayersCoinMessage, 'queue')
+    ev.messageRegister.registerMessage('changePlayersCoin', ChangePlayersCoinMessage, 'queue')
+    ev.messageRegister.registerMessage('nyokkiResult', NyokkiResultMessage, 'queue')
   }
 
   /**
@@ -37,6 +66,15 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.messageListenerRegister.on('nyokkiTurnSelect', this.nyokkiTurnSelect)
     this.messageListenerRegister.on('timeLimitConfirm', this.timeLimitConfirm)
     this.messageListenerRegister.on('sendBetCoin', this.sendBetCoin)
+    this.messageListenerRegister.on('sendBetCoinResponse', this.sendBetCoinResponse)
+    this.messageListenerRegister.on('nyokkiGameStartCount', this.gameStartCount)
+    this.messageListenerRegister.on('nyokkiTurnTimer', this.turnTimer)
+    this.messageListenerRegister.on('nyokkiActionResponse', this.nyokkiActionResponse)
+    this.messageListenerRegister.on('nyokkiTurnEnd', this.nyokkiTurnEnd)
+    this.messageListenerRegister.on('nyokkiTurnStart', this.nyokkiTurnStart)
+    this.messageListenerRegister.on('updatePlayersCoin', this.updatePlayersCoin)
+    this.messageListenerRegister.on('changePlayersCoin', this.changePlayersCoin)
+    this.messageListenerRegister.on('nyokkiResult', this.nyokkiResult)
   }
 
   /**
@@ -46,6 +84,15 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.messageListenerRegister.off('nyokkiTurnSelect', this.nyokkiTurnSelect)
     this.messageListenerRegister.off('timeLimitConfirm', this.timeLimitConfirm)
     this.messageListenerRegister.off('sendBetCoin', this.sendBetCoin)
+    this.messageListenerRegister.off('sendBetCoinResponse', this.sendBetCoinResponse)
+    this.messageListenerRegister.off('nyokkiGameStartCount', this.gameStartCount)
+    this.messageListenerRegister.off('nyokkiTurnTimer', this.turnTimer)
+    this.messageListenerRegister.off('nyokkiActionResponse', this.nyokkiActionResponse)
+    this.messageListenerRegister.off('nyokkiTurnEnd', this.nyokkiTurnEnd)
+    this.messageListenerRegister.off('nyokkiTurnStart', this.nyokkiTurnStart)
+    this.messageListenerRegister.off('updatePlayersCoin', this.updatePlayersCoin)
+    this.messageListenerRegister.off('changePlayersCoin', this.changePlayersCoin)
+    this.messageListenerRegister.off('nyokkiResult', this.nyokkiResult)
   }
 
   private readonly nyokkiTurnSelect = (msg: NyokkiTurnSelectMessage): void => {
@@ -58,5 +105,48 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   private readonly sendBetCoin = (msg: SendBetCoinMessage): void => {
     this.eventBus.post(new SendBetCoinEvent(msg.data.playerId, msg.data.betCoins))
+  }
+
+  private readonly sendBetCoinResponse = (msg: SendBetCoinResponseMessage): void => {
+    this.eventBus.post(new SendBetCoinResponseEvent(msg.data.playerId, msg.data.betCoins, msg.data.currentCoins))
+  }
+
+  private readonly gameStartCount = (msg: NyokkiGameStartCountMessage): void => {
+    this.eventBus.post(new NyokkiGameStartCountEvent(msg.data.countdown))
+  }
+
+  private readonly turnTimer = (msg: NyokkiTurnTimerMessage): void => {
+    this.eventBus.post(new NyokkiTurnTimerEvent(msg.data.countdown))
+  }
+
+  private readonly nyokkiActionResponse = (msg: NyokkiActionResponseMessage): void => {
+    this.eventBus.post(
+      new NyokkiActionResponseEvent(
+        msg.data.sameTimePlayersId,
+        msg.data.nyokkiStatus,
+        msg.data.nyokkiLogText,
+        msg.data.order
+      )
+    )
+  }
+
+  private readonly nyokkiTurnEnd = (msg: NyokkiTurnEndMessage): void => {
+    this.eventBus.post(new NyokkiTurnEndEvent(msg.data.noNyokkiPlayerIds))
+  }
+
+  private readonly nyokkiTurnStart = (msg: NyokkiTurnStartMessage): void => {
+    this.eventBus.post(new NyokkiTurnStartEvent(msg.data.turnNumber))
+  }
+
+  private readonly updatePlayersCoin = (msg: UpdatePlayersCoinMessage): void => {
+    this.eventBus.post(new UpdatePlayersCoinEvent(msg.data.playersCoin))
+  }
+
+  private readonly changePlayersCoin = (msg: ChangePlayersCoinMessage): void => {
+    this.eventBus.post(new ChangePlayersCoinEvent(msg.data.playerId, msg.data.coins))
+  }
+
+  private readonly nyokkiResult = (msg: NyokkiResultMessage): void => {
+    this.eventBus.post(new NyokkiResultEvent())
   }
 }
