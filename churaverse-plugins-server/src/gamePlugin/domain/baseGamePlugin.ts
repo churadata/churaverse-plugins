@@ -12,6 +12,7 @@ import { GameEndEvent } from '../event/gameEndEvent'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
 import { IGameInfo } from '../interface/IGameInfo'
+import '../store/defGamePluginStore'
 
 export abstract class BaseGamePlugin extends BasePlugin<IMainScene> implements IGameInfo {
   /** ゲーム一意のid */
@@ -80,13 +81,16 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> implements I
     this._isActive = true
     const gameOwnerId = ev.playerId
     this._gameOwnerId = gameOwnerId
-    this._participantIds =  this.store.of('playerPlugin').players.getAllId()
+    this._participantIds = this.store.of('playerPlugin').players.getAllId()
 
     const networkPluginStore = this.store.of('networkPlugin')
     const responseGameStartMessage = new ResponseGameStartMessage({ gameId: this.gameId, playerId: gameOwnerId })
     networkPluginStore.messageSender.send(responseGameStartMessage)
 
-    const gameParticipantMessage = new UpdateGameParticipantMessage({ gameId: this.gameId, participantIds: this.participantIds })
+    const gameParticipantMessage = new UpdateGameParticipantMessage({
+      gameId: this.gameId,
+      participantIds: this.participantIds,
+    })
     networkPluginStore.messageSender.send(gameParticipantMessage)
 
     const gamePluginStore = this.store.of('gamePlugin')
