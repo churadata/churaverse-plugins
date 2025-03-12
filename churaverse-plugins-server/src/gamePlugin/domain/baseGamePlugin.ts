@@ -12,7 +12,6 @@ import { GameEndEvent } from '../event/gameEndEvent'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
 import { IGameInfo } from '../interface/IGameInfo'
-import '../store/defGamePluginStore'
 
 export abstract class BaseGamePlugin extends BasePlugin<IMainScene> implements IGameInfo {
   /** ゲーム一意のid */
