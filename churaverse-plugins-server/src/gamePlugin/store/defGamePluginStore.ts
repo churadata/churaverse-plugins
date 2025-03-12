@@ -1,3 +1,4 @@
+import { IGameInfo } from '../interface/IGameInfo'
 import { IGameInfoRepository } from '../interface/IGameInfoRepository'
 
 declare module 'churaverse-engine-server' {
@@ -7,5 +8,5 @@ declare module 'churaverse-engine-server' {
 }
 
 export interface GamePluginStore {
-  readonly games: IGameInfoRepository
+  readonly games: IGameInfoRepository<IGameInfo>
 }
