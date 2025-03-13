@@ -44,7 +44,7 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param gameOwnerName ゲームオーナーの名前
    */
   setGameStartForGuest(gameName: string, gameOwnerName: string | undefined): void {
-    this.setDescriptionText(`${gameName}が開始されました！<br>${gameOwnerName}さんがターンを入力中です。`)
+    this.open(`${gameName}が開始されました！<br>${gameOwnerName}さんがターンを入力中です。`)
   }
 
   /**
