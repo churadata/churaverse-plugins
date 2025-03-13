@@ -2,5 +2,5 @@
 
 ### Description
 
-ちゅられんのBaseGamePluginとは別の親クラスを持つplugin(client側).
-ちゅられんで必要な定数やインターフェースを持つ.
+ちゅられんのBaseGamePluginとは別の親クラスが実装されたplugin(client側).
+ちゅられんで必要な定数やインターフェース等を持つ.
