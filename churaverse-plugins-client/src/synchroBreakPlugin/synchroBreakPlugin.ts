@@ -1,4 +1,4 @@
-import { PhaserLoadAssets, PhaserSceneInit, IMainScene } from 'churaverse-engine-client'
+import { PhaserLoadAssets, PhaserSceneInit, IMainScene, DomManager } from 'churaverse-engine-client'
 import { Scene } from 'phaser'
 import { BaseGamePlugin } from '@churaverse/game-plugin-client/domain/baseGamePlugin'
 import { GamePluginStore } from '@churaverse/game-plugin-client/store/defGamePluginStore'
@@ -29,6 +29,7 @@ import { NyokkiStatus } from './type/nyokkiStatus'
 import { ChangePlayersCoinEvent } from './event/changePlayersCoinEvent'
 import { IRankingBoard } from './interface/IRankingBoard'
 import { NyokkiResultEvent } from './event/nyokkiResultEvent'
+import { NYOKKI_STATUS_ID } from './ui/rankingBoard/rankingBoard'
 
 export class SynchroBreakPlugin extends BaseGamePlugin {
   protected readonly gameId = 'synchroBreak'
@@ -42,6 +43,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   private scene!: Scene
   private coinViewerIconUis!: Map<string, CoinViewerIcon>
   private socketController!: SocketController
+  private nyokkiSuccessMessage: string | undefined = undefined
 
   public listenEvent(): void {
     super.listenEvent()
@@ -136,15 +138,12 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     const gameOwnerName = this.playerPluginStore.players.get(this.gameOwnerId)?.name
     const descriptionWindow = this.getDescriptionWindow()
     if (this.gameOwnerId === this.playerPluginStore.ownPlayerId) {
-      descriptionWindow.open(
-        `ニョッキゲームを開始しました。<br>あなたはゲームの管理者です。 <br>ターン数(1~10)を選択してください。`
-      )
+      descriptionWindow.setGameStartForHost(this.gameName)
       this.gamePluginStore.gameUiManager.getUi(this.gameId, 'turnSelectConfirm')?.open()
     } else {
-      descriptionWindow.open(`${this.gameName}が開始されました！<br>${gameOwnerName}さんがターンを入力中です。`)
+      descriptionWindow.setGameStartForGuest(this.gameName, gameOwnerName)
     }
   }
-
   /**
    * ゲームの参加者が更新された時の処理
    */
@@ -200,12 +199,10 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
 
     const descriptionWindow = this.getDescriptionWindow()
     if (this.gameOwnerId === this.playerPluginStore.ownPlayerId) {
-      descriptionWindow.setDescriptionText(`${ev.allTurn}ターン選択しました。<br>制限時間(3~15)を選択してください。`)
+      descriptionWindow.setTimeLimitSelection(ev.allTurn)
       this.gamePluginStore.gameUiManager.getUi(this.gameId, 'timeLimitConfirm')?.open()
     } else {
-      descriptionWindow.setDescriptionText(
-        `${ev.allTurn}ターン選択されました。<br>${gameOwnerName}さんが制限時間を入力中です。`
-      )
+      descriptionWindow.setTimeLimitWaiting(ev.allTurn, gameOwnerName)
     }
   }
 
@@ -218,13 +215,9 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
 
     const descriptionWindow = this.getDescriptionWindow()
     if (this.gameOwnerId === this.playerPluginStore.ownPlayerId) {
-      descriptionWindow.setDescriptionText(
-        `制限時間を${ev.timeLimit}秒選択しました。<br>ベットコインを入力してください。`
-      )
+      descriptionWindow.setTimeLimitConfirmed(ev.timeLimit)
     } else {
-      descriptionWindow.setDescriptionText(
-        `制限時間が${ev.timeLimit}秒選択されました。<br>ベットコインを入力してください。`
-      )
+      descriptionWindow.setTimeLimitAcknowledged(ev.timeLimit)
     }
 
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betCoinConfirm')?.open()
@@ -243,9 +236,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
 
     const descriptionWindow = this.getDescriptionWindow()
     if (ev.playerId === this.playerPluginStore.ownPlayerId) {
-      descriptionWindow.setDescriptionText(
-        `ベットコインを${ev.betCoins}枚選択しました。<br>相手のベットコインを待っています。`
-      )
+      descriptionWindow.setBetCoinSelection(betCoins)
     }
   }
 
@@ -262,9 +253,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
 
     const descriptionWindow = this.getDescriptionWindow()
     if (ev.playerId === this.playerPluginStore.ownPlayerId) {
-      descriptionWindow.setDescriptionText(
-        `ベットコインを${ev.betCoins}枚選択しました。<br>相手のベットコインを待っています。`
-      )
+      descriptionWindow.setBetCoinSelection(betCoins)
     }
 
     const rankingBoard = this.getRankingBoard()
@@ -279,7 +268,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   private readonly gameStartCount = (ev: NyokkiGameStartCountEvent): void => {
     if (this.isOwnPlayerMidwayParticipant) return
     const descriptionWindow = this.getDescriptionWindow()
-    descriptionWindow.setDescriptionText(`ゲーム開始まで<br>${ev.countdown}秒`)
+    descriptionWindow.setGameStartCountdown(ev.countdown)
   }
 
   /**
@@ -288,17 +277,21 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   private readonly turnTimer = (ev: NyokkiTurnTimerEvent): void => {
     if (this.isOwnPlayerMidwayParticipant) return
     const descriptionWindow = this.getDescriptionWindow()
+    const ownPlayerId = this.playerPluginStore.ownPlayerId
+    const ownPlayerName = this.playerPluginStore.players.get(ownPlayerId)?.name
+    const playerNyokkiStatus = DomManager.getElementById(NYOKKI_STATUS_ID(ownPlayerId))
+    const status = playerNyokkiStatus?.dataset.status
     if (ev.countdown === this.synchroBreakPluginStore.timeLimit) {
-      descriptionWindow.setDescriptionText(
-        `シンクロブレイク開始！！！<br>残り${ev.countdown}秒以内にボタンを押してください！`
-      )
+      descriptionWindow.setSynchroBreakStart(ev.countdown)
       this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.open()
       // } else if (ev.countdown === 0) {
-      //   descriptionWindow.setDescriptionText(`シンクロブレイク終了！！！`)
+      //   descriptionWindow.setSynchroBreakEnd()
     } else {
-      descriptionWindow.setDescriptionText(
-        `現在シンクロブレイク進行中<br>残り${ev.countdown}秒以内にボタンを押してください！`
-      )
+      if (status === 'success') {
+        descriptionWindow.setSynchroBreakInProgress(ev.countdown, ownPlayerName, this.nyokkiSuccessMessage)
+      } else {
+        descriptionWindow.setSynchroBreakInProgress(ev.countdown, undefined, undefined)
+      }
     }
   }
 
@@ -316,6 +309,13 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
       const rankingBoard = this.getRankingBoard()
       rankingBoard.changeNyokkiStatus(playerId, status)
 
+      //ニョッキアクションの実行結果をプレイヤーに通知する
+      if (status === 'success') {
+        const descriptionWindow = this.getDescriptionWindow()
+        descriptionWindow.setNyokkiSuccess(nyokkiLogText)
+        this.nyokkiSuccessMessage = nyokkiLogText
+      }
+
       // シンクロブレイクのニョッキアクションUIを表示させる。
       this.synchroBreakPluginStore.synchroBreakIcons.get(playerId)?.handlePlayerSynchroBreakIcons(ev.order, status)
     }
@@ -329,7 +329,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.close()
 
     const descriptionWindow = this.getDescriptionWindow()
-    descriptionWindow.setDescriptionText(`シンクロブレイクが終了しました！！！！`)
+    descriptionWindow.setSynchroBreakEnd()
     const rankingBoard = this.getRankingBoard()
     const status: NyokkiStatus = 'nyokki'
     const noNyokkiPlayerIds = ev.noNyokkiPlayerIds
@@ -348,15 +348,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     this.resetPlayerNyokkiIcon()
     this.removeBetCoinUi()
     const descriptionWindow = this.getDescriptionWindow()
-    descriptionWindow.setDescriptionText(
-      `ターンが終了しました。<br>残り${ev.turnNumber}ターンです。<br>ベットコインを入力してください。`
-    )
+    descriptionWindow.setTurnStart(ev.turnNumber)
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betCoinConfirm')?.open()
-
-    const rankingBoard = this.getRankingBoard()
-    const gameTurn = this.synchroBreakPluginStore.gameTurn
-    if (gameTurn === undefined) throw new Error('gameTurn is not found')
-    rankingBoard.updateTurnNumber(ev.turnNumber, gameTurn)
   }
 
   /**
