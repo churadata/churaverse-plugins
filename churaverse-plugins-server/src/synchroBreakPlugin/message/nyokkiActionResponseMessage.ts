@@ -4,11 +4,14 @@ import { SendableObject } from '@churaverse/network-plugin-server/types/sendable
 
 export interface NyokkiActionResponseData extends SendableObject {
   sameTimePlayersId: string[]
-  nyokkiStatus: boolean // trueならばnyokki(シンクロ)している状態
+  nyokkiStatus: boolean
   nyokkiLogText: string
   order: number
 }
 
+/**
+ * ニョッキアクションのレスポンスを返すメッセージ
+ */
 export class NyokkiActionResponseMessage extends BaseMessage<IMainScene> {
   public constructor(public readonly data: NyokkiActionResponseData) {
     super('nyokkiActionResponse', data)

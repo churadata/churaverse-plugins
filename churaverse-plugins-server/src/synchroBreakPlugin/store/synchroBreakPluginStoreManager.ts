@@ -1,4 +1,5 @@
 import { Store, IEventBus, IMainScene } from 'churaverse-engine-server'
+import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 import { SynchroBreakPluginStore } from './defSynchroBreakPluginStore'
 import { Game } from '../logic/game'
 import { NyokkiCollection } from '../repository/nyokkiCollection'
@@ -17,7 +18,6 @@ export function initSynchroBreakPluginStore(eventBus: IEventBus<IMainScene>, sto
     betCoinRepository: new BetCoinRepository(),
     timeLimit: undefined,
     turnSelect: undefined,
-    participants: new Map<string, boolean>(),
     nyokkiLogTextCreate: new NyokkiLogTextCreate(store.of('playerPlugin').players),
   }
 

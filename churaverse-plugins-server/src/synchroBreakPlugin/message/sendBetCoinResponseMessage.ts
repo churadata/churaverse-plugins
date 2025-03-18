@@ -4,10 +4,13 @@ import { SendableObject } from '@churaverse/network-plugin-server/types/sendable
 
 export interface SendBetCoinResponseData extends SendableObject {
   playerId: string
-  betCoins: number // ベットしたコイン数
-  currentCoins: number // プレイヤーが所持しているコイン数
+  betCoins: number
+  currentCoins: number
 }
 
+/**
+ * プレイヤーが賭けたコイン数と現在の所持コイン数を送信するメッセージ
+ */
 export class SendBetCoinResponseMessage extends BaseMessage<IMainScene> {
   public constructor(public readonly data: SendBetCoinResponseData) {
     super('sendBetCoinResponse', data)

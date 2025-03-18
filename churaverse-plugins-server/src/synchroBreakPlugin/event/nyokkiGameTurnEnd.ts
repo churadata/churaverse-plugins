@@ -1,5 +1,8 @@
 import { CVEvent, IMainScene } from 'churaverse-engine-server'
 
+/**
+ * ターン終了時のイベント
+ */
 export class NyokkiGameTurnEnd extends CVEvent<IMainScene> {
   public constructor() {
     super('nyokkiGameTurnEnd', true)
