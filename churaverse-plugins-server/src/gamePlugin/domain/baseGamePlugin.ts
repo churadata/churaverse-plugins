@@ -131,6 +131,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> implements I
   private terminateGame(): void {
     this._isActive = false
     this._gameOwnerId = undefined
+    this.store.of('gamePlugin').games.delete(this.gameId)
     this.clearParticipantIds()
     this.handleGameTermination()
   }
