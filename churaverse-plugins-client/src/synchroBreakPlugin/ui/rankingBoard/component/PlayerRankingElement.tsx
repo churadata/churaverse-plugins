@@ -24,17 +24,6 @@ export const getRankColorClass = (rank: number): string => {
   }
 }
 
-export const getNyokkiStatusClass = (status: NyokkiStatus): string => {
-  switch (status) {
-    case 'yet':
-      return style.yet
-    case 'success':
-      return style.success
-    case 'nyokki':
-      return style.nyokki
-  }
-}
-
 export const PlayerRankingElement: JSXFunc<boardProps> = (props: boardProps) => {
   const playerId: string = props.playerId
   return (

@@ -4,16 +4,16 @@ import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defN
 import { SelectTurnForm } from './component/SelectTurnForm'
 import { NyokkiTurnSelectMessage } from '../../message/nyokkiTurnSelectMessage'
 
-// turn入力部分
+/**  turn入力部分 */
 export const TURN_SELECT_FIELD_ID = 'turn-select-field-id'
 
-// turn数の増加部分
+/** turn数の増加部分 */
 export const TURN_SELECT_INCREASE_BUTTON_ID = 'turn-select-increase'
 
-// turn数の減少部分
+/** turn数の減少部分 */
 export const TURN_SELECT_DECREASE_BUTTON_ID = 'turn-select-decrease'
 
-// turn数送信ボタン
+/** turn数送信ボタン */
 export const TURN_SELECT_SEND_BUTTON_ID = 'turn-select-send'
 
 export class TurnSelectFormContainer implements IGameUiComponent {
@@ -27,19 +27,19 @@ export class TurnSelectFormContainer implements IGameUiComponent {
   }
 
   public initialize(): void {
-    this.turnSelectFormContainer()
-    this.setUpInputFields(this.store.of('playerPlugin').ownPlayerId)
-  }
-
-  public turnSelectFormContainer(): void {
     this.element = DomManager.addJsxDom(SelectTurnForm())
 
     domLayerSetting(this.element, 'lowest')
     this.element.addEventListener('click', () => {
       makeLayerHigherTemporary(this.element, 'lower')
     })
+
+    this.setUpInputFields(this.store.of('playerPlugin').ownPlayerId)
   }
 
+  /**
+   * ターン数選択フォームの入力部分を設定する
+   */
   private setUpInputFields(playerId: string): void {
     this.turnSelectInputField = DomManager.getElementById<HTMLInputElement>(TURN_SELECT_FIELD_ID)
 

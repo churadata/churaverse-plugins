@@ -6,16 +6,16 @@ import '@churaverse/game-plugin-client/gameUiManager'
 import { TimeLimitForm } from './component/TimeLimitForm'
 import { TimeLimitConfirmMessage } from '../../message/timeLimitConfirmMessage'
 
-// 制限時間入力部分
+/** 制限時間入力部分 */
 export const TIME_LIMIT_INPUT_FIELD_ID = 'synchro-break-time-limit-input-field'
 
-// 制限時間増加ボタン
+/** 制限時間増加ボタン */
 export const TIME_LIMIT_INCREMENT_BUTTON_ID = 'synchro-break-time-limit-increment'
 
-// 制限時間減少ボタン
+/** 制限時間減少ボタン */
 export const TIME_LIMIT_DECREMENT_BUTTON_ID = 'synchro-break-time-limit-decrement'
 
-// 制限時間確定ボタン
+/** 制限時間確定ボタン */
 export const TIME_LIMIT_SEND_BUTTON_ID = 'synchro-break-time-limit-send-button'
 
 // 制限時間の最大値と最小値
@@ -41,6 +41,9 @@ export class TimeLimitFormContainer implements IGameUiComponent {
     this.setUpInputFields()
   }
 
+  /**
+   * 制限時間入力部分を設定する
+   */
   private setUpInputFields(): void {
     this.timeLimitInputField = DomManager.getElementById<HTMLInputElement>(TIME_LIMIT_INPUT_FIELD_ID)
 

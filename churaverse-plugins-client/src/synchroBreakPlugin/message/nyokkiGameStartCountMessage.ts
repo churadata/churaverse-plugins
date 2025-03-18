@@ -3,9 +3,12 @@ import { BaseMessage } from '@churaverse/network-plugin-client/message/baseMessa
 import { SendableObject } from '@churaverse/network-plugin-client/types/sendable'
 
 export interface NyokkiGameStartCountMessageData extends SendableObject {
-  countdown: number
+  remainingSeconds: number
 }
 
+/**
+ * ニョッキゲームの開始カウントダウンメッセージ
+ */
 export class NyokkiGameStartCountMessage extends BaseMessage<IMainScene> {
   public constructor(public readonly data: NyokkiGameStartCountMessageData) {
     super('nyokkiGameStartCount', data)

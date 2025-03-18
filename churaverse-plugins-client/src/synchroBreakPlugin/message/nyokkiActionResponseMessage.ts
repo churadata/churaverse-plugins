@@ -2,13 +2,19 @@ import { IMainScene } from 'churaverse-engine-client'
 import { BaseMessage } from '@churaverse/network-plugin-client/message/baseMessage'
 import { SendableObject } from '@churaverse/network-plugin-client/types/sendable'
 
+/**
+ * @param
+ */
 export interface NyokkiActionResponseData extends SendableObject {
   sameTimePlayersId: string[]
-  nyokkiStatus: boolean // trueならばnyokki失敗
-  nyokkiLogText: string // ログに流すnyokkiメッセージ
-  order: number // ニョッキした順番
+  nyokkiStatus: boolean
+  nyokkiLogText: string
+  order: number
 }
 
+/**
+ * ニョッキアクションのレスポンスを返すメッセージ
+ */
 export class NyokkiActionResponseMessage extends BaseMessage<IMainScene> {
   public constructor(public readonly data: NyokkiActionResponseData) {
     super('nyokkiActionResponse', data)
