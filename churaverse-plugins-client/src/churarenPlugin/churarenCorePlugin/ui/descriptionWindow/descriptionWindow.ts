@@ -1,7 +1,7 @@
 import { DomManager, IMainScene, Store, domLayerSetting } from 'churaverse-engine-client'
 import { CHURAREN_GAME_START_BUTTON_ID, DescriptionWindowComponent } from './component/DescriptionWindowComponent'
 import '@churaverse/game-plugin-client/gameUiManager'
-import { POPUP_GAME_START_WINDOW_BUTTON_ID } from '../startWindow/component/RuleExplanationWindowComponent'
+import { CHURAREN_DESCRIPTION } from '../startWindow/component/RuleExplanationWindowComponent'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { ChurarenPlayerReadyMessage } from '../../message/churarenPlayerReadyMessage'
 import { IDescriptionWindow } from '../../interface/IChurarenUiComponent'
@@ -9,7 +9,7 @@ import { IDescriptionWindow } from '../../interface/IChurarenUiComponent'
 export class DescriptionWindow implements IDescriptionWindow {
   public element!: HTMLElement
   public visible: boolean = true
-  private descriptionText: string = DomManager.getElementById(POPUP_GAME_START_WINDOW_BUTTON_ID).innerHTML
+  private descriptionText: string = CHURAREN_DESCRIPTION
   private readonly networkPluginStore!: NetworkPluginStore<IMainScene>
 
   public constructor(

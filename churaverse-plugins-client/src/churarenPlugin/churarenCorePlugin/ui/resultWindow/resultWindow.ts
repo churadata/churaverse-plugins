@@ -13,11 +13,11 @@ export class ResultWindow implements IResultWindow {
   public initialize(): void {
     this.element = DomManager.addJsxDom(GameResultWindowComponent())
     domLayerSetting(this.element, 'lowest')
-    this.finishButton()
+    this.setFinishButton()
   }
 
   // 結果画面の表示
-  private finishButton(): void {
+  private setFinishButton(): void {
     const finishButton = DomManager.getElementById(CHURAREN_GAME_FINISH_BUTTON_ID)
 
     finishButton.onclick = () => {
