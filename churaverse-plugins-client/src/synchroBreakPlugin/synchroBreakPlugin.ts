@@ -239,7 +239,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   private readonly gameStartCount = (ev: NyokkiGameStartCountEvent): void => {
     if (this.isOwnPlayerMidwayParticipant) return
     const descriptionWindow = this.getDescriptionWindow()
-    descriptionWindow.setGameStartCountdown(ev.countdown)
+    descriptionWindow.setGameStartCountdown(ev.remainingSeconds)
   }
 
   /**
@@ -250,16 +250,14 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     const descriptionWindow = this.getDescriptionWindow()
     const ownPlayerId = this.playerPluginStore.ownPlayerId
     const ownPlayerName = this.playerPluginStore.players.get(ownPlayerId)?.name
-    if (ev.countdown === this.synchroBreakPluginStore.timeLimit) {
-      descriptionWindow.setSynchroBreakStart(ev.countdown)
+    if (ev.remainingSeconds === this.synchroBreakPluginStore.timeLimit) {
+      descriptionWindow.setSynchroBreakStart(ev.remainingSeconds)
       this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.open()
-      // } else if (ev.countdown === 0) {
-      //   descriptionWindow.setSynchroBreakEnd()
     } else {
       if (this.nyokkiStatus === 'yet') {
-        descriptionWindow.setSynchroBreakInProgress(ev.countdown)
+        descriptionWindow.setSynchroBreakInProgress(ev.remainingSeconds)
       } else {
-        descriptionWindow.setSynchroBreakInProgress(ev.countdown, ownPlayerName, this.nyokkiActionMessage)
+        descriptionWindow.setSynchroBreakInProgress(ev.remainingSeconds, ownPlayerName, this.nyokkiActionMessage)
       }
     }
   }
