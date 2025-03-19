@@ -4,14 +4,16 @@ import { RegisterMessageEvent } from '@churaverse/network-plugin-server/event/re
 import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-server/event/registerMessageListenerEvent'
 import { IMessageListenerRegister } from '@churaverse/network-plugin-server/interface/IMessageListenerRegister'
 import { ChurarenPlayerReadyMessage } from '../message/churarenPlayerReadyMessage'
-import { ChurarenPlayerReadyEvent } from '../event/churarenPlayerReadyEvent'
 import { UpdateChurarenUiMessage } from '../message/updateChurarenUiMessage'
+import { ChurarenPluginStore } from '../store/defChurarenPluginStore'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
+  private readonly churarenPluginStore!: ChurarenPluginStore
 
   public constructor(eventBus: IEventBus<IMainScene>, store: Store<IMainScene>) {
     super(eventBus, store)
+    this.churarenPluginStore = store.of('churarenPlugin')
   }
 
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
@@ -41,6 +43,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   public onChurarenPlayerReady = (msg: ChurarenPlayerReadyMessage): void => {
-    this.eventBus.post(new ChurarenPlayerReadyEvent(msg.data.playerId))
+    this.churarenPluginStore.readyPlayers.add(msg.data.playerId)
   }
 }

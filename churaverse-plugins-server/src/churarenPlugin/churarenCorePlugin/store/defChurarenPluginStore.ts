@@ -1,7 +1,7 @@
 import { ChurarenGameSequence } from '../logic/churarenGameSequence'
 
 export interface ChurarenPluginStore {
-  timeLimit: number | undefined
+  readyPlayers: Set<string>
   churarenGameSequence: ChurarenGameSequence
 }
 

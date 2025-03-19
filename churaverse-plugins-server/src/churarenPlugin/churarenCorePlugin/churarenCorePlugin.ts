@@ -8,7 +8,9 @@ import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
 import { UpdateChurarenUiEvent } from './event/updateChurarenUiEvent'
 import { UpdateChurarenUiMessage } from './message/updateChurarenUiMessage'
 import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
-import { CHURAREN_CONSTANTS } from '@churaverse/churaren-engine-server'
+import { CHURAREN_CONSTANTS, isChurarenGameResult } from '@churaverse/churaren-engine-server'
+
+const RESULT_DISPLAY_TIME = 5 // 結果表示時間(sec)
 
 export class ChurarenCorePlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -77,8 +79,7 @@ export class ChurarenCorePlugin extends BaseGamePlugin {
       console.log('All players are ready')
       this.sequence()
         .then(() => {
-          console.log('Game end')
-          this.bus.post(new GameEndEvent(this.gameId))
+          console.log('sequence done')
         })
         .catch((err) => {
           console.error(err)
@@ -88,8 +89,16 @@ export class ChurarenCorePlugin extends BaseGamePlugin {
   }
 
   private readonly updateChurarenUi = (ev: UpdateChurarenUiEvent): void => {
-    const updateChurarenUiMessage = new UpdateChurarenUiMessage({ uiType: ev.uiType })
+    const uiType = ev.uiType
+    const updateChurarenUiMessage = new UpdateChurarenUiMessage({ uiType })
     this.networkPluginStore.messageSender.send(updateChurarenUiMessage)
+
+    if (isChurarenGameResult(uiType)) {
+      setTimeout(() => {
+        this.bus.post(new GameEndEvent(this.gameId))
+        console.log('Game end')
+      }, RESULT_DISPLAY_TIME * 1000)
+    }
   }
 
   private async sequence(): Promise<void> {

@@ -7,7 +7,7 @@ import { ChurarenGameSequence } from '../logic/churarenGameSequence'
  */
 export function initChurarenPluginStore(store: Store<IMainScene>, eventBus: IEventBus<IMainScene>): void {
   const churarenPluginStore: ChurarenPluginStore = {
-    timeLimit: 0,
+    readyPlayers: new Set<string>(),
     churarenGameSequence: new ChurarenGameSequence(store, eventBus),
   }
 
