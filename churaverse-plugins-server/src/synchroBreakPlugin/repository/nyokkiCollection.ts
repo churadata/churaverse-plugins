@@ -1,9 +1,10 @@
-import { Nyokki, NyokkiStatus } from '../model/nyokki'
+import { Nyokki } from '../model/nyokki'
+import { INyokkiCollection } from '../interface/INyokkiCollection'
 
 /**
  * nyokkiCollectionで各プレイヤーのnyokkiの状態を保存する
  */
-export class NyokkiCollection {
+export class NyokkiCollection implements INyokkiCollection {
   public readonly userNyokkiMap: Map<string, Nyokki>
 
   public constructor() {
@@ -16,43 +17,29 @@ export class NyokkiCollection {
     this.userNyokkiMap.set(id, nyokki)
   }
 
-  public delete(id: string): void {
-    this.userNyokkiMap.delete(id)
+  public delete(playerId: string): void {
+    this.userNyokkiMap.delete(playerId)
   }
 
-  public get(id: string): Nyokki | undefined {
-    return this.userNyokkiMap.get(id)
+  public get(playerId: string): Nyokki | undefined {
+    return this.userNyokkiMap.get(playerId)
   }
 
-  public has(id: string): boolean {
-    return this.userNyokkiMap.has(id)
-  }
-
-  public getNyokkiCollectionSize(): number {
-    const nyokkiCollectionSize = this.userNyokkiMap.size
-    return nyokkiCollectionSize
-  }
-
-  public getNyokkiCollectionArray(): Array<[string, NyokkiStatus]> {
-    const userNyokkiArray: Array<[string, NyokkiStatus]> = Array.from(this.userNyokkiMap, ([playerId, nyokki]) => [
-      playerId,
-      nyokki.getNyokkiStatus,
-    ])
-    return userNyokkiArray
-  }
-
-  public makeNyokki(id: string, isNyokki: boolean): void {
-    const nyokki = this.userNyokkiMap.get(id)
+  public makeNyokki(playerId: string, isNyokki: boolean): void {
+    const nyokki = this.userNyokkiMap.get(playerId)
     if (nyokki === undefined) return
 
     nyokki.nyokki(isNyokki)
-    this.set(id, nyokki)
+    this.set(playerId, nyokki)
   }
 
   public clear(): void {
     this.userNyokkiMap.clear()
   }
 
+  /**
+   * @return ニョッキしたプレイヤーのIDの配列
+   */
   public getAllPlayerId(): string[] {
     return Array.from(this.userNyokkiMap.keys())
   }

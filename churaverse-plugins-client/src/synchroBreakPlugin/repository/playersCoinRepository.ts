@@ -7,6 +7,14 @@ export class PlayersCoinRepository implements IPlayersCoinRepository {
     this.playerCoins.set(playerId, coins)
   }
 
+  public get(playerId: string): number {
+    const coins = this.playerCoins.get(playerId)
+    if (coins === undefined) {
+      throw new Error('playerIdがplayersCoinRepositoryに存在しません')
+    }
+    return coins
+  }
+
   public change(playerId: string, coins: number): void {
     if (this.playerCoins.has(playerId)) {
       this.playerCoins.set(playerId, coins)

@@ -7,7 +7,7 @@ export interface NyokkiTurnStartData extends SendableObject {
 }
 
 /**
- * ゲームターン終了を知らせる
+ * ゲームターン開始を知らせる
  */
 export class NyokkiTurnStartMessage extends BaseMessage<IMainScene> {
   public constructor(public readonly data: NyokkiTurnStartData) {

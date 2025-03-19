@@ -7,6 +7,9 @@ export interface SendBetCoinData extends SendableObject {
   betCoins: number
 }
 
+/**
+ * プレイヤーが賭けたコイン数を送信するメッセージ
+ */
 export class SendBetCoinMessage extends BaseMessage<IMainScene> {
   public constructor(public readonly data: SendBetCoinData) {
     super('sendBetCoin', data)

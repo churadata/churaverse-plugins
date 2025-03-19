@@ -18,8 +18,6 @@ import { NyokkiActionResponseMessage } from '../message/nyokkiActionResponseMess
 import { NyokkiTurnEndMessage } from '../message/nyokkiTurnEndMessage'
 import { NyokkiTurnStartMessage } from '../message/nyokkiTurnStartMessage'
 import { UpdatePlayersCoinMessage } from '../message/updatePlayersCoinMessage'
-import { ChangePlayersCoinMessage } from '../message/changePlayersCoinMessage'
-import { NyokkiResultMessage } from '../message/nyokkiResultMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
@@ -40,8 +38,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('nyokkiTurnEnd', NyokkiTurnEndMessage, 'allClients')
     ev.messageRegister.registerMessage('nyokkiTurnStart', NyokkiTurnStartMessage, 'allClients')
     ev.messageRegister.registerMessage('updatePlayersCoin', UpdatePlayersCoinMessage, 'allClients')
-    ev.messageRegister.registerMessage('changePlayersCoin', ChangePlayersCoinMessage, 'allClients')
-    ev.messageRegister.registerMessage('nyokkiResult', NyokkiResultMessage, 'allClients')
   }
 
   /**

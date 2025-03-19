@@ -6,6 +6,9 @@ export interface UpdatePlayersCoinData extends SendableObject {
   playersCoin: Array<{ playerId: string; coins: number }>
 }
 
+/**
+ * 全プレイヤーの所持コイン数を更新するメッセージ
+ */
 export class UpdatePlayersCoinMessage extends BaseMessage<IMainScene> {
   public constructor(public readonly data: UpdatePlayersCoinData) {
     super('updatePlayersCoin', data)

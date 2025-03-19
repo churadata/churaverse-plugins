@@ -1,5 +1,11 @@
 import { CVEvent, IMainScene } from 'churaverse-engine-client'
 
+/**
+ * プレイヤーがベットした際のレスポンスイベント
+ * @param playerId ベットしたプレイヤーID
+ * @param betCoins ベットしたコイン数
+ * @param currentCoins 現在の所持コイン数
+ */
 export class SendBetCoinResponseEvent extends CVEvent<IMainScene> {
   public constructor(
     public readonly playerId: string,

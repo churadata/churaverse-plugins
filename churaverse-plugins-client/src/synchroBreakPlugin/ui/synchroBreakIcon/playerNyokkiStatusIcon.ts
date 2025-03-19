@@ -45,8 +45,8 @@ export class PlayerNyokkiStatusIcon {
   private init(scene: Scene, playerRenderer: IPlayerRenderer): void {
     const iconPosX = 0
     const iconPosY = -85
-    const iconSizeX = 19 // 21
-    const iconSizeY = 19 // 21
+    const iconSizeX = 19
+    const iconSizeY = 19
     const missSizeX = 42
     const missSizeY = 28
 
@@ -90,29 +90,48 @@ export class PlayerNyokkiStatusIcon {
     }
   }
 
-  public handlePlayerSynchroBreakIcons(order: number, status?: NyokkiStatus): void {
+  /**
+   * プレイヤーのニョッキステータスアイコンを表示する
+   * @param order ニョッキした順位
+   * @param status ニョッキの状態
+   */
+  public handlePlayerSynchroBreakIcons(order: number, status: NyokkiStatus): void {
+    // 10位以上の場合は結果を表示しない
     if (order >= 10) return
-    if (status === 'nyokki') {
-      // 結果がNyokkiだった場合、順位に関係なくmissを出現させる。
-      this.nyokkiIconActive.setTexture('miss')
-      this.nyokkiIconActive.setAlpha(1)
-      return
-    }
-    if (order === -1) {
-      // yetをnyokkiに変える処理
-      this.nyokkiIconActive.setTexture('miss')
-      this.nyokkiIconActive.setAlpha(status === 'yet' ? 1 : 0)
-    }
 
-    if (order >= 4 && order < 10) {
-      // 4位以下の人に、wallPaperを追加する処理
-      this.successRankFrame.setTexture('rankFrame')
-      this.successRankFrame.setAlpha(status === 'success' ? 1 : 0)
+    // ステータスごとの表示処理
+    switch (status) {
+      case 'nyokki':
+        this.displayMissIcon()
+        break
+      case 'success':
+        this.displaySuccessIcon(order)
+        break
     }
+  }
 
+  /**
+   * ニョッキ失敗アイコンを表示
+   */
+  private displayMissIcon(): void {
+    this.nyokkiIconActive.setTexture('miss')
+    this.nyokkiIconActive.setAlpha(1)
+  }
+
+  /**
+   * nyokki成功のアイコンを表示
+   */
+  private displaySuccessIcon(order: number): void {
+    // 順位に応じたアイコンを選択
     const iconKey = order <= 3 ? `rank${order}` : `number_din${order}`
     this.successIconActive.setTexture(iconKey)
-    this.successIconActive.setAlpha(status === 'success' ? 1 : 0)
+    this.successIconActive.setAlpha(1)
+
+    // 4位以下は枠も表示
+    if (order >= 4 && order < 10) {
+      this.successRankFrame.setTexture('rankFrame')
+      this.successRankFrame.setAlpha(1)
+    }
   }
 
   public resetStatusIcon(): void {

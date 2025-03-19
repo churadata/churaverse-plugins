@@ -7,6 +7,9 @@ export interface NyokkiTurnSelectData extends SendableObject {
   allTurn: number
 }
 
+/**
+ * プレイヤーがゲームターン数を選択した際のメッセージ
+ */
 export class NyokkiTurnSelectMessage extends BaseMessage<IMainScene> {
   public constructor(public readonly data: NyokkiTurnSelectData) {
     super('nyokkiTurnSelect', data)

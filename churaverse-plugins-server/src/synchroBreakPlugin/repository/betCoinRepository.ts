@@ -1,19 +1,23 @@
-export class BetCoinRepository {
+import { IBetCoinRepository } from '../interface/IBetCoinRepository'
+
+/**
+ * ベットしたコインを管理するリポジトリ
+ */
+export class BetCoinRepository implements IBetCoinRepository {
   private readonly playerBetCoins = new Map<string, number>()
 
-  public set(id: string, coinNumber: number): void {
-    this.playerBetCoins.set(id, coinNumber)
+  public set(playerId: string, betCoin: number): void {
+    this.playerBetCoins.set(playerId, betCoin)
   }
 
-  public get(id: string): number | undefined {
-    return this.playerBetCoins.get(id)
+  public get(playerId: string): number | undefined {
+    return this.playerBetCoins.get(playerId)
   }
 
-  public delete(id: string): void {
-    this.playerBetCoins.delete(id)
+  public delete(playerId: string): void {
+    this.playerBetCoins.delete(playerId)
   }
 
-  // clear()を呼び出せるようにnyokkiGameEndEventを作成する
   public clear(): void {
     this.playerBetCoins.clear()
   }
@@ -25,16 +29,17 @@ export class BetCoinRepository {
     return this.playerBetCoins.size
   }
 
+  /**
+   * ニョッキ成功時のコイン増加量を計算する
+   * @param betCoins ベットしたコイン数
+   * @param totalPlayerNum 全プレイヤー数
+   * @param playerOrder ニョッキしたプレイヤーの順位
+   */
   public calculateMultiplier(betCoins: number, totalPlayerNum: number, playerOrder: number): number {
     // playerOrderが-1ということはnyokkiしていないことを意味するため、増加分はなし
     if (playerOrder === -1) return 0
 
     const calculatedCoinsNumber = betCoins * (totalPlayerNum - playerOrder)
     return calculatedCoinsNumber
-  }
-
-  public getPlayersBetCoinArray(): Array<[string, number]> {
-    const playerBetCoinArray = Array.from(this.playerBetCoins)
-    return playerBetCoinArray
   }
 }

@@ -39,6 +39,9 @@ export class NyokkiLogTextCreate implements INyokkiLogTextCreate {
     }
   }
 
+  /**
+   * ニョッキ成功時のログを生成する
+   */
   private nyokkiSafeLog(playerIds: string[]): string {
     const playerName: Player | undefined = this.players.get(playerIds[0])
     if (playerName === undefined) throw new Error('nyokkiアクションでプレイヤーIDの取得に失敗')
@@ -46,6 +49,9 @@ export class NyokkiLogTextCreate implements INyokkiLogTextCreate {
     return `${playerName.name}さん${message}`
   }
 
+  /**
+   * にょっき失敗時のログを生成する
+   */
   private nyokkiOutLog(playerIds: string[]): string {
     let message: string = ''
     for (let i = 0; i < playerIds.length; i++) {

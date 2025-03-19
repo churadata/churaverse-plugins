@@ -3,9 +3,12 @@ import { BaseMessage } from '@churaverse/network-plugin-server/message/baseMessa
 import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
 
 export interface NyokkiTurnTimerMessageData extends SendableObject {
-  countdown: number
+  remainingSeconds: number
 }
 
+/**
+ * ターン進行中の残り時間(秒数)を送信するメッセージ
+ */
 export class NyokkiTurnTimerMessage extends BaseMessage<IMainScene> {
   public constructor(public readonly data: NyokkiTurnTimerMessageData) {
     super('nyokkiTurnTimer', data)

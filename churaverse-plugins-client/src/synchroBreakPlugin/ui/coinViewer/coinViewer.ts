@@ -26,8 +26,8 @@ const NUMBER_HEL8_NAME = 'number_hel8'
 const NUMBER_HEL9_NAME = 'number_hel9'
 
 const betUiPosX = 75
-const betUiPosY = 25 // 初期値23
-const numberIconPoxX = 11 // 初期値10
+const betUiPosY = 25
+const numberIconPoxX = 11
 const numberIconPoxY = 12
 
 export class CoinViewer {
@@ -46,7 +46,10 @@ export class CoinViewer {
     }
   }
 
-  public setBetCoins(playerId: string, betCoins: number): void {
+  /**
+   * プレイヤーのベットコインを表示する
+   */
+  public setBetCoins(betCoins: number): void {
     this.betUi = this.scene.add.image(0, 35, BET_ICON_NAME).setDisplaySize(betUiPosX, betUiPosY).setAlpha(1).setDepth(0)
     this.playerRenderer.addToPlayerContainer(this.betUi)
 
@@ -72,7 +75,6 @@ export class CoinViewer {
         .setAlpha(1)
         .setDepth(1)
 
-      // コインUIを配列に追加
       this.coinUi.push(coinImage)
 
       // コインUIをプレイヤーコンテナに追加
@@ -87,6 +89,9 @@ export class CoinViewer {
     this.coinUi = [] // coinUi配列をクリア
   }
 
+  /**
+   * ベットコインの画像を読み込む
+   */
   public static loadAssets(scene: Scene): void {
     scene.load.image(BET_ICON_NAME, BET_ICON_PATH)
     scene.load.image(NUMBER_HEL0_NAME, NUMBER_HEL0_PATH)
