@@ -34,7 +34,7 @@ export class DescriptionWindow implements IDescriptionWindow {
    * ゲーム開始時主催者サイドの文章更新処理
    * @param gameName ゲーム名
    */
-  setGameStartForHost(gameName: string): void {
+  public setGameStartForHost(gameName: string): void {
     this.open(`${gameName}を開始しました。<br>あなたはゲームの管理者です。 <br>ターン数(1~10)を選択してください。`)
   }
 
@@ -43,7 +43,7 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param gameName ゲーム名
    * @param gameOwnerName ゲームオーナーの名前
    */
-  setGameStartForGuest(gameName: string, gameOwnerName: string | undefined): void {
+  public setGameStartForGuest(gameName: string, gameOwnerName?: string): void {
     this.open(`${gameName}が開始されました！<br>${gameOwnerName}さんがターンを入力中です。`)
   }
 
@@ -60,7 +60,7 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param turn 選択されたターン数
    * @param gameOwnerName ゲームオーナーの名前
    */
-  public setTimeLimitWaiting(turn: number, gameOwnerName: string | undefined): void {
+  public setTimeLimitWaiting(turn: number, gameOwnerName?: string): void {
     this.setDescriptionText(`${turn}ターン選択しました。<br>${gameOwnerName}さんが制限時間を入力中です。`)
   }
 
@@ -108,17 +108,13 @@ export class DescriptionWindow implements IDescriptionWindow {
    * シンクロブレイク進行中の文章更新処理
    * @param countdown シンクロブレイク終了までのカウントダウン
    */
-  public setSynchroBreakInProgress(
-    countdown: number,
-    playerName: string | undefined,
-    nyokkiSuccessMessage: string | undefined
-  ): void {
+  public setSynchroBreakInProgress(countdown: number, playerName?: string, nyokkiSuccessMessage?: string): void {
     const descriptionText = ['現在シンクロブレイク進行中', `残り${countdown}秒以内にボタンを押してください！`]
-    if (!!playerName && !!nyokkiSuccessMessage) {
+    if (playerName && nyokkiSuccessMessage) {
       descriptionText.splice(1, 0, nyokkiSuccessMessage)
     }
 
-    this.setDescriptionText(descriptionText.join('<br>') as string)
+    this.setDescriptionText(descriptionText.join('<br>'))
   }
 
   /**
@@ -138,7 +134,11 @@ export class DescriptionWindow implements IDescriptionWindow {
     )
   }
 
-  public setNyokkiSuccess(text: string): void {
+  /**
+   * ニョッキアクションの文章更新処理
+   * @param text ニョッキアクションの文章
+   */
+  public setNyokkiAction(text: string): void {
     const descriptionText = this.element.innerHTML.split('<br>')
     descriptionText.splice(1, 0, text)
     this.setDescriptionText(descriptionText.join('<br>'))

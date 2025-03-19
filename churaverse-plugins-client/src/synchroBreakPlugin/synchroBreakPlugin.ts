@@ -1,4 +1,4 @@
-import { PhaserLoadAssets, PhaserSceneInit, IMainScene, DomManager } from 'churaverse-engine-client'
+import { PhaserLoadAssets, PhaserSceneInit, IMainScene } from 'churaverse-engine-client'
 import { Scene } from 'phaser'
 import { BaseGamePlugin } from '@churaverse/game-plugin-client/domain/baseGamePlugin'
 import { GamePluginStore } from '@churaverse/game-plugin-client/store/defGamePluginStore'
@@ -29,11 +29,12 @@ import { NyokkiStatus } from './type/nyokkiStatus'
 import { ChangePlayersCoinEvent } from './event/changePlayersCoinEvent'
 import { IRankingBoard } from './interface/IRankingBoard'
 import { NyokkiResultEvent } from './event/nyokkiResultEvent'
-import { NYOKKI_STATUS_ID } from './ui/rankingBoard/rankingBoard'
 
 export class SynchroBreakPlugin extends BaseGamePlugin {
   protected readonly gameId = 'synchroBreak'
   protected readonly gameName = 'シンクロブレイク'
+  private nyokkiActionMessage: string | undefined = undefined
+  private nyokkiStatus: NyokkiStatus = 'yet'
 
   private synchroBreakPluginStore!: SynchroBreakPluginStore
   private gamePluginStore!: GamePluginStore
@@ -43,7 +44,6 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   private scene!: Scene
   private coinViewerIconUis!: Map<string, CoinViewerIcon>
   private socketController!: SocketController
-  private nyokkiSuccessMessage: string | undefined = undefined
 
   public listenEvent(): void {
     super.listenEvent()
@@ -133,6 +133,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     this.socketController.registerMessageListener()
     this.synchroBreakDialogManager.setGameAbortButtonText()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
+    this.nyokkiActionMessage = undefined
+    this.nyokkiStatus = 'yet'
 
     if (this.gameOwnerId === undefined) return
     const gameOwnerName = this.playerPluginStore.players.get(this.gameOwnerId)?.name
@@ -279,18 +281,16 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     const descriptionWindow = this.getDescriptionWindow()
     const ownPlayerId = this.playerPluginStore.ownPlayerId
     const ownPlayerName = this.playerPluginStore.players.get(ownPlayerId)?.name
-    const playerNyokkiStatus = DomManager.getElementById(NYOKKI_STATUS_ID(ownPlayerId))
-    const status = playerNyokkiStatus?.dataset.status
     if (ev.countdown === this.synchroBreakPluginStore.timeLimit) {
       descriptionWindow.setSynchroBreakStart(ev.countdown)
       this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.open()
       // } else if (ev.countdown === 0) {
       //   descriptionWindow.setSynchroBreakEnd()
     } else {
-      if (status === 'success') {
-        descriptionWindow.setSynchroBreakInProgress(ev.countdown, ownPlayerName, this.nyokkiSuccessMessage)
+      if (this.nyokkiStatus === 'yet') {
+        descriptionWindow.setSynchroBreakInProgress(ev.countdown)
       } else {
-        descriptionWindow.setSynchroBreakInProgress(ev.countdown, undefined, undefined)
+        descriptionWindow.setSynchroBreakInProgress(ev.countdown, ownPlayerName, this.nyokkiActionMessage)
       }
     }
   }
@@ -304,16 +304,17 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     this.gamePluginStore.gameLogRenderer.gameLog(nyokkiLogText, 0)
     let status: NyokkiStatus = 'success'
     if (ev.nyokkiState) status = 'nyokki'
+    this.nyokkiStatus = status
     for (let i = 0; i < nyokkiCollectionPlayerId.length; i++) {
       const playerId = nyokkiCollectionPlayerId[i]
       const rankingBoard = this.getRankingBoard()
       rankingBoard.changeNyokkiStatus(playerId, status)
 
       //ニョッキアクションの実行結果をプレイヤーに通知する
-      if (status === 'success') {
+      if (playerId === this.playerPluginStore.ownPlayerId) {
         const descriptionWindow = this.getDescriptionWindow()
-        descriptionWindow.setNyokkiSuccess(nyokkiLogText)
-        this.nyokkiSuccessMessage = nyokkiLogText
+        this.nyokkiActionMessage = ev.nyokkiLogText
+        descriptionWindow.setNyokkiAction(ev.nyokkiLogText)
       }
 
       // シンクロブレイクのニョッキアクションUIを表示させる。
@@ -327,6 +328,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   private readonly nyokkiTurnEnd = (ev: NyokkiTurnEndEvent): void => {
     if (this.isOwnPlayerMidwayParticipant) return
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.close()
+    this.nyokkiActionMessage = undefined
+    this.nyokkiStatus = 'yet'
 
     const descriptionWindow = this.getDescriptionWindow()
     descriptionWindow.setSynchroBreakEnd()
