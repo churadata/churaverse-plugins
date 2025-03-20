@@ -28,6 +28,7 @@ import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
 import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 import { UpdateChurarenUiEvent } from '@churaverse/churaren-core-plugin-server/event/updateChurarenUiEvent'
 
+// TODO:(DELETE)錬金アイテムを実装するまでの仮実装
 import '@churaverse/bomb-plugin-server/store/defBombPluginStore'
 import '@churaverse/shark-plugin-server/store/defSharkPluginStore'
 import { Bomb } from '@churaverse/bomb-plugin-server/domain/bomb'
@@ -247,11 +248,6 @@ export class ChurarenBossPlugin extends ChurarenEngine {
     const limitX = currentMap.width / 2
     const limitY = currentMap.height / 2
     return new Position(limitX, limitY)
-  }
-
-  // 待機処理を行うためのヘルパー関数
-  private async delay(ms: number): Promise<void> {
-    await new Promise((resolve) => setTimeout(resolve, ms))
   }
 
   // TODO:(DELETE) 以下は錬金アイテム実装までの仮実装
