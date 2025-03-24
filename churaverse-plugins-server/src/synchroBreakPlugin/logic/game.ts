@@ -1,13 +1,13 @@
 import { IMainScene, IEventBus, Store } from 'churaverse-engine-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
-import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
 import { IGame } from '../interface/IGame'
 import { NyokkiGameTurnEnd } from '../event/nyokkiGameTurnEnd'
 import { NyokkiGameTurnStartEvent } from '../event/nyokkiGameTurnStartEvent'
 import { SynchroBreakPluginStore } from '../store/defSynchroBreakPluginStore'
 import { NyokkiGameStartCountMessage } from '../message/nyokkiGameStartCountMessage'
 import { NyokkiTurnTimerMessage } from '../message/nyokkiTurnTimerMessage'
+import { NyokkiResultEvent } from '../event/nyokkiResultEvent'
 
 export class Game implements IGame {
   private synchroBreakPluginStore!: SynchroBreakPluginStore
@@ -72,8 +72,8 @@ export class Game implements IGame {
     if (turnSelect === undefined) return
     if (turnSelect <= this.turnCountNumber) {
       this.turnCountNumber = 1
-      const nyokkiGameEndEvent = new GameEndEvent('synchroBreak')
-      this.eventBus.post(nyokkiGameEndEvent)
+      const nyokkiResult = new NyokkiResultEvent()
+      this.eventBus.post(nyokkiResult)
     } else {
       this.turnCountNumber++
       const nyokkiTurnEnd = new NyokkiGameTurnEnd()

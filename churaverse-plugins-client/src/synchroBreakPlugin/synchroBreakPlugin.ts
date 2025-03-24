@@ -24,6 +24,9 @@ import { NyokkiTurnStartEvent } from './event/nyokkiTurnStartEvent'
 import { UpdatePlayersCoinEvent } from './event/updatePlayersCoinEvent'
 import { NyokkiStatus } from './type/nyokkiStatus'
 import { IRankingBoard } from './interface/IRankingBoard'
+import { NyokkiResultEvent } from './event/nyokkiResultEvent'
+import { NyokkiGameEndEvent } from './event/nyokkiGameEndEvent'
+import { NyokkiGameEndMessage } from './message/nyokkiGameEndMessage'
 
 export class SynchroBreakPlugin extends BaseGamePlugin {
   protected readonly gameId = 'synchroBreak'
@@ -66,6 +69,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('nyokkiTurnEnd', this.nyokkiTurnEnd)
     this.bus.subscribeEvent('nyokkiTurnStart', this.nyokkiTurnStart)
     this.bus.subscribeEvent('updatePlayersCoin', this.updatePlayersCoin)
+    this.bus.subscribeEvent('nyokkiResult', this.getNyokkiResult)
+    this.bus.subscribeEvent('nyokkiGameEnd', this.nyokkiGameEnd)
   }
 
   /**
@@ -82,6 +87,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     this.bus.unsubscribeEvent('nyokkiTurnEnd', this.nyokkiTurnEnd)
     this.bus.unsubscribeEvent('nyokkiTurnStart', this.nyokkiTurnStart)
     this.bus.unsubscribeEvent('updatePlayersCoin', this.updatePlayersCoin)
+    this.bus.unsubscribeEvent('nyokkiResult', this.getNyokkiResult)
+    this.bus.unsubscribeEvent('nyokkiGameEnd', this.nyokkiGameEnd)
   }
 
   private phaserSceneInit(ev: PhaserSceneInit): void {
@@ -333,6 +340,15 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   }
 
   /**
+   * 閉じるボタンが押された時のゲーム終了処理
+   */
+  private readonly nyokkiGameEnd = (ev: NyokkiGameEndEvent): void => {
+    if (ev.playerId !== this.playerPluginStore.ownPlayerId) return
+    this.gamePluginStore.gameUiManager.removeAllUis(this.gameId)
+    this.store.of('networkPlugin').messageSender.send(new NyokkiGameEndMessage({ playerId: ev.playerId }))
+  }
+
+  /**
    * ゲームの説明ウィンドウを取得する
    */
   private getDescriptionWindow(): IDescriptionWindow {
@@ -348,6 +364,13 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     const rankingBoard = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')
     if (rankingBoard === undefined) throw new Error('rankingBoard is not found')
     return rankingBoard
+  }
+
+  /**
+   * 結果ウィンドウを取得する
+   */
+  private getNyokkiResult = (ev: NyokkiResultEvent): void => {
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiResultScreen')?.createResultRanking()
   }
 
   /**
