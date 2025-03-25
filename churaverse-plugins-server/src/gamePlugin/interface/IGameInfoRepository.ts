@@ -1,11 +1,12 @@
 import { GameIds } from './gameIds'
+import { IGameInfo } from './IGameInfo'
 
 /**
  * 各ゲームのメタ情報を管理するリポジトリのインターフェース
  */
-export interface IGameInfoRepository<T> {
-  set: (id: GameIds, entity: T) => void
+export interface IGameInfoRepository {
+  set: (id: GameIds, entity: IGameInfo) => void
   delete: (id: GameIds) => void
-  get: (id: GameIds) => T | undefined
+  get: (id: GameIds) => IGameInfo | undefined
   getAllId: () => GameIds[]
 }

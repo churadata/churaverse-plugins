@@ -1,14 +1,13 @@
 import { GameIds } from '../interface/gameIds'
 import { IGameInfo } from '../interface/IGameInfo'
 import { IGameInfoRepository } from '../interface/IGameInfoRepository'
-
 /**
  * 各ゲームのメタ情報を管理するリポジトリ
  */
-export class GameInfoRepository<T extends IGameInfo> implements IGameInfoRepository<T> {
-  private readonly games = new Map<GameIds, T>()
+export class GameInfoRepository implements IGameInfoRepository {
+  private readonly games = new Map<GameIds, IGameInfo>()
 
-  public set(id: GameIds, entity: T): void {
+  public set(id: GameIds, entity: IGameInfo): void {
     this.games.set(id, entity)
   }
 
@@ -16,7 +15,7 @@ export class GameInfoRepository<T extends IGameInfo> implements IGameInfoReposit
     this.games.delete(id)
   }
 
-  public get(id: GameIds): T | undefined {
+  public get(id: GameIds): IGameInfo | undefined {
     return this.games.get(id)
   }
 
