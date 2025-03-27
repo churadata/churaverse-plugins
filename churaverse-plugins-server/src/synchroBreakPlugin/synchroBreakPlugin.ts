@@ -1,7 +1,6 @@
-import { IMainScene, EntityDespawnEvent } from 'churaverse-engine-server'
+import { IMainScene } from 'churaverse-engine-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
-import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
 import { SocketController } from './controller/socketController'
@@ -49,7 +48,6 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    */
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
-    this.bus.subscribeEvent('entityDespawn', this.onPlayerLeave)
     this.bus.subscribeEvent('nyokkiTurnSelect', this.nyokkiTurnSelect)
     this.bus.subscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
     this.bus.subscribeEvent('sendBetCoin', this.sendBetCoin)
@@ -65,7 +63,6 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    */
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
-    this.bus.unsubscribeEvent('entityDespawn', this.onPlayerLeave)
     this.bus.unsubscribeEvent('nyokkiTurnSelect', this.nyokkiTurnSelect)
     this.bus.unsubscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
     this.bus.unsubscribeEvent('sendBetCoin', this.sendBetCoin)
@@ -117,15 +114,6 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     if (this.finishedPlayers.length >= this.participantIds.length) {
       this.bus.post(new GameEndEvent(this.gameId))
     }
-  }
-
-  /**
-   * プレイヤーがゲームプレイ中に退出した際の処理
-   */
-  private readonly onPlayerLeave = (ev: EntityDespawnEvent): void => {
-    if (!(ev.entity instanceof Player)) return
-    const playerId: string = ev.entity.id
-    this.removePlayersRepository(playerId)
   }
 
   /**
