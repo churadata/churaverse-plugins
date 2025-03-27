@@ -369,7 +369,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   /**
    * 結果ウィンドウを取得する
    */
-  private getNyokkiResult = (ev: NyokkiResultEvent): void => {
+  private readonly getNyokkiResult = (ev: NyokkiResultEvent): void => {
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiResultScreen')?.createResultRanking()
   }
 
