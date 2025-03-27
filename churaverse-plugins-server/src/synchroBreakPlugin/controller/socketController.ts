@@ -18,6 +18,9 @@ import { NyokkiActionResponseMessage } from '../message/nyokkiActionResponseMess
 import { NyokkiTurnEndMessage } from '../message/nyokkiTurnEndMessage'
 import { NyokkiTurnStartMessage } from '../message/nyokkiTurnStartMessage'
 import { UpdatePlayersCoinMessage } from '../message/updatePlayersCoinMessage'
+import { NyokkiResultMessage } from '../message/nyokkiResultMessage'
+import { NyokkiGameEndMessage } from '../message/nyokkiGameEndMessage'
+import { NyokkiGameEndEvent } from '../event/nyokkiGameEndEvent'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
@@ -38,6 +41,8 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('nyokkiTurnEnd', NyokkiTurnEndMessage, 'allClients')
     ev.messageRegister.registerMessage('nyokkiTurnStart', NyokkiTurnStartMessage, 'allClients')
     ev.messageRegister.registerMessage('updatePlayersCoin', UpdatePlayersCoinMessage, 'allClients')
+    ev.messageRegister.registerMessage('nyokkiResult', NyokkiResultMessage, 'allClients')
+    ev.messageRegister.registerMessage('nyokkiGameEnd', NyokkiGameEndMessage, 'allClients')
   }
 
   /**
@@ -55,6 +60,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.messageListenerRegister.on('timeLimitConfirm', this.timeLimitConfirm)
     this.messageListenerRegister.on('sendBetCoin', this.sendBetCoin)
     this.messageListenerRegister.on('nyokki', this.nyokki)
+    this.messageListenerRegister.on('nyokkiGameEnd', this.nyokkiGameEnd)
   }
 
   /**
@@ -65,6 +71,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.messageListenerRegister.off('timeLimitConfirm', this.timeLimitConfirm)
     this.messageListenerRegister.off('sendBetCoin', this.sendBetCoin)
     this.messageListenerRegister.off('nyokki', this.nyokki)
+    this.messageListenerRegister.off('nyokkiGameEnd', this.nyokkiGameEnd)
   }
 
   private readonly nyokkiTurnSelect = (msg: NyokkiTurnSelectMessage): void => {
@@ -81,5 +88,9 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   private readonly nyokki = (msg: NyokkiMessage): void => {
     this.eventBus.post(new NyokkiEvent(msg.data.playerId))
+  }
+
+  private readonly nyokkiGameEnd = (msg: NyokkiGameEndMessage): void => {
+    this.eventBus.post(new NyokkiGameEndEvent(msg.data.playerId))
   }
 }
