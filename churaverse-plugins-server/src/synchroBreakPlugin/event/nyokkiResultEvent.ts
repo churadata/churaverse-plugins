@@ -1,7 +1,7 @@
 import { CVEvent, IMainScene } from 'churaverse-engine-server'
 
 /**
- * ゲーム終了時のイベント
+ * ゲーム終了後の結果ウィンドウ表示イベント
  */
 export class NyokkiResultEvent extends CVEvent<IMainScene> {
   public constructor() {

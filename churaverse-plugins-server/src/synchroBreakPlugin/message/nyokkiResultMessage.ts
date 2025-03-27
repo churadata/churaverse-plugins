@@ -5,7 +5,7 @@ import { SendableObject } from '@churaverse/network-plugin-server/types/sendable
 export interface NyokkiResultData extends SendableObject {}
 
 /**
- * ゲームターン終了を知らせる
+ * ゲーム終了後の結果ウィンドウ表示メッセージ
  */
 export class NyokkiResultMessage extends BaseMessage<IMainScene> {
   public constructor(public readonly data: NyokkiResultData) {

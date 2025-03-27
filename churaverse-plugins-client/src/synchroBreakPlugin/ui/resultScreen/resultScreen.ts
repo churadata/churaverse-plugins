@@ -104,7 +104,6 @@ export class ResultScreen implements INyokkiResultScreen {
     const exitButton = DomManager.jsxToDom(ResultExitButton())
     this.element.appendChild(exitButton)
     exitButton.addEventListener('click', () => {
-      // 最後に閉じボタンを押したプレイヤーがゲームを終了する
       const playerId = this.store.of('playerPlugin').ownPlayerId
       this.eventBus.post(new NyokkiGameEndEvent(playerId))
       this.remove()
