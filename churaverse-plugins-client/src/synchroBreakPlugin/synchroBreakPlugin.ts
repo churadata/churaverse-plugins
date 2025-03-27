@@ -134,6 +134,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
       descriptionWindow.setGameStartForGuest(this.gameName, gameOwnerName)
     }
   }
+
   /**
    * ゲームの参加者が更新された時の処理
    */
@@ -277,7 +278,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
       const rankingBoard = this.getRankingBoard()
       rankingBoard.changeNyokkiStatus(playerId, status)
 
-      //ニョッキアクションの実行結果をプレイヤーに通知する
+      // ニョッキアクションの実行結果をプレイヤーに通知する
       if (playerId === this.playerPluginStore.ownPlayerId) {
         const descriptionWindow = this.getDescriptionWindow()
         this.nyokkiActionMessage = ev.nyokkiLogText

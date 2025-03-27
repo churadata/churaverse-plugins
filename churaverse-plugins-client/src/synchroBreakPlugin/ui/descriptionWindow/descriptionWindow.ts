@@ -110,7 +110,7 @@ export class DescriptionWindow implements IDescriptionWindow {
    */
   public setSynchroBreakInProgress(countdown: number, playerName?: string, nyokkiSuccessMessage?: string): void {
     const descriptionText = ['現在シンクロブレイク進行中', `残り${countdown}秒以内にボタンを押してください！`]
-    if (playerName && nyokkiSuccessMessage) {
+    if (playerName !== undefined && nyokkiSuccessMessage !== undefined) {
       descriptionText.splice(1, 0, nyokkiSuccessMessage)
     }
 
