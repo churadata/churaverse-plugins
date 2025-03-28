@@ -16,6 +16,10 @@ export const TURN_SELECT_DECREASE_BUTTON_ID = 'turn-select-decrease'
 /** turn数送信ボタン */
 export const TURN_SELECT_SEND_BUTTON_ID = 'turn-select-send'
 
+// ターン数の最大値と最小値
+export const SYNCHRO_BREAK_MAX_TURN_SELECT: number = 10
+export const SYNCHRO_BREAK_MIN_TURN_SELECT: number = 1
+
 export class TurnSelectFormContainer implements IGameUiComponent {
   public element!: HTMLElement
   public readonly visible = false
@@ -45,26 +49,29 @@ export class TurnSelectFormContainer implements IGameUiComponent {
 
     const sendButton = DomManager.getElementById(TURN_SELECT_SEND_BUTTON_ID)
     sendButton.onclick = () => {
-      if (this.turnSelectInputField.value !== '') {
-        const turnNumber = Number(this.turnSelectInputField.value)
+      const turnNumber = Number(this.turnSelectInputField.value)
+
+      if (turnNumber >= SYNCHRO_BREAK_MIN_TURN_SELECT && turnNumber <= SYNCHRO_BREAK_MAX_TURN_SELECT) {
         this.networkPluginStore.messageSender.send(new NyokkiTurnSelectMessage({ playerId, allTurn: turnNumber }))
 
         this.turnSelectInputField.value = ''
         this.close()
+      } else {
+        this.turnSelectInputField.value = SYNCHRO_BREAK_MIN_TURN_SELECT.toString()
       }
     }
 
     const plusButton = DomManager.getElementById(TURN_SELECT_INCREASE_BUTTON_ID)
     plusButton.onclick = () => {
       const value: number = Number(this.turnSelectInputField.value)
-      if (value >= 10) return
+      if (value >= SYNCHRO_BREAK_MAX_TURN_SELECT) return
       const incrementedNum: string = (value + 1).toString()
       this.turnSelectInputField.value = incrementedNum
     }
 
     const minusButton = DomManager.getElementById(TURN_SELECT_DECREASE_BUTTON_ID)
     minusButton.onclick = () => {
-      if (Number(this.turnSelectInputField.value) <= 1) return
+      if (Number(this.turnSelectInputField.value) <= SYNCHRO_BREAK_MIN_TURN_SELECT) return
       const value: number = Number(this.turnSelectInputField.value)
       const decrementedNum: string = (value - 1).toString()
       this.turnSelectInputField.value = decrementedNum
