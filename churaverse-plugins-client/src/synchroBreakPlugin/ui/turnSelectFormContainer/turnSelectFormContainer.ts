@@ -32,7 +32,7 @@ export class TurnSelectFormContainer implements IGameUiComponent {
 
   public initialize(): void {
     this.element = DomManager.addJsxDom(SelectTurnForm())
-
+    this.turnSelectInputField = DomManager.getElementById<HTMLInputElement>(TURN_SELECT_FIELD_ID)
     domLayerSetting(this.element, 'lowest')
     this.element.addEventListener('click', () => {
       makeLayerHigherTemporary(this.element, 'lower')
@@ -41,46 +41,53 @@ export class TurnSelectFormContainer implements IGameUiComponent {
     this.setUpInputFields(this.store.of('playerPlugin').ownPlayerId)
   }
 
+  public get inputFieldValue(): number {
+    const value = Number(this.turnSelectInputField.value)
+    return isNaN(value) ? SYNCHRO_BREAK_MIN_TURN_SELECT : value
+  }
+
+  public set inputFieldValue(value: number) {
+    this.turnSelectInputField.value = value.toString()
+  }
+
   /**
    * ターン数選択フォームの入力部分を設定する
    */
   private setUpInputFields(playerId: string): void {
-    this.turnSelectInputField = DomManager.getElementById<HTMLInputElement>(TURN_SELECT_FIELD_ID)
-
     const sendButton = DomManager.getElementById(TURN_SELECT_SEND_BUTTON_ID)
     sendButton.onclick = () => {
-      const turnNumber = Number(this.turnSelectInputField.value)
+      const turnNumber = this.inputFieldValue
 
       if (turnNumber >= SYNCHRO_BREAK_MIN_TURN_SELECT && turnNumber <= SYNCHRO_BREAK_MAX_TURN_SELECT) {
         this.networkPluginStore.messageSender.send(new NyokkiTurnSelectMessage({ playerId, allTurn: turnNumber }))
 
-        this.turnSelectInputField.value = ''
+        this.inputFieldValue = SYNCHRO_BREAK_MIN_TURN_SELECT
         this.close()
       } else {
-        this.turnSelectInputField.value = SYNCHRO_BREAK_MIN_TURN_SELECT.toString()
+        this.inputFieldValue = SYNCHRO_BREAK_MIN_TURN_SELECT
       }
     }
 
     const plusButton = DomManager.getElementById(TURN_SELECT_INCREASE_BUTTON_ID)
     plusButton.onclick = () => {
-      const value: number = Number(this.turnSelectInputField.value)
-      if (value >= SYNCHRO_BREAK_MAX_TURN_SELECT) return
-      const incrementedNum: string = (value + 1).toString()
-      this.turnSelectInputField.value = incrementedNum
+      const turnNumber = this.inputFieldValue
+
+      if (turnNumber >= SYNCHRO_BREAK_MAX_TURN_SELECT) return
+      this.inputFieldValue = turnNumber + 1
     }
 
     const minusButton = DomManager.getElementById(TURN_SELECT_DECREASE_BUTTON_ID)
     minusButton.onclick = () => {
-      if (Number(this.turnSelectInputField.value) <= SYNCHRO_BREAK_MIN_TURN_SELECT) return
-      const value: number = Number(this.turnSelectInputField.value)
-      const decrementedNum: string = (value - 1).toString()
-      this.turnSelectInputField.value = decrementedNum
+      const turnNumber = this.inputFieldValue
+
+      if (turnNumber <= SYNCHRO_BREAK_MIN_TURN_SELECT) return
+      this.inputFieldValue = turnNumber - 1
     }
   }
 
   public open(): void {
-    this.turnSelectInputField.value = '1'
     this.element.style.display = 'flex'
+    this.inputFieldValue = SYNCHRO_BREAK_MIN_TURN_SELECT
   }
 
   public close(): void {

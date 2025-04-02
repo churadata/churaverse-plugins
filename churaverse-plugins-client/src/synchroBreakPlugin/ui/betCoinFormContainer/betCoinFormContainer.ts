@@ -28,27 +28,35 @@ export class BetCoinFormContainer implements IGameUiComponent {
 
   public initialize(): void {
     this.setBetCoinFormContainer()
+    this.betCoinInputField = DomManager.getElementById<HTMLInputElement>(BET_COIN_INPUT_FIELD_ID)
     const ownPlayerId = this.store.of('playerPlugin').ownPlayerId
     this.setUpInputFields(ownPlayerId)
+  }
+
+  public get inputFieldValue(): number {
+    const value = Number(this.betCoinInputField.value)
+    return isNaN(value) ? SYNCHRO_BREAK_MIN_BET_COIN : value
+  }
+
+  public set inputFieldValue(value: number) {
+    this.betCoinInputField.value = value.toString()
   }
 
   /**
    * ベットコインの入力部分を設定する
    */
   private setUpInputFields(ownPlayerId: string): void {
-    this.betCoinInputField = DomManager.getElementById<HTMLInputElement>(BET_COIN_INPUT_FIELD_ID)
-
     const sendButton = DomManager.getElementById(BET_COIN_SEND_BUTTON_ID)
     sendButton.onclick = () => {
       const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
-      const betCoins = Number(this.betCoinInputField.value)
+      const betCoins = this.inputFieldValue
 
       if (betCoins >= SYNCHRO_BREAK_MIN_BET_COIN && betCoins <= ownPlayerCoins) {
         this.store.of('networkPlugin').messageSender.send(new SendBetCoinMessage({ playerId: ownPlayerId, betCoins }))
-        this.betCoinInputField.value = ''
+        this.inputFieldValue = SYNCHRO_BREAK_MIN_BET_COIN
         this.close()
       } else {
-        this.betCoinInputField.value = SYNCHRO_BREAK_MIN_BET_COIN.toString()
+        this.inputFieldValue = SYNCHRO_BREAK_MIN_BET_COIN
       }
     }
 
@@ -58,21 +66,17 @@ export class BetCoinFormContainer implements IGameUiComponent {
     const plusButton = DomManager.getElementById(BET_COIN_INCREMENT_BUTTON_ID)
     plusButton.onclick = () => {
       const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
+      const betCoins = this.inputFieldValue
 
-      if (Number(this.betCoinInputField.value) >= ownPlayerCoins || Number(this.betCoinInputField.value) >= maxBetCoins)
-        return
-
-      const value: number = Number(this.betCoinInputField.value)
-      const incrementedNum: string = (value + 1).toString()
-      this.betCoinInputField.value = incrementedNum
+      if (betCoins >= ownPlayerCoins || betCoins >= maxBetCoins) return
+      this.inputFieldValue = betCoins + 1
     }
 
     const minusButton = DomManager.getElementById(BET_COIN_DECREMENT_BUTTON_ID)
     minusButton.onclick = () => {
-      if (Number(this.betCoinInputField.value) <= SYNCHRO_BREAK_MIN_BET_COIN) return
-      const value: number = Number(this.betCoinInputField.value)
-      const decrementedNum: string = (value - 1).toString()
-      this.betCoinInputField.value = decrementedNum
+      const betCoins = this.inputFieldValue
+      if (betCoins <= SYNCHRO_BREAK_MIN_BET_COIN) return
+      this.inputFieldValue = betCoins - 1
     }
   }
 
@@ -87,7 +91,7 @@ export class BetCoinFormContainer implements IGameUiComponent {
 
   public open(): void {
     this.element.style.display = 'flex'
-    this.betCoinInputField.value = '0'
+    this.inputFieldValue = SYNCHRO_BREAK_MIN_BET_COIN
   }
 
   public close(): void {
