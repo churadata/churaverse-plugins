@@ -11,10 +11,11 @@ import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
+import { IGameInfo } from '../interface/IGameInfo'
 
-export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
+export abstract class BaseGamePlugin extends BasePlugin<IMainScene> implements IGameInfo {
   /** ゲーム一意のid */
-  protected abstract readonly gameId: GameIds
+  public abstract readonly gameId: GameIds
   /** ゲームの状態を保存する変数 */
   private _isActive: boolean
   /** ゲームを開始したプレイヤーid */
@@ -31,21 +32,21 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   /**
    * ゲームの状態を取得する
    */
-  protected get isActive(): boolean {
+  public get isActive(): boolean {
     return this._isActive
   }
 
   /**
    * ゲームを開始したプレイヤーidを取得する
    */
-  protected get gameOwnerId(): string | undefined {
+  public get gameOwnerId(): string | undefined {
     return this._gameOwnerId
   }
 
   /**
    * ゲーム参加者のプレイヤーidリストを取得する
    */
-  protected get participantIds(): string[] {
+  public get participantIds(): string[] {
     return this._participantIds
   }
 
@@ -79,13 +80,21 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     this._isActive = true
     const gameOwnerId = ev.playerId
     this._gameOwnerId = gameOwnerId
-    const participantIds = this.store.of('playerPlugin').players.getAllId()
-    this._participantIds = participantIds
-    const responseGameStartMessage = new ResponseGameStartMessage({ gameId: this.gameId, playerId: gameOwnerId })
+    this._participantIds = this.store.of('playerPlugin').players.getAllId()
+
     const networkPluginStore = this.store.of('networkPlugin')
+    const responseGameStartMessage = new ResponseGameStartMessage({ gameId: this.gameId, playerId: gameOwnerId })
     networkPluginStore.messageSender.send(responseGameStartMessage)
-    const gameParticipantMessage = new UpdateGameParticipantMessage({ gameId: this.gameId, participantIds })
+
+    const gameParticipantMessage = new UpdateGameParticipantMessage({
+      gameId: this.gameId,
+      participantIds: this.participantIds,
+    })
     networkPluginStore.messageSender.send(gameParticipantMessage)
+
+    const gamePluginStore = this.store.of('gamePlugin')
+    gamePluginStore.games.set(this.gameId, this)
+
     this.handleGameStart()
   }
 
@@ -122,6 +131,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   private terminateGame(): void {
     this._isActive = false
     this._gameOwnerId = undefined
+    this.store.of('gamePlugin').games.delete(this.gameId)
     this.clearParticipantIds()
     this.handleGameTermination()
   }
