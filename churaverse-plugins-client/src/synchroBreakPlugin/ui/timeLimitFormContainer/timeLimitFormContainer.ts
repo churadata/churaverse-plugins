@@ -33,12 +33,8 @@ export class TimeLimitFormContainer implements IGameUiComponent {
   }
 
   public initialize(): void {
-    this.element = DomManager.addJsxDom(TimeLimitForm())
+    this.setTimeLimitFormContainer()
     this.timeLimitInputField = DomManager.getElementById<HTMLInputElement>(TIME_LIMIT_INPUT_FIELD_ID)
-    domLayerSetting(this.element, 'lowest')
-    this.element.addEventListener('click', () => {
-      makeLayerHigherTemporary(this.element, 'lower')
-    })
     this.setUpInputFields()
   }
 
@@ -85,6 +81,15 @@ export class TimeLimitFormContainer implements IGameUiComponent {
       if (timeLimitValue <= SYNCHRO_BREAK_MIN_TIME_LIMIT) return
       this.inputFieldValue = timeLimitValue - 1
     }
+  }
+
+  private setTimeLimitFormContainer(): void {
+    this.element = DomManager.addJsxDom(TimeLimitForm())
+    domLayerSetting(this.element, 'lowest')
+    this.element.addEventListener('click', () => {
+      makeLayerHigherTemporary(this.element, 'lower')
+    })
+    this.close()
   }
 
   public open(): void {

@@ -31,13 +31,8 @@ export class TurnSelectFormContainer implements IGameUiComponent {
   }
 
   public initialize(): void {
-    this.element = DomManager.addJsxDom(SelectTurnForm())
+    this.setTurnSelectFormContainer()
     this.turnSelectInputField = DomManager.getElementById<HTMLInputElement>(TURN_SELECT_FIELD_ID)
-    domLayerSetting(this.element, 'lowest')
-    this.element.addEventListener('click', () => {
-      makeLayerHigherTemporary(this.element, 'lower')
-    })
-
     this.setUpInputFields(this.store.of('playerPlugin').ownPlayerId)
   }
 
@@ -83,6 +78,15 @@ export class TurnSelectFormContainer implements IGameUiComponent {
       if (turnNumber <= SYNCHRO_BREAK_MIN_TURN_SELECT) return
       this.inputFieldValue = turnNumber - 1
     }
+  }
+
+  private setTurnSelectFormContainer(): void {
+    this.element = DomManager.addJsxDom(SelectTurnForm())
+    domLayerSetting(this.element, 'lowest')
+    this.element.addEventListener('click', () => {
+      makeLayerHigherTemporary(this.element, 'lower')
+    })
+    this.close()
   }
 
   public open(): void {
