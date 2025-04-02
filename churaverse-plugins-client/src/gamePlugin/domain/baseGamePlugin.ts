@@ -94,7 +94,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   }
 
   /**
-   * ゲーム特有の途中入室時の処理を実装するための抽象メソッド
+   * 自プレイヤーがゲーム開始済みの状態で入室した際の処理を実装するための抽象メソッド
    * 各ゲームプラグインでオーバーライドし、具体的なロジックを定義する
    */
   protected abstract handleMidwayParticipant(): void
@@ -167,7 +167,14 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   private readonly updateGameParticipant = (ev: UpdateGameParticipantEvent): void => {
     if (ev.gameId !== this.gameId) return
     this._participantIds = ev.participantIds
+    this.handleGameParticipant()
   }
+
+  /**
+   * ゲーム参加者が更新された際の処理を実装するための抽象メソッド
+   * 各ゲームプラグインでオーバーライドし、具体的なロジックを定義する
+   */
+  protected abstract handleGameParticipant(): void
 
   /**
    * ゲーム参加者のプレイヤーidリストをクリアする
