@@ -65,6 +65,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._participantIds = this.store.of('playerPlugin').players.getAllId()
     this.gamePluginStore.gameUiManager.initializeAllUis(this.gameId)
     this.gamePluginStore.gameLogRenderer.gameStartLog(this.gameName, this.gameOwnerId ?? '')
+    this.gamePluginStore.games.set(this.gameId, this)
   }
 
   private readonly gameAbort = (ev: GameAbortEvent): void => {
@@ -84,5 +85,6 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._gameOwnerId = undefined
     this._participantIds = []
     this._isOwnPlayerMidwayParticipant = false
+    this.gamePluginStore.games.delete(this.gameId)
   }
 }
