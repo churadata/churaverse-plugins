@@ -18,19 +18,36 @@ import { BaseGamePlugin } from './baseGamePlugin'
  */
 export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo {
   public abstract gameId: GameIds
+  private _isActive: boolean = false
+  private _gameOwnerId?: string
+  private _participantIds: string[] = []
+
+  public get isActive(): boolean {
+    return this._isActive
+  }
+
+  public get gameOwnerId(): string | undefined {
+    return this._gameOwnerId
+  }
+
+  public get participantIds(): string[] {
+    return this._participantIds
+  }
 
   public listenEvent(): void {
     super.listenEvent()
-    this.bus.subscribeEvent('gameStart', this.gameStart.bind(this))
+    this.bus.subscribeEvent('gameStart', this.gameStart.bind(this), 'HIGH')
     this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this))
   }
 
   protected subscribeGameEvent(): void {
+    super.subscribeGameEvent()
     this.bus.subscribeEvent('gameAbort', this.gameAbort)
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
   }
 
   protected unsubscribeGameEvent(): void {
+    super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
   }
@@ -43,7 +60,10 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   }
 
   private gameStart(ev: GameStartEvent): void {
+    this._isActive = this.gameId === ev.gameId
     if (!this.isActive) return
+    this._gameOwnerId = ev.playerId
+    this._participantIds = this.store.of('playerPlugin').players.getAllId()
 
     const gameStartMessage = new ResponseGameStartMessage({ gameId: this.gameId, playerId: ev.playerId })
     this.store.of('networkPlugin').messageSender.send(gameStartMessage)
@@ -53,17 +73,27 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
       participantIds: this.participantIds,
     })
     this.store.of('networkPlugin').messageSender.send(gameParticipantMessage)
+    this.gamePluginStore.games.set(this.gameId, this)
   }
 
   private readonly gameAbort = (ev: GameAbortEvent): void => {
     if (ev.gameId !== this.gameId) return
     const gameAbortMessage = new ResponseGameAbortMessage({ gameId: this.gameId, playerId: ev.playerId })
     this.store.of('networkPlugin').messageSender.send(gameAbortMessage)
+    this.terminateGame()
   }
 
   private readonly gameEnd = (ev: GameEndEvent): void => {
     if (ev.gameId !== this.gameId) return
     const gameEndMessage = new ResponseGameEndMessage({ gameId: this.gameId })
     this.store.of('networkPlugin').messageSender.send(gameEndMessage)
+    this.terminateGame()
+  }
+
+  private terminateGame(): void {
+    this._isActive = false
+    this._gameOwnerId = undefined
+    this._participantIds = []
+    this.gamePluginStore.games.delete(this.gameId)
   }
 }

@@ -1,52 +1,36 @@
 import { BasePlugin, IMainScene } from 'churaverse-engine-server'
-import { IGameInfo } from '../interface/IGameInfo'
 import { GameIds } from '../interface/gameIds'
-import { GamePluginStore } from '../store/defGamePluginStore'
 import { GameStartEvent } from '../event/gameStartEvent'
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
+import { GamePluginStore } from '../store/defGamePluginStore'
 
 /**
  * 全てのゲームプラグインの基本となる抽象クラス
  */
-export abstract class BaseGamePlugin extends BasePlugin<IMainScene> implements IGameInfo {
+export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   public abstract gameId: GameIds
-  private _isActive: boolean = false
-  private _gameOwnerId?: string
-  private _participantIds: string[] = []
   protected gamePluginStore!: GamePluginStore
-
-  public get isActive(): boolean {
-    return this._isActive
-  }
-
-  public get gameOwnerId(): string | undefined {
-    return this._gameOwnerId
-  }
-
-  public get participantIds(): string[] {
-    return this._participantIds
-  }
 
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.getStores.bind(this))
-    this.bus.subscribeEvent('gameStart', this.onGameStart.bind(this), 'HIGH')
+    this.bus.subscribeEvent('gameStart', this.onGameStart.bind(this))
   }
 
   /**
    * ゲーム開始時に共通して登録されるイベントリスナー
    */
   protected subscribeGameEvent(): void {
-    this.bus.subscribeEvent('gameEnd', this.terminateGame, 'HIGH')
-    this.bus.subscribeEvent('gameAbort', this.terminateGame, 'HIGH')
+    this.bus.subscribeEvent('gameEnd', this.onGameTerminate)
+    this.bus.subscribeEvent('gameAbort', this.onGameTerminate)
   }
 
   /**
    * ゲーム中断・終了時に共通して削除されるイベントリスナー
    */
   protected unsubscribeGameEvent(): void {
-    this.bus.unsubscribeEvent('gameEnd', this.terminateGame)
-    this.bus.unsubscribeEvent('gameAbort', this.terminateGame)
+    this.bus.unsubscribeEvent('gameEnd', this.onGameTerminate)
+    this.bus.unsubscribeEvent('gameAbort', this.onGameTerminate)
   }
 
   private getStores(): void {
@@ -54,21 +38,13 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> implements I
   }
 
   private onGameStart(ev: GameStartEvent): void {
-    this._isActive = this.gameId === ev.gameId
-    if (!this.isActive) return
-    this._gameOwnerId = ev.playerId
-    this._participantIds = this.store.of('playerPlugin').players.getAllId()
+    if ((this.gamePluginStore.games.get(this.gameId)?.isActive) === false) return
     this.subscribeGameEvent()
-    this.gamePluginStore.games.set(this.gameId, this)
     this.handleGameStart()
   }
 
-  private readonly terminateGame = (ev: GameAbortEvent | GameEndEvent): void => {
+  private readonly onGameTerminate = (ev: GameAbortEvent | GameEndEvent): void => {
     if (ev.gameId !== this.gameId) return
-    this._isActive = false
-    this._gameOwnerId = undefined
-    this._participantIds = []
-    this.gamePluginStore.games.delete(this.gameId)
     this.unsubscribeGameEvent()
     this.handleGameTermination()
   }
