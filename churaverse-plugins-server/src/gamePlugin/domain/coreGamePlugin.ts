@@ -1,3 +1,5 @@
+import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
+import '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { GameStartEvent } from '../event/gameStartEvent'
@@ -9,19 +11,16 @@ import { ResponseGameEndMessage } from '../message/gameEndMessage'
 import { ResponseGameStartMessage } from '../message/gameStartMessage'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
 import { UpdateGameParticipantMessage } from '../message/updateGameParticipantMessage'
-import { GamePluginStore } from '../store/defGamePluginStore'
-import { BasicGamePlugin } from './basicGamePlugin'
-import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
+import { BaseGamePlugin } from './baseGamePlugin'
 
 /**
  * BasicGamePluginを拡張したCoreなゲーム抽象クラス
  */
-export abstract class CoreGamePlugin extends BasicGamePlugin implements IGameInfo {
+export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo {
   public abstract gameId: GameIds
   private _isActive: boolean = false
   private _gameOwnerId?: string
   private _participantIds: string[] = []
-  protected gamePluginStore!: GamePluginStore
 
   public get isActive(): boolean {
     return this._isActive
@@ -36,23 +35,21 @@ export abstract class CoreGamePlugin extends BasicGamePlugin implements IGameInf
   }
 
   public listenEvent(): void {
-    this.bus.subscribeEvent('init', this.getStores.bind(this))
-    this.bus.subscribeEvent('gameStart', this.gameStart.bind(this))
+    super.listenEvent()
+    this.bus.subscribeEvent('gameStart', this.gameStart.bind(this), 'HIGH')
     this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this))
   }
 
   protected subscribeGameEvent(): void {
+    super.subscribeGameEvent()
     this.bus.subscribeEvent('gameAbort', this.gameAbort)
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
   }
 
   protected unsubscribeGameEvent(): void {
+    super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
-  }
-
-  private getStores(): void {
-    this.gamePluginStore = this.store.of('gamePlugin')
   }
 
   private priorGameData(ev: PriorGameDataEvent): void {
@@ -76,24 +73,21 @@ export abstract class CoreGamePlugin extends BasicGamePlugin implements IGameInf
       participantIds: this.participantIds,
     })
     this.store.of('networkPlugin').messageSender.send(gameParticipantMessage)
-
     this.gamePluginStore.games.set(this.gameId, this)
-
-    this.handleGameStart()
   }
 
   private readonly gameAbort = (ev: GameAbortEvent): void => {
     if (ev.gameId !== this.gameId) return
-    this.terminateGame()
     const gameAbortMessage = new ResponseGameAbortMessage({ gameId: this.gameId, playerId: ev.playerId })
     this.store.of('networkPlugin').messageSender.send(gameAbortMessage)
+    this.terminateGame()
   }
 
   private readonly gameEnd = (ev: GameEndEvent): void => {
     if (ev.gameId !== this.gameId) return
-    this.terminateGame()
     const gameEndMessage = new ResponseGameEndMessage({ gameId: this.gameId })
     this.store.of('networkPlugin').messageSender.send(gameEndMessage)
+    this.terminateGame()
   }
 
   private terminateGame(): void {
@@ -101,6 +95,17 @@ export abstract class CoreGamePlugin extends BasicGamePlugin implements IGameInf
     this._gameOwnerId = undefined
     this._participantIds = []
     this.gamePluginStore.games.delete(this.gameId)
-    this.handleGameTermination()
+  }
+
+  protected removeParticipantId(playerId: string): void {
+    const index = this._participantIds.indexOf(playerId)
+    if (index !== -1) {
+      this._participantIds.splice(index, 1)
+      this.store
+        .of('networkPlugin')
+        .messageSender.send(
+          new UpdateGameParticipantMessage({ gameId: this.gameId, participantIds: [...this._participantIds] })
+        )
+    }
   }
 }

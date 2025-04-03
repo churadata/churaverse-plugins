@@ -3,20 +3,19 @@ import { GameEndEvent } from '../event/gameEndEvent'
 import { GameStartEvent } from '../event/gameStartEvent'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
 import { GameIds } from '../interface/gameIds'
-import { GamePluginStore } from '../store/defGamePluginStore'
-import { BasicGamePlugin } from './basicGamePlugin'
+import { IGameInfo } from '../interface/IGameInfo'
+import { BaseGamePlugin } from './baseGamePlugin'
 
 /**
  * BasicGamePluginを拡張したCoreなゲーム抽象クラス
  */
-export abstract class CoreGamePlugin extends BasicGamePlugin {
-  protected abstract gameId: GameIds
+export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo {
+  public abstract gameId: GameIds
   protected abstract gameName: string
   private _isActive: boolean = false
   private _gameOwnerId?: string
   private _participantIds: string[] = []
   private _isOwnPlayerMidwayParticipant: boolean = false
-  protected gamePluginStore!: GamePluginStore
 
   public get isActive(): boolean {
     return this._isActive
@@ -35,16 +34,19 @@ export abstract class CoreGamePlugin extends BasicGamePlugin {
   }
 
   public listenEvent(): void {
-    this.bus.subscribeEvent('gameStart', this.gameStart.bind(this))
-    this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this))
+    super.listenEvent()
+    this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this), 'HIGH')
+    this.bus.subscribeEvent('gameStart', this.gameStart.bind(this), 'HIGH')
   }
 
   protected subscribeGameEvent(): void {
+    super.subscribeGameEvent()
     this.bus.subscribeEvent('gameAbort', this.gameAbort)
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
   }
 
   protected unsubscribeGameEvent(): void {
+    super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
   }
@@ -52,19 +54,17 @@ export abstract class CoreGamePlugin extends BasicGamePlugin {
   private priorGameData(ev: PriorGameDataEvent): void {
     this._isActive = this.gameId === ev.runningGameId
     if (!this.isActive) return
-    this._isOwnPlayerMidwayParticipant = true
     this.gamePluginStore.gameLogRenderer.gameLog(`${this.gameName}が開始されています。`, 400)
-    this.handleMidwayParticipant()
+    this._isOwnPlayerMidwayParticipant = true
   }
 
-  private gameStart(ev: GameStartEvent): void {
+  protected gameStart(ev: GameStartEvent): void {
     this._isActive = this.gameId === ev.gameId
     if (!this.isActive) return
     this._gameOwnerId = ev.playerId
     this._participantIds = this.store.of('playerPlugin').players.getAllId()
     this.gamePluginStore.gameUiManager.initializeAllUis(this.gameId)
     this.gamePluginStore.gameLogRenderer.gameStartLog(this.gameName, this.gameOwnerId ?? '')
-    this.handleGameStart()
   }
 
   private readonly gameAbort = (ev: GameAbortEvent): void => {
@@ -83,11 +83,6 @@ export abstract class CoreGamePlugin extends BasicGamePlugin {
     this._isActive = false
     this._gameOwnerId = undefined
     this._participantIds = []
-    if (!this.isOwnPlayerMidwayParticipant) {
-      this.gamePluginStore.gameUiManager.removeAllUis(this.gameId)
-    } else {
-      this._isOwnPlayerMidwayParticipant = false
-    }
-    this.handleGameTermination()
+    this._isOwnPlayerMidwayParticipant = false
   }
 }
