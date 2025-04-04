@@ -8,7 +8,7 @@ import { GamePluginStore } from '../store/defGamePluginStore'
 import { BaseGamePlugin } from './baseGamePlugin'
 
 /**
- * BasicGamePluginを拡張したCoreなゲーム抽象クラス
+ * BaseGamePluginを拡張したCoreなゲーム抽象クラス
  */
 export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo {
   public abstract gameId: GameIds
