@@ -4,19 +4,23 @@ import { GameIds } from '../interface/gameIds'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
-import { GamePluginStore } from '../store/defGamePluginStore'
+import { GameInfoStore } from '../store/defGamePluginStore'
 
 /**
  * 全てのゲームプラグインの基本となる抽象クラス
  */
 export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   public abstract gameId: GameIds
-  protected gamePluginStore!: GamePluginStore
+  protected gameInfoStore!: GameInfoStore
 
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.getStores.bind(this))
     this.bus.subscribeEvent('gameStart', this.onGameStart.bind(this))
     this.bus.subscribeEvent('priorGameData', this.getPriorGameData.bind(this))
+  }
+
+  public getStores(): void {
+    this.gameInfoStore = this.store.of('gameInfo')
   }
 
   /**
@@ -35,17 +39,13 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     this.bus.unsubscribeEvent('gameEnd', this.onGameTerminate)
   }
 
-  private getStores(): void {
-    this.gamePluginStore = this.store.of('gamePlugin')
-  }
-
   private getPriorGameData(ev: PriorGameDataEvent): void {
-    if ((this.gamePluginStore.games.get(this.gameId)?.isActive) === false) return
+    if (this.gameInfoStore.games.get(this.gameId)?.isActive === false) return
     this.handleMidwayParticipant()
   }
 
   private onGameStart(ev: GameStartEvent): void {
-    if ((this.gamePluginStore.games.get(this.gameId)?.isActive) === false) return
+    if (this.gameInfoStore.games.get(this.gameId)?.isActive === false) return
     this.subscribeGameEvent()
     this.handleGameStart()
   }

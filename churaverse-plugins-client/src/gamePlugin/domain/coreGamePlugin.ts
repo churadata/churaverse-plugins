@@ -4,6 +4,7 @@ import { GameStartEvent } from '../event/gameStartEvent'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
 import { GameIds } from '../interface/gameIds'
 import { IGameInfo } from '../interface/IGameInfo'
+import { GamePluginStore } from '../store/defGamePluginStore'
 import { BaseGamePlugin } from './baseGamePlugin'
 
 /**
@@ -16,6 +17,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private _gameOwnerId?: string
   private _participantIds: string[] = []
   private _isOwnPlayerMidwayParticipant: boolean = false
+  protected gamePluginStore!: GamePluginStore
 
   public get isActive(): boolean {
     return this._isActive
@@ -35,6 +37,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
 
   public listenEvent(): void {
     super.listenEvent()
+    this.bus.subscribeEvent('init', this.getStores.bind(this))
     this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this), 'HIGH')
     this.bus.subscribeEvent('gameStart', this.gameStart.bind(this), 'HIGH')
   }
@@ -51,6 +54,10 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
   }
 
+  public getStores(): void {
+    this.gamePluginStore = this.store.of('gamePlugin')
+  }
+
   private priorGameData(ev: PriorGameDataEvent): void {
     this._isActive = this.gameId === ev.runningGameId
     if (!this.isActive) return
@@ -65,7 +72,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._participantIds = this.store.of('playerPlugin').players.getAllId()
     this.gamePluginStore.gameUiManager.initializeAllUis(this.gameId)
     this.gamePluginStore.gameLogRenderer.gameStartLog(this.gameName, this.gameOwnerId ?? '')
-    this.gamePluginStore.games.set(this.gameId, this)
+    this.gameInfoStore.games.set(this.gameId, this)
   }
 
   private readonly gameAbort = (ev: GameAbortEvent): void => {
@@ -85,6 +92,6 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._gameOwnerId = undefined
     this._participantIds = []
     this._isOwnPlayerMidwayParticipant = false
-    this.gamePluginStore.games.delete(this.gameId)
+    this.gameInfoStore.games.delete(this.gameId)
   }
 }
