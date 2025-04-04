@@ -96,4 +96,16 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._participantIds = []
     this.gamePluginStore.games.delete(this.gameId)
   }
+
+  protected removeParticipantId(playerId: string): void {
+    const index = this._participantIds.indexOf(playerId)
+    if (index !== -1) {
+      this._participantIds.splice(index, 1)
+      this.store
+        .of('networkPlugin')
+        .messageSender.send(
+          new UpdateGameParticipantMessage({ gameId: this.gameId, participantIds: [...this._participantIds] })
+        )
+    }
+  }
 }
