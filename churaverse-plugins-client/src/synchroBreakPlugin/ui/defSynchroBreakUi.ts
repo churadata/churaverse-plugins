@@ -1,4 +1,4 @@
-import { IDescriptionWindow } from '../interface/IDescriptionWindow'
+import { IDescriptionWindow } from '../interface/IDescriptionText'
 import { IRankingBoard } from '../interface/IRankingBoard'
 import { TurnSelectFormContainer } from './turnSelectFormContainer/turnSelectFormContainer'
 import { TimeLimitFormContainer } from './timeLimitFormContainer/timeLimitFormContainer'
