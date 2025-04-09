@@ -4,6 +4,7 @@ import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { GameStartEvent } from '../event/gameStartEvent'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
+import { PlayerLeaveEvent } from '../event/playerLeaveEvent'
 import { GameIds } from '../interface/gameIds'
 import { IGameInfo } from '../interface/IGameInfo'
 import { ResponseGameAbortMessage } from '../message/gameAbortMessage'
@@ -44,12 +45,14 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     super.subscribeGameEvent()
     this.bus.subscribeEvent('gameAbort', this.gameAbort)
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
+    this.bus.subscribeEvent('playerLeave', this.playerLeave)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
+    this.bus.unsubscribeEvent('playerLeave', this.playerLeave)
   }
 
   private priorGameData(ev: PriorGameDataEvent): void {
@@ -97,8 +100,10 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.gamePluginStore.games.delete(this.gameId)
   }
 
-  protected removeParticipantId(playerId: string): void {
-    const index = this._participantIds.indexOf(playerId)
+  private readonly playerLeave = (ev: PlayerLeaveEvent): void => {
+    if (ev.playerId === undefined) return
+
+    const index = this._participantIds.indexOf(ev.playerId)
     if (index !== -1) {
       this._participantIds.splice(index, 1)
       this.store
