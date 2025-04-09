@@ -1,7 +1,7 @@
 import { DomManager, domLayerSetting } from 'churaverse-engine-client'
 import { DescriptionWindowComponent } from './component/DescriptionWindowComponent'
 import '@churaverse/game-plugin-client/gameUiManager'
-import { IDescriptionWindow } from '../../interface/IDescriptionWindow'
+import { IDescriptionWindow } from '../../interface/IDescriptionText'
 
 export class DescriptionWindow implements IDescriptionWindow {
   public element!: HTMLElement
@@ -13,9 +13,8 @@ export class DescriptionWindow implements IDescriptionWindow {
     domLayerSetting(this.element, 'lowest')
   }
 
-  public open(text: string): void {
+  public open(): void {
     this.element.style.display = 'flex'
-    this.element.innerHTML = text
   }
 
   public remove(): void {
@@ -35,7 +34,10 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param gameName ゲーム名
    */
   public setGameStartForHost(gameName: string): void {
-    this.open(`${gameName}を開始しました。<br>あなたはゲームの管理者です。 <br>ターン数(1~10)を選択してください。`)
+    this.open()
+    this.setDescriptionText(
+      `${gameName}を開始しました。<br>あなたはゲームの管理者です。 <br>ターン数(1~10)を選択してください。`
+    )
   }
 
   /**
@@ -43,8 +45,9 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param gameName ゲーム名
    * @param gameOwnerName ゲームオーナーの名前
    */
-  public setGameStartForGuest(gameName: string, gameOwnerName?: string): void {
-    this.open(`${gameName}が開始されました！<br>${gameOwnerName}さんがターンを入力中です。`)
+  public setGameStartForGuest(gameName: string, gameOwnerName: string): void {
+    this.open()
+    this.setDescriptionText(`${gameName}が開始されました！<br>${gameOwnerName}さんがターンを入力中です。`)
   }
 
   /**
@@ -60,7 +63,7 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param turn 選択されたターン数
    * @param gameOwnerName ゲームオーナーの名前
    */
-  public setTimeLimitWaiting(turn: number, gameOwnerName?: string): void {
+  public setTimeLimitWaiting(turn: number, gameOwnerName: string): void {
     this.setDescriptionText(`${turn}ターン選択しました。<br>${gameOwnerName}さんが制限時間を入力中です。`)
   }
 

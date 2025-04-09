@@ -12,7 +12,7 @@ import { NyokkiTurnSelectEvent } from './event/nyokkiTurnSelectEvent'
 import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
 import { SendBetCoinResponseEvent } from './event/sendBetCoinResponseEvent'
 import { registerSynchroBreakUi } from './ui/registerSynchroBreakUi'
-import { IDescriptionWindow } from './interface/IDescriptionWindow'
+import { IDescriptionWindow } from './interface/IDescriptionText'
 import { PlayerNyokkiStatusIcon } from './ui/synchroBreakIcon/playerNyokkiStatusIcon'
 import { CoinViewer } from './ui/coinViewer/coinViewer'
 import { CoinViewerIcon } from './ui/coinViewer/coinViewerIcon'
@@ -125,7 +125,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     this.nyokkiStatus = 'yet'
 
     if (this.gameOwnerId === undefined) return
-    const gameOwnerName = this.playerPluginStore.players.get(this.gameOwnerId)?.name
+    const gameOwnerName = this.playerPluginStore.players.get(this.gameOwnerId)?.name ?? 'ゲームオーナー'
     const descriptionWindow = this.getDescriptionWindow()
     if (this.gameOwnerId === this.playerPluginStore.ownPlayerId) {
       descriptionWindow.setGameStartForHost(this.gameName)
@@ -180,7 +180,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   private readonly nyokkiTurnSelect = (ev: NyokkiTurnSelectEvent): void => {
     if (this.isOwnPlayerMidwayParticipant) return
 
-    const gameOwnerName = this.playerPluginStore.players.get(ev.playerId)?.name
+    const gameOwnerName = this.playerPluginStore.players.get(ev.playerId)?.name ?? 'ゲームオーナー'
 
     const rankingBoard = this.getRankingBoard()
     rankingBoard.updateTurnNumber(1, ev.allTurn)
