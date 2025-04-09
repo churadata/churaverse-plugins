@@ -55,6 +55,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   }
 
   public getStores(): void {
+    super.getStores()
     this.gamePluginStore = this.store.of('gamePlugin')
   }
 
