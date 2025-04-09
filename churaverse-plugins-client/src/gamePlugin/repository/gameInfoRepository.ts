@@ -1,6 +1,7 @@
 import { GameIds } from '../interface/gameIds'
 import { IGameInfo } from '../interface/IGameInfo'
 import { IGameInfoRepository } from '../interface/IGameInfoRepository'
+
 /**
  * 各ゲームのメタ情報を管理するリポジトリ
  */
