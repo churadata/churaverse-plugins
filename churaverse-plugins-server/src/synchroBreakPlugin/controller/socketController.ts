@@ -42,7 +42,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('nyokkiTurnStart', NyokkiTurnStartMessage, 'allClients')
     ev.messageRegister.registerMessage('updatePlayersCoin', UpdatePlayersCoinMessage, 'allClients')
     ev.messageRegister.registerMessage('nyokkiResult', NyokkiResultMessage, 'allClients')
-    ev.messageRegister.registerMessage('nyokkiGameEnd', NyokkiGameEndMessage, 'allClients')
+    ev.messageRegister.registerMessage('nyokkiGameEnd', NyokkiGameEndMessage, 'onlyServer')
   }
 
   /**
