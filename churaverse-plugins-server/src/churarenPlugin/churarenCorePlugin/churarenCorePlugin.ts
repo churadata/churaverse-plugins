@@ -15,7 +15,6 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
   private socketController!: SocketController
   private networkPluginStore!: NetworkPluginStore<IMainScene>
-  private readonly readyPlayers = new Set<string>()
 
   public listenEvent(): void {
     super.listenEvent()
@@ -69,10 +68,8 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    * 中断・終了時に実行される処理
    */
   protected handleGameTermination(): void {
-    this.unsubscribeGameEvent()
     resetChurarenPluginStore(this.store)
     this.socketController.unregisterMessageListener()
-    this.readyPlayers.clear()
   }
 
   private readonly updateChurarenUi = (ev: UpdateChurarenUiEvent): void => {
