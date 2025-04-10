@@ -82,10 +82,8 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
     const uiType = ev.uiType
     const updateChurarenUiMessage = new UpdateChurarenUiMessage({ uiType })
     this.networkPluginStore.messageSender.send(updateChurarenUiMessage)
-    console.log(`Update UI: ${uiType}`)
 
     if (isChurarenGameResult(uiType)) {
-      console.log(`Game result: ${uiType}`)
       setTimeout(() => {
         this.bus.post(new GameEndEvent(this.gameId))
         console.log('Game end')

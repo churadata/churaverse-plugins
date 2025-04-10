@@ -13,7 +13,7 @@ const TIME_OUT = 30 // プレイヤーの準備確認のタイムアウト時間
 
 export class ChurarenGameSequence implements IChurarenGameSequence {
   private readonly gamePluginStore: GamePluginStore
-  private churarenGamePluginStore!: IGameInfo | undefined
+  private churarenGameInfoStore!: IGameInfo | undefined
   private readyPlayers!: IReadyPlayerRepository
 
   private gameId!: GameIds
@@ -27,7 +27,7 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
 
   public async sequence(gameId: GameIds): Promise<void> {
     this.gameId = gameId
-    this.churarenGamePluginStore = this.gamePluginStore.games.get(this.gameId)
+    this.churarenGameInfoStore = this.gamePluginStore.games.get(this.gameId)
     this.readyPlayers = this.store.of('churarenPlugin').readyPlayers
     await this.onPlayerReady()
     if (!this.isActive) return
@@ -43,7 +43,7 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
     await new Promise<void>((resolve) => {
       const checkReady: () => void = () => {
         if (!this.isActive) return
-        if (this.readyPlayers.length() === this.churarenGamePluginStore?.participantIds.length) {
+        if (this.readyPlayers.length() === this.churarenGameInfoStore?.participantIds.length) {
           resolve()
         } else if (timeOut <= 0) {
           resolve()
