@@ -8,7 +8,8 @@ export interface UpdateChurarenUiData extends SendableObject {
 }
 
 /**
- * 準備完了ボタンが押された際のメッセージ
+ * ちゅられんのUIを更新するメッセージ
+ * @param uiType 更新するUIの種類
  */
 export class UpdateChurarenUiMessage extends BaseMessage<IMainScene> {
   public constructor(public readonly data: UpdateChurarenUiData) {

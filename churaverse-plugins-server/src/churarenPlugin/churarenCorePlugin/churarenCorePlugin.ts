@@ -80,7 +80,6 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
     if (isChurarenGameResult(uiType)) {
       setTimeout(() => {
         this.bus.post(new GameEndEvent(this.gameId))
-        console.log('Game end')
       }, RESULT_DISPLAY_TIME * 1000)
     }
   }

@@ -6,7 +6,6 @@ export { ChurarenWeaponDamageCause } from './model/churarenWeaponDamageCause'
 // utils
 export { isWeaponEntity } from './utils/isWeaponEntity'
 export { isWeaponDamageCause } from './utils/isWeaponDamageCause'
-export { getRandomPosition } from './utils/getRandomPosition'
 export { uniqueId } from './utils/uniqueId'
 
 // constants
