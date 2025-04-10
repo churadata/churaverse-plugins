@@ -1,10 +1,34 @@
 import { JSXFunc } from 'churaverse-engine-client'
 import style from './RuleExplanationWindowComponent.module.scss'
-import description1 from '../../../assets/description1.png'
-import description2 from '../../../assets/description2.png'
-import description3 from '../../../assets/description3.png'
+import ruleDescription from '../../../assets/rule_description.png'
 export const POPUP_GAME_START_WINDOW_BUTTON_ID = 'gameStartForm-open-button'
 export const GAME_START_BUTTON = 'game-start-button'
+
+export interface FrameInfo {
+  name: string
+  x: number
+  y: number
+  width: number
+  height: number
+}
+
+const ruleEntries = [
+  {
+    text: '制限時間内に、各プレイヤーは一度だけニョッキボタンを押します。',
+    frame: { x: 0, y: 932, width: 326, height: 132 },
+    displaySize: { width: 200, height: 80 },
+  },
+  {
+    text: '他のプレイヤーと同時にニョッキボタンを押すor時間内に押さなかった場合は、失敗となります。',
+    frame: { x: 0, y: 499, width: 500, height: 432 },
+    displaySize: { width: 200, height: 150 },
+  },
+  {
+    text: 'ニョッキ成功したプレイヤーの中で、ニョッキボタンを早く押した人から順に順位が決まります。',
+    frame: { x: 0, y: 0, width: 790, height: 498 },
+    displaySize: { width: 200, height: 110 },
+  },
+]
 
 export const RuleExplanationWindowComponent: JSXFunc = () => {
   return (
@@ -25,15 +49,27 @@ export const RuleExplanationWindowComponent: JSXFunc = () => {
       </ol>
       <p className={style.nyokkigameIntro}>🍄ニョッキゲームルール🍄</p>
       <ol>
-        <li>制限時間内に、各プレイヤーは一度だけニョッキボタンを押します。</li>
-        <img src={description1} style={{ width: '200px', height: '80px' }}></img>
-        <br />
-        <li>他のプレイヤーと同時にニョッキボタンを押すor時間内に押さなかった場合は、失敗となります。</li>
-        <img src={description2} style={{ width: '200px', height: '150px' }}></img>
-        <br />
-        <li>ニョッキ成功したプレイヤーの中で、ニョッキボタンを早く押した人から順に順位が決まります。</li>
-        <img src={description3} style={{ width: '200px', height: '110px' }}></img>
-        <br />
+        {ruleEntries.map(({ text, frame, displaySize }, idx) => {
+          const scaleX = displaySize.width / frame.width
+          const scaleY = displaySize.height / frame.height
+
+          return (
+            <li key={idx}>
+              {text}
+              <div
+                className={style.ruleDescription}
+                style={{
+                  backgroundImage: `url(${ruleDescription})`,
+                  width: `${frame.width}px`,
+                  height: `${frame.height}px`,
+                  backgroundPosition: `-${frame.x}px -${frame.y}px`,
+                  transform: `scale(${scaleX}, ${scaleY})`,
+                  transformOrigin: 'top left',
+                }}
+              />
+            </li>
+          )
+        })}
         <li>
           順位の高い順に高い倍率が付与され、「ベットコイン×倍率」がreturnします。
           <br />

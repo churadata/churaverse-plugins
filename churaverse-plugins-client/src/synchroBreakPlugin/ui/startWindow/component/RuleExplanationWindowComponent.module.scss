@@ -38,3 +38,9 @@
   font-size: 40px;
   font-family: 'Monomaniac One';
 }
+
+.ruleDescription {
+  background-repeat: no-repeat;
+  background-size: auto; // 必要なら調整
+  display: inline-block;
+}
