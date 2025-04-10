@@ -14,7 +14,6 @@ const RESULT_DISPLAY_TIME = 5 // 結果表示時間(sec)
 
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
-  private churarenPluginStore!: ChurarenPluginStore
   private socketController!: SocketController
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private readonly readyPlayers = new Set<string>()
@@ -57,7 +56,6 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   protected handleGameStart(): void {
     initChurarenPluginStore(this.store, this.bus)
     this.socketController.registerMessageListener()
-    this.churarenPluginStore = this.store.of('churarenPlugin')
     this.sequence()
       .then(() => {
         console.log('sequence done')
@@ -92,7 +90,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   }
 
   private async sequence(): Promise<void> {
-    await this.churarenPluginStore.churarenGameSequence.sequence(this.gameId)
+    await this.store.of('churarenPlugin').churarenGameSequence.sequence(this.gameId)
   }
 }
 
