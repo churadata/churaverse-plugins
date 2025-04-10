@@ -15,8 +15,9 @@ export const BET_COIN_DECREMENT_BUTTON_ID = 'bet-coin-decrement'
 /** ベットコイン送信ボタン */
 export const BET_COIN_SEND_BUTTON_ID = 'bet-coin-send-button'
 
-// ベットコインの最小値
+// ベットコインの最小値と最大値
 export const SYNCHRO_BREAK_MIN_BET_COIN: number = 0
+export const SYNCHRO_BREAK_MAX_BET_COIN: number = 999
 
 export class BetCoinFormContainer implements IGameUiComponent {
   public element!: HTMLElement
@@ -60,15 +61,12 @@ export class BetCoinFormContainer implements IGameUiComponent {
       }
     }
 
-    // ベットコインの最大値
-    const maxBetCoins = 999
-
     const plusButton = DomManager.getElementById(BET_COIN_INCREMENT_BUTTON_ID)
     plusButton.onclick = () => {
       const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
       const betCoins = this.inputFieldValue
 
-      if (betCoins >= ownPlayerCoins || betCoins >= maxBetCoins) return
+      if (betCoins >= ownPlayerCoins || betCoins >= SYNCHRO_BREAK_MAX_BET_COIN) return
       this.inputFieldValue = betCoins + 1
     }
 
@@ -91,7 +89,6 @@ export class BetCoinFormContainer implements IGameUiComponent {
 
   public open(): void {
     this.element.style.display = 'flex'
-    this.inputFieldValue = SYNCHRO_BREAK_MIN_BET_COIN
   }
 
   public close(): void {

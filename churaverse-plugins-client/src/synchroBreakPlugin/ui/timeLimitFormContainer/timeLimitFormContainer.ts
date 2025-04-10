@@ -94,7 +94,6 @@ export class TimeLimitFormContainer implements IGameUiComponent {
 
   public open(): void {
     this.element.style.display = 'flex'
-    this.inputFieldValue = SYNCHRO_BREAK_MIN_TIME_LIMIT
   }
 
   public close(): void {
