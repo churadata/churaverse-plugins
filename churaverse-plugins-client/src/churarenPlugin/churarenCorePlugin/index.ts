@@ -1,4 +1,4 @@
-export { type IChurarenCollidable } from './model/IChurarenCollidable'
+export { ChurarenEnemyDamageCause } from './model/churarenEnemyDamageCause'
 export { type ChurarenWeaponEntity } from './model/churarenWeaponEntity'
 export { ChurarenWeaponDamageCause } from './model/churarenWeaponDamageCause'
 export { isWeaponEntity } from './util/isWeaponEntity'
