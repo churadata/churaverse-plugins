@@ -30,6 +30,8 @@ const ruleEntries = [
   },
 ]
 
+const ruleDescriptionSize = { width: 790, height: 1064 }
+
 export const RuleExplanationWindowComponent: JSXFunc = () => {
   return (
     <div className={style.container} id={POPUP_GAME_START_WINDOW_BUTTON_ID}>
@@ -52,19 +54,18 @@ export const RuleExplanationWindowComponent: JSXFunc = () => {
         {ruleEntries.map(({ text, frame, displaySize }, idx) => {
           const scaleX = displaySize.width / frame.width
           const scaleY = displaySize.height / frame.height
-
           return (
             <li key={idx}>
-              {text}
+              <p>{text}</p>
               <div
                 className={style.ruleDescription}
                 style={{
                   backgroundImage: `url(${ruleDescription})`,
-                  width: `${frame.width}px`,
-                  height: `${frame.height}px`,
-                  backgroundPosition: `-${frame.x}px -${frame.y}px`,
-                  transform: `scale(${scaleX}, ${scaleY})`,
-                  transformOrigin: 'top left',
+                  width: `${displaySize.width}px`,
+                  height: `${displaySize.height}px`,
+                  backgroundSize: `${ruleDescriptionSize.width * scaleX}px ${ruleDescriptionSize.height * scaleY}px`,
+                  backgroundPosition: `-${frame.x * scaleX}px -${frame.y * scaleY}px`,
+                  backgroundRepeat: 'no-repeat',
                 }}
               />
             </li>
