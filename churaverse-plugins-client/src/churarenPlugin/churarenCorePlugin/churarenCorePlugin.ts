@@ -1,7 +1,6 @@
 import { CoreGamePlugin } from '@churaverse/game-plugin-client/domain/coreGamePlugin'
 import { CHURAREN_CONSTANTS } from './constants/churarenConstants'
 import { SocketController } from './controller/socketController'
-import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { ChurarenDialogManager } from './ui/startWindow/churarenDialogManager'
 import { UpdateChurarenUiEvent } from './event/updateChurarenUiEvent'
 import { RegisterGameUiEvent } from '@churaverse/game-plugin-client/event/registerGameUiEvent'
@@ -13,7 +12,6 @@ import { BaseGamePlugin } from '@churaverse/game-plugin-client/domain/baseGamePl
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
   protected gameName = CHURAREN_CONSTANTS.GAME_NAME
-  private playerPluginStore!: PlayerPluginStore
   private churarenDialogManager!: ChurarenDialogManager
   private socketController!: SocketController
 
@@ -49,8 +47,6 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
 
   protected init(): void {
     this.churarenDialogManager = new ChurarenDialogManager(this.store, this.bus, this.gameId)
-    this.playerPluginStore = this.store.of('playerPlugin')
-    this.gamePluginStore = this.store.of('gamePlugin')
   }
 
   protected registerGameUi(ev: RegisterGameUiEvent): void {
