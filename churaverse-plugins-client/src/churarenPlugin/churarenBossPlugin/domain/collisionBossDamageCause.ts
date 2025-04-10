@@ -1,11 +1,8 @@
 import { ChurarenEnemyDamageCause } from '@churaverse/churaren-core-plugin-client'
-import { DamageCauseType, Entity } from 'churaverse-engine-client'
+import { Entity } from 'churaverse-engine-client'
 
 export class CollisionBossDamageCause extends ChurarenEnemyDamageCause {
-  public constructor(
-    public readonly entityName: DamageCauseType,
-    public readonly entity: Entity
-  ) {
+  public constructor(public readonly entity: Entity) {
     super('boss', entity)
   }
 }

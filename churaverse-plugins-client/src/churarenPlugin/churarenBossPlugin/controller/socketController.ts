@@ -75,12 +75,12 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   private readonly collisionBossDamage = (msg: WeaponDamageMessage): void => {
     const data = msg.data
-    if (data.cause !== 'collisionBoss') return
+    if (data.cause !== 'boss') return
     const target = this.store.of('playerPlugin').players.get(data.targetId)
-    const bossEntity = this.bossPluginStore.bosses.get(data.weaponId)
-    const attacker = bossEntity?.bossId
-    if (target === undefined || bossEntity === undefined || attacker === undefined) return
-    const collisionBossDamageCause = new CollisionBossDamageCause('collisionBoss', bossEntity)
+    const boss = this.bossPluginStore.bosses.get(data.weaponId)
+    const attacker = boss?.bossId
+    if (target === undefined || boss === undefined || attacker === undefined) return
+    const collisionBossDamageCause = new CollisionBossDamageCause(boss)
     const livingDamageEvent = new LivingDamageEvent(target, collisionBossDamageCause, data.amount)
     this.eventBus.post(livingDamageEvent)
   }
