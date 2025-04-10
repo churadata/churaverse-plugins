@@ -1,6 +1,5 @@
 import { CoreGamePlugin } from '@churaverse/game-plugin-server/domain/coreGamePlugin'
 import { SocketController } from './controller/socketController'
-import { ChurarenPluginStore } from './store/defChurarenPluginStore'
 import { initChurarenPluginStore, resetChurarenPluginStore } from './store/churarenPluginStoreManager'
 import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
 import { UpdateChurarenUiEvent } from './event/updateChurarenUiEvent'
