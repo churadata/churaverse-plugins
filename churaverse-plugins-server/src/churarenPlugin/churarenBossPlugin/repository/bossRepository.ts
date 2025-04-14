@@ -22,4 +22,11 @@ export class BossRepository extends CollidableEntityRepository<Boss> implements 
   public getAllId(): string[] {
     return Array.from(this.bosses.keys())
   }
+
+  public clear(): void {
+    this.getAllId().forEach((id) => {
+      super.delete(id)
+    })
+    this.bosses.clear()
+  }
 }

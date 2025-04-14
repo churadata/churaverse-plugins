@@ -13,14 +13,19 @@ import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defN
 import { MapPluginStore } from '@churaverse/map-plugin-server/store/defMapPluginStore'
 import { Boss, CHURAREN_BOSS_SIZE, CHURAREN_BOSS_WALK_DURATION_MS } from './domain/boss'
 import { SocketController } from './controller/socketController'
-import { initBossPluginStore, resetBossPluginStore } from './store/initBossPluginStore'
+import { initBossPluginStore } from './store/initBossPluginStore'
 import { walkBoss } from './domain/bossService'
 import { BossSpawnData, BossSpawnMessage } from './message/bossSpawnMessage'
 import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
 import { BossWalkMessage } from './message/bossWalkMessage'
 import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { CollisionBossDamageCause } from './domain/collisionBossDamageCause'
-import { CHURAREN_CONSTANTS, ChurarenWeaponDamageCause, uniqueId } from '@churaverse/churaren-core-plugin-server'
+import {
+  CHURAREN_CONSTANTS,
+  ChurarenWeaponDamageCause,
+  isChurarenGameResult,
+  uniqueId,
+} from '@churaverse/churaren-core-plugin-server'
 import { WeaponDamageMessage } from '@churaverse/player-plugin-server/message/weaponDamageMessage'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
 import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
@@ -59,6 +64,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('entitySpawn', this.spawnBoss)
     this.bus.subscribeEvent('updateChurarenUi', this.sendSpawnedBoss)
     this.bus.subscribeEvent('livingDamage', this.onLivingDamage)
+    this.bus.subscribeEvent('updateChurarenUi', this.clearChurarenBoss)
   }
 
   protected unsubscribeGameEvent(): void {
@@ -67,13 +73,13 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     this.bus.unsubscribeEvent('entitySpawn', this.spawnBoss)
     this.bus.unsubscribeEvent('updateChurarenUi', this.sendSpawnedBoss)
     this.bus.unsubscribeEvent('livingDamage', this.onLivingDamage)
+    this.bus.unsubscribeEvent('updateChurarenUi', this.clearChurarenBoss)
   }
 
   protected handleGameStart(): void {}
 
   protected handleGameTermination(): void {
-    this.removeBoss()
-    resetBossPluginStore(this.store)
+    this.bossPluginStore.bosses.clear()
   }
 
   private readonly update = (ev: UpdateEvent): void => {
@@ -153,13 +159,6 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     }
   }
 
-  private removeBoss(): void {
-    const bossIds = this.bossPluginStore.bosses.getAllId()
-    for (const bossId of bossIds) {
-      this.bossPluginStore.bosses.delete(bossId)
-    }
-  }
-
   private onCollisionPlayer(boss: Boss, player: Player): void {
     if (player.isDead) return
     if (!boss.isCollidable) return
@@ -200,6 +199,14 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
       this.store.of('playerPlugin').players,
       this.onCollisionPlayer.bind(this)
     )
+  }
+
+  private readonly clearChurarenBoss = (ev: UpdateChurarenUiEvent): void => {
+    if (!isChurarenGameResult(ev.uiType)) return
+    const bossIds = this.bossPluginStore.bosses.getAllId()
+    for (const bossId of bossIds) {
+      this.bossPluginStore.bosses.delete(bossId)
+    }
   }
 
   private isBossWalkInMap(dest: Position, currentMap: WorldMap): boolean {
