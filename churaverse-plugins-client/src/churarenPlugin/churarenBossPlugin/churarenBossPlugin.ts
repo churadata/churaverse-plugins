@@ -182,5 +182,6 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
       this.removeBoss(bossId)
     })
     this.bossPluginStore.bossRenderers.clear()
+    this.bossPluginStore.bosses.clear()
   }
 }
