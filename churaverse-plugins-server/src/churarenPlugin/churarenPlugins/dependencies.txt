@@ -1,0 +1,2 @@
+@churaverse/churaren-core-plugin-server
+@churaverse/churaren-boss-plugin-server
