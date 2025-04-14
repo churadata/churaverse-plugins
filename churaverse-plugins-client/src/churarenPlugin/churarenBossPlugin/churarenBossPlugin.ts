@@ -20,7 +20,12 @@ import { Player } from '@churaverse/player-plugin-client/domain/player'
 import { BossWalkEvent } from './event/bossWalkEvent'
 import '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
 import '@churaverse/churaren-core-plugin-client/churarenCorePlugin'
-import { CHURAREN_CONSTANTS, ChurarenWeaponDamageCause } from '@churaverse/churaren-core-plugin-client'
+import {
+  CHURAREN_CONSTANTS,
+  ChurarenWeaponDamageCause,
+  isChurarenGameResult,
+} from '@churaverse/churaren-core-plugin-client'
+import { UpdateChurarenUiEvent } from '@churaverse/churaren-core-plugin-client/event/updateChurarenUiEvent'
 
 export class ChurarenBossPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -47,15 +52,16 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   public subscribeGameEvent(): void {
     super.subscribeGameEvent()
     this.bus.subscribeEvent('entitySpawn', this.spawnBoss)
-    this.bus.subscribeEvent('entityDespawn', this.removeBoss)
+    this.bus.subscribeEvent('entityDespawn', this.despawnBoss)
     this.bus.subscribeEvent('livingDamage', this.onLivingDamage)
     this.bus.subscribeEvent('bossWalk', this.moveBoss)
+    this.bus.subscribeEvent('updateChurarenUi', this.clearChurarenBoss)
   }
 
   public unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('entitySpawn', this.spawnBoss)
-    this.bus.unsubscribeEvent('entityDespawn', this.removeBoss)
+    this.bus.unsubscribeEvent('entityDespawn', this.despawnBoss)
     this.bus.unsubscribeEvent('livingDamage', this.onLivingDamage)
     this.bus.unsubscribeEvent('bossWalk', this.moveBoss)
   }
@@ -97,14 +103,10 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     renderer.spawn(boss.position)
   }
 
-  public removeBoss = (ev: EntityDespawnEvent): void => {
+  public despawnBoss = (ev: EntityDespawnEvent): void => {
     if (!(ev.entity instanceof Boss)) return
     const bossId = ev.entity.bossId
-    const bossRenderer = this.bossPluginStore.bossRenderers.get(bossId)
-    if (bossRenderer === undefined) return
-    bossRenderer.destroy()
-    this.bossPluginStore.bosses.delete(bossId)
-    this.bossPluginStore.bossRenderers.delete(bossId)
+    this.removeBoss(bossId)
   }
 
   public onLivingDamage = (ev: LivingDamageEvent): void => {
@@ -120,12 +122,20 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
       this.addDamageCauseLog(attacker, ev.cause.name, ev.amount)
     }
     if (this.isBossDead(ev.target.bossId)) {
-      this.clearChurarenBoss()
+      this.removeBoss(ev.target.bossId)
     }
   }
 
   private isBossDead(id: string): boolean {
     return this.bossPluginStore.bosses.get(id)?.isDead ?? false
+  }
+
+  private removeBoss(bossId: string): void {
+    const bossRenderer = this.bossPluginStore.bossRenderers.get(bossId)
+    if (bossRenderer === undefined) return
+    bossRenderer.destroy()
+    this.bossPluginStore.bosses.delete(bossId)
+    this.bossPluginStore.bossRenderers.delete(bossId)
   }
 
   private addDamageCauseLog(attacker: Player, cause: DamageCauseType, damage: number): void {
@@ -166,9 +176,10 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     ev.cancel()
   }
 
-  private clearChurarenBoss(): void {
-    this.bossPluginStore.bossRenderers.forEach((renderer) => {
-      renderer.destroy()
+  public clearChurarenBoss = (ev: UpdateChurarenUiEvent): void => {
+    if (!isChurarenGameResult(ev.uiType)) return
+    this.bossPluginStore.bosses.getAllId().forEach((bossId) => {
+      this.removeBoss(bossId)
     })
     this.bossPluginStore.bossRenderers.clear()
   }

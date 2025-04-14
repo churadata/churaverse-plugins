@@ -75,7 +75,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   private readonly collisionBossDamage = (msg: WeaponDamageMessage): void => {
     const data = msg.data
-    if (data.cause !== 'boss') return
+    if (data.cause !== 'collisionBoss') return
     const target = this.store.of('playerPlugin').players.get(data.targetId)
     const boss = this.bossPluginStore.bosses.get(data.weaponId)
     const attacker = boss?.bossId
