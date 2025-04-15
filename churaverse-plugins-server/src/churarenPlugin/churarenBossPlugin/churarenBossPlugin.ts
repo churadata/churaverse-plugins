@@ -184,12 +184,12 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     }
 
     if (boss.isDead) {
-      const updateChurarenUi = new UpdateChurarenUiEvent('win')
-      this.bus.post(updateChurarenUi)
-
       const bossDespawnEvent = new EntityDespawnEvent(boss)
       this.bossPluginStore.bosses.delete(boss.bossId)
       this.bus.post(bossDespawnEvent)
+
+      const updateChurarenUi = new UpdateChurarenUiEvent('win')
+      this.bus.post(updateChurarenUi)
     }
   }
 
