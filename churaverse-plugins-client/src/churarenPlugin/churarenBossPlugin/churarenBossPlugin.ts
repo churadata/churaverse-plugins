@@ -121,13 +121,6 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
       if (attacker === undefined) return
       this.addDamageCauseLog(attacker, ev.cause.name, ev.amount)
     }
-    if (this.isBossDead(ev.target.bossId)) {
-      this.removeBoss(ev.target.bossId)
-    }
-  }
-
-  private isBossDead(id: string): boolean {
-    return this.bossPluginStore.bosses.get(id)?.isDead ?? false
   }
 
   private removeBoss(bossId: string): void {

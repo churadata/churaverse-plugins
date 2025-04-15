@@ -58,9 +58,9 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   private readonly bossSpawn = (msg: BossSpawnMessage): void => {
     const data = msg.data
+    if (this.bossPluginStore.bosses.get(data.bossId) !== undefined) return
     const pos = new Position(data.startPos.x, data.startPos.y)
     const boss = new Boss(data.bossId, pos, data.spawnTime, data.bossHp)
-    if (this.bossPluginStore.bosses.get(data.bossId) !== undefined) return
     const bossSpawnEvent = new EntitySpawnEvent(boss)
     this.eventBus.post(bossSpawnEvent)
   }
