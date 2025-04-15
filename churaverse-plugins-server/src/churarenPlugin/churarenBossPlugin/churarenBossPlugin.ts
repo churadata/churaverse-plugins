@@ -32,6 +32,7 @@ import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
 import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 import { UpdateChurarenUiEvent } from '@churaverse/churaren-core-plugin-server/event/updateChurarenUiEvent'
 import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
+import { IGameInfo } from '@churaverse/game-plugin-server/interface/IGameInfo'
 
 const bossSpeedMultiplier = 2
 
@@ -40,6 +41,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   private bossPluginStore!: BossPluginStore
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private mapPluginStore!: MapPluginStore
+  private churarenGameInfo: IGameInfo | undefined
   private socketController!: SocketController
   private readonly updatePositionTime = CHURAREN_BOSS_WALK_DURATION_MS
   private readonly halfBossSize: number = CHURAREN_BOSS_SIZE / 2
@@ -61,8 +63,8 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
     this.bus.subscribeEvent('update', this.update)
-    this.bus.subscribeEvent('entitySpawn', this.spawnBoss)
-    this.bus.subscribeEvent('updateChurarenUi', this.sendSpawnedBoss)
+    this.bus.subscribeEvent('entitySpawn', this.onBossEntitySpawned)
+    this.bus.subscribeEvent('updateChurarenUi', this.generateBoss)
     this.bus.subscribeEvent('livingDamage', this.onLivingDamage)
     this.bus.subscribeEvent('updateChurarenUi', this.clearChurarenBoss)
   }
@@ -70,13 +72,15 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('update', this.update)
-    this.bus.unsubscribeEvent('entitySpawn', this.spawnBoss)
-    this.bus.unsubscribeEvent('updateChurarenUi', this.sendSpawnedBoss)
+    this.bus.unsubscribeEvent('entitySpawn', this.onBossEntitySpawned)
+    this.bus.unsubscribeEvent('updateChurarenUi', this.generateBoss)
     this.bus.unsubscribeEvent('livingDamage', this.onLivingDamage)
     this.bus.unsubscribeEvent('updateChurarenUi', this.clearChurarenBoss)
   }
 
-  protected handleGameStart(): void {}
+  protected handleGameStart(): void {
+    this.churarenGameInfo = this.store.of('gamePlugin').games.get(this.gameId)
+  }
 
   protected handleGameTermination(): void {
     this.bossPluginStore.bosses.clear()
@@ -87,16 +91,16 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   }
 
   private init(): void {
+    initBossPluginStore(this.store)
     this.networkPluginStore = this.store.of('networkPlugin')
     this.mapPluginStore = this.store.of('mapPlugin')
-    initBossPluginStore(this.store)
     this.bossPluginStore = this.store.of('bossPlugin')
   }
 
-  private readonly sendSpawnedBoss = (ev: UpdateChurarenUiEvent): void => {
-    if (ev.uiType !== 'countTimer') return
+  private readonly generateBoss = (ev: UpdateChurarenUiEvent): void => {
+    if (ev.uiType !== 'countTimer' || this.churarenGameInfo === undefined) return
     const worldMap = this.mapPluginStore.mapManager.currentMap
-    const bossHp = 100
+    const bossHp = this.churarenGameInfo?.participantIds.length * 120
     let startPos = worldMap.getRandomSpawnPoint()
 
     if (this.isBossWalkInMap(startPos, worldMap)) {
@@ -115,7 +119,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     this.bus.post(bossSpawnEvent)
   }
 
-  private readonly spawnBoss = (ev: EntitySpawnEvent): void => {
+  private readonly onBossEntitySpawned = (ev: EntitySpawnEvent): void => {
     if (!(ev.entity instanceof Boss)) return
     const boss = ev.entity
     this.bossPluginStore.bosses.set(boss.bossId, boss)
@@ -125,11 +129,11 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
         console.log('boss is dead or not found')
         return
       }
-      this.onBossWalk(boss.bossId)
+      this.updateBossPosition(boss.bossId)
     }, this.updatePositionTime)
   }
 
-  private onBossWalk(bossId: string): void {
+  private updateBossPosition(bossId: string): void {
     const boss = this.bossPluginStore.bosses.get(bossId)
     if (boss === undefined) return
 
