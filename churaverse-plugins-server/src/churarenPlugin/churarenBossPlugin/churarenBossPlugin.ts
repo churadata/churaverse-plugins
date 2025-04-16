@@ -25,6 +25,7 @@ import {
   ChurarenWeaponDamageCause,
   isChurarenGameResult,
   uniqueId,
+  UpdateChurarenUiType,
 } from '@churaverse/churaren-core-plugin-server'
 import { WeaponDamageMessage } from '@churaverse/player-plugin-server/message/weaponDamageMessage'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
@@ -45,6 +46,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   private socketController!: SocketController
   private readonly updatePositionTime = CHURAREN_BOSS_WALK_DURATION_MS
   private readonly halfBossSize: number = CHURAREN_BOSS_SIZE / 2
+  private currentUiType: UpdateChurarenUiType = 'gameOver'
 
   public listenEvent(): void {
     super.listenEvent()
@@ -66,7 +68,6 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('entitySpawn', this.onBossEntitySpawned)
     this.bus.subscribeEvent('updateChurarenUi', this.generateBoss)
     this.bus.subscribeEvent('livingDamage', this.onLivingDamage)
-    this.bus.subscribeEvent('updateChurarenUi', this.clearChurarenBoss)
   }
 
   protected unsubscribeGameEvent(): void {
@@ -75,7 +76,6 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     this.bus.unsubscribeEvent('entitySpawn', this.onBossEntitySpawned)
     this.bus.unsubscribeEvent('updateChurarenUi', this.generateBoss)
     this.bus.unsubscribeEvent('livingDamage', this.onLivingDamage)
-    this.bus.unsubscribeEvent('updateChurarenUi', this.clearChurarenBoss)
   }
 
   protected handleGameStart(): void {
@@ -98,9 +98,10 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   }
 
   private readonly generateBoss = (ev: UpdateChurarenUiEvent): void => {
-    if (ev.uiType !== 'countTimer' || this.churarenGameInfo === undefined) return
+    this.currentUiType = ev.uiType
+    if (this.currentUiType !== 'countTimer' || this.churarenGameInfo === undefined) return
     const worldMap = this.mapPluginStore.mapManager.currentMap
-    const bossHp = this.churarenGameInfo?.participantIds.length * 120
+    const bossHp = this.churarenGameInfo.participantIds.length * 120
     let startPos = worldMap.getRandomSpawnPoint()
 
     if (this.isBossWalkInMap(startPos, worldMap)) {
@@ -123,14 +124,26 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     if (!(ev.entity instanceof Boss)) return
     const boss = ev.entity
     this.bossPluginStore.bosses.set(boss.bossId, boss)
-    const intervalId = setInterval(() => {
-      if (boss.isDead || this.bossPluginStore.bosses.get(boss.bossId) === undefined) {
-        clearInterval(intervalId)
-        console.log('boss is dead or not found')
+    let expected = Date.now() + this.updatePositionTime
+    const bossWalkLoop = (): void => {
+      if (
+        this.churarenGameInfo === undefined ||
+        this.bossPluginStore.bosses.get(boss.bossId) === undefined ||
+        !this.churarenGameInfo.isActive
+      )
+        return
+      if (isChurarenGameResult(this.currentUiType)) {
+        boss.stop()
+        boss.isCollidable = false
         return
       }
       this.updateBossPosition(boss.bossId)
-    }, this.updatePositionTime)
+      const diff = Date.now() - expected
+      expected += this.updatePositionTime
+      const nextDelay = Math.max(0, this.updatePositionTime - diff)
+      setTimeout(bossWalkLoop, nextDelay)
+    }
+    setTimeout(bossWalkLoop, this.updatePositionTime)
   }
 
   private updateBossPosition(bossId: string): void {
@@ -203,14 +216,6 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
       this.store.of('playerPlugin').players,
       this.onCollisionPlayer.bind(this)
     )
-  }
-
-  private readonly clearChurarenBoss = (ev: UpdateChurarenUiEvent): void => {
-    if (!isChurarenGameResult(ev.uiType)) return
-    const bossIds = this.bossPluginStore.bosses.getAllId()
-    for (const bossId of bossIds) {
-      this.bossPluginStore.bosses.delete(bossId)
-    }
   }
 
   private isBossWalkInMap(dest: Position, currentMap: WorldMap): boolean {
