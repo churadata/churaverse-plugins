@@ -12,7 +12,7 @@ import { NyokkiTurnSelectEvent } from './event/nyokkiTurnSelectEvent'
 import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
 import { SendBetCoinResponseEvent } from './event/sendBetCoinResponseEvent'
 import { registerSynchroBreakUi } from './ui/registerSynchroBreakUi'
-import { IDescriptionWindow } from './interface/IDescriptionText'
+import { IDescriptionText } from './interface/IDescriptionText'
 import { PlayerNyokkiStatusIcon } from './ui/synchroBreakIcon/playerNyokkiStatusIcon'
 import { CoinViewer } from './ui/coinViewer/coinViewer'
 import { CoinViewerIcon } from './ui/coinViewer/coinViewerIcon'
@@ -127,11 +127,13 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     if (this.gameOwnerId === undefined) return
     const gameOwnerName = this.playerPluginStore.players.get(this.gameOwnerId)?.name ?? 'ゲームオーナー'
     const descriptionWindow = this.getDescriptionWindow()
+    descriptionWindow.setGameName(this.gameName)
+    descriptionWindow.setGameOwnerName(gameOwnerName)
     if (this.gameOwnerId === this.playerPluginStore.ownPlayerId) {
-      descriptionWindow.setGameStartForHost(this.gameName)
+      descriptionWindow.setGameStartForHost()
       this.gamePluginStore.gameUiManager.getUi(this.gameId, 'turnSelectConfirm')?.open()
     } else {
-      descriptionWindow.setGameStartForGuest(this.gameName, gameOwnerName)
+      descriptionWindow.setGameStartForGuest()
     }
   }
 
@@ -180,8 +182,6 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   private readonly nyokkiTurnSelect = (ev: NyokkiTurnSelectEvent): void => {
     if (this.isOwnPlayerMidwayParticipant) return
 
-    const gameOwnerName = this.playerPluginStore.players.get(ev.playerId)?.name ?? 'ゲームオーナー'
-
     const rankingBoard = this.getRankingBoard()
     rankingBoard.updateTurnNumber(1, ev.allTurn)
 
@@ -192,7 +192,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
       descriptionWindow.setTimeLimitSelection(ev.allTurn)
       this.gamePluginStore.gameUiManager.getUi(this.gameId, 'timeLimitConfirm')?.open()
     } else {
-      descriptionWindow.setTimeLimitWaiting(ev.allTurn, gameOwnerName)
+      descriptionWindow.setTimeLimitWaiting(ev.allTurn)
     }
   }
 
@@ -337,8 +337,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   /**
    * ゲームの説明ウィンドウを取得する
    */
-  private getDescriptionWindow(): IDescriptionWindow {
-    const descriptionWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')
+  private getDescriptionWindow(): IDescriptionText {
+    const descriptionWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionText')
     if (descriptionWindow === undefined) throw new Error('descriptionWindow is not found')
     return descriptionWindow
   }

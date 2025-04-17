@@ -1,12 +1,22 @@
 import { DomManager, domLayerSetting } from 'churaverse-engine-client'
 import { DescriptionWindowComponent } from './component/DescriptionWindowComponent'
 import '@churaverse/game-plugin-client/gameUiManager'
-import { IDescriptionWindow } from '../../interface/IDescriptionText'
+import { IDescriptionText } from '../../interface/IDescriptionText'
 
-export class DescriptionWindow implements IDescriptionWindow {
+export class DescriptionWindow implements IDescriptionText {
   public element!: HTMLElement
   public visible: boolean = false
   private descriptionText: string = ''
+  private gameName: string = 'ゲーム'
+  private gameOwnerName: string = 'ゲームオーナー'
+
+  public setGameName(name: string): void {
+    this.gameName = name
+  }
+
+  public setGameOwnerName(name: string): void {
+    this.gameOwnerName = name
+  }
 
   public initialize(): void {
     this.element = DomManager.addJsxDom(DescriptionWindowComponent({ description: this.descriptionText }))
@@ -31,23 +41,20 @@ export class DescriptionWindow implements IDescriptionWindow {
 
   /**
    * ゲーム開始時主催者サイドの文章更新処理
-   * @param gameName ゲーム名
    */
-  public setGameStartForHost(gameName: string): void {
+  public setGameStartForHost(): void {
     this.open()
     this.setDescriptionText(
-      `${gameName}を開始しました。<br>あなたはゲームの管理者です。 <br>ターン数(1~10)を選択してください。`
+      `${this.gameName}を開始しました。<br>あなたはゲームの管理者です。 <br>ターン数(1~10)を選択してください。`
     )
   }
 
   /**
    * ゲーム開始時参加者サイドの文章更新処理
-   * @param gameName ゲーム名
-   * @param gameOwnerName ゲームオーナーの名前
    */
-  public setGameStartForGuest(gameName: string, gameOwnerName: string): void {
+  public setGameStartForGuest(): void {
     this.open()
-    this.setDescriptionText(`${gameName}が開始されました！<br>${gameOwnerName}さんがターンを入力中です。`)
+    this.setDescriptionText(`${this.gameName}が開始されました！<br>${this.gameOwnerName}さんがターンを入力中です。`)
   }
 
   /**
@@ -61,10 +68,9 @@ export class DescriptionWindow implements IDescriptionWindow {
   /**
    * ターン選択後の制限時間入力待ち文章更新処理
    * @param turn 選択されたターン数
-   * @param gameOwnerName ゲームオーナーの名前
    */
-  public setTimeLimitWaiting(turn: number, gameOwnerName: string): void {
-    this.setDescriptionText(`${turn}ターン選択しました。<br>${gameOwnerName}さんが制限時間を入力中です。`)
+  public setTimeLimitWaiting(turn: number): void {
+    this.setDescriptionText(`${turn}ターン選択しました。<br>${this.gameOwnerName}さんが制限時間を入力中です。`)
   }
 
   /**
@@ -104,7 +110,7 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param timeLimit シンクロブレイクの制限時間
    */
   public setSynchroBreakStart(timeLimit: number): void {
-    this.setDescriptionText(`シンクロブレイク開始！！！<br>残り${timeLimit}秒以内にボタンを押してください！`)
+    this.setDescriptionText(`${this.gameName}開始！！！<br>残り${timeLimit}秒以内にボタンを押してください！`)
   }
 
   /**
@@ -112,7 +118,7 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param countdown シンクロブレイク終了までのカウントダウン
    */
   public setSynchroBreakInProgress(countdown: number, playerName?: string, nyokkiSuccessMessage?: string): void {
-    const descriptionText = ['現在シンクロブレイク進行中', `残り${countdown}秒以内にボタンを押してください！`]
+    const descriptionText = [`現在${this.gameName}進行中`, `残り${countdown}秒以内にボタンを押してください！`]
     if (playerName !== undefined && nyokkiSuccessMessage !== undefined) {
       descriptionText.splice(1, 0, nyokkiSuccessMessage)
     }
@@ -124,7 +130,7 @@ export class DescriptionWindow implements IDescriptionWindow {
    * シンクロブレイク終了の文章更新処理
    */
   public setSynchroBreakEnd(): void {
-    this.setDescriptionText('シンクロブレイク終了！！！')
+    this.setDescriptionText(`${this.gameName}終了！！！`)
   }
 
   /**
