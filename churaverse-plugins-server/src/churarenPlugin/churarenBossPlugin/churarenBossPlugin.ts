@@ -140,10 +140,10 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
       this.updateBossPosition(boss.bossId)
       const diff = Date.now() - expected
       expected += this.updatePositionTime
-      const nextDelay = Math.max(0, this.updatePositionTime - diff)
+      const nextDelay = Math.min(this.updatePositionTime, Math.max(0, this.updatePositionTime - diff))
       setTimeout(bossWalkLoop, nextDelay)
     }
-    setTimeout(bossWalkLoop, this.updatePositionTime)
+    bossWalkLoop()
   }
 
   private updateBossPosition(bossId: string): void {
