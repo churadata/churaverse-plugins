@@ -7,7 +7,7 @@ import { UpdateChurarenUiType } from '../types/uiTypes'
 
 const TIME_OUT = 30 // プレイヤーの準備確認のタイムアウト時間(秒)
 const COUNTDOWN_TIME = 3 // カウントダウン時間(秒)
-export const TIME_LIMIT = 3 * 60 // 制限時間(分)
+export const TIME_LIMIT = 1 * 60 // 制限時間(分)
 
 export class ChurarenGameSequence implements IChurarenGameSequence {
   private readonly gamePluginStore: GamePluginStore
@@ -41,13 +41,16 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
         if (!this.isActive) return
         if (readyPlayerSize === churarenParticipants) {
           resolve()
+          console.log('All players are ready')
         } else if (timeOut <= 0) {
           resolve()
+          console.log('Timeout waiting for players to be ready')
+        } else {
+          setTimeout(() => {
+            timeOut -= 1
+            checkReady()
+          }, 1000)
         }
-        setTimeout(() => {
-          timeOut -= 1
-          checkReady()
-        }, 1000)
       }
       checkReady()
     })
