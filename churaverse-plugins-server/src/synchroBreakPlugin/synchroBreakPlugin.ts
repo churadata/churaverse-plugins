@@ -174,15 +174,15 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     const sameTimePlayersSize = this.sameTimePlayers.length
     const sameTimePlayersId = this.sameTimePlayers
 
-    // trueならばsuccess, falseならばnyokki
-    const nyokkiStatus = sameTimePlayersSize !== 1
+    // isSuccessがtrueならば成功, falseならば失敗
+    const isSuccess = sameTimePlayersSize === 1
     this.sameTimePlayers.forEach((playerId) => {
-      this.synchroBreakPluginStore.nyokkiCollection.makeNyokki(playerId, nyokkiStatus)
+      this.synchroBreakPluginStore.nyokkiCollection.makeNyokki(playerId, isSuccess)
     })
 
     const nyokkiLogText = this.synchroBreakPluginStore.nyokkiLogTextCreate.nyokkiLogTextCreate(
       sameTimePlayersId,
-      nyokkiStatus
+      isSuccess
     )
 
     const playerOrders = this.synchroBreakPluginStore.nyokkiCollection.playerOrders()
@@ -192,7 +192,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     const order = playerOrders.indexOf(this.sameTimePlayers[0]) + 1
     const nyokkiActionMessage = new NyokkiActionResponseMessage({
       sameTimePlayersId,
-      nyokkiStatus,
+      isSuccess,
       nyokkiLogText,
       order,
     })
