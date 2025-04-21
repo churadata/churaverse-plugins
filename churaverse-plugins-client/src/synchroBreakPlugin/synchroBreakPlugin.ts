@@ -153,14 +153,14 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    */
   protected handleGameTermination(): void {
     this.unsubscribeGameEvent()
-    resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
     this.synchroBreakDialogManager.setGameStartButtonText()
 
-    this.removeBetCoinUi()
-    this.resetPlayerNyokkiIcon()
-
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.close()
+    if (!this.isOwnPlayerMidwayParticipant) {
+      resetSynchroBreakPluginStore(this.store)
+      this.removeBetCoinUi()
+      this.resetPlayerNyokkiIcon()
+    }
   }
 
   /**
