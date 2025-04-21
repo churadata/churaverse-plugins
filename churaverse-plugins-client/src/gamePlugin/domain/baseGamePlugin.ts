@@ -146,13 +146,13 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   private terminateGame(gamePluginStore: GamePluginStore): void {
     this._isActive = false
     this._gameOwnerId = undefined
+    this.handleGameTermination()
     this.clearParticipantIds()
     if (!this.isOwnPlayerMidwayParticipant) {
       gamePluginStore.gameUiManager.removeAllUis(this.gameId)
     } else {
       this._isOwnPlayerMidwayParticipant = false
     }
-    this.handleGameTermination()
   }
 
   /**
