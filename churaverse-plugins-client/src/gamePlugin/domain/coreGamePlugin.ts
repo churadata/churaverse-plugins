@@ -2,6 +2,7 @@ import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { GameStartEvent } from '../event/gameStartEvent'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
+import { UpdateGameParticipantEvent } from '../event/updateGameParticipantEvent'
 import { GameIds } from '../interface/gameIds'
 import { IGameInfo } from '../interface/IGameInfo'
 import { GamePluginStore } from '../store/defGamePluginStore'
@@ -46,12 +47,14 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     super.subscribeGameEvent()
     this.bus.subscribeEvent('gameAbort', this.gameAbort)
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
+    this.bus.subscribeEvent('updateGameParticipant', this.updateGameParticipant)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
+    this.bus.unsubscribeEvent('updateGameParticipant', this.updateGameParticipant)
   }
 
   public getStores(): void {
@@ -95,4 +98,19 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._isOwnPlayerMidwayParticipant = false
     this.gameInfoStore.games.delete(this.gameId)
   }
+
+  /**
+   * ゲーム参加者のidリストを受け取り、ゲーム参加者リストを更新する
+   */
+  private readonly updateGameParticipant = (ev: UpdateGameParticipantEvent): void => {
+    if (ev.gameId !== this.gameId) return
+    this._participantIds = ev.participantIds
+    this.handleGameParticipant()
+  }
+
+  /**
+   * ゲーム参加者が更新された際の処理を実装するための抽象メソッド
+   * 各ゲームプラグインでオーバーライドし、具体的なロジックを定義する
+   */
+  protected abstract handleGameParticipant(): void
 }

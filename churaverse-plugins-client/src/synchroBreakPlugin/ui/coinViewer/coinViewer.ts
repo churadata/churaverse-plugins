@@ -53,6 +53,9 @@ export class CoinViewer {
         .image(xOffset, 35, NUMBER_NAME)
         .setFrame(Number(digit))
         .setDisplaySize(numberIconPosX, numberIconPosY)
+        .setAlpha(1)
+        .setDepth(0)
+
       this.coinUi.push(coinImage)
       this.playerRenderer.addToPlayerContainer(coinImage)
     }
