@@ -38,13 +38,13 @@ export class TimeLimitFormContainer implements IGameUiComponent {
     this.element.addEventListener('click', () => {
       makeLayerHigherTemporary(this.element, 'lower')
     })
-    this.setUpInputFields()
+    this.setupInputFields()
   }
 
   /**
    * 制限時間入力部分を設定する
    */
-  private setUpInputFields(): void {
+  private setupInputFields(): void {
     this.timeLimitInputField = DomManager.getElementById<HTMLInputElement>(TIME_LIMIT_INPUT_FIELD_ID)
 
     const sendButton = DomManager.getElementById(TIME_LIMIT_SEND_BUTTON_ID)

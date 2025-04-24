@@ -34,13 +34,13 @@ export class TurnSelectFormContainer implements IGameUiComponent {
       makeLayerHigherTemporary(this.element, 'lower')
     })
 
-    this.setUpInputFields(this.store.of('playerPlugin').ownPlayerId)
+    this.setupInputFields(this.store.of('playerPlugin').ownPlayerId)
   }
 
   /**
    * ターン数選択フォームの入力部分を設定する
    */
-  private setUpInputFields(playerId: string): void {
+  private setupInputFields(playerId: string): void {
     this.turnSelectInputField = DomManager.getElementById<HTMLInputElement>(TURN_SELECT_FIELD_ID)
 
     const sendButton = DomManager.getElementById(TURN_SELECT_SEND_BUTTON_ID)

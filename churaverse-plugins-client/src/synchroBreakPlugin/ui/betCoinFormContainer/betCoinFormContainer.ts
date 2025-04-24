@@ -26,13 +26,13 @@ export class BetCoinFormContainer implements IGameUiComponent {
   public initialize(): void {
     this.setBetCoinFormContainer()
     const ownPlayerId = this.store.of('playerPlugin').ownPlayerId
-    this.setUpInputFields(ownPlayerId)
+    this.setupInputFields(ownPlayerId)
   }
 
   /**
    * ベットコインの入力部分を設定する
    */
-  private setUpInputFields(ownPlayerId: string): void {
+  private setupInputFields(ownPlayerId: string): void {
     this.betCoinInputField = DomManager.getElementById<HTMLInputElement>(BET_COIN_INPUT_FIELD_ID)
 
     const sendButton = DomManager.getElementById(BET_COIN_SEND_BUTTON_ID)
