@@ -17,9 +17,16 @@ export const BET_COIN_SEND_BUTTON_ID = 'bet-coin-send-button'
 
 export class BetCoinFormContainer implements IGameUiComponent {
   public element!: HTMLElement
+  public readonly visible: boolean = false
   private betCoinInputField!: HTMLInputElement
 
-  public readonly visible: boolean = false
+  private get inputFieldValue(): number {
+    return Number(this.betCoinInputField.value)
+  }
+
+  private set inputFieldValue(value: number) {
+    this.betCoinInputField.value = value.toString()
+  }
 
   public constructor(private readonly store: Store<IMainScene>) {}
 
@@ -37,12 +44,11 @@ export class BetCoinFormContainer implements IGameUiComponent {
 
     const sendButton = DomManager.getElementById(BET_COIN_SEND_BUTTON_ID)
     sendButton.onclick = () => {
-      if (this.betCoinInputField.value !== '') {
-        const betCoins = Number(this.betCoinInputField.value)
-        this.store.of('networkPlugin').messageSender.send(new SendBetCoinMessage({ playerId: ownPlayerId, betCoins }))
-        this.betCoinInputField.value = ''
-        this.close()
-      }
+      this.store
+        .of('networkPlugin')
+        .messageSender.send(new SendBetCoinMessage({ playerId: ownPlayerId, betCoins: this.inputFieldValue }))
+      this.inputFieldValue = 0
+      this.close()
     }
 
     // ベットコインの最大値
@@ -52,20 +58,15 @@ export class BetCoinFormContainer implements IGameUiComponent {
     plusButton.onclick = () => {
       const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
 
-      if (Number(this.betCoinInputField.value) >= ownPlayerCoins || Number(this.betCoinInputField.value) >= maxBetCoins)
-        return
+      if (this.inputFieldValue >= ownPlayerCoins || this.inputFieldValue >= maxBetCoins) return
 
-      const value: number = Number(this.betCoinInputField.value)
-      const incrementedNum: string = (value + 1).toString()
-      this.betCoinInputField.value = incrementedNum
+      this.inputFieldValue++
     }
 
     const minusButton = DomManager.getElementById(BET_COIN_DECREMENT_BUTTON_ID)
     minusButton.onclick = () => {
-      if (Number(this.betCoinInputField.value) <= 0) return
-      const value: number = Number(this.betCoinInputField.value)
-      const decrementedNum: string = (value - 1).toString()
-      this.betCoinInputField.value = decrementedNum
+      if (this.inputFieldValue <= 0) return
+      this.inputFieldValue--
     }
   }
 
@@ -80,7 +81,7 @@ export class BetCoinFormContainer implements IGameUiComponent {
 
   public open(): void {
     this.element.style.display = 'flex'
-    this.betCoinInputField.value = '0'
+    this.inputFieldValue = 0
   }
 
   public close(): void {

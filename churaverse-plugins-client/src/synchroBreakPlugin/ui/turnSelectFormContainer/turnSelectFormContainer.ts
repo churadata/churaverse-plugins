@@ -22,6 +22,14 @@ export class TurnSelectFormContainer implements IGameUiComponent {
   private turnSelectInputField!: HTMLInputElement
   private readonly networkPluginStore!: NetworkPluginStore<IMainScene>
 
+  private get inputFieldValue(): number {
+    return Number(this.turnSelectInputField.value)
+  }
+
+  private set inputFieldValue(value: number) {
+    this.turnSelectInputField.value = value.toString()
+  }
+
   public constructor(public readonly store: Store<IMainScene>) {
     this.networkPluginStore = this.store.of('networkPlugin')
   }
@@ -45,34 +53,28 @@ export class TurnSelectFormContainer implements IGameUiComponent {
 
     const sendButton = DomManager.getElementById(TURN_SELECT_SEND_BUTTON_ID)
     sendButton.onclick = () => {
-      if (this.turnSelectInputField.value !== '') {
-        const turnNumber = Number(this.turnSelectInputField.value)
-        this.networkPluginStore.messageSender.send(new NyokkiTurnSelectMessage({ playerId, allTurn: turnNumber }))
-
-        this.turnSelectInputField.value = ''
-        this.close()
-      }
+      this.networkPluginStore.messageSender.send(
+        new NyokkiTurnSelectMessage({ playerId, allTurn: this.inputFieldValue })
+      )
+      this.inputFieldValue = 0
+      this.close()
     }
 
     const plusButton = DomManager.getElementById(TURN_SELECT_INCREASE_BUTTON_ID)
     plusButton.onclick = () => {
-      const value: number = Number(this.turnSelectInputField.value)
-      if (value >= 10) return
-      const incrementedNum: string = (value + 1).toString()
-      this.turnSelectInputField.value = incrementedNum
+      if (this.inputFieldValue >= 10) return
+      this.inputFieldValue++
     }
 
     const minusButton = DomManager.getElementById(TURN_SELECT_DECREASE_BUTTON_ID)
     minusButton.onclick = () => {
-      if (Number(this.turnSelectInputField.value) <= 1) return
-      const value: number = Number(this.turnSelectInputField.value)
-      const decrementedNum: string = (value - 1).toString()
-      this.turnSelectInputField.value = decrementedNum
+      if (Number(this.inputFieldValue) <= 1) return
+      this.inputFieldValue--
     }
   }
 
   public open(): void {
-    this.turnSelectInputField.value = '1'
+    this.inputFieldValue = 0
     this.element.style.display = 'flex'
   }
 
