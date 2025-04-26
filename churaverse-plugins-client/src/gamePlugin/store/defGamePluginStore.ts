@@ -1,6 +1,6 @@
 import { IGameUiManager } from '../interface/IGameUiManager'
 import { IGameLogRenderer } from '../interface/IGameLogRenderer'
-import { IGameInfoRepository } from '../interface/IGameInfoRepository'
+import { GameInfoRepository } from '../repository/gameInfoRepository'
 
 declare module 'churaverse-engine-client' {
   export interface StoreInMain {
@@ -15,5 +15,5 @@ export interface GamePluginStore {
 }
 
 export interface GameInfoStore {
-  readonly games: IGameInfoRepository
+  readonly games: GameInfoRepository
 }

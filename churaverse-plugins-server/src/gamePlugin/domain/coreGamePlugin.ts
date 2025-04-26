@@ -1,5 +1,6 @@
 import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 import '@churaverse/network-plugin-server/store/defNetworkPluginStore'
+import { EntityDespawnEvent } from 'churaverse-engine-server'
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { GameStartEvent } from '../event/gameStartEvent'
@@ -12,6 +13,7 @@ import { ResponseGameStartMessage } from '../message/gameStartMessage'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
 import { UpdateGameParticipantMessage } from '../message/updateGameParticipantMessage'
 import { BaseGamePlugin } from './baseGamePlugin'
+import { Player } from '@churaverse/player-plugin-server/domain/player'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -44,12 +46,14 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     super.subscribeGameEvent()
     this.bus.subscribeEvent('gameAbort', this.gameAbort)
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
+    this.bus.subscribeEvent('entityDespawn', this.playerLeave)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
+    this.bus.unsubscribeEvent('entityDespawn', this.playerLeave)
   }
 
   private priorGameData(ev: PriorGameDataEvent): void {
@@ -95,5 +99,19 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._gameOwnerId = undefined
     this._participantIds = []
     this.gamePluginStore.games.delete(this.gameId)
+  }
+
+  private readonly playerLeave = (ev: EntityDespawnEvent): void => {
+    if (!(ev.entity instanceof Player)) return
+
+    const index = this._participantIds.indexOf(ev.entity.id)
+    if (index !== -1) {
+      this._participantIds.splice(index, 1)
+      this.store
+        .of('networkPlugin')
+        .messageSender.send(
+          new UpdateGameParticipantMessage({ gameId: this.gameId, participantIds: [...this._participantIds] })
+        )
+    }
   }
 }
