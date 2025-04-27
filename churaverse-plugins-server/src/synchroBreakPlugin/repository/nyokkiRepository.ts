@@ -1,10 +1,10 @@
 import { Nyokki } from '../model/nyokki'
-import { INyokkiCollection } from '../interface/INyokkiCollection'
+import { INyokkiRepository } from '../interface/INyokkiRepository'
 
 /**
- * nyokkiCollectionで各プレイヤーのnyokkiの状態を保存する
+ * nyokkiRepositoryで各プレイヤーのnyokkiの状態を保存する
  */
-export class NyokkiCollection implements INyokkiCollection {
+export class NyokkiRepository implements INyokkiRepository {
   public readonly userNyokkiMap: Map<string, Nyokki>
 
   public constructor() {
