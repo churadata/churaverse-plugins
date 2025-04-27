@@ -15,6 +15,10 @@ export const BET_COIN_DECREMENT_BUTTON_ID = 'bet-coin-decrement'
 /** ベットコイン送信ボタン */
 export const BET_COIN_SEND_BUTTON_ID = 'bet-coin-send-button'
 
+// ベットコインの最大値と最小値
+export const SYNCHRO_BREAK_MAX_BET_COIN: number = 999
+export const SYNCHRO_BREAK_MIN_BET_COIN: number = 0
+
 export class BetCoinFormContainer implements IGameUiComponent {
   public element!: HTMLElement
   public readonly visible: boolean = false
@@ -44,28 +48,33 @@ export class BetCoinFormContainer implements IGameUiComponent {
 
     const sendButton = DomManager.getElementById(BET_COIN_SEND_BUTTON_ID)
     sendButton.onclick = () => {
-      this.store
-        .of('networkPlugin')
-        .messageSender.send(new SendBetCoinMessage({ playerId: ownPlayerId, betCoins: this.inputFieldValue }))
-      this.inputFieldValue = 0
-      this.close()
+      const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
+      if (
+        this.inputFieldValue >= SYNCHRO_BREAK_MIN_BET_COIN &&
+        this.inputFieldValue <= SYNCHRO_BREAK_MAX_BET_COIN &&
+        this.inputFieldValue <= ownPlayerCoins
+      ) {
+        this.store
+          .of('networkPlugin')
+          .messageSender.send(new SendBetCoinMessage({ playerId: ownPlayerId, betCoins: this.inputFieldValue }))
+        this.close()
+      } else {
+        this.inputFieldValue = SYNCHRO_BREAK_MIN_BET_COIN
+      }
     }
-
-    // ベットコインの最大値
-    const maxBetCoins = 999
 
     const plusButton = DomManager.getElementById(BET_COIN_INCREMENT_BUTTON_ID)
     plusButton.onclick = () => {
       const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
-
-      if (this.inputFieldValue >= ownPlayerCoins || this.inputFieldValue >= maxBetCoins) return
+      
+      if (this.inputFieldValue >= ownPlayerCoins || this.inputFieldValue >= SYNCHRO_BREAK_MAX_BET_COIN) return
 
       this.inputFieldValue++
     }
 
     const minusButton = DomManager.getElementById(BET_COIN_DECREMENT_BUTTON_ID)
     minusButton.onclick = () => {
-      if (this.inputFieldValue <= 0) return
+      if (this.inputFieldValue <= SYNCHRO_BREAK_MIN_BET_COIN) return
       this.inputFieldValue--
     }
   }
@@ -81,7 +90,7 @@ export class BetCoinFormContainer implements IGameUiComponent {
 
   public open(): void {
     this.element.style.display = 'flex'
-    this.inputFieldValue = 0
+    this.inputFieldValue = SYNCHRO_BREAK_MIN_BET_COIN
   }
 
   public close(): void {

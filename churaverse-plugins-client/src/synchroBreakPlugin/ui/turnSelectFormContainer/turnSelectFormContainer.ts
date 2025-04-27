@@ -16,6 +16,10 @@ export const TURN_SELECT_DECREASE_BUTTON_ID = 'turn-select-decrease'
 /** turn数送信ボタン */
 export const TURN_SELECT_SEND_BUTTON_ID = 'turn-select-send'
 
+// turn数の最大値と最小値
+export const SYNCHRO_BREAK_MAX_TURN = 10
+export const SYNCHRO_BREAK_MIN_TURN = 1
+
 export class TurnSelectFormContainer implements IGameUiComponent {
   public element!: HTMLElement
   public readonly visible = false
@@ -56,25 +60,25 @@ export class TurnSelectFormContainer implements IGameUiComponent {
       this.networkPluginStore.messageSender.send(
         new NyokkiTurnSelectMessage({ playerId, allTurn: this.inputFieldValue })
       )
-      this.inputFieldValue = 0
+      this.inputFieldValue = SYNCHRO_BREAK_MIN_TURN
       this.close()
     }
 
     const plusButton = DomManager.getElementById(TURN_SELECT_INCREASE_BUTTON_ID)
     plusButton.onclick = () => {
-      if (this.inputFieldValue >= 10) return
+      if (this.inputFieldValue >= SYNCHRO_BREAK_MAX_TURN) return
       this.inputFieldValue++
     }
 
     const minusButton = DomManager.getElementById(TURN_SELECT_DECREASE_BUTTON_ID)
     minusButton.onclick = () => {
-      if (Number(this.inputFieldValue) <= 1) return
+      if (this.inputFieldValue <= SYNCHRO_BREAK_MIN_TURN) return
       this.inputFieldValue--
     }
   }
 
   public open(): void {
-    this.inputFieldValue = 0
+    this.inputFieldValue = SYNCHRO_BREAK_MIN_TURN
     this.element.style.display = 'flex'
   }
 
