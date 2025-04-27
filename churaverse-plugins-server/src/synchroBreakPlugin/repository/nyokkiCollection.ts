@@ -44,11 +44,12 @@ export class NyokkiCollection implements INyokkiCollection {
     return Array.from(this.userNyokkiMap.keys())
   }
 
+  /**
+   * ニョッキに成功したプレイヤーIDを、ニョッキした順に返す
+   */
   public playerOrders(): string[] {
     const nyokkiArray = Array.from(this.userNyokkiMap.values())
     nyokkiArray.sort((a, b) => a.nyokkiTime - b.nyokkiTime)
-    const playerOrders = nyokkiArray.map((nyokki) => nyokki.playerId)
-
-    return playerOrders
+    return nyokkiArray.filter((nyokki) => nyokki.getNyokkiStatus === 'success').map((nyokki) => nyokki.playerId)
   }
 }

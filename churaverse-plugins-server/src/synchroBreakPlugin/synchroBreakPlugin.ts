@@ -8,7 +8,7 @@ import { NyokkiTurnSelectEvent } from './event/nyokkiTurnSelectEvent'
 import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
 import { SendBetCoinEvent } from './event/sendBetCoinEvent'
 import { NyokkiEvent } from './event/nyokkiEvent'
-import { Nyokki, NyokkiStatus } from './model/nyokki'
+import { Nyokki } from './model/nyokki'
 import { NyokkiActionResponseMessage } from './message/nyokkiActionResponseMessage'
 import { NyokkiGameTurnEnd } from './event/nyokkiGameTurnEnd'
 import { NyokkiTurnEndMessage } from './message/nyokkiTurnEndMessage'
@@ -259,21 +259,13 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const player: Nyokki | undefined = this.synchroBreakPluginStore.nyokkiCollection.get(playerId)
     if (player === undefined) return currentCoins
 
-    const playerStatus: NyokkiStatus = player.getNyokkiStatus
     const betCoins = this.synchroBreakPluginStore.betCoinRepository.get(playerId)
     const totalPlayerNum = this.participantIds.length
     const playerOrder: string[] = this.synchroBreakPluginStore.nyokkiCollection.playerOrders()
     if (betCoins === undefined) throw new Error('betCoins is undefined')
-    // playerStatusが'success'の場合にのみpayoutの増加分の値を返す。それ以外はpayoutを0とする
-    const payout = this.synchroBreakPluginStore.betCoinRepository.calculateMultiplier(
-      betCoins,
-      totalPlayerNum,
-      playerOrder.indexOf(playerId)
-    )
-
-    const gain = playerStatus === 'success' ? payout : 0
-    const calculatedCoins = gain + currentCoins
-    return calculatedCoins
+    const orderIndex = playerOrder.indexOf(playerId)
+    // ニョッキしていればコイン計算、していなければそのまま
+    return orderIndex !== -1 ? currentCoins + betCoins * (totalPlayerNum - orderIndex) : currentCoins
   }
 }
 
