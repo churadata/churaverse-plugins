@@ -13,7 +13,7 @@ const numberIconPosX = 11
 const numberIconPosY = 12
 
 export class CoinViewer {
-  private betUi!: Phaser.GameObjects.Image
+  private betUi?: Phaser.GameObjects.Image
   private coinUi: Phaser.GameObjects.Image[] = []
 
   public constructor(

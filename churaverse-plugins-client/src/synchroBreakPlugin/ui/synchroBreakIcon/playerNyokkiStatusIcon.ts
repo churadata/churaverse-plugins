@@ -13,15 +13,11 @@ const rankPaths = [RANK1, RANK2, RANK3]
 const RANK_ORDER_NAME = 'rank_order_number'
 
 export class PlayerNyokkiStatusIcon {
-  private successIconActive!: Phaser.GameObjects.Image
-  private successRankFrame!: Phaser.GameObjects.Image
-  private nyokkiIconActive!: Phaser.GameObjects.Image
+  private readonly successIconActive: Phaser.GameObjects.Image
+  private readonly successRankFrame: Phaser.GameObjects.Image
+  private readonly nyokkiIconActive: Phaser.GameObjects.Image
 
   public constructor(scene: Scene, playerRenderer: IPlayerRenderer) {
-    this.init(scene, playerRenderer)
-  }
-
-  private init(scene: Scene, playerRenderer: IPlayerRenderer): void {
     const iconPosX = 0
     const iconPosY = -88
     const iconSizeX = 35
@@ -47,6 +43,10 @@ export class PlayerNyokkiStatusIcon {
       .setAlpha(0)
       .setDepth(3)
 
+    this.init(playerRenderer)
+  }
+
+  private init(playerRenderer: IPlayerRenderer): void {
     playerRenderer.addToPlayerFrontContainer(this.successRankFrame)
     playerRenderer.addToPlayerFrontContainer(this.successIconActive)
     playerRenderer.addToPlayerFrontContainer(this.nyokkiIconActive)
