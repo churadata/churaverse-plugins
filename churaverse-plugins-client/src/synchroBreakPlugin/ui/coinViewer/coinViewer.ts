@@ -2,10 +2,10 @@ import { Scene } from 'phaser'
 import { IPlayerRenderer } from '@churaverse/player-plugin-client/domain/IPlayerRenderer'
 
 import BET_ICON_PATH from '../../assets/betCoin/bet.png'
-import NUMBER_PATH from '../../assets/betCoin/bet_coin_number.png'
+import BET_COIN_NUMBER_PATH from '../../assets/betCoin/bet_coin_number.png'
 
-const BET_ICON_NAME = 'bet_icon'
-const NUMBER_NAME = 'bet_coin_number_icon'
+const TEXTURE_BET_ICON = 'bet_icon'
+const TEXTURE_BET_COIN_NUMBER = 'bet_coin_number_icon'
 
 const betUiPosX = 80
 const betUiPosY = 25
@@ -32,7 +32,11 @@ export class CoinViewer {
    * プレイヤーのベットコインを表示する
    */
   public setBetCoins(betCoins: number): void {
-    this.betUi = this.scene.add.image(0, 35, BET_ICON_NAME).setDisplaySize(betUiPosX, betUiPosY).setAlpha(1).setDepth(0)
+    this.betUi = this.scene.add
+      .image(0, 35, TEXTURE_BET_ICON)
+      .setDisplaySize(betUiPosX, betUiPosY)
+      .setAlpha(1)
+      .setDepth(0)
 
     this.playerRenderer.addToPlayerContainer(this.betUi)
 
@@ -50,7 +54,7 @@ export class CoinViewer {
       const xOffset = Math.round(startX + (numberIconPosX + 2) * i)
 
       const coinImage = this.scene.add
-        .image(xOffset, 35, NUMBER_NAME)
+        .image(xOffset, 35, TEXTURE_BET_COIN_NUMBER)
         .setFrame(Number(digit))
         .setDisplaySize(numberIconPosX, numberIconPosY)
         .setAlpha(1)
@@ -72,8 +76,8 @@ export class CoinViewer {
    * ベットコインの画像を読み込む
    */
   public static loadAssets(scene: Scene): void {
-    scene.load.image(BET_ICON_NAME, BET_ICON_PATH)
-    scene.load.spritesheet(NUMBER_NAME, NUMBER_PATH, {
+    scene.load.image(TEXTURE_BET_ICON, BET_ICON_PATH)
+    scene.load.spritesheet(TEXTURE_BET_COIN_NUMBER, BET_COIN_NUMBER_PATH, {
       frameWidth: 9,
       frameHeight: 12,
     })
