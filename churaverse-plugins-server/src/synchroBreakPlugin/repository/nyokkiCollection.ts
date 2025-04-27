@@ -25,7 +25,7 @@ export class NyokkiCollection implements INyokkiCollection {
     return this.userNyokkiMap.get(playerId)
   }
 
-  public makeNyokki(playerId: string, isSuccess: boolean): void {
+  public addNyokki(playerId: string, isSuccess: boolean): void {
     const nyokki = this.userNyokkiMap.get(playerId)
     if (nyokki === undefined) return
 

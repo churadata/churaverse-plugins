@@ -175,7 +175,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     // isSuccessがtrueならば成功, falseならば失敗
     const isSuccess = sameTimePlayersSize === 1
     this.sameTimePlayers.forEach((playerId) => {
-      this.synchroBreakPluginStore.nyokkiCollection.makeNyokki(playerId, isSuccess)
+      this.synchroBreakPluginStore.nyokkiCollection.addNyokki(playerId, isSuccess)
     })
 
     const nyokkiLogText = this.synchroBreakPluginStore.nyokkiLogTextCreate.nyokkiLogTextCreate(
@@ -264,7 +264,8 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const playerOrder: string[] = this.synchroBreakPluginStore.nyokkiCollection.playerOrders()
     if (betCoins === undefined) throw new Error('betCoins is undefined')
     const orderIndex = playerOrder.indexOf(playerId)
-    // ニョッキしていればコイン計算、していなければそのまま
+
+    // ニョッキに成功した場合はコインの増加量を計算し、失敗した場合は現在のコイン数をそのまま返す
     return orderIndex !== -1 ? currentCoins + betCoins * (totalPlayerNum - orderIndex) : currentCoins
   }
 }
