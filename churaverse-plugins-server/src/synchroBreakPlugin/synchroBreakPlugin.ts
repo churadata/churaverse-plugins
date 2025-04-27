@@ -121,26 +121,19 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.synchroBreakPluginStore.playersCoinRepository.set(playerId, currentCoins)
     this.networkPluginStore.messageSender.send(new SendBetCoinResponseMessage({ playerId, betCoins, currentCoins }))
 
-    this.checkAndStartGameIfAllBet().catch((error) => {
-      console.error('ゲーム開始確認処理でエラーが発生しました:', error)
-    })
+    this.checkAndStartGameIfAllBet()
   }
 
   /**
    * 全プレイヤーがベットしているか確認し、全プレイヤーがベットしている場合にゲームを開始する
    */
-  private async checkAndStartGameIfAllBet(): Promise<void> {
+  private checkAndStartGameIfAllBet(): void {
     const betCoinPlayerNumber = this.synchroBreakPluginStore.betCoinRepository.getBetCoinPlayerCount()
     const totalPlayerNum = this.participantIds.length
     if (betCoinPlayerNumber >= totalPlayerNum) {
-      this.synchroBreakPluginStore.game
-        .processTurnSequence()
-        .then(() => {
-          console.log(
-            '===== ===== ===== ===== ===== ===== ===== ===== ===== ===== finishSequence ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== '
-          )
-        })
-        .catch(() => {})
+      this.synchroBreakPluginStore.game.processTurnSequence().catch((error) => {
+        console.error('ゲーム開始確認処理でエラーが発生しました:', error)
+      })
     }
   }
 
@@ -149,8 +142,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   private readonly nyokkiAction = (ev: NyokkiEvent): void => {
     const playerId = ev.playerId
-    const now = Date.now()
-    const nyokki = new Nyokki(playerId, now)
+    const nyokki = new Nyokki(playerId, Date.now())
     this.synchroBreakPluginStore.nyokkiRepository.set(playerId, nyokki)
 
     const sameTimePlayerNum = this.sameTimePlayers.length
@@ -169,11 +161,10 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * ニョッキアクションの結果を返す
    */
   private nyokkiActionResponse(): void {
-    const sameTimePlayersSize = this.sameTimePlayers.length
     const sameTimePlayersId = this.sameTimePlayers
 
     // isSuccessがtrueならば成功, falseならば失敗
-    const isSuccess = sameTimePlayersSize === 1
+    const isSuccess = this.sameTimePlayers.length === 1
     this.sameTimePlayers.forEach((playerId) => {
       this.synchroBreakPluginStore.nyokkiRepository.addNyokki(playerId, isSuccess)
     })
