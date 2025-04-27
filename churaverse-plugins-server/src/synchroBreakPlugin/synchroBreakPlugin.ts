@@ -118,7 +118,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     if (coins === undefined) throw new Error('coins is undefined')
 
     const currentCoins = coins - betCoins
-    this.synchroBreakPluginStore.playersCoinRepository.change(playerId, currentCoins)
+    this.synchroBreakPluginStore.playersCoinRepository.set(playerId, currentCoins)
     this.networkPluginStore.messageSender.send(new SendBetCoinResponseMessage({ playerId, betCoins, currentCoins }))
 
     this.checkAndStartGameIfAllBet().catch((error) => {
@@ -245,7 +245,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   private calculateResultPlayersCoin(): void {
     this.participantIds.forEach((playerId) => {
       const calculatedCoins = this.calculateCoins(playerId)
-      this.synchroBreakPluginStore.playersCoinRepository.change(playerId, calculatedCoins)
+      this.synchroBreakPluginStore.playersCoinRepository.set(playerId, calculatedCoins)
     })
   }
 
