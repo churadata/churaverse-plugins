@@ -9,7 +9,7 @@ import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defN
 import { isChurarenGameResult } from './types/uiTypes'
 import { IMainScene } from 'churaverse-engine-server'
 
-const RESULT_DISPLAY_TIME = 5 // 結果表示時間(sec)
+const RESULT_DISPLAY_TIME_SECONDS = 5 // 結果表示時間(sec)
 
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -80,7 +80,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
     if (isChurarenGameResult(uiType)) {
       setTimeout(() => {
         this.bus.post(new GameEndEvent(this.gameId))
-      }, RESULT_DISPLAY_TIME * 1000)
+      }, RESULT_DISPLAY_TIME_SECONDS * 1000)
     }
   }
 
