@@ -12,8 +12,8 @@ import { BaseGamePlugin } from '@churaverse/game-plugin-client/domain/baseGamePl
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
   protected gameName = CHURAREN_CONSTANTS.GAME_NAME
-  private churarenDialogManager!: ChurarenDialogManager
-  private socketController!: SocketController
+  private churarenDialogManager?: ChurarenDialogManager
+  private socketController?: SocketController
 
   public listenEvent(): void {
     super.listenEvent()
@@ -57,16 +57,16 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    * ゲームが開始された時の処理
    */
   protected handleGameStart(): void {
-    this.socketController.registerMessageListener()
-    this.churarenDialogManager.setGameAbortButtonText()
+    this.socketController?.registerMessageListener()
+    this.churarenDialogManager?.setGameAbortButtonText()
   }
 
   /**
    * 中断・終了時に実行される処理
    */
   protected handleGameTermination(): void {
-    this.socketController.unregisterMessageListener()
-    this.churarenDialogManager.setGameStartButtonText()
+    this.socketController?.unregisterMessageListener()
+    this.churarenDialogManager?.setGameStartButtonText()
   }
 
   /**
@@ -74,8 +74,8 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    */
   protected handleMidwayParticipant(): void {
     this.subscribeGameEvent()
-    this.socketController.registerMessageListener()
-    this.churarenDialogManager.setGameAbortButtonText()
+    this.socketController?.registerMessageListener()
+    this.churarenDialogManager?.setGameAbortButtonText()
   }
 
   private readonly updateChurarenUi = (ev: UpdateChurarenUiEvent): void => {
