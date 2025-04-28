@@ -3,12 +3,12 @@ import { TimerContainerComponent } from './component/TimerContainerComponent'
 import { ITimerContainer } from '../../interface/IChurarenUiComponent'
 
 export const GAME_COUNTDOWN_TIMER_ID = 'churaren-game-countdown-timer'
-export const COUNTDOWN_TIME_SECONDS = 3 * 60 // 制限時間(分)
+export const COUNTDOWN_TIME_MINUTES = 3 * 60 // 制限時間(分)
 
 export class TimerContainer implements ITimerContainer {
   public element!: HTMLElement
   public visible: boolean = false
-  public time: number = COUNTDOWN_TIME_SECONDS
+  public time: number = COUNTDOWN_TIME_MINUTES
   private animationFrameId: number | null = null
 
   public initialize(): void {
