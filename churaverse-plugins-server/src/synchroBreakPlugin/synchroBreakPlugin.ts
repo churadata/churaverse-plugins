@@ -25,6 +25,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   private socketController!: SocketController
   private sameTimePlayers: string[] = []
   private readonly nyokkiDurationTime = 100
+  private readonly initialPlayerCoins = 100
 
   public listenEvent(): void {
     super.listenEvent()
@@ -77,7 +78,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
     this.synchroBreakPluginStore.game.getSynchroBreakPluginStore(this.synchroBreakPluginStore)
     for (const playerId of this.participantIds) {
-      this.synchroBreakPluginStore.playersCoinRepository.set(playerId, 100)
+      this.synchroBreakPluginStore.playersCoinRepository.set(playerId, this.initialPlayerCoins)
     }
 
     const sortedPlayersCoin = this.synchroBreakPluginStore.playersCoinRepository.sortedPlayerCoins()
@@ -175,8 +176,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     )
 
     const playerOrders = this.synchroBreakPluginStore.nyokkiRepository.playerOrders()
-
-    console.log('playerOrders:', playerOrders) // 同時処理のプレイヤーのデバック用
 
     const order = playerOrders.indexOf(this.sameTimePlayers[0]) + 1
     const nyokkiActionMessage = new NyokkiActionResponseMessage({
