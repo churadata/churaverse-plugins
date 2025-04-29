@@ -2,7 +2,7 @@ import { Store, IEventBus, IMainScene } from 'churaverse-engine-server'
 import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 import { SynchroBreakPluginStore } from './defSynchroBreakPluginStore'
 import { Game } from '../logic/game'
-import { NyokkiCollection } from '../repository/nyokkiCollection'
+import { NyokkiRepository } from '../repository/nyokkiRepository'
 import { BetCoinRepository } from '../repository/betCoinRepository'
 import { PlayersCoinRepository } from '../repository/playersCoinRepository'
 import { NyokkiLogTextCreate } from '../logic/nyokkiLogTextCreate'
@@ -13,7 +13,7 @@ import { NyokkiLogTextCreate } from '../logic/nyokkiLogTextCreate'
 export function initSynchroBreakPluginStore(eventBus: IEventBus<IMainScene>, store: Store<IMainScene>): void {
   const synchroBreakPluginStore: SynchroBreakPluginStore = {
     game: new Game(eventBus, store),
-    nyokkiCollection: new NyokkiCollection(),
+    nyokkiRepository: new NyokkiRepository(),
     playersCoinRepository: new PlayersCoinRepository(),
     betCoinRepository: new BetCoinRepository(),
     timeLimit: undefined,

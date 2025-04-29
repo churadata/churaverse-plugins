@@ -105,7 +105,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.eventBus.post(
       new NyokkiActionResponseEvent(
         msg.data.sameTimePlayersId,
-        msg.data.nyokkiStatus,
+        msg.data.isSuccess,
         msg.data.nyokkiLogText,
         msg.data.order
       )

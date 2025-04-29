@@ -2,80 +2,62 @@ import { Scene } from 'phaser'
 import { IPlayerRenderer } from '@churaverse/player-plugin-client/domain/IPlayerRenderer'
 import { NyokkiStatus } from '../../type/nyokkiStatus'
 
-import RANK_FRAME from '../../assets/nyokkiOrderIcons/rankFrame.png'
-import MISS from '../../assets/nyokkiOrderIcons/miss.png'
-import RANK1 from '../../assets/nyokkiOrderIcons/rank1.png'
-import RANK2 from '../../assets/nyokkiOrderIcons/rank2.png'
-import RANK3 from '../../assets/nyokkiOrderIcons/rank3.png'
-import NUMBER_DIN0 from '../../assets/nyokkiOrderIcons/number_din0.png'
-import NUMBER_DIN1 from '../../assets/nyokkiOrderIcons/number_din1.png'
-import NUMBER_DIN2 from '../../assets/nyokkiOrderIcons/number_din2.png'
-import NUMBER_DIN3 from '../../assets/nyokkiOrderIcons/number_din3.png'
-import NUMBER_DIN4 from '../../assets/nyokkiOrderIcons/number_din4.png'
-import NUMBER_DIN5 from '../../assets/nyokkiOrderIcons/number_din5.png'
-import NUMBER_DIN6 from '../../assets/nyokkiOrderIcons/number_din6.png'
-import NUMBER_DIN7 from '../../assets/nyokkiOrderIcons/number_din7.png'
-import NUMBER_DIN8 from '../../assets/nyokkiOrderIcons/number_din8.png'
-import NUMBER_DIN9 from '../../assets/nyokkiOrderIcons/number_din9.png'
+import RANK_FRAME_PATH from '../../assets/nyokkiOrderIcons/rankFrame.png'
+import MISS_PATH from '../../assets/nyokkiOrderIcons/miss.png'
+import RANK1_PATH from '../../assets/nyokkiOrderIcons/rank1.png'
+import RANK2_PATH from '../../assets/nyokkiOrderIcons/rank2.png'
+import RANK3_PATH from '../../assets/nyokkiOrderIcons/rank3.png'
+import RANK_NUMBER_PATH from '../../assets/nyokkiOrderIcons/rank_number.png'
 
-const numberPaths = [
-  NUMBER_DIN0,
-  NUMBER_DIN1,
-  NUMBER_DIN2,
-  NUMBER_DIN3,
-  NUMBER_DIN4,
-  NUMBER_DIN5,
-  NUMBER_DIN6,
-  NUMBER_DIN7,
-  NUMBER_DIN8,
-  NUMBER_DIN9,
-]
-
-const rankPaths = [RANK1, RANK2, RANK3]
+const rankPaths = [RANK1_PATH, RANK2_PATH, RANK3_PATH]
+const TEXTURE_RANK_FRAME = 'rank_frame'
+const TEXTURE_SUCCESS = 'success'
+const TEXTURE_MISS = 'miss'
+const TEXTURE_RANK_NUMBER = 'rank_number'
 
 export class PlayerNyokkiStatusIcon {
-  private successIconActive!: Phaser.GameObjects.Image
-  private successRankFrame!: Phaser.GameObjects.Image
-  private nyokkiIconActive!: Phaser.GameObjects.Image
+  private readonly successIconActive: Phaser.GameObjects.Image
+  private readonly successRankFrame: Phaser.GameObjects.Image
+  private readonly nyokkiIconActive: Phaser.GameObjects.Image
 
   public constructor(scene: Scene, playerRenderer: IPlayerRenderer) {
-    this.init(scene, playerRenderer)
-  }
-
-  private init(scene: Scene, playerRenderer: IPlayerRenderer): void {
     const iconPosX = 0
-    const iconPosY = -85
-    const iconSizeX = 19
-    const iconSizeY = 19
-    const missSizeX = 42
-    const missSizeY = 28
+    const iconPosY = -88
+    const iconSizeX = 35
+    const iconSizeY = 35
+    const missSizeX = 50
+    const missSizeY = 30
 
     this.successRankFrame = scene.add
-      .image(iconPosX, iconPosY, 'rankFrame')
+      .image(iconPosX, iconPosY, TEXTURE_RANK_FRAME)
       .setDisplaySize(iconSizeX, iconSizeY)
       .setAlpha(0)
       .setDepth(1) // 背景の深度を1に設定
 
     this.successIconActive = scene.add
-      .image(iconPosX, iconPosY, 'number_din1')
+      .image(iconPosX, iconPosY, TEXTURE_SUCCESS)
       .setDisplaySize(iconSizeX, iconSizeY)
       .setAlpha(0)
       .setDepth(2) // 順位画像の深度を2に設定
 
     this.nyokkiIconActive = scene.add
-      .image(iconPosX, iconPosY, 'miss')
+      .image(iconPosX, iconPosY, TEXTURE_MISS)
       .setDisplaySize(missSizeX, missSizeY)
       .setAlpha(0)
-      .setDepth(3)
+      .setDepth(3) // 順位画像の深度を3に設定
 
+    this.init(playerRenderer)
+  }
+
+  private init(playerRenderer: IPlayerRenderer): void {
     playerRenderer.addToPlayerFrontContainer(this.successRankFrame)
     playerRenderer.addToPlayerFrontContainer(this.successIconActive)
     playerRenderer.addToPlayerFrontContainer(this.nyokkiIconActive)
   }
 
   public static loadAssets(scene: Scene): void {
-    scene.load.image('rankFrame', RANK_FRAME)
-    scene.load.image('miss', MISS)
+    scene.load.image(TEXTURE_RANK_FRAME, RANK_FRAME_PATH)
+    scene.load.image(TEXTURE_MISS, MISS_PATH)
 
     for (let order = 1; order <= 3; order++) {
       const rankKey = `rank${order}`
@@ -83,11 +65,10 @@ export class PlayerNyokkiStatusIcon {
       scene.load.image(rankKey, rankPath)
     }
 
-    for (let order = 0; order <= 9; order++) {
-      const numberKey = `number_din${order}`
-      const numberPath = numberPaths[order]
-      scene.load.image(numberKey, numberPath)
-    }
+    scene.load.spritesheet(TEXTURE_RANK_NUMBER, RANK_NUMBER_PATH, {
+      frameWidth: 16,
+      frameHeight: 24,
+    })
   }
 
   /**
@@ -114,7 +95,7 @@ export class PlayerNyokkiStatusIcon {
    * ニョッキ失敗アイコンを表示
    */
   private displayMissIcon(): void {
-    this.nyokkiIconActive.setTexture('miss')
+    this.nyokkiIconActive.setTexture(TEXTURE_MISS)
     this.nyokkiIconActive.setAlpha(1)
   }
 
@@ -122,15 +103,21 @@ export class PlayerNyokkiStatusIcon {
    * nyokki成功のアイコンを表示
    */
   private displaySuccessIcon(order: number): void {
-    // 順位に応じたアイコンを選択
-    const iconKey = order <= 3 ? `rank${order}` : `number_din${order}`
-    this.successIconActive.setTexture(iconKey)
-    this.successIconActive.setAlpha(1)
+    // 1位~3位は専用アイコンを表示
+    if (order <= 3) {
+      const iconKey = `rank${order}`
+      this.successIconActive.setTexture(iconKey)
+      this.successIconActive.setAlpha(1)
+    }
 
-    // 4位以下は枠も表示
+    // 4位~9位は枠と数字を表示
     if (order >= 4 && order < 10) {
-      this.successRankFrame.setTexture('rankFrame')
+      this.successRankFrame.setTexture(TEXTURE_RANK_FRAME)
       this.successRankFrame.setAlpha(1)
+
+      this.successIconActive.setTexture(TEXTURE_RANK_NUMBER)
+      this.successIconActive.setFrame(order)
+      this.successIconActive.setAlpha(1)
     }
   }
 

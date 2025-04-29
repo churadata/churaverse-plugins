@@ -4,5 +4,4 @@ export interface IBetCoinRepository {
   delete: (playerId: string) => void
   clear: () => void
   getBetCoinPlayerCount: () => number
-  calculateMultiplier: (betCoins: number, totalPlayerNum: number, playerOrder: number) => number
 }

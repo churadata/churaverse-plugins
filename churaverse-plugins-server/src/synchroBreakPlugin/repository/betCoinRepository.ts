@@ -28,18 +28,4 @@ export class BetCoinRepository implements IBetCoinRepository {
   public getBetCoinPlayerCount(): number {
     return this.playerBetCoins.size
   }
-
-  /**
-   * ニョッキ成功時のコイン増加量を計算する
-   * @param betCoins ベットしたコイン数
-   * @param totalPlayerNum 全プレイヤー数
-   * @param playerOrder ニョッキしたプレイヤーの順位
-   */
-  public calculateMultiplier(betCoins: number, totalPlayerNum: number, playerOrder: number): number {
-    // playerOrderが-1ということはnyokkiしていないことを意味するため、増加分はなし
-    if (playerOrder === -1) return 0
-
-    const calculatedCoinsNumber = betCoins * (totalPlayerNum - playerOrder)
-    return calculatedCoinsNumber
-  }
 }

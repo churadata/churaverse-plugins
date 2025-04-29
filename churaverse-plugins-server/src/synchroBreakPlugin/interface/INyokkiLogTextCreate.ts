@@ -1,3 +1,3 @@
 export interface INyokkiLogTextCreate {
-  nyokkiLogTextCreate: (playerIds: string[], nyokkiStatus: boolean) => string
+  nyokkiLogTextCreate: (playerIds: string[], isSuccess: boolean) => string
 }
