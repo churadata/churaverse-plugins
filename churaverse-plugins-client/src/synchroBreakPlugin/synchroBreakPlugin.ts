@@ -155,8 +155,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
 
     this.removeBetCoinUi()
     this.resetPlayerNyokkiIcon()
-
-    this.gamePluginStore.gameUiManager.removeAllUis(this.gameId)
   }
 
   /**
