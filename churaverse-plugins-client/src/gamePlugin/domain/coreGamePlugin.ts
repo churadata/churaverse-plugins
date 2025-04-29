@@ -96,6 +96,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._gameOwnerId = undefined
     this._participantIds = []
     this._isOwnPlayerMidwayParticipant = false
+    this.gamePluginStore.gameUiManager.removeAllUis(this.gameId)
     this.gameInfoStore.games.delete(this.gameId)
   }
 
