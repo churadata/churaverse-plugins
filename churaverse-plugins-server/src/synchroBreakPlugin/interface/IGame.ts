@@ -1,6 +1,4 @@
-import { SynchroBreakPluginStore } from '../store/defSynchroBreakPluginStore'
-
 export interface IGame {
+  getPluginStores: () => void
   processTurnSequence: () => Promise<void>
-  getSynchroBreakPluginStore: (synchroBreakPluginStore: SynchroBreakPluginStore) => void
 }

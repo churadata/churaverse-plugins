@@ -73,10 +73,10 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * シンクロブレイク特有の開始時に実行される処理
    */
   protected handleGameStart(): void {
-    initSynchroBreakPluginStore(this.bus, this.store)
+    initSynchroBreakPluginStore(this.gameId, this.bus, this.store)
     this.socketController.registerMessageListener()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
-    this.synchroBreakPluginStore.game.getSynchroBreakPluginStore(this.synchroBreakPluginStore)
+    this.synchroBreakPluginStore.game.getPluginStores()
     for (const playerId of this.participantIds) {
       this.synchroBreakPluginStore.playersCoinRepository.set(playerId, this.initialPlayerCoins)
     }
