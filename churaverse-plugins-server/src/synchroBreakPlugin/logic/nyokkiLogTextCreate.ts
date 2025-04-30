@@ -31,11 +31,11 @@ const nyokkiOutLogEnding = [
 export class NyokkiLogTextCreate implements INyokkiLogTextCreate {
   public constructor(private readonly players: IPlayerRepository) {}
 
-  public nyokkiLogTextCreate(playerIds: string[], nyokkiStatus: boolean): string {
-    if (nyokkiStatus) {
-      return this.nyokkiOutLog(playerIds)
-    } else {
+  public nyokkiLogTextCreate(playerIds: string[], isSuccess: boolean): string {
+    if (isSuccess) {
       return this.nyokkiSafeLog(playerIds)
+    } else {
+      return this.nyokkiOutLog(playerIds)
     }
   }
 

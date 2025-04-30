@@ -4,6 +4,7 @@ import {
   BET_COIN_INCREMENT_BUTTON_ID,
   BET_COIN_INPUT_FIELD_ID,
   BET_COIN_SEND_BUTTON_ID,
+  SYNCHRO_BREAK_MIN_BET_COIN,
 } from '../betCoinFormContainer'
 import style from './BetCoinForm.module.scss'
 
@@ -12,7 +13,14 @@ export const BetCoinForm: JSXFunc = () => {
     <div className={style.betCoinFormContainer}>
       <p>ベットコイン</p>
       <button className={style.decrementButton} id={BET_COIN_DECREMENT_BUTTON_ID} />
-      <input type="text" className={style.betCoinInput} value="0" id={BET_COIN_INPUT_FIELD_ID} disabled />
+      <input
+        type="number"
+        className={style.betCoinInput}
+        defaultValue={SYNCHRO_BREAK_MIN_BET_COIN}
+        min={SYNCHRO_BREAK_MIN_BET_COIN}
+        id={BET_COIN_INPUT_FIELD_ID}
+        readOnly
+      />
       <button className={style.incrementButton} id={BET_COIN_INCREMENT_BUTTON_ID} />
       <button className={style.sendButton} id={BET_COIN_SEND_BUTTON_ID}>
         OK
