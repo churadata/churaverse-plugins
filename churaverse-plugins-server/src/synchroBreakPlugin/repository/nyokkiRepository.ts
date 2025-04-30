@@ -1,10 +1,10 @@
 import { Nyokki } from '../model/nyokki'
-import { INyokkiCollection } from '../interface/INyokkiCollection'
+import { INyokkiRepository } from '../interface/INyokkiRepository'
 
 /**
- * nyokkiCollectionで各プレイヤーのnyokkiの状態を保存する
+ * nyokkiRepositoryで各プレイヤーのnyokkiの状態を保存する
  */
-export class NyokkiCollection implements INyokkiCollection {
+export class NyokkiRepository implements INyokkiRepository {
   public readonly userNyokkiMap: Map<string, Nyokki>
 
   public constructor() {
@@ -25,11 +25,11 @@ export class NyokkiCollection implements INyokkiCollection {
     return this.userNyokkiMap.get(playerId)
   }
 
-  public makeNyokki(playerId: string, isNyokki: boolean): void {
+  public addNyokki(playerId: string, isSuccess: boolean): void {
     const nyokki = this.userNyokkiMap.get(playerId)
     if (nyokki === undefined) return
 
-    nyokki.nyokki(isNyokki)
+    nyokki.setNyokkiStatus(isSuccess)
     this.set(playerId, nyokki)
   }
 
@@ -44,11 +44,12 @@ export class NyokkiCollection implements INyokkiCollection {
     return Array.from(this.userNyokkiMap.keys())
   }
 
+  /**
+   * ニョッキに成功したプレイヤーIDを、ニョッキした順に返す
+   */
   public playerOrders(): string[] {
     const nyokkiArray = Array.from(this.userNyokkiMap.values())
     nyokkiArray.sort((a, b) => a.nyokkiTime - b.nyokkiTime)
-    const playerOrders = nyokkiArray.map((nyokki) => nyokki.playerId)
-
-    return playerOrders
+    return nyokkiArray.filter((nyokki) => nyokki.getNyokkiStatus === 'success').map((nyokki) => nyokki.playerId)
   }
 }

@@ -4,8 +4,8 @@ import {
   TURN_SELECT_INCREASE_BUTTON_ID,
   TURN_SELECT_DECREASE_BUTTON_ID,
   TURN_SELECT_SEND_BUTTON_ID,
-  SYNCHRO_BREAK_MIN_TURN_SELECT,
-  SYNCHRO_BREAK_MAX_TURN_SELECT,
+  SYNCHRO_BREAK_MAX_TURN,
+  SYNCHRO_BREAK_MIN_TURN,
 } from '../turnSelectFormContainer'
 import style from './SelectTurnForm.module.scss'
 
@@ -17,9 +17,9 @@ export const SelectTurnForm: JSXFunc = () => {
       <input
         type="number"
         className={style.turnSelectInput}
-        defaultValue={SYNCHRO_BREAK_MIN_TURN_SELECT}
-        min={SYNCHRO_BREAK_MIN_TURN_SELECT}
-        max={SYNCHRO_BREAK_MAX_TURN_SELECT}
+        defaultValue={SYNCHRO_BREAK_MIN_TURN}
+        min={SYNCHRO_BREAK_MIN_TURN}
+        max={SYNCHRO_BREAK_MAX_TURN}
         step={1}
         id={TURN_SELECT_FIELD_ID}
       ></input>

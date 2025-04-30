@@ -1,7 +1,6 @@
-import { IMainScene, EntityDespawnEvent } from 'churaverse-engine-server'
+import { IMainScene } from 'churaverse-engine-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
-import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
-import { Player } from '@churaverse/player-plugin-server/domain/player'
+import { CoreGamePlugin } from '@churaverse/game-plugin-server/domain/coreGamePlugin'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
 import { SocketController } from './controller/socketController'
@@ -9,7 +8,7 @@ import { NyokkiTurnSelectEvent } from './event/nyokkiTurnSelectEvent'
 import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
 import { SendBetCoinEvent } from './event/sendBetCoinEvent'
 import { NyokkiEvent } from './event/nyokkiEvent'
-import { Nyokki, NyokkiStatus } from './model/nyokki'
+import { Nyokki } from './model/nyokki'
 import { NyokkiActionResponseMessage } from './message/nyokkiActionResponseMessage'
 import { NyokkiGameTurnEnd } from './event/nyokkiGameTurnEnd'
 import { NyokkiTurnEndMessage } from './message/nyokkiTurnEndMessage'
@@ -18,14 +17,15 @@ import { SendBetCoinResponseMessage } from './message/sendBetCoinResponseMessage
 import { NyokkiGameTurnStartEvent } from './event/nyokkiGameTurnStartEvent'
 import { NyokkiTurnStartMessage } from './message/nyokkiTurnStartMessage'
 
-export class SynchroBreakPlugin extends BaseGamePlugin {
-  protected readonly gameId = 'synchroBreak'
+export class SynchroBreakPlugin extends CoreGamePlugin {
+  public readonly gameId = 'synchroBreak'
 
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private synchroBreakPluginStore!: SynchroBreakPluginStore
   private socketController!: SocketController
   private sameTimePlayers: string[] = []
   private readonly nyokkiDurationTime = 100
+  private readonly initialPlayerCoins = 100
 
   public listenEvent(): void {
     super.listenEvent()
@@ -44,7 +44,6 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    */
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
-    this.bus.subscribeEvent('entityDespawn', this.onPlayerLeave)
     this.bus.subscribeEvent('nyokkiTurnSelect', this.nyokkiTurnSelect)
     this.bus.subscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
     this.bus.subscribeEvent('sendBetCoin', this.sendBetCoin)
@@ -58,7 +57,6 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    */
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
-    this.bus.unsubscribeEvent('entityDespawn', this.onPlayerLeave)
     this.bus.unsubscribeEvent('nyokkiTurnSelect', this.nyokkiTurnSelect)
     this.bus.unsubscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
     this.bus.unsubscribeEvent('sendBetCoin', this.sendBetCoin)
@@ -75,13 +73,12 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    * シンクロブレイク特有の開始時に実行される処理
    */
   protected handleGameStart(): void {
-    this.subscribeGameEvent()
     initSynchroBreakPluginStore(this.bus, this.store)
     this.socketController.registerMessageListener()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
     this.synchroBreakPluginStore.game.getSynchroBreakPluginStore(this.synchroBreakPluginStore)
     for (const playerId of this.participantIds) {
-      this.synchroBreakPluginStore.playersCoinRepository.set(playerId, 100)
+      this.synchroBreakPluginStore.playersCoinRepository.set(playerId, this.initialPlayerCoins)
     }
 
     const sortedPlayersCoin = this.synchroBreakPluginStore.playersCoinRepository.sortedPlayerCoins()
@@ -92,27 +89,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    * シンクロブレイク特有の中断・終了時に実行される処理
    */
   protected handleGameTermination(): void {
-    this.unsubscribeGameEvent()
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
-  }
-
-  /**
-   * プレイヤーがゲームプレイ中に退出した際の処理
-   */
-  private readonly onPlayerLeave = (ev: EntityDespawnEvent): void => {
-    if (!(ev.entity instanceof Player)) return
-    const playerId: string = ev.entity.id
-    this.removePlayersRepository(playerId)
-  }
-
-  /**
-   * シンクロブレイクのゲームに参加しているプレイヤー情報を削除する
-   */
-  private removePlayersRepository(playerId: string): void {
-    this.synchroBreakPluginStore.playersCoinRepository.delete(playerId)
-    this.synchroBreakPluginStore.betCoinRepository.delete(playerId)
-    this.synchroBreakPluginStore.nyokkiCollection.delete(playerId)
   }
 
   /**
@@ -141,29 +119,22 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     if (coins === undefined) throw new Error('coins is undefined')
 
     const currentCoins = coins - betCoins
-    this.synchroBreakPluginStore.playersCoinRepository.change(playerId, currentCoins)
+    this.synchroBreakPluginStore.playersCoinRepository.set(playerId, currentCoins)
     this.networkPluginStore.messageSender.send(new SendBetCoinResponseMessage({ playerId, betCoins, currentCoins }))
 
-    this.checkAndStartGameIfAllBet().catch((error) => {
-      console.error('ゲーム開始確認処理でエラーが発生しました:', error)
-    })
+    this.checkAndStartGameIfAllBet()
   }
 
   /**
    * 全プレイヤーがベットしているか確認し、全プレイヤーがベットしている場合にゲームを開始する
    */
-  private async checkAndStartGameIfAllBet(): Promise<void> {
+  private checkAndStartGameIfAllBet(): void {
     const betCoinPlayerNumber = this.synchroBreakPluginStore.betCoinRepository.getBetCoinPlayerCount()
     const totalPlayerNum = this.participantIds.length
     if (betCoinPlayerNumber >= totalPlayerNum) {
-      this.synchroBreakPluginStore.game
-        .processTurnSequence()
-        .then(() => {
-          console.log(
-            '===== ===== ===== ===== ===== ===== ===== ===== ===== ===== finishSequence ===== ===== ===== ===== ===== ===== ===== ===== ===== ===== '
-          )
-        })
-        .catch(() => {})
+      this.synchroBreakPluginStore.game.processTurnSequence().catch((error) => {
+        console.error('ゲーム開始確認処理でエラーが発生しました:', error)
+      })
     }
   }
 
@@ -172,9 +143,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    */
   private readonly nyokkiAction = (ev: NyokkiEvent): void => {
     const playerId = ev.playerId
-    const now = Date.now()
-    const nyokki = new Nyokki(playerId, now)
-    this.synchroBreakPluginStore.nyokkiCollection.set(playerId, nyokki)
+    const nyokki = new Nyokki(playerId, Date.now())
+    this.synchroBreakPluginStore.nyokkiRepository.set(playerId, nyokki)
 
     const sameTimePlayerNum = this.sameTimePlayers.length
     if (sameTimePlayerNum === 0) {
@@ -192,28 +162,25 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    * ニョッキアクションの結果を返す
    */
   private nyokkiActionResponse(): void {
-    const sameTimePlayersSize = this.sameTimePlayers.length
     const sameTimePlayersId = this.sameTimePlayers
 
-    // trueならばsuccess, falseならばnyokki
-    const nyokkiStatus = sameTimePlayersSize !== 1
+    // isSuccessがtrueならば成功, falseならば失敗
+    const isSuccess = this.sameTimePlayers.length === 1
     this.sameTimePlayers.forEach((playerId) => {
-      this.synchroBreakPluginStore.nyokkiCollection.makeNyokki(playerId, nyokkiStatus)
+      this.synchroBreakPluginStore.nyokkiRepository.addNyokki(playerId, isSuccess)
     })
 
     const nyokkiLogText = this.synchroBreakPluginStore.nyokkiLogTextCreate.nyokkiLogTextCreate(
       sameTimePlayersId,
-      nyokkiStatus
+      isSuccess
     )
 
-    const playerOrders = this.synchroBreakPluginStore.nyokkiCollection.playerOrders()
-
-    console.log('playerOrders:', playerOrders) // 同時処理のプレイヤーのデバック用
+    const playerOrders = this.synchroBreakPluginStore.nyokkiRepository.playerOrders()
 
     const order = playerOrders.indexOf(this.sameTimePlayers[0]) + 1
     const nyokkiActionMessage = new NyokkiActionResponseMessage({
       sameTimePlayersId,
-      nyokkiStatus,
+      isSuccess,
       nyokkiLogText,
       order,
     })
@@ -237,10 +204,10 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    * ターンが終了した際の処理
    */
   private readonly nyokkiGameTurnEnd = (ev: NyokkiGameTurnEnd): void => {
-    const nyokkiCollection: string[] = this.synchroBreakPluginStore.nyokkiCollection.getAllPlayerId()
+    const nyokkiRepository: string[] = this.synchroBreakPluginStore.nyokkiRepository.getAllPlayerId()
 
     // ニョッキしていないプレイヤーIdを取得
-    const noNyokkiPlayerIds = this.participantIds.filter((playerId) => !nyokkiCollection.includes(playerId))
+    const noNyokkiPlayerIds = this.participantIds.filter((playerId) => !nyokkiRepository.includes(playerId))
     const nyokkiTurnSelect = this.synchroBreakPluginStore.turnSelect
 
     if (nyokkiTurnSelect === undefined) throw new Error('nyokkiTurnSelect is undefined')
@@ -251,14 +218,14 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
 
     this.calculateResultPlayersCoin()
 
-    this.resetTurnCollection()
+    this.resetTurnRepository()
   }
 
   /**
    * ニョッキコレクションとベットコインレポジトリをリセットする
    */
-  private resetTurnCollection(): void {
-    this.synchroBreakPluginStore.nyokkiCollection.clear()
+  private resetTurnRepository(): void {
+    this.synchroBreakPluginStore.nyokkiRepository.clear()
     this.synchroBreakPluginStore.betCoinRepository.clear()
   }
 
@@ -268,7 +235,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   private calculateResultPlayersCoin(): void {
     this.participantIds.forEach((playerId) => {
       const calculatedCoins = this.calculateCoins(playerId)
-      this.synchroBreakPluginStore.playersCoinRepository.change(playerId, calculatedCoins)
+      this.synchroBreakPluginStore.playersCoinRepository.set(playerId, calculatedCoins)
     })
   }
 
@@ -279,24 +246,17 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     const currentCoins = this.synchroBreakPluginStore.playersCoinRepository.get(playerId)
     if (currentCoins === undefined) throw new Error('currentCoins is undefined')
 
-    const player: Nyokki | undefined = this.synchroBreakPluginStore.nyokkiCollection.get(playerId)
+    const player: Nyokki | undefined = this.synchroBreakPluginStore.nyokkiRepository.get(playerId)
     if (player === undefined) return currentCoins
 
-    const playerStatus: NyokkiStatus = player.getNyokkiStatus
     const betCoins = this.synchroBreakPluginStore.betCoinRepository.get(playerId)
     const totalPlayerNum = this.participantIds.length
-    const playerOrder: string[] = this.synchroBreakPluginStore.nyokkiCollection.playerOrders()
+    const playerOrder: string[] = this.synchroBreakPluginStore.nyokkiRepository.playerOrders()
     if (betCoins === undefined) throw new Error('betCoins is undefined')
-    // playerStatusが'success'の場合にのみpayoutの増加分の値を返す。それ以外はpayoutを0とする
-    const payout = this.synchroBreakPluginStore.betCoinRepository.calculateMultiplier(
-      betCoins,
-      totalPlayerNum,
-      playerOrder.indexOf(playerId)
-    )
+    const orderIndex = playerOrder.indexOf(playerId)
 
-    const gain = playerStatus === 'success' ? payout : 0
-    const calculatedCoins = gain + currentCoins
-    return calculatedCoins
+    // ニョッキに成功した場合はコインの増加量を計算し、失敗した場合は現在のコイン数をそのまま返す
+    return orderIndex !== -1 ? currentCoins + betCoins * (totalPlayerNum - orderIndex) : currentCoins
   }
 }
 

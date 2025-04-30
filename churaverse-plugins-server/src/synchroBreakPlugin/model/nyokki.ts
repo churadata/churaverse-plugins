@@ -12,8 +12,8 @@ export class Nyokki {
     this.nyokkiStatus = 'yet'
   }
 
-  public nyokki(isNyokki: boolean): void {
-    this.nyokkiStatus = isNyokki ? 'nyokki' : 'success'
+  public setNyokkiStatus(isSuccess: boolean): void {
+    this.nyokkiStatus = isSuccess ? 'success' : 'nyokki'
   }
 
   public get getNyokkiStatus(): NyokkiStatus {

@@ -117,7 +117,6 @@ export class RankingBoard implements IRankingBoard {
    * プレイヤーの所持コイン数を変更する
    */
   public changePlayersCoin(playerId: string, coins: number): void {
-    if (!this.checkElementExist(RANKING_BOARD_CONTAINER_ID)) return
     const playerCoins = DomManager.getElementById(PLAYER_COINS_ID(playerId))
     if (playerCoins === null) return
     playerCoins.textContent = `${coins}コイン`
@@ -127,7 +126,6 @@ export class RankingBoard implements IRankingBoard {
    * プレイヤーのニョッキステータスを変更する
    */
   public changeNyokkiStatus(playrId: string, status: NyokkiStatus): void {
-    if (!this.checkElementExist(RANKING_BOARD_CONTAINER_ID)) return
     const playerNyokkiStatus = DomManager.getElementById(NYOKKI_STATUS_ID(playrId))
     if (playerNyokkiStatus === null) return
 
@@ -163,14 +161,6 @@ export class RankingBoard implements IRankingBoard {
     playerIds.forEach((playerId) => {
       this.changeNyokkiStatus(playerId, 'yet')
     })
-  }
-
-  /**
-   * ランキングボードの要素が存在するかどうかを確認する
-   */
-  private checkElementExist(elementId: string): boolean {
-    const element = document.getElementById(elementId)
-    return element !== null
   }
 
   /**

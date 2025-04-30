@@ -21,18 +21,10 @@ export const SYNCHRO_BREAK_MAX_BET_COIN: number = 999
 
 export class BetCoinFormContainer implements IGameUiComponent {
   public element!: HTMLElement
+  public readonly visible: boolean = false
   private betCoinInputField!: HTMLInputElement
 
-  public readonly visible: boolean = false
-
   public constructor(private readonly store: Store<IMainScene>) {}
-
-  public initialize(): void {
-    this.setBetCoinFormContainer()
-    this.betCoinInputField = DomManager.getElementById<HTMLInputElement>(BET_COIN_INPUT_FIELD_ID)
-    const ownPlayerId = this.store.of('playerPlugin').ownPlayerId
-    this.setUpInputFields(ownPlayerId)
-  }
 
   public get inputFieldValue(): number {
     const value = Number(this.betCoinInputField.value)
@@ -43,10 +35,17 @@ export class BetCoinFormContainer implements IGameUiComponent {
     this.betCoinInputField.value = value.toString()
   }
 
+  public initialize(): void {
+    this.setBetCoinFormContainer()
+    const ownPlayerId = this.store.of('playerPlugin').ownPlayerId
+    this.setupInputFields(ownPlayerId)
+  }
+
   /**
    * ベットコインの入力部分を設定する
    */
-  private setUpInputFields(ownPlayerId: string): void {
+  private setupInputFields(ownPlayerId: string): void {
+    this.betCoinInputField = DomManager.getElementById<HTMLInputElement>(BET_COIN_INPUT_FIELD_ID)
     const sendButton = DomManager.getElementById(BET_COIN_SEND_BUTTON_ID)
     sendButton.onclick = () => {
       const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)

@@ -28,16 +28,6 @@ export class TimeLimitFormContainer implements IGameUiComponent {
   private timeLimitInputField!: HTMLInputElement
   private readonly networkPluginStore!: NetworkPluginStore<IMainScene>
 
-  public constructor(private readonly store: Store<IMainScene>) {
-    this.networkPluginStore = this.store.of('networkPlugin')
-  }
-
-  public initialize(): void {
-    this.setTimeLimitFormContainer()
-    this.timeLimitInputField = DomManager.getElementById<HTMLInputElement>(TIME_LIMIT_INPUT_FIELD_ID)
-    this.setUpInputFields()
-  }
-
   public get inputFieldValue(): number {
     const value = Number(this.timeLimitInputField.value)
     return isNaN(value) ? SYNCHRO_BREAK_MIN_TIME_LIMIT : value
@@ -47,10 +37,20 @@ export class TimeLimitFormContainer implements IGameUiComponent {
     this.timeLimitInputField.value = value.toString()
   }
 
+  public constructor(private readonly store: Store<IMainScene>) {
+    this.networkPluginStore = this.store.of('networkPlugin')
+  }
+
+  public initialize(): void {
+    this.setTimeLimitFormContainer()
+    this.setupInputFields()
+  }
+
   /**
    * 制限時間入力部分を設定する
    */
-  private setUpInputFields(): void {
+  private setupInputFields(): void {
+    this.timeLimitInputField = DomManager.getElementById<HTMLInputElement>(TIME_LIMIT_INPUT_FIELD_ID)
     const sendButton = DomManager.getElementById(TIME_LIMIT_SEND_BUTTON_ID)
     sendButton.onclick = () => {
       const timeLimitValue = this.inputFieldValue
