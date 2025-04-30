@@ -24,9 +24,9 @@ import { NyokkiTurnStartEvent } from './event/nyokkiTurnStartEvent'
 import { UpdatePlayersCoinEvent } from './event/updatePlayersCoinEvent'
 import { NyokkiStatus } from './type/nyokkiStatus'
 import { IRankingBoard } from './interface/IRankingBoard'
-import { NyokkiResultEvent } from './event/nyokkiResultEvent'
-import { NyokkiGameEndEvent } from './event/nyokkiGameEndEvent'
-import { NyokkiGameEndMessage } from './message/nyokkiGameEndMessage'
+import { SynchroBreakResultEvent } from './event/synchroBreakResultEvent'
+import { SynchroBreakEndEvent } from './event/synchroBreakEndEvent'
+import { SynchroBreakEndMessage } from './message/synchroBreakEndMessage'
 
 export class SynchroBreakPlugin extends BaseGamePlugin {
   protected readonly gameId = 'synchroBreak'
@@ -69,8 +69,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('nyokkiTurnEnd', this.nyokkiTurnEnd)
     this.bus.subscribeEvent('nyokkiTurnStart', this.nyokkiTurnStart)
     this.bus.subscribeEvent('updatePlayersCoin', this.updatePlayersCoin)
-    this.bus.subscribeEvent('nyokkiResult', this.getNyokkiResult)
-    this.bus.subscribeEvent('nyokkiGameEnd', this.nyokkiGameEnd)
+    this.bus.subscribeEvent('synchroBreakResult', this.getNyokkiResult)
+    this.bus.subscribeEvent('synchroBreakEnd', this.synchroBreakEnd)
   }
 
   /**
@@ -87,8 +87,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     this.bus.unsubscribeEvent('nyokkiTurnEnd', this.nyokkiTurnEnd)
     this.bus.unsubscribeEvent('nyokkiTurnStart', this.nyokkiTurnStart)
     this.bus.unsubscribeEvent('updatePlayersCoin', this.updatePlayersCoin)
-    this.bus.unsubscribeEvent('nyokkiResult', this.getNyokkiResult)
-    this.bus.unsubscribeEvent('nyokkiGameEnd', this.nyokkiGameEnd)
+    this.bus.unsubscribeEvent('synchroBreakResult', this.getNyokkiResult)
+    this.bus.unsubscribeEvent('synchroBreakEnd', this.synchroBreakEnd)
   }
 
   private phaserSceneInit(ev: PhaserSceneInit): void {
@@ -342,10 +342,10 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   /**
    * 閉じるボタンが押された時のゲーム終了処理
    */
-  private readonly nyokkiGameEnd = (ev: NyokkiGameEndEvent): void => {
+  private readonly synchroBreakEnd = (ev: SynchroBreakEndEvent): void => {
     if (ev.playerId !== this.playerPluginStore.ownPlayerId) return
     this.gamePluginStore.gameUiManager.removeAllUis(this.gameId)
-    this.store.of('networkPlugin').messageSender.send(new NyokkiGameEndMessage({ playerId: ev.playerId }))
+    this.store.of('networkPlugin').messageSender.send(new SynchroBreakEndMessage({ playerId: ev.playerId }))
   }
 
   /**
@@ -369,8 +369,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   /**
    * 結果ウィンドウを取得する
    */
-  private readonly getNyokkiResult = (ev: NyokkiResultEvent): void => {
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiResultScreen')?.createResultRanking()
+  private readonly getNyokkiResult = (ev: SynchroBreakResultEvent): void => {
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'synchroBreakResultScreen')?.createResultRanking()
   }
 
   /**

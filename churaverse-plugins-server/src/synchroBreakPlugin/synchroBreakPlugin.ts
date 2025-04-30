@@ -16,9 +16,9 @@ import { UpdatePlayersCoinMessage } from './message/updatePlayersCoinMessage'
 import { SendBetCoinResponseMessage } from './message/sendBetCoinResponseMessage'
 import { NyokkiGameTurnStartEvent } from './event/nyokkiGameTurnStartEvent'
 import { NyokkiTurnStartMessage } from './message/nyokkiTurnStartMessage'
-import { NyokkiResultEvent } from './event/nyokkiResultEvent'
-import { NyokkiResultMessage } from './message/nyokkiResultMessage'
-import { NyokkiGameEndEvent } from './event/nyokkiGameEndEvent'
+import { SynchroBreakResultEvent } from './event/synchroBreakResultEvent'
+import { SynchroBreakResultMessage } from './message/synchroBreakResultMessage'
+import { SynchroBreakEndEvent } from './event/synchroBreakEndEvent'
 import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
 
 export class SynchroBreakPlugin extends BaseGamePlugin {
@@ -54,8 +54,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('nyokki', this.nyokkiAction)
     this.bus.subscribeEvent('nyokkiGameTurnEnd', this.nyokkiGameTurnEnd)
     this.bus.subscribeEvent('nyokkiGameTurnStart', this.nyokkiGameTurnStart)
-    this.bus.subscribeEvent('nyokkiResult', this.nyokkiResult)
-    this.bus.subscribeEvent('nyokkiGameEnd', this.nyokkiGameEnd)
+    this.bus.subscribeEvent('synchroBreakResult', this.synchroBreakResult)
+    this.bus.subscribeEvent('synchroBreakEnd', this.synchroBreakEnd)
   }
 
   /**
@@ -69,8 +69,8 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
     this.bus.unsubscribeEvent('nyokki', this.nyokkiAction)
     this.bus.unsubscribeEvent('nyokkiGameTurnEnd', this.nyokkiGameTurnEnd)
     this.bus.unsubscribeEvent('nyokkiGameTurnStart', this.nyokkiGameTurnStart)
-    this.bus.unsubscribeEvent('nyokkiResult', this.nyokkiResult)
-    this.bus.unsubscribeEvent('nyokkiGameEnd', this.nyokkiGameEnd)
+    this.bus.unsubscribeEvent('synchroBreakResult', this.synchroBreakResult)
+    this.bus.unsubscribeEvent('synchroBreakEnd', this.synchroBreakEnd)
   }
 
   private init(): void {
@@ -107,7 +107,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   /**
    * 結果ウィンドウの閉じるボタンを押した時に実行される処理
    */
-  private readonly nyokkiGameEnd = (ev: NyokkiGameEndEvent): void => {
+  private readonly synchroBreakEnd = (ev: SynchroBreakEndEvent): void => {
     const playerId: string = ev.playerId
     this.finishedPlayers.push(playerId)
     this.removePlayersRepository(playerId)
@@ -267,11 +267,11 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
   /**
    * プレイヤーに結果画面を表示させる。
    */
-  private readonly nyokkiResult = (ev: NyokkiResultEvent): void => {
+  private readonly synchroBreakResult = (ev: SynchroBreakResultEvent): void => {
     const sortedPlayersCoin = this.synchroBreakPluginStore.playersCoinRepository.sortedPlayerCoins()
     this.networkPluginStore.messageSender.send(new UpdatePlayersCoinMessage({ playersCoin: sortedPlayersCoin }))
-    const nyokkiResultMessage = new NyokkiResultMessage({})
-    this.networkPluginStore.messageSender.send(nyokkiResultMessage)
+    const synchroBreakResultMessage = new SynchroBreakResultMessage({})
+    this.networkPluginStore.messageSender.send(synchroBreakResultMessage)
   }
 
   /**

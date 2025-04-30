@@ -4,7 +4,7 @@ import { ResultRankingListPanel } from './components/ResultRankingListPanel'
 import { ResultExitButton } from './components/ResultExitButton'
 import { INyokkiResultScreen } from '../../interface/INyokkiResultScreen'
 import { GamePluginStore } from '@churaverse/game-plugin-client/store/defGamePluginStore'
-import { NyokkiGameEndEvent } from '../../event/nyokkiGameEndEvent'
+import { SynchroBreakEndEvent } from '../../event/synchroBreakEndEvent'
 
 // resultRankingのID
 export const RESULT_LIST_ID = 'result-list'
@@ -105,7 +105,7 @@ export class ResultScreen implements INyokkiResultScreen {
     this.element.appendChild(exitButton)
     exitButton.addEventListener('click', () => {
       const playerId = this.store.of('playerPlugin').ownPlayerId
-      this.eventBus.post(new NyokkiGameEndEvent(playerId))
+      this.eventBus.post(new SynchroBreakEndEvent(playerId))
       this.remove()
     })
   }

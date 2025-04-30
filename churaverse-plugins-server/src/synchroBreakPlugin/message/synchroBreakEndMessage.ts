@@ -2,21 +2,21 @@ import { IMainScene } from 'churaverse-engine-server'
 import { BaseMessage } from '@churaverse/network-plugin-server/message/baseMessage'
 import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
 
-export interface NyokkiGameEndData extends SendableObject {
+export interface SynchroBreakEndData extends SendableObject {
   playerId: string
 }
 
 /**
  * ゲーム終了を知らせる
  */
-export class NyokkiGameEndMessage extends BaseMessage<IMainScene> {
-  public constructor(public readonly data: NyokkiGameEndData) {
-    super('nyokkiGameEnd', data)
+export class SynchroBreakEndMessage extends BaseMessage<IMainScene> {
+  public constructor(public readonly data: SynchroBreakEndData) {
+    super('synchroBreakEnd', data)
   }
 }
 
 declare module '@churaverse/network-plugin-server/message/messages' {
   export interface MainMessageMap {
-    nyokkiGameEnd: NyokkiGameEndMessage
+    synchroBreakEnd: SynchroBreakEndMessage
   }
 }

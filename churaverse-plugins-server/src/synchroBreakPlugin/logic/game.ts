@@ -7,7 +7,7 @@ import { NyokkiGameTurnStartEvent } from '../event/nyokkiGameTurnStartEvent'
 import { SynchroBreakPluginStore } from '../store/defSynchroBreakPluginStore'
 import { NyokkiGameStartCountMessage } from '../message/nyokkiGameStartCountMessage'
 import { NyokkiTurnTimerMessage } from '../message/nyokkiTurnTimerMessage'
-import { NyokkiResultEvent } from '../event/nyokkiResultEvent'
+import { SynchroBreakResultEvent } from '../event/synchroBreakResultEvent'
 
 export class Game implements IGame {
   private synchroBreakPluginStore!: SynchroBreakPluginStore
@@ -72,8 +72,8 @@ export class Game implements IGame {
     if (turnSelect === undefined) return
     if (turnSelect <= this.turnCountNumber) {
       this.turnCountNumber = 1
-      const nyokkiResult = new NyokkiResultEvent()
-      this.eventBus.post(nyokkiResult)
+      const synchroBreakResult = new SynchroBreakResultEvent()
+      this.eventBus.post(synchroBreakResult)
     } else {
       this.turnCountNumber++
       const nyokkiTurnEnd = new NyokkiGameTurnEnd()

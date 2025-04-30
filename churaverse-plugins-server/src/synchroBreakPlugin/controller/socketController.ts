@@ -18,9 +18,9 @@ import { NyokkiActionResponseMessage } from '../message/nyokkiActionResponseMess
 import { NyokkiTurnEndMessage } from '../message/nyokkiTurnEndMessage'
 import { NyokkiTurnStartMessage } from '../message/nyokkiTurnStartMessage'
 import { UpdatePlayersCoinMessage } from '../message/updatePlayersCoinMessage'
-import { NyokkiResultMessage } from '../message/nyokkiResultMessage'
-import { NyokkiGameEndMessage } from '../message/nyokkiGameEndMessage'
-import { NyokkiGameEndEvent } from '../event/nyokkiGameEndEvent'
+import { SynchroBreakResultMessage } from '../message/synchroBreakResultMessage'
+import { SynchroBreakEndMessage } from '../message/synchroBreakEndMessage'
+import { SynchroBreakEndEvent } from '../event/synchroBreakEndEvent'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
@@ -41,8 +41,8 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('nyokkiTurnEnd', NyokkiTurnEndMessage, 'allClients')
     ev.messageRegister.registerMessage('nyokkiTurnStart', NyokkiTurnStartMessage, 'allClients')
     ev.messageRegister.registerMessage('updatePlayersCoin', UpdatePlayersCoinMessage, 'allClients')
-    ev.messageRegister.registerMessage('nyokkiResult', NyokkiResultMessage, 'allClients')
-    ev.messageRegister.registerMessage('nyokkiGameEnd', NyokkiGameEndMessage, 'onlyServer')
+    ev.messageRegister.registerMessage('synchroBreakResult', SynchroBreakResultMessage, 'allClients')
+    ev.messageRegister.registerMessage('synchroBreakEnd', SynchroBreakEndMessage, 'onlyServer')
   }
 
   /**
@@ -60,7 +60,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.messageListenerRegister.on('timeLimitConfirm', this.timeLimitConfirm)
     this.messageListenerRegister.on('sendBetCoin', this.sendBetCoin)
     this.messageListenerRegister.on('nyokki', this.nyokki)
-    this.messageListenerRegister.on('nyokkiGameEnd', this.nyokkiGameEnd)
+    this.messageListenerRegister.on('synchroBreakEnd', this.synchroBreakEnd)
   }
 
   /**
@@ -71,7 +71,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.messageListenerRegister.off('timeLimitConfirm', this.timeLimitConfirm)
     this.messageListenerRegister.off('sendBetCoin', this.sendBetCoin)
     this.messageListenerRegister.off('nyokki', this.nyokki)
-    this.messageListenerRegister.off('nyokkiGameEnd', this.nyokkiGameEnd)
+    this.messageListenerRegister.off('synchroBreakEnd', this.synchroBreakEnd)
   }
 
   private readonly nyokkiTurnSelect = (msg: NyokkiTurnSelectMessage): void => {
@@ -90,7 +90,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.eventBus.post(new NyokkiEvent(msg.data.playerId))
   }
 
-  private readonly nyokkiGameEnd = (msg: NyokkiGameEndMessage): void => {
-    this.eventBus.post(new NyokkiGameEndEvent(msg.data.playerId))
+  private readonly synchroBreakEnd = (msg: SynchroBreakEndMessage): void => {
+    this.eventBus.post(new SynchroBreakEndEvent(msg.data.playerId))
   }
 }
