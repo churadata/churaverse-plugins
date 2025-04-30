@@ -73,7 +73,6 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._isActive = this.gameId === ev.gameId
     if (!this.isActive) return
     this._gameOwnerId = ev.playerId
-    this._participantIds = this.store.of('playerPlugin').players.getAllId()
     this.gamePluginStore.gameUiManager.initializeAllUis(this.gameId)
     this.gamePluginStore.gameLogRenderer.gameStartLog(this.gameName, this.gameOwnerId ?? '')
     this.gameInfoStore.games.set(this.gameId, this)
@@ -91,6 +90,11 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.terminateGame()
   }
 
+  private readonly updateGameParticipant = (ev: UpdateGameParticipantEvent): void => {
+    if (ev.gameId !== this.gameId) return
+    this._participantIds = ev.participantIds
+  }
+
   private terminateGame(): void {
     this._isActive = false
     this._gameOwnerId = undefined
@@ -99,19 +103,4 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.gamePluginStore.gameUiManager.removeAllUis(this.gameId)
     this.gameInfoStore.games.delete(this.gameId)
   }
-
-  /**
-   * ゲーム参加者のidリストを受け取り、ゲーム参加者リストを更新する
-   */
-  private readonly updateGameParticipant = (ev: UpdateGameParticipantEvent): void => {
-    if (ev.gameId !== this.gameId) return
-    this._participantIds = ev.participantIds
-    this.handleGameParticipant()
-  }
-
-  /**
-   * ゲーム参加者が更新された際の処理を実装するための抽象メソッド
-   * 各ゲームプラグインでオーバーライドし、具体的なロジックを定義する
-   */
-  protected abstract handleGameParticipant(): void
 }
