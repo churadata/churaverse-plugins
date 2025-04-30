@@ -2,6 +2,7 @@ import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { GameStartEvent } from '../event/gameStartEvent'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
+import { UpdateGameParticipantEvent } from '../event/updateGameParticipantEvent'
 import { GameIds } from '../interface/gameIds'
 import { IGameInfo } from '../interface/IGameInfo'
 import { GamePluginStore } from '../store/defGamePluginStore'
@@ -46,12 +47,14 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     super.subscribeGameEvent()
     this.bus.subscribeEvent('gameAbort', this.gameAbort)
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
+    this.bus.subscribeEvent('updateGameParticipant', this.updateGameParticipant)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
+    this.bus.unsubscribeEvent('updateGameParticipant', this.updateGameParticipant)
   }
 
   public getStores(): void {
@@ -70,7 +73,6 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._isActive = this.gameId === ev.gameId
     if (!this.isActive) return
     this._gameOwnerId = ev.playerId
-    this._participantIds = this.store.of('playerPlugin').players.getAllId()
     this.gamePluginStore.gameUiManager.initializeAllUis(this.gameId)
     this.gamePluginStore.gameLogRenderer.gameStartLog(this.gameName, this.gameOwnerId ?? '')
     this.gameInfoStore.games.set(this.gameId, this)
@@ -86,6 +88,11 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     if (ev.gameId !== this.gameId) return
     this.gamePluginStore.gameLogRenderer.gameEndLog(this.gameName)
     this.terminateGame()
+  }
+
+  private readonly updateGameParticipant = (ev: UpdateGameParticipantEvent): void => {
+    if (ev.gameId !== this.gameId) return
+    this._participantIds = ev.participantIds
   }
 
   private terminateGame(): void {
