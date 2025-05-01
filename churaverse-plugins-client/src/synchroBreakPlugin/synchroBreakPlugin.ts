@@ -57,8 +57,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
     this.bus.subscribeEvent('updateGameParticipant', this.handleGameParticipant)
-    this.bus.subscribeEvent('synchroBreakTurnSelect', this.synchroBreakTurnSelect)
-    this.bus.subscribeEvent('synchroBreakTurnSelect', this.synchroBreakTurnSelect)
+    this.bus.unsubscribeEvent('synchroBreakTurnSelect', this.synchroBreakTurnSelect)
     this.bus.subscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
     this.bus.subscribeEvent('sendBetCoinResponse', this.sendBetCoinResponse)
     this.bus.subscribeEvent('synchroBreakStartCount', this.gameStartCount)
