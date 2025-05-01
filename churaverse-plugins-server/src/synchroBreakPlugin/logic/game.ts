@@ -13,20 +13,21 @@ import { NyokkiTurnTimerMessage } from '../message/nyokkiTurnTimerMessage'
 
 export class Game implements IGame {
   private synchroBreakPluginStore!: SynchroBreakPluginStore
-  private gamePluginStore!: GamePluginStore
-  private networkPluginStore!: NetworkPluginStore<IMainScene>
+  private readonly gamePluginStore: GamePluginStore
+  private readonly networkPluginStore: NetworkPluginStore<IMainScene>
   private turnCountNumber: number = 1
 
   public constructor(
     private readonly gameId: GameIds,
     private readonly eventBus: IEventBus<IMainScene>,
     private readonly store: Store<IMainScene>
-  ) {}
-
-  public getPluginStores(): void {
-    this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
+  ) {
     this.gamePluginStore = this.store.of('gamePlugin')
     this.networkPluginStore = this.store.of('networkPlugin')
+  }
+
+  public setSynchroBreakPluginStore(): void {
+    this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
   }
 
   public async processTurnSequence(): Promise<void> {

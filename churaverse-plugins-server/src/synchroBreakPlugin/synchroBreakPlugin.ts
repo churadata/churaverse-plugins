@@ -76,7 +76,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     initSynchroBreakPluginStore(this.gameId, this.bus, this.store)
     this.socketController.registerMessageListener()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
-    this.synchroBreakPluginStore.game.getPluginStores()
+    this.synchroBreakPluginStore.game.setSynchroBreakPluginStore()
     for (const playerId of this.participantIds) {
       this.synchroBreakPluginStore.playersCoinRepository.set(playerId, this.initialPlayerCoins)
     }

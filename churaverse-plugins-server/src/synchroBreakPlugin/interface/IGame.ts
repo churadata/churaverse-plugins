@@ -1,4 +1,4 @@
 export interface IGame {
-  getPluginStores: () => void
+  setSynchroBreakPluginStore: () => void
   processTurnSequence: () => Promise<void>
 }
