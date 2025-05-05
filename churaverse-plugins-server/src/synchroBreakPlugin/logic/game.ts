@@ -3,11 +3,11 @@ import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defN
 import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
 import { IGame } from '../interface/IGame'
-import { NyokkiGameTurnEnd } from '../event/nyokkiGameTurnEnd'
-import { NyokkiGameTurnStartEvent } from '../event/nyokkiGameTurnStartEvent'
+import { SynchroBreakTurnEndEvent } from '../event/synchroBreakTurnEndEvent'
+import { SynchroBreakTurnStartEvent } from '../event/synchroBreakTurnStartEvent'
 import { SynchroBreakPluginStore } from '../store/defSynchroBreakPluginStore'
-import { NyokkiGameStartCountMessage } from '../message/nyokkiGameStartCountMessage'
-import { NyokkiTurnTimerMessage } from '../message/nyokkiTurnTimerMessage'
+import { SynchroBreakStartCountMessage } from '../message/synchroBreakStartCountMessage'
+import { SynchroBreakTurnTimerMessage } from '../message/synchroBreakTurnTimerMessage'
 
 export class Game implements IGame {
   private synchroBreakPluginStore!: SynchroBreakPluginStore
@@ -43,8 +43,8 @@ export class Game implements IGame {
     await this.delay(1000)
 
     for (let remainingSeconds = 3; remainingSeconds > 0; remainingSeconds--) {
-      const nyokkiGameStartCountMessage = new NyokkiGameStartCountMessage({ remainingSeconds })
-      this.networkPluginStore.messageSender.send(nyokkiGameStartCountMessage)
+      const synchroBreakStartCountMessage = new SynchroBreakStartCountMessage({ remainingSeconds })
+      this.networkPluginStore.messageSender.send(synchroBreakStartCountMessage)
 
       await this.delay(1000)
     }
@@ -57,8 +57,8 @@ export class Game implements IGame {
     const turnTimer = this.synchroBreakPluginStore.timeLimit
     if (turnTimer === undefined) return
     for (let remainingSeconds = turnTimer; remainingSeconds > 0; remainingSeconds--) {
-      const nyokkiTurnTimerMessage = new NyokkiTurnTimerMessage({ remainingSeconds })
-      this.networkPluginStore.messageSender.send(nyokkiTurnTimerMessage)
+      const synchroBreakTurnTimerMessage = new SynchroBreakTurnTimerMessage({ remainingSeconds })
+      this.networkPluginStore.messageSender.send(synchroBreakTurnTimerMessage)
 
       await this.delay(1000)
     }
@@ -72,18 +72,18 @@ export class Game implements IGame {
     if (turnSelect === undefined) return
     if (turnSelect <= this.turnCountNumber) {
       this.turnCountNumber = 1
-      const nyokkiGameEndEvent = new GameEndEvent('synchroBreak')
-      this.eventBus.post(nyokkiGameEndEvent)
+      const synchroBreakEndEvent = new GameEndEvent('synchroBreak')
+      this.eventBus.post(synchroBreakEndEvent)
     } else {
       this.turnCountNumber++
-      const nyokkiTurnEnd = new NyokkiGameTurnEnd()
-      this.eventBus.post(nyokkiTurnEnd)
+      const synchroBreakTurnEnd = new SynchroBreakTurnEndEvent()
+      this.eventBus.post(synchroBreakTurnEnd)
 
       // ニョッキしなかったプレイヤーのFBを与えるため、1秒待機
       await this.delay(1000)
 
-      const nyokkiTurnStart = new NyokkiGameTurnStartEvent(this.turnCountNumber)
-      this.eventBus.post(nyokkiTurnStart)
+      const synchroBreakTurnStart = new SynchroBreakTurnStartEvent(this.turnCountNumber)
+      this.eventBus.post(synchroBreakTurnStart)
     }
   }
 
