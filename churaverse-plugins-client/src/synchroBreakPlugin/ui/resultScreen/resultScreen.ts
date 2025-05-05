@@ -23,7 +23,6 @@ export class ResultScreen implements INyokkiResultScreen {
   private gamePluginStore!: GamePluginStore
 
   public readonly visible: boolean = false
-  // private node!: HTMLElement
 
   public constructor(
     private readonly store: Store<IMainScene>,
@@ -44,7 +43,6 @@ export class ResultScreen implements INyokkiResultScreen {
   public createResultRanking(): void {
     this.element.style.display = ''
     this.resultScreenContainer.innerHTML = ''
-    // this.createResultRankingList(playersElementsArray)
 
     // ランキングボードを削除
     const rankingBoard = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')

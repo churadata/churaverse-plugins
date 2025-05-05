@@ -8,8 +8,8 @@ export interface SynchroBreakResultData extends SendableObject {}
  * ゲーム終了後の結果ウィンドウ表示メッセージ
  */
 export class SynchroBreakResultMessage extends BaseMessage<IMainScene> {
-  public constructor(public readonly data: SynchroBreakResultData) {
-    super('synchroBreakResult', data)
+  public constructor() {
+    super('synchroBreakResult')
   }
 }
 
