@@ -67,7 +67,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.subscribeEvent('nyokkiTurnEnd', this.nyokkiTurnEnd)
     this.bus.subscribeEvent('nyokkiTurnStart', this.nyokkiTurnStart)
     this.bus.subscribeEvent('updatePlayersCoin', this.updatePlayersCoin)
-    this.bus.subscribeEvent('synchroBreakResult', this.getNyokkiResult)
+    this.bus.subscribeEvent('synchroBreakResult', this.getSynchroBreakResult)
     this.bus.subscribeEvent('synchroBreakEnd', this.synchroBreakEnd)
   }
 
@@ -85,7 +85,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.unsubscribeEvent('nyokkiTurnEnd', this.nyokkiTurnEnd)
     this.bus.unsubscribeEvent('nyokkiTurnStart', this.nyokkiTurnStart)
     this.bus.unsubscribeEvent('updatePlayersCoin', this.updatePlayersCoin)
-    this.bus.unsubscribeEvent('synchroBreakResult', this.getNyokkiResult)
+    this.bus.unsubscribeEvent('synchroBreakResult', this.getSynchroBreakResult)
     this.bus.unsubscribeEvent('synchroBreakEnd', this.synchroBreakEnd)
   }
 
@@ -363,7 +363,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   /**
    * 結果ウィンドウを取得する
    */
-  private readonly getNyokkiResult = (ev: SynchroBreakResultEvent): void => {
+  private readonly getSynchroBreakResult = (ev: SynchroBreakResultEvent): void => {
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'synchroBreakResultScreen')?.createResultRanking()
   }
 

@@ -108,6 +108,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   private readonly synchroBreakEnd = (ev: SynchroBreakEndEvent): void => {
     const playerId: string = ev.playerId
+    if (this.finishedPlayers.includes(playerId)) return
     this.finishedPlayers.push(playerId)
     if (this.finishedPlayers.length >= this.participantIds.length) {
       this.bus.post(new GameEndEvent(this.gameId))
