@@ -2,7 +2,7 @@ import { Store, IMainScene, DomManager, domLayerSetting, IEventBus } from 'chura
 import { ResultRankingListItem } from './components/ResultRankingListItem'
 import { ResultRankingListPanel } from './components/ResultRankingListPanel'
 import { ResultExitButton } from './components/ResultExitButton'
-import { INyokkiResultScreen } from '../../interface/INyokkiResultScreen'
+import { ISynchroBreakResultScreen } from '../../interface/ISynchroBreakResultScreen'
 import { GamePluginStore } from '@churaverse/game-plugin-client/store/defGamePluginStore'
 import { SynchroBreakEndEvent } from '../../event/synchroBreakEndEvent'
 
@@ -15,7 +15,7 @@ export const RESULT_CONTAINER_ID = 'result-container'
  */
 export const ROW_CONTENT_CONTAINER_CLASS_NAME = 'result-ranking-list-row-container'
 
-export class ResultScreen implements INyokkiResultScreen {
+export class ResultScreen implements ISynchroBreakResultScreen {
   protected readonly gameId = 'synchroBreak'
 
   public element!: HTMLElement
