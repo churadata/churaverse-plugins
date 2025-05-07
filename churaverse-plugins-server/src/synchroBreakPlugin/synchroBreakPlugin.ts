@@ -16,7 +16,6 @@ import { UpdatePlayersCoinMessage } from './message/updatePlayersCoinMessage'
 import { SendBetCoinResponseMessage } from './message/sendBetCoinResponseMessage'
 import { NyokkiGameTurnStartEvent } from './event/nyokkiGameTurnStartEvent'
 import { NyokkiTurnStartMessage } from './message/nyokkiTurnStartMessage'
-import { SynchroBreakResultEvent } from './event/synchroBreakResultEvent'
 import { SynchroBreakResultMessage } from './message/synchroBreakResultMessage'
 import { SynchroBreakEndEvent } from './event/synchroBreakEndEvent'
 import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
@@ -246,7 +245,8 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   /**
    * プレイヤーに結果画面を表示させる。
    */
-  private readonly synchroBreakResult = (ev: SynchroBreakResultEvent): void => {
+  private readonly synchroBreakResult = (): void => {
+    this.calculateResultPlayersCoin()
     const sortedPlayersCoin = this.synchroBreakPluginStore.playersCoinRepository.sortedPlayerCoins()
     this.networkPluginStore.messageSender.send(new UpdatePlayersCoinMessage({ playersCoin: sortedPlayersCoin }))
     this.networkPluginStore.messageSender.send(new SynchroBreakResultMessage())
