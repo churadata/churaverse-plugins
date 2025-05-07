@@ -75,12 +75,12 @@ export class ResultScreen implements ISynchroBreakResultScreen {
     sortedPlayers.forEach((player) => {
       const playerName = this.store.of('playerPlugin').players.get(player.playerId)?.name
       if (playerName === undefined) return
-      const playerListElement = this.resultList(currentRank, playerName, player.coins)
-      this.element.appendChild(playerListElement)
 
       if (player.coins !== previousCoins) {
         currentRank++
       }
+      const playerListElement = this.resultList(currentRank, playerName, player.coins)
+      this.element.appendChild(playerListElement)
       previousCoins = player.coins
     })
 
