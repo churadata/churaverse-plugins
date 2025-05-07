@@ -4,6 +4,7 @@ import { GameStartEvent } from '../event/gameStartEvent'
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { GamePluginStore } from '../store/defGamePluginStore'
+import { PriorGameDataEvent } from '../event/priorGameDataEvent'
 
 /**
  * 全てのゲームプラグインの基本となる抽象クラス
@@ -15,6 +16,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.getStores.bind(this))
     this.bus.subscribeEvent('gameStart', this.onGameStart.bind(this))
+    this.bus.subscribeEvent('priorGameData', this.getPriorGameData.bind(this))
   }
 
   /**
@@ -37,8 +39,18 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     this.gamePluginStore = this.store.of('gamePlugin')
   }
 
+  protected getIsActive(): boolean {
+    return this.gamePluginStore.games.get(this.gameId)?.isActive ?? false
+  }
+
+  private getPriorGameData(ev: PriorGameDataEvent): void {
+    if (!this.getIsActive()) return
+    this.subscribeGameEvent()
+    this.handleMidwayParticipant()
+  }
+
   private onGameStart(ev: GameStartEvent): void {
-    if ((this.gamePluginStore.games.get(this.gameId)?.isActive) === false) return
+    if (!this.getIsActive()) return
     this.subscribeGameEvent()
     this.handleGameStart()
   }
@@ -60,4 +72,10 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
    * 各ゲームプラグインでオーバーライドし、具体的な処理を定義する。
    */
   protected abstract handleGameTermination(): void
+
+  /**
+   * 途中参加のプレイヤーに進行中のゲームを通知する
+   * イベントを発火し、それぞれのゲームプラグインで処理を行う
+   */
+  protected abstract handleMidwayParticipant(): void
 }
