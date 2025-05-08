@@ -46,7 +46,6 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   private getPriorGameData(ev: PriorGameDataEvent): void {
     if (!this.getIsActive()) return
     this.subscribeGameEvent()
-    this.handleMidwayParticipant()
   }
 
   private onGameStart(ev: GameStartEvent): void {
@@ -72,10 +71,4 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
    * 各ゲームプラグインでオーバーライドし、具体的な処理を定義する。
    */
   protected abstract handleGameTermination(): void
-
-  /**
-   * 途中参加のプレイヤーに進行中のゲームを通知する
-   * イベントを発火し、それぞれのゲームプラグインで処理を行う
-   */
-  protected abstract handleMidwayParticipant(): void
 }
