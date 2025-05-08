@@ -32,14 +32,6 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   }
 
   /**
-   * gameの状態を取得する
-   * @returns boolean
-   */
-  protected getIsActive(): boolean {
-    return this.gameInfoStore.games.get(this.gameId)?.isActive ?? false
-  }
-
-  /**
    * ゲーム中断・終了時に共通して削除されるイベントリスナー
    */
   protected unsubscribeGameEvent(): void {
@@ -47,9 +39,18 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     this.bus.unsubscribeEvent('gameEnd', this.onGameTerminate)
   }
 
+  /**
+   * gameの状態を取得する
+   * @returns boolean
+   */
+  protected getIsActive(): boolean {
+    return this.gameInfoStore.games.get(this.gameId)?.isActive ?? false
+  }
+
   private getPriorGameData(ev: PriorGameDataEvent): void {
     if (!this.getIsActive()) return
     this.handleMidwayParticipant()
+    this.subscribeGameEvent()
   }
 
   private onGameStart(ev: GameStartEvent): void {

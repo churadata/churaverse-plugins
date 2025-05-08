@@ -4,6 +4,7 @@ import { GameStartEvent } from '../event/gameStartEvent'
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { GamePluginStore } from '../store/defGamePluginStore'
+import { PriorGameDataEvent } from '../event/priorGameDataEvent'
 
 /**
  * 全てのゲームプラグインの基本となる抽象クラス
@@ -15,6 +16,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.getStores.bind(this))
     this.bus.subscribeEvent('gameStart', this.onGameStart.bind(this))
+    this.bus.subscribeEvent('priorGameData', this.getPriorGameData.bind(this))
   }
 
   /**
@@ -37,8 +39,17 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     this.gamePluginStore = this.store.of('gamePlugin')
   }
 
+  protected getIsActive(): boolean {
+    return this.gamePluginStore.games.get(this.gameId)?.isActive ?? false
+  }
+
+  private getPriorGameData(ev: PriorGameDataEvent): void {
+    if (!this.getIsActive()) return
+    this.subscribeGameEvent()
+  }
+
   private onGameStart(ev: GameStartEvent): void {
-    if ((this.gamePluginStore.games.get(this.gameId)?.isActive) === false) return
+    if (!this.getIsActive()) return
     this.subscribeGameEvent()
     this.handleGameStart()
   }
