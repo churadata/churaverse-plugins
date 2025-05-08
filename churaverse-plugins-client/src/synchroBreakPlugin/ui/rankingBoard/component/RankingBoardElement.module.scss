@@ -1,0 +1,79 @@
+.container {
+  position: fixed;
+  top: 100px;
+  left: 50px;
+  width: 320px;
+  max-height: calc(85vh - 130px);
+  font-size: 14px;
+
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  row-gap: 10px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 14px;
+  box-shadow: 0 10px 15px 0 rgba(0, 0, 0, 0.2);
+
+  overflow-y: auto;
+  transition: opacity 0.5s;
+}
+
+.turn {
+  display: flex;
+  justify-content: center;
+  padding-left: 12px;
+  font-size: 2em;
+  white-space: pre;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  border-left: solid var(--c-primary) 5px;
+  padding-left: 12px;
+  font-size: 1.2em;
+}
+
+.boardElementContainer {
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  gap: 10px;
+  font-size: 0.9em;
+  width: 100%;
+  padding: 10px 0;
+  border-bottom: 1px solid lightsteelblue;
+  align-items: center;
+  justify-content: center;
+}
+
+.boardElementContainer > div {
+  flex: 2;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.boardElementContainer > .playerId {
+  flex: 2;
+}
+
+.boardElementContainer > .status {
+  flex: 2;
+}
+
+.boardElementContainer:last-child {
+  border-bottom: none;
+}
+
+.closeButton {
+  background-color: #ccc;
+  color: #333;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 16px; // 変更: 縦方向のpaddingを4pxに（元は8px）
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
