@@ -271,8 +271,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const nyokkiCollectionPlayerId = ev.sameTimePlayersId
     const nyokkiLogText = ev.nyokkiLogText
     this.gamePluginStore.gameLogRenderer.gameLog(nyokkiLogText, 0)
-    let status: NyokkiStatus = 'success'
-    if (!ev.isSuccess) status = 'nyokki'
+    const status: NyokkiStatus = ev.isSuccess ? 'success' : 'nyokki'
     for (let i = 0; i < nyokkiCollectionPlayerId.length; i++) {
       const playerId = nyokkiCollectionPlayerId[i]
       const rankingBoard = this.getRankingBoard()
