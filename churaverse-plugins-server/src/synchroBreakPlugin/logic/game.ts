@@ -2,6 +2,8 @@ import { IMainScene, IEventBus, Store } from 'churaverse-engine-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
+import { GamePluginStore } from '@churaverse/game-plugin-server/store/defGamePluginStore'
+import { GameIds } from '@churaverse/game-plugin-server/interface/gameIds'
 import { IGame } from '../interface/IGame'
 import { NyokkiGameTurnEnd } from '../event/nyokkiGameTurnEnd'
 import { NyokkiGameTurnStartEvent } from '../event/nyokkiGameTurnStartEvent'
@@ -11,27 +13,29 @@ import { NyokkiTurnTimerMessage } from '../message/nyokkiTurnTimerMessage'
 
 export class Game implements IGame {
   private synchroBreakPluginStore!: SynchroBreakPluginStore
-  private networkPluginStore!: NetworkPluginStore<IMainScene>
+  private readonly gamePluginStore: GamePluginStore
+  private readonly networkPluginStore: NetworkPluginStore<IMainScene>
   private turnCountNumber: number = 1
 
   public constructor(
+    private readonly gameId: GameIds,
     private readonly eventBus: IEventBus<IMainScene>,
     private readonly store: Store<IMainScene>
   ) {
-    this.getStores()
-  }
-
-  private getStores(): void {
+    this.gamePluginStore = this.store.of('gamePlugin')
     this.networkPluginStore = this.store.of('networkPlugin')
   }
 
-  public getSynchroBreakPluginStore(synchroBreakPluginStore: SynchroBreakPluginStore): void {
-    this.synchroBreakPluginStore = synchroBreakPluginStore
+  public setSynchroBreakPluginStore(): void {
+    this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
   }
 
   public async processTurnSequence(): Promise<void> {
+    if (!this.isActive) return
     await this.startTurnCountdown()
+    if (!this.isActive) return
     await this.startTurnTimer()
+    if (!this.isActive) return
     await this.finishTurn()
   }
 
@@ -39,6 +43,8 @@ export class Game implements IGame {
    * ターン開始前の3秒カウントダウンを実行
    */
   private async startTurnCountdown(): Promise<void> {
+    if (!this.isActive) return
+
     // 最後にベットしたプレイヤーにも説明ウィンドウが表示されるように、1秒待機
     await this.delay(1000)
 
@@ -54,6 +60,7 @@ export class Game implements IGame {
    * ターンの制限時間をカウントダウン
    */
   private async startTurnTimer(): Promise<void> {
+    if (!this.isActive) return
     const turnTimer = this.synchroBreakPluginStore.timeLimit
     if (turnTimer === undefined) return
     for (let remainingSeconds = turnTimer; remainingSeconds > 0; remainingSeconds--) {
@@ -69,7 +76,7 @@ export class Game implements IGame {
    */
   private async finishTurn(): Promise<void> {
     const turnSelect = this.synchroBreakPluginStore.turnSelect
-    if (turnSelect === undefined) return
+    if (!this.isActive || turnSelect === undefined) return
     if (turnSelect <= this.turnCountNumber) {
       this.turnCountNumber = 1
       const nyokkiGameEndEvent = new GameEndEvent('synchroBreak')
@@ -85,6 +92,10 @@ export class Game implements IGame {
       const nyokkiTurnStart = new NyokkiGameTurnStartEvent(this.turnCountNumber)
       this.eventBus.post(nyokkiTurnStart)
     }
+  }
+
+  private get isActive(): boolean {
+    return this.gamePluginStore.games.get(this.gameId)?.isActive ?? false
   }
 
   /**

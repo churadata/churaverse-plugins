@@ -1,5 +1,6 @@
 import { Store, IEventBus, IMainScene } from 'churaverse-engine-server'
 import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
+import { GameIds } from '@churaverse/game-plugin-server/interface/gameIds'
 import { SynchroBreakPluginStore } from './defSynchroBreakPluginStore'
 import { Game } from '../logic/game'
 import { NyokkiRepository } from '../repository/nyokkiRepository'
@@ -10,9 +11,13 @@ import { NyokkiLogTextCreate } from '../logic/nyokkiLogTextCreate'
 /**
  * SynchroBreakPluginStoreを初期化する関数
  */
-export function initSynchroBreakPluginStore(eventBus: IEventBus<IMainScene>, store: Store<IMainScene>): void {
+export function initSynchroBreakPluginStore(
+  gameId: GameIds,
+  eventBus: IEventBus<IMainScene>,
+  store: Store<IMainScene>
+): void {
   const synchroBreakPluginStore: SynchroBreakPluginStore = {
-    game: new Game(eventBus, store),
+    game: new Game(gameId, eventBus, store),
     nyokkiRepository: new NyokkiRepository(),
     playersCoinRepository: new PlayersCoinRepository(),
     betCoinRepository: new BetCoinRepository(),
