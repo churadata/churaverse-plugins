@@ -2,26 +2,27 @@ import { IChurarenGameSequence } from '../interface/IChurarenGameSequence'
 import { IEventBus, IMainScene, Store } from 'churaverse-engine-server'
 import { GameIds } from '@churaverse/game-plugin-server/interface/gameIds'
 import { GamePluginStore } from '@churaverse/game-plugin-server/store/defGamePluginStore'
-import { UpdateChurarenUiEvent } from '../event/updateChurarenUiEvent'
-import { UpdateChurarenUiType } from '../types/uiTypes'
+import { ChurarenStartCountdownEvent } from '../event/churarenStartCountdownEvent'
+import { ChurarenStartTimerEvent } from '../event/churarenStartTimerEvent'
+import { ChurarenResultEvent } from '../event/churarenResultEvent'
 
-const TIME_OUT = 30 // プレイヤーの準備確認のタイムアウト時間(秒)
-const COUNTDOWN_TIME = 3 // カウントダウン時間(秒)
-export const TIME_LIMIT = 3 * 60 // 制限時間(分)
+const TIME_OUT_SECONDS = 30 // プレイヤーの準備確認のタイムアウト時間(秒)
+const COUNTDOWN_TIME_SECONDS = 3 // カウントダウン時間(秒)
+export const TIME_LIMIT_MINUTES = 3 * 60 // 制限時間(分)
 
 export class ChurarenGameSequence implements IChurarenGameSequence {
   private readonly gamePluginStore: GamePluginStore
-  private gameId!: GameIds
 
   public constructor(
+    private readonly gameId: GameIds,
     private readonly store: Store<IMainScene>,
     private readonly eventBus: IEventBus<IMainScene>
   ) {
+    this.gameId = gameId
     this.gamePluginStore = this.store.of('gamePlugin')
   }
 
-  public async sequence(gameId: GameIds): Promise<void> {
-    this.gameId = gameId
+  public async sequence(): Promise<void> {
     await this.onPlayerReady()
     if (!this.isActive) return
     await this.countdown()
@@ -32,7 +33,7 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
   }
 
   private async onPlayerReady(): Promise<void> {
-    let timeOut: number = TIME_OUT
+    let timeOut: number = TIME_OUT_SECONDS
     const churarenParticipants = this.gamePluginStore.games.get(this.gameId)?.participantIds.length
     if (churarenParticipants === undefined) return
     await new Promise<void>((resolve) => {
@@ -41,42 +42,39 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
         if (!this.isActive) return
         if (readyPlayerSize === churarenParticipants) {
           resolve()
+          console.log('All players are ready')
         } else if (timeOut <= 0) {
           resolve()
+          console.log('Timeout waiting for players to be ready')
+        } else {
+          setTimeout(() => {
+            timeOut -= 1
+            checkReady()
+          }, 1000)
         }
-        setTimeout(() => {
-          timeOut -= 1
-          checkReady()
-        }, 1000)
       }
       checkReady()
     })
   }
 
   private async countdown(): Promise<void> {
-    this.changeUi('startCount')
-    for (let i = COUNTDOWN_TIME; i > 0; i--) {
+    this.eventBus.post(new ChurarenStartCountdownEvent())
+    for (let i = COUNTDOWN_TIME_SECONDS; i > 0; i--) {
       if (!this.isActive) return
       await this.delay(1000)
     }
   }
 
   private async timer(): Promise<void> {
-    await this.delay(1000) // 表示が切り替わるための待ち時間
-    this.changeUi('countTimer')
-    for (let i = TIME_LIMIT; i > 0; i--) {
+    this.eventBus.post(new ChurarenStartTimerEvent())
+    for (let i = TIME_LIMIT_MINUTES; i > 0; i--) {
       if (!this.isActive) return
       await this.delay(1000)
     }
   }
 
   private async timeOver(): Promise<void> {
-    this.changeUi('timeOver')
-  }
-
-  private changeUi(uiType: UpdateChurarenUiType): void {
-    const updateChurarenUi = new UpdateChurarenUiEvent(uiType)
-    this.eventBus.post(updateChurarenUi)
+    this.eventBus.post(new ChurarenResultEvent('timeOver'))
   }
 
   private get isActive(): boolean {

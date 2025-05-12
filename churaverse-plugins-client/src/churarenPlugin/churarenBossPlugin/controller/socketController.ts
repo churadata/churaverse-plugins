@@ -36,6 +36,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public setupMessageListenerRegister(ev: RegisterMessageListenerEvent<IMainScene>): void {
     this.messageListenerRegister = ev.messageListenerRegister
+    this.bossPluginStore = this.store.of('bossPlugin')
   }
 
   public registerMessageListener(): void {
@@ -52,15 +53,11 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.messageListenerRegister.off('bossWalk', this.bossWalk)
   }
 
-  public getStore(): void {
-    this.bossPluginStore = this.store.of('bossPlugin')
-  }
-
   private readonly bossSpawn = (msg: BossSpawnMessage): void => {
     const data = msg.data
+    if (this.bossPluginStore.bosses.get(data.bossId) !== undefined) return
     const pos = new Position(data.startPos.x, data.startPos.y)
     const boss = new Boss(data.bossId, pos, data.spawnTime, data.bossHp)
-    if (this.bossPluginStore.bosses.get(data.bossId) !== undefined) return
     const bossSpawnEvent = new EntitySpawnEvent(boss)
     this.eventBus.post(bossSpawnEvent)
   }
@@ -75,7 +72,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   private readonly collisionBossDamage = (msg: WeaponDamageMessage): void => {
     const data = msg.data
-    if (data.cause !== 'boss') return
+    if (data.cause !== 'collisionBoss') return
     const target = this.store.of('playerPlugin').players.get(data.targetId)
     const boss = this.bossPluginStore.bosses.get(data.weaponId)
     const attacker = boss?.bossId

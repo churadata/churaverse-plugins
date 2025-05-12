@@ -1,15 +1,16 @@
 import { DomManager, IMainScene, Store, domLayerSetting } from 'churaverse-engine-client'
-import { CHURAREN_GAME_START_BUTTON_ID, DescriptionWindowComponent } from './component/DescriptionWindowComponent'
+import { DescriptionWindowComponent } from './component/DescriptionWindowComponent'
 import '@churaverse/game-plugin-client/gameUiManager'
 import { CHURAREN_DESCRIPTION } from '../startWindow/component/RuleExplanationWindowComponent'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { ChurarenPlayerReadyMessage } from '../../message/churarenPlayerReadyMessage'
 import { IDescriptionWindow } from '../../interface/IChurarenUiComponent'
 
+export const CHURAREN_GAME_START_BUTTON_ID = 'churaren-send-ready-button'
+
 export class DescriptionWindow implements IDescriptionWindow {
   public element!: HTMLElement
   public visible: boolean = true
-  private descriptionText: string = CHURAREN_DESCRIPTION
   private readonly networkPluginStore!: NetworkPluginStore<IMainScene>
 
   public constructor(
@@ -20,13 +21,12 @@ export class DescriptionWindow implements IDescriptionWindow {
   }
 
   public initialize(): void {
-    this.element = DomManager.addJsxDom(DescriptionWindowComponent({ description: this.descriptionText }))
+    this.element = DomManager.addJsxDom(DescriptionWindowComponent({ description: CHURAREN_DESCRIPTION }))
     domLayerSetting(this.element, 'lowest')
     this.setSendReadyButton(this.playerId)
   }
 
   public remove(): void {
-    this.descriptionText = ''
     this.element.parentNode?.removeChild(this.element)
   }
 

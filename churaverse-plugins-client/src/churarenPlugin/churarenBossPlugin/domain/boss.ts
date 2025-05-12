@@ -20,13 +20,6 @@ export class Boss extends LivingEntity {
   }
 
   /**
-   * ボスが死んでいるかどうか
-   */
-  public get isDead(): boolean {
-    return this.hp <= 0
-  }
-
-  /**
    * ボスの移動
    * @param position 移動先の座標
    */

@@ -3,8 +3,8 @@ import { IBossRendererFactory } from '../domain/IBossRendererFactory'
 import { BossPluginStore } from './defBossPluginStore'
 import { BossRepository } from '../repository/bossRepository'
 import { IBossRenderer } from '../domain/IBossRenderer'
-import { DamageCauseLogRenderer } from '../ui/damageCauseLog/damageCauseLogRenderer'
-import { DamageCauseLogRepository } from '../ui/damageCauseLog/deathLogRepository'
+import { BossDamageCauseLogRenderer } from '../ui/damageCauseLog/bossDamageCauseLogRenderer'
+import { BossDamageCauseLogRepository } from '../ui/damageCauseLog/bossDamageLogRepository'
 
 export function initBossPluginStore(store: Store<IMainScene>, rendererFactory: IBossRendererFactory | undefined): void {
   if (rendererFactory === undefined) throw Error('rendererFactory is undefined')
@@ -13,8 +13,8 @@ export function initBossPluginStore(store: Store<IMainScene>, rendererFactory: I
     bosses: new BossRepository(),
     bossRenderers: new Map<string, IBossRenderer>(),
     bossRendererFactory: rendererFactory,
-    damageCauseLogRenderer: new DamageCauseLogRenderer(store.of('coreUiPlugin').fadeOutLogRenderer),
-    damageCauseLogRepository: new DamageCauseLogRepository(),
+    damageCauseLogRenderer: new BossDamageCauseLogRenderer(store.of('coreUiPlugin').fadeOutLogRenderer),
+    damageCauseLogRepository: new BossDamageCauseLogRepository(),
   }
 
   store.setInit('bossPlugin', bossPluginStore)

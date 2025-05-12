@@ -1,9 +1,8 @@
 // constants
 export { CHURAREN_CONSTANTS } from './constants/churarenConstants'
 
-// types
-export type { UpdateChurarenUiType, ChurarenUiState, ChurarenGameResult } from './types/uiTypes'
-export { isChurarenUiState, isChurarenGameResult } from './types/uiTypes'
+// type
+export { type ChurarenGameResultType } from './types/uiTypes'
 
 // model
 export { ChurarenEnemyDamageCause } from './model/churarenEnemyDamageCause'

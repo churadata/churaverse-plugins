@@ -2,18 +2,19 @@ import { CoreGamePlugin } from '@churaverse/game-plugin-server/domain/coreGamePl
 import { SocketController } from './controller/socketController'
 import { initChurarenPluginStore, resetChurarenPluginStore } from './store/churarenPluginStoreManager'
 import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
-import { UpdateChurarenUiEvent } from './event/updateChurarenUiEvent'
-import { UpdateChurarenUiMessage } from './message/updateChurarenUiMessage'
 import { CHURAREN_CONSTANTS } from './constants/churarenConstants'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
-import { isChurarenGameResult } from './types/uiTypes'
 import { IMainScene } from 'churaverse-engine-server'
+import { ChurarenResultEvent } from './event/churarenResultEvent'
+import { ChurarenStartCountdownMessage } from './message/churarenStartCountdownMessage'
+import { ChurarenStartTimerMessage } from './message/churarenStartTimerMessage'
+import { ChurarenResultMessage } from './message/churarenResultMessage'
 
-const RESULT_DISPLAY_TIME = 5 // 結果表示時間(sec)
+const RESULT_DISPLAY_TIME_SECONDS = 5 // 結果表示時間(sec)
 
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
-  private socketController!: SocketController
+  private socketController?: SocketController
   private networkPluginStore!: NetworkPluginStore<IMainScene>
 
   public listenEvent(): void {
@@ -33,7 +34,9 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    */
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
-    this.bus.subscribeEvent('updateChurarenUi', this.updateChurarenUi)
+    this.bus.subscribeEvent('churarenStartCountdown', this.countdown)
+    this.bus.subscribeEvent('churarenStartTimer', this.timer)
+    this.bus.subscribeEvent('churarenResult', this.churarenResult)
   }
 
   /**
@@ -41,7 +44,9 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    */
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
-    this.bus.unsubscribeEvent('updateChurarenUi', this.updateChurarenUi)
+    this.bus.unsubscribeEvent('churarenStartCountdown', this.countdown)
+    this.bus.unsubscribeEvent('churarenStartTimer', this.timer)
+    this.bus.unsubscribeEvent('churarenResult', this.churarenResult)
   }
 
   private init(): void {
@@ -52,8 +57,8 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    * ゲームが開始された時の処理
    */
   protected handleGameStart(): void {
-    initChurarenPluginStore(this.store, this.bus)
-    this.socketController.registerMessageListener()
+    initChurarenPluginStore(this.gameId, this.store, this.bus)
+    this.socketController?.registerMessageListener()
     this.sequence()
       .then(() => {
         console.log('sequence done')
@@ -69,23 +74,30 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    */
   protected handleGameTermination(): void {
     resetChurarenPluginStore(this.store)
-    this.socketController.unregisterMessageListener()
+    this.socketController?.unregisterMessageListener()
   }
 
-  private readonly updateChurarenUi = (ev: UpdateChurarenUiEvent): void => {
-    const uiType = ev.uiType
-    const updateChurarenUiMessage = new UpdateChurarenUiMessage({ uiType })
-    this.networkPluginStore.messageSender.send(updateChurarenUiMessage)
+  private readonly countdown = (): void => {
+    this.networkPluginStore.messageSender.send(new ChurarenStartCountdownMessage())
+  }
 
-    if (isChurarenGameResult(uiType)) {
-      setTimeout(() => {
-        this.bus.post(new GameEndEvent(this.gameId))
-      }, RESULT_DISPLAY_TIME * 1000)
-    }
+  private readonly timer = (): void => {
+    this.networkPluginStore.messageSender.send(new ChurarenStartTimerMessage())
+  }
+
+  /**
+   * 結果を表示する処理 \
+   * `RESULT_DISPLAY_TIME_SECONDS`秒後にゲームを終了する
+   */
+  private readonly churarenResult = (ev: ChurarenResultEvent): void => {
+    this.networkPluginStore.messageSender.send(new ChurarenResultMessage({ resultType: ev.resultType }))
+    setTimeout(() => {
+      this.bus.post(new GameEndEvent(this.gameId))
+    }, RESULT_DISPLAY_TIME_SECONDS * 1000)
   }
 
   private async sequence(): Promise<void> {
-    await this.store.of('churarenPlugin').churarenGameSequence.sequence(this.gameId)
+    await this.store.of('churarenPlugin').churarenGameSequence.sequence()
   }
 }
 

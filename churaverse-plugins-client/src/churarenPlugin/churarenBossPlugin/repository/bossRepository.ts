@@ -22,4 +22,8 @@ export class BossRepository {
   public get size(): number {
     return this.bosses.size
   }
+
+  public clear(): void {
+    this.bosses.clear()
+  }
 }
