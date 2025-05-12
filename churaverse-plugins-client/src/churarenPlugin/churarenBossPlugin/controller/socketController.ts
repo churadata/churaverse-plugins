@@ -36,6 +36,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public setupMessageListenerRegister(ev: RegisterMessageListenerEvent<IMainScene>): void {
     this.messageListenerRegister = ev.messageListenerRegister
+    this.bossPluginStore = this.store.of('bossPlugin')
   }
 
   public registerMessageListener(): void {
@@ -50,10 +51,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.messageListenerRegister.off('bossDespawn', this.bossDespawn)
     this.messageListenerRegister.off('weaponDamage', this.collisionBossDamage)
     this.messageListenerRegister.off('bossWalk', this.bossWalk)
-  }
-
-  public getStore(): void {
-    this.bossPluginStore = this.store.of('bossPlugin')
   }
 
   private readonly bossSpawn = (msg: BossSpawnMessage): void => {
