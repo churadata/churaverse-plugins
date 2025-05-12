@@ -4,8 +4,12 @@ import { RegisterMessageEvent } from '@churaverse/network-plugin-client/event/re
 import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-client/event/registerMessageListenerEvent'
 import { BaseSocketController } from '@churaverse/network-plugin-client/interface/baseSocketController'
 import { ChurarenPlayerReadyMessage } from '../message/churarenPlayerReadyMessage'
-import { UpdateChurarenUiMessage } from '../message/updateChurarenUiMessage'
-import { UpdateChurarenUiEvent } from '../event/updateChurarenUiEvent'
+import { ChurarenStartTimerMessage } from '../message/churarenStartTimerMessage'
+import { ChurarenStartCountdownMessage } from '../message/churarenStartCountdownMessage'
+import { ChurarenResultMessage } from '../message/churarenResultMessage'
+import { ChurarenStartCountdownEvent } from '../event/churarenStartCountdownEvent'
+import { ChurarenStartTimerEvent } from '../event/churarenStartTimer'
+import { ChurarenResultEvent } from '../event/churarenResultEvent'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
@@ -16,7 +20,9 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
     ev.messageRegister.registerMessage('churarenPlayerReady', ChurarenPlayerReadyMessage, 'queue')
-    ev.messageRegister.registerMessage('updateChurarenUi', UpdateChurarenUiMessage, 'dest=onlySelf')
+    ev.messageRegister.registerMessage('churarenStartCountdown', ChurarenStartCountdownMessage, 'queue')
+    ev.messageRegister.registerMessage('churarenStartTimer', ChurarenStartTimerMessage, 'queue')
+    ev.messageRegister.registerMessage('churarenResult', ChurarenResultMessage, 'queue')
   }
 
   public setupMessageListenerRegister(ev: RegisterMessageListenerEvent<IMainScene>): void {
@@ -24,15 +30,26 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   public registerMessageListener(): void {
-    this.messageListenerRegister.on('updateChurarenUi', this.updateChurarenUi)
+    this.messageListenerRegister.on('churarenStartCountdown', this.churarenStartCountdown)
+    this.messageListenerRegister.on('churarenStartTimer', this.churarenStartTimer)
+    this.messageListenerRegister.on('churarenResult', this.churarenResult)
   }
 
   public unregisterMessageListener(): void {
-    this.messageListenerRegister.off('updateChurarenUi', this.updateChurarenUi)
+    this.messageListenerRegister.off('churarenStartCountdown', this.churarenStartCountdown)
+    this.messageListenerRegister.off('churarenStartTimer', this.churarenStartTimer)
+    this.messageListenerRegister.off('churarenResult', this.churarenResult)
   }
 
-  public updateChurarenUi = (msg: UpdateChurarenUiMessage): void => {
-    const uiType = msg.data.uiType
-    this.eventBus.post(new UpdateChurarenUiEvent(uiType))
+  public churarenStartCountdown = (): void => {
+    this.eventBus.post(new ChurarenStartCountdownEvent())
+  }
+
+  public churarenStartTimer = (): void => {
+    this.eventBus.post(new ChurarenStartTimerEvent())
+  }
+
+  public churarenResult = (msg: ChurarenResultMessage): void => {
+    this.eventBus.post(new ChurarenResultEvent(msg.data.resultType))
   }
 }

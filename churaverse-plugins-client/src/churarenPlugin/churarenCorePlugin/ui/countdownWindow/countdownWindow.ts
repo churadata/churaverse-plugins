@@ -3,7 +3,7 @@ import { CountdownWindowComponent } from './component/CountdownWindowComponent'
 import { ICountdownWindow } from '../../interface/IChurarenUiComponent'
 
 export const CHURAREN_GAME_START_COUNTDOWN_ID = 'churaren-game-start-countdown'
-const COUNTDOWN_TIME = 3
+const COUNTDOWN_TIME_SECONDS = 3
 
 export class CountdownWindow implements ICountdownWindow {
   public countdownTime: number = 0
@@ -17,7 +17,7 @@ export class CountdownWindow implements ICountdownWindow {
   }
 
   public startCountdown(): void {
-    this.countdownTime = COUNTDOWN_TIME
+    this.countdownTime = COUNTDOWN_TIME_SECONDS
     this.element.style.display = 'flex'
     this.updateCountdown()
     this.intervalId = setInterval(() => {
@@ -32,7 +32,6 @@ export class CountdownWindow implements ICountdownWindow {
 
   private updateCountdown(): void {
     const countdownElement = DomManager.getElementById(CHURAREN_GAME_START_COUNTDOWN_ID)
-    if (countdownElement === null || countdownElement === undefined) return
     if (this.countdownTime === 0) {
       countdownElement.innerHTML = 'START!'
     } else if (this.countdownTime === -1) {
@@ -54,6 +53,7 @@ export class CountdownWindow implements ICountdownWindow {
   }
 
   public remove(): void {
+    this.close()
     this.element.parentNode?.removeChild(this.element)
   }
 }
