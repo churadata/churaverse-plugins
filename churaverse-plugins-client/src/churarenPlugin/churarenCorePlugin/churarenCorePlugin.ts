@@ -2,18 +2,17 @@ import { CoreGamePlugin } from '@churaverse/game-plugin-client/domain/coreGamePl
 import { CHURAREN_CONSTANTS } from './constants/churarenConstants'
 import { SocketController } from './controller/socketController'
 import { ChurarenDialogManager } from './ui/startWindow/churarenDialogManager'
-import { UpdateChurarenUiEvent } from './event/updateChurarenUiEvent'
 import { RegisterGameUiEvent } from '@churaverse/game-plugin-client/event/registerGameUiEvent'
 import { registerChurarenUi } from './ui/registerChurarenUi'
 import { CHURAREN_UI_KEYS } from './ui/defChurarenUi'
-import { ChurarenGameResult } from './types/uiTypes'
 import { BaseGamePlugin } from '@churaverse/game-plugin-client/domain/baseGamePlugin'
+import { ChurarenResultEvent } from './event/churarenResultEvent'
 
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
   protected gameName = CHURAREN_CONSTANTS.GAME_NAME
-  private churarenDialogManager!: ChurarenDialogManager
-  private socketController!: SocketController
+  private churarenDialogManager?: ChurarenDialogManager
+  private socketController?: SocketController
 
   public listenEvent(): void {
     super.listenEvent()
@@ -34,7 +33,9 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    */
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
-    this.bus.subscribeEvent('updateChurarenUi', this.updateChurarenUi)
+    this.bus.subscribeEvent('churarenStartCountdown', this.startCountdown)
+    this.bus.subscribeEvent('churarenStartTimer', this.startTimer)
+    this.bus.subscribeEvent('churarenResult', this.resultChurarenUi)
   }
 
   /**
@@ -42,7 +43,9 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    */
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
-    this.bus.unsubscribeEvent('updateChurarenUi', this.updateChurarenUi)
+    this.bus.unsubscribeEvent('churarenStartCountdown', this.startCountdown)
+    this.bus.unsubscribeEvent('churarenStartTimer', this.startTimer)
+    this.bus.unsubscribeEvent('churarenResult', this.resultChurarenUi)
   }
 
   protected init(): void {
@@ -57,60 +60,43 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    * ゲームが開始された時の処理
    */
   protected handleGameStart(): void {
-    this.socketController.registerMessageListener()
-    this.churarenDialogManager.setGameAbortButtonText()
+    this.socketController?.registerMessageListener()
+    this.churarenDialogManager?.setGameAbortButtonText()
   }
 
   /**
    * 中断・終了時に実行される処理
    */
   protected handleGameTermination(): void {
-    this.socketController.unregisterMessageListener()
-    this.churarenDialogManager.setGameStartButtonText()
+    this.socketController?.unregisterMessageListener()
+    this.churarenDialogManager?.setGameStartButtonText()
+    this.gamePluginStore.gameUiManager.removeAllUis(this.gameId)
   }
 
   /**
    * 途中参加時の処理
    */
   protected handleMidwayParticipant(): void {
-    this.subscribeGameEvent()
-    this.socketController.registerMessageListener()
-    this.churarenDialogManager.setGameAbortButtonText()
+    this.socketController?.registerMessageListener()
+    this.churarenDialogManager?.setGameAbortButtonText()
   }
 
-  private readonly updateChurarenUi = (ev: UpdateChurarenUiEvent): void => {
-    switch (ev.uiType) {
-      case 'startCount':
-        this.updateCountdown()
-        break
-      case 'countTimer':
-        this.updateTimer()
-        break
-      default:
-        this.deleteTimerComponent()
-        this.resultChurarenUi(ev.uiType)
-        break
-    }
-  }
-
-  private updateCountdown(): void {
+  private readonly startCountdown = (): void => {
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.DESCRIPTION_WINDOW)?.remove()
     const countdownWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.COUNTDOWN_WINDOW)
     countdownWindow?.startCountdown()
   }
 
-  private updateTimer(): void {
+  private readonly startTimer = (): void => {
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.COUNTDOWN_WINDOW)?.remove()
     const timerContainer = this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.TIMER_CONTAINER)
     timerContainer?.startTimer()
   }
 
-  private resultChurarenUi(resultType: ChurarenGameResult): void {
+  private readonly resultChurarenUi = (ev: ChurarenResultEvent): void => {
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.TIMER_CONTAINER)?.remove()
     const resultWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.RESULT_WINDOW)
-    resultWindow?.showResult(resultType)
-  }
-
-  private deleteTimerComponent(): void {
-    const timerContainer = this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.TIMER_CONTAINER)
-    timerContainer?.remove()
+    resultWindow?.showResult(ev.resultType)
   }
 }
 

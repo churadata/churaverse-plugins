@@ -4,14 +4,18 @@ import { RegisterMessageEvent } from '@churaverse/network-plugin-server/event/re
 import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-server/event/registerMessageListenerEvent'
 import { IMessageListenerRegister } from '@churaverse/network-plugin-server/interface/IMessageListenerRegister'
 import { ChurarenPlayerReadyMessage } from '../message/churarenPlayerReadyMessage'
-import { UpdateChurarenUiMessage } from '../message/updateChurarenUiMessage'
+import { ChurarenStartCountdownMessage } from '../message/churarenStartCountdownMessage'
+import { ChurarenStartTimerMessage } from '../message/churarenStartTimerMessage'
+import { ChurarenResultMessage } from '../message/churarenResultMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
 
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
     ev.messageRegister.registerMessage('churarenPlayerReady', ChurarenPlayerReadyMessage, 'onlyServer')
-    ev.messageRegister.registerMessage('updateChurarenUi', UpdateChurarenUiMessage, 'allClients')
+    ev.messageRegister.registerMessage('churarenStartCountdown', ChurarenStartCountdownMessage, 'allClients')
+    ev.messageRegister.registerMessage('churarenStartTimer', ChurarenStartTimerMessage, 'onlyServer')
+    ev.messageRegister.registerMessage('churarenResult', ChurarenResultMessage, 'allClients')
   }
 
   /**
