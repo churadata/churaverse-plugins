@@ -2,7 +2,7 @@ import { Entity } from 'churaverse-engine-server'
 import { ChurarenEnemyDamageCause } from '@churaverse/churaren-core-plugin-server'
 
 /**
- * ボスとの当たり判定によるダメージの抽象クラス
+ * ボスとの当たり判定によるダメージを表すクラス
  * @param collisionName 当たり判定の名前
  * @param collisionEntity 当たり判定のエンティティ
  */
