@@ -32,7 +32,6 @@ export class CountdownWindow implements ICountdownWindow {
 
   private updateCountdown(): void {
     const countdownElement = DomManager.getElementById(CHURAREN_GAME_START_COUNTDOWN_ID)
-    if (countdownElement === null || countdownElement === undefined) return
     if (this.countdownTime === 0) {
       countdownElement.innerHTML = 'START!'
     } else if (this.countdownTime === -1) {
@@ -54,6 +53,7 @@ export class CountdownWindow implements ICountdownWindow {
   }
 
   public remove(): void {
+    this.close()
     this.element.parentNode?.removeChild(this.element)
   }
 }

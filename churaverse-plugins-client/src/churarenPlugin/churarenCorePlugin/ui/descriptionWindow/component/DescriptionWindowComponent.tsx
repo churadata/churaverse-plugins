@@ -1,6 +1,6 @@
 import { JSXFunc } from 'churaverse-engine-client'
 import style from './DescriptionWindowComponent.module.scss'
-export const CHURAREN_GAME_START_BUTTON_ID = 'churaren-send-ready-button'
+import { CHURAREN_GAME_START_BUTTON_ID } from '../descriptionWindow'
 
 interface DescriptionWindowProps {
   description: string
