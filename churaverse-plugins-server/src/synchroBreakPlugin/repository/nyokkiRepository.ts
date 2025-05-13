@@ -5,15 +5,13 @@ import { INyokkiRepository } from '../interface/INyokkiRepository'
  * nyokkiRepositoryで各プレイヤーのnyokkiの状態を保存する
  */
 export class NyokkiRepository implements INyokkiRepository {
-  public readonly userNyokkiMap: Map<string, Nyokki>
+  public readonly userNyokkiMap = new Map<string, Nyokki>()
 
   public constructor() {
     this.userNyokkiMap = new Map<string, Nyokki>()
   }
 
-  public set(id: string, nyokki: Nyokki | undefined): void {
-    if (nyokki === undefined) return
-
+  public set(id: string, nyokki: Nyokki): void {
     this.userNyokkiMap.set(id, nyokki)
   }
 
