@@ -16,6 +16,9 @@ import { UpdatePlayersCoinMessage } from './message/updatePlayersCoinMessage'
 import { SendBetCoinResponseMessage } from './message/sendBetCoinResponseMessage'
 import { NyokkiGameTurnStartEvent } from './event/nyokkiGameTurnStartEvent'
 import { NyokkiTurnStartMessage } from './message/nyokkiTurnStartMessage'
+import { SynchroBreakResultMessage } from './message/synchroBreakResultMessage'
+import { SynchroBreakEndEvent } from './event/synchroBreakEndEvent'
+import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
 
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
@@ -24,6 +27,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   private synchroBreakPluginStore!: SynchroBreakPluginStore
   private socketController!: SocketController
   private sameTimePlayers: string[] = []
+  private finishedPlayers: string[] = []
   private readonly nyokkiDurationTime = 100
   private readonly initialPlayerCoins = 100
 
@@ -50,6 +54,8 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.subscribeEvent('nyokki', this.nyokkiAction)
     this.bus.subscribeEvent('nyokkiGameTurnEnd', this.nyokkiGameTurnEnd)
     this.bus.subscribeEvent('nyokkiGameTurnStart', this.nyokkiGameTurnStart)
+    this.bus.subscribeEvent('synchroBreakResult', this.synchroBreakResult)
+    this.bus.subscribeEvent('synchroBreakEnd', this.synchroBreakEnd)
   }
 
   /**
@@ -63,6 +69,8 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.unsubscribeEvent('nyokki', this.nyokkiAction)
     this.bus.unsubscribeEvent('nyokkiGameTurnEnd', this.nyokkiGameTurnEnd)
     this.bus.unsubscribeEvent('nyokkiGameTurnStart', this.nyokkiGameTurnStart)
+    this.bus.unsubscribeEvent('synchroBreakResult', this.synchroBreakResult)
+    this.bus.unsubscribeEvent('synchroBreakEnd', this.synchroBreakEnd)
   }
 
   private init(): void {
@@ -77,6 +85,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.socketController.registerMessageListener()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
     this.synchroBreakPluginStore.game.getSynchroBreakPluginStore(this.synchroBreakPluginStore)
+    this.finishedPlayers = []
     for (const playerId of this.participantIds) {
       this.synchroBreakPluginStore.playersCoinRepository.set(playerId, this.initialPlayerCoins)
     }
@@ -91,6 +100,18 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   protected handleGameTermination(): void {
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
+  }
+
+  /**
+   * 結果ウィンドウの閉じるボタンを押した時に実行される処理
+   */
+  private readonly synchroBreakEnd = (ev: SynchroBreakEndEvent): void => {
+    const playerId: string = ev.playerId
+    if (this.finishedPlayers.includes(playerId)) return
+    this.finishedPlayers.push(playerId)
+    if (this.finishedPlayers.length >= this.participantIds.length) {
+      this.bus.post(new GameEndEvent(this.gameId))
+    }
   }
 
   /**
@@ -219,6 +240,16 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.calculateResultPlayersCoin()
 
     this.resetTurnRepository()
+  }
+
+  /**
+   * プレイヤーに結果画面を表示させる。
+   */
+  private readonly synchroBreakResult = (): void => {
+    this.calculateResultPlayersCoin()
+    const sortedPlayersCoin = this.synchroBreakPluginStore.playersCoinRepository.sortedPlayerCoins()
+    this.networkPluginStore.messageSender.send(new UpdatePlayersCoinMessage({ playersCoin: sortedPlayersCoin }))
+    this.networkPluginStore.messageSender.send(new SynchroBreakResultMessage())
   }
 
   /**
