@@ -6,6 +6,7 @@ import { GameIds } from '../interface/gameIds'
 import { IGameInfo } from '../interface/IGameInfo'
 import { GamePluginStore } from '../store/defGamePluginStore'
 import { BaseGamePlugin } from './baseGamePlugin'
+import { UpdateGameParticipantEvent } from '../event/updateGameParticipantEvent'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -46,12 +47,14 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     super.subscribeGameEvent()
     this.bus.subscribeEvent('gameAbort', this.gameAbort)
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
+    this.bus.subscribeEvent('updateGameParticipant', this.updateGameParticipant)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
+    this.bus.unsubscribeEvent('updateGameParticipant', this.updateGameParticipant)
   }
 
   public getStores(): void {
@@ -94,4 +97,16 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._isOwnPlayerMidwayParticipant = false
     this.gameInfoStore.games.delete(this.gameId)
   }
+
+  private readonly updateGameParticipant = (ev: UpdateGameParticipantEvent): void => {
+    if (ev.gameId !== this.gameId) return
+
+    const leaveId = this._participantIds.find((id) => !ev.participantIds.includes(id))
+    if (leaveId === undefined) return
+
+    this._participantIds = ev.participantIds
+    this.handlePlayerLeave(leaveId)
+  }
+
+  protected abstract handlePlayerLeave(playerId: string): void
 }
