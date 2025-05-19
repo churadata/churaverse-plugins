@@ -1,10 +1,7 @@
-import { CVEvent, IMainScene } from 'churaverse-engine-server'
+import { IMainScene, CVEvent } from 'churaverse-engine-server'
 
-/**
- * プレイヤーが退出した際に発火されるイベント
- */
 export class PlayerLeaveEvent extends CVEvent<IMainScene> {
-  public constructor(public readonly playerId: string) {
+  public constructor(public readonly id: string) {
     super('playerLeave', true)
   }
 }
