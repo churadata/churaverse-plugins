@@ -48,14 +48,14 @@ export class CoinViewer {
     const startX = 14 - totalWidth / 2 + numberIconPosX / 2
 
     for (let i = 0; i < numDigits; i++) {
-      const digit = betCoinsStr[i]
+      const digit = Number(betCoinsStr[i])
 
       // 各桁の描画する位置を計算(非整数値になると、Uiがぼやけて描画されるとため、整数で位置を指定)
       const xOffset = Math.round(startX + (numberIconPosX + 2) * i)
 
       const coinImage = this.scene.add
         .image(xOffset, 35, TEXTURE_BET_COIN_NUMBER)
-        .setFrame(Number(digit))
+        .setFrame(digit)
         .setDisplaySize(numberIconPosX, numberIconPosY)
         .setAlpha(1)
         .setDepth(0)
