@@ -88,6 +88,11 @@ export class PlayerNyokkiStatusIcon {
       case 'success':
         this.displaySuccessIcon(order)
         break
+      case 'yet':
+        this.resetStatusIcon()
+        break
+      default:
+        throw new Error('received unsupported nyokki status')
     }
   }
 
