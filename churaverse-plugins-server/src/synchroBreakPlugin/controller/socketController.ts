@@ -3,20 +3,20 @@ import { BaseSocketController } from '@churaverse/network-plugin-server/interfac
 import { RegisterMessageEvent } from '@churaverse/network-plugin-server/event/registerMessageEvent'
 import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-server/event/registerMessageListenerEvent'
 import { IMessageListenerRegister } from '@churaverse/network-plugin-server/interface/IMessageListenerRegister'
-import { NyokkiTurnSelectMessage } from '../message/nyokkiTurnSelectMessage'
-import { NyokkiTurnSelectEvent } from '../event/nyokkiTurnSelectEvent'
+import { SynchroBreakTurnSelectMessage } from '../message/synchroBreakTurnSelectMessage'
+import { SynchroBreakTurnSelectEvent } from '../event/synchroBreakTurnSelectEvent'
 import { TimeLimitConfirmMessage } from '../message/timeLimitConfirmMessage'
 import { TimeLimitConfirmEvent } from '../event/timeLimitConfirmEvent'
 import { SendBetCoinMessage } from '../message/sendBetCoinMessage'
 import { SendBetCoinEvent } from '../event/sendBetCoinEvent'
 import { SendBetCoinResponseMessage } from '../message/sendBetCoinResponseMessage'
-import { NyokkiGameStartCountMessage } from '../message/nyokkiGameStartCountMessage'
-import { NyokkiTurnTimerMessage } from '../message/nyokkiTurnTimerMessage'
+import { SynchroBreakStartCountMessage } from '../message/synchroBreakStartCountMessage'
+import { SynchroBreakTurnTimerMessage } from '../message/synchroBreakTurnTimerMessage'
 import { NyokkiMessage } from '../message/nyokkiMessage'
 import { NyokkiEvent } from '../event/nyokkiEvent'
 import { NyokkiActionResponseMessage } from '../message/nyokkiActionResponseMessage'
-import { NyokkiTurnEndMessage } from '../message/nyokkiTurnEndMessage'
-import { NyokkiTurnStartMessage } from '../message/nyokkiTurnStartMessage'
+import { SynchroBreakTurnEndMessage } from '../message/synchroBreakTurnEndMessage'
+import { SynchroBreakTurnStartMessage } from '../message/synchroBreakTurnStartMessage'
 import { UpdatePlayersCoinMessage } from '../message/updatePlayersCoinMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
@@ -27,16 +27,16 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
-    ev.messageRegister.registerMessage('nyokkiTurnSelect', NyokkiTurnSelectMessage, 'allClients')
+    ev.messageRegister.registerMessage('synchroBreakTurnSelect', SynchroBreakTurnSelectMessage, 'allClients')
     ev.messageRegister.registerMessage('timeLimitConfirm', TimeLimitConfirmMessage, 'allClients')
     ev.messageRegister.registerMessage('sendBetCoin', SendBetCoinMessage, 'onlyServer')
     ev.messageRegister.registerMessage('sendBetCoinResponse', SendBetCoinResponseMessage, 'allClients')
-    ev.messageRegister.registerMessage('nyokkiGameStartCount', NyokkiGameStartCountMessage, 'allClients')
-    ev.messageRegister.registerMessage('nyokkiTurnTimer', NyokkiTurnTimerMessage, 'allClients')
+    ev.messageRegister.registerMessage('synchroBreakStartCount', SynchroBreakStartCountMessage, 'allClients')
+    ev.messageRegister.registerMessage('synchroBreakTurnTimer', SynchroBreakTurnTimerMessage, 'allClients')
     ev.messageRegister.registerMessage('nyokki', NyokkiMessage, 'onlyServer')
     ev.messageRegister.registerMessage('nyokkiActionResponse', NyokkiActionResponseMessage, 'allClients')
-    ev.messageRegister.registerMessage('nyokkiTurnEnd', NyokkiTurnEndMessage, 'allClients')
-    ev.messageRegister.registerMessage('nyokkiTurnStart', NyokkiTurnStartMessage, 'allClients')
+    ev.messageRegister.registerMessage('synchroBreakTurnEnd', SynchroBreakTurnEndMessage, 'allClients')
+    ev.messageRegister.registerMessage('synchroBreakTurnStart', SynchroBreakTurnStartMessage, 'allClients')
     ev.messageRegister.registerMessage('updatePlayersCoin', UpdatePlayersCoinMessage, 'allClients')
   }
 
@@ -51,7 +51,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
    * メッセージリスナーを登録する
    */
   public registerMessageListener(): void {
-    this.messageListenerRegister.on('nyokkiTurnSelect', this.nyokkiTurnSelect)
+    this.messageListenerRegister.on('synchroBreakTurnSelect', this.synchroBreakTurnSelect)
     this.messageListenerRegister.on('timeLimitConfirm', this.timeLimitConfirm)
     this.messageListenerRegister.on('sendBetCoin', this.sendBetCoin)
     this.messageListenerRegister.on('nyokki', this.nyokki)
@@ -61,14 +61,14 @@ export class SocketController extends BaseSocketController<IMainScene> {
    * メッセージリスナーを解除する
    */
   public unregisterMessageListener(): void {
-    this.messageListenerRegister.off('nyokkiTurnSelect', this.nyokkiTurnSelect)
+    this.messageListenerRegister.off('synchroBreakTurnSelect', this.synchroBreakTurnSelect)
     this.messageListenerRegister.off('timeLimitConfirm', this.timeLimitConfirm)
     this.messageListenerRegister.off('sendBetCoin', this.sendBetCoin)
     this.messageListenerRegister.off('nyokki', this.nyokki)
   }
 
-  private readonly nyokkiTurnSelect = (msg: NyokkiTurnSelectMessage): void => {
-    this.eventBus.post(new NyokkiTurnSelectEvent(msg.data.allTurn))
+  private readonly synchroBreakTurnSelect = (msg: SynchroBreakTurnSelectMessage): void => {
+    this.eventBus.post(new SynchroBreakTurnSelectEvent(msg.data.allTurn))
   }
 
   private readonly timeLimitConfirm = (msg: TimeLimitConfirmMessage): void => {
