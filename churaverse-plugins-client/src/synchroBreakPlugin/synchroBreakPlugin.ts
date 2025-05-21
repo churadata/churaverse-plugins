@@ -296,7 +296,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   /**
    * ターンが開始した際の処理
    */
-  private readonly nyokkiTurnStart = (ev: NyokkiTurnStartEvent): void => {
+  private readonly synchroBreakTurnStart = (ev: SynchroBreakTurnStartEvent): void => {
     if (this.isOwnPlayerMidwayParticipant) return
     this.resetPlayerNyokkiIcon()
     this.removeBetCoinUi()
