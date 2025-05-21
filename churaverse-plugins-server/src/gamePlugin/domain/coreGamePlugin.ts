@@ -12,6 +12,7 @@ import { ResponseGameStartMessage } from '../message/gameStartMessage'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
 import { UpdateGameParticipantMessage } from '../message/updateGameParticipantMessage'
 import { BaseGamePlugin } from './baseGamePlugin'
+import { PlayerLeaveEvent } from '@churaverse/player-plugin-server/event/playerLeaveEvent'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -44,12 +45,14 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     super.subscribeGameEvent()
     this.bus.subscribeEvent('gameAbort', this.gameAbort)
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
+    this.bus.subscribeEvent('playerLeave', this.onPlayerLeave)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
+    this.bus.subscribeEvent('playerLeave', this.onPlayerLeave)
   }
 
   private priorGameData(ev: PriorGameDataEvent): void {
@@ -96,4 +99,31 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._participantIds = []
     this.gamePluginStore.games.delete(this.gameId)
   }
+
+  private readonly onPlayerLeave = (ev: PlayerLeaveEvent): void => {
+    if (ev.id === undefined) return
+
+    if (this.removeParticipant(ev.id)) {
+      this.handlePlayerLeave(ev.id)
+    }
+  }
+
+  private removeParticipant(playerId: string): boolean {
+    const idx = this._participantIds.indexOf(playerId)
+    if (idx === -1) return false
+    this._participantIds.splice(idx, 1)
+    this.sendParticipantUpdate()
+    return true
+  }
+
+  private sendParticipantUpdate(): void {
+    this.store.of('networkPlugin').messageSender.send(
+      new UpdateGameParticipantMessage({
+        gameId: this.gameId,
+        participantIds: this._participantIds,
+      })
+    )
+  }
+
+  protected abstract handlePlayerLeave(playerId: string): void
 }
