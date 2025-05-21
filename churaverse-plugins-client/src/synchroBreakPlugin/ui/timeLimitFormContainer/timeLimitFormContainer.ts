@@ -73,17 +73,14 @@ export class TimeLimitFormContainer implements IGameUiComponent {
 
     const plusButton = DomManager.getElementById(TIME_LIMIT_INCREMENT_BUTTON_ID)
     plusButton.onclick = () => {
-      if (this.inputFieldValue < SYNCHRO_BREAK_MAX_TIME_LIMIT) {
-        this.inputFieldValue++
-      }
+      if (this.inputFieldValue >= SYNCHRO_BREAK_MAX_TIME_LIMIT) return
+      this.inputFieldValue++
     }
 
     const minusButton = DomManager.getElementById(TIME_LIMIT_DECREMENT_BUTTON_ID)
     minusButton.onclick = () => {
-      if (this.inputFieldValue <= 0) return
-      if (this.inputFieldValue > SYNCHRO_BREAK_MIN_TIME_LIMIT) {
-        this.inputFieldValue--
-      }
+      if (this.inputFieldValue <= SYNCHRO_BREAK_MIN_TIME_LIMIT) return
+      this.inputFieldValue--
     }
   }
 

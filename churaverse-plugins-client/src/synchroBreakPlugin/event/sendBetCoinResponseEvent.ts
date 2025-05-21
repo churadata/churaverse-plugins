@@ -16,7 +16,7 @@ export class SendBetCoinResponseEvent extends CVEvent<IMainScene> {
   }
 }
 
-declare module 'churaVerse-engine-client' {
+declare module 'churaverse-engine-client' {
   export interface CVMainEventMap {
     sendBetCoinResponse: SendBetCoinResponseEvent
   }
