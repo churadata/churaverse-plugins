@@ -27,7 +27,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   private rendererFactory?: BossRendererFactory
   private bossPluginStore!: BossPluginStore
   private playerPluginStore!: PlayerPluginStore
-  private socketController!: SocketController
+  private socketController?: SocketController
   private readonly damageCauseLog: BossDamageCauseLogRepository = new BossDamageCauseLogRepository()
 
   public listenEvent(): void {
@@ -75,12 +75,13 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   public handleGameStart(): void {
     initBossPluginStore(this.store, this.rendererFactory)
     this.bossPluginStore = this.store.of('bossPlugin')
-    this.socketController.registerMessageListener()
+    this.socketController?.registerMessageListener()
+    this.socketController?.getStore()
   }
 
   protected handleGameTermination(): void {
     resetBossPluginStore(this.store)
-    this.socketController.unregisterMessageListener()
+    this.socketController?.unregisterMessageListener()
   }
 
   public handleMidwayParticipant(): void {
