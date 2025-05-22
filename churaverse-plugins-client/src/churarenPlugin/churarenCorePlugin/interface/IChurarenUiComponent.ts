@@ -1,5 +1,5 @@
 import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
-import { ChurarenGameResult } from '../types/uiTypes'
+import { ChurarenGameResultType } from '../types/uiTypes'
 
 export interface IDescriptionWindow extends IGameUiComponent {
   setDescriptionText: (text: string) => void
@@ -16,5 +16,5 @@ export interface ITimerContainer extends IGameUiComponent {
 }
 
 export interface IResultWindow extends IGameUiComponent {
-  showResult: (result: ChurarenGameResult) => void
+  showResult: (result: ChurarenGameResultType) => void
 }

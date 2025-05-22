@@ -1,7 +1,7 @@
 import { domLayerSetting, DomManager } from 'churaverse-engine-client'
 import { GameResultWindowComponent } from './component/ResultWindowComponent'
-import { ChurarenGameResult } from '../../types/uiTypes'
 import { IResultWindow } from '../../interface/IChurarenUiComponent'
+import { ChurarenGameResultType } from '../../types/uiTypes'
 
 export const CHURAREN_GAME_FINISH_BUTTON_ID = 'churaren-game-finish-button'
 export const CHURAREN_GAME_RESULT_TEXT_ID = 'churaren-game-result-text'
@@ -25,7 +25,7 @@ export class ResultWindow implements IResultWindow {
     }
   }
 
-  public showResult(result: ChurarenGameResult): void {
+  public showResult(result: ChurarenGameResultType): void {
     const resultText = DomManager.getElementById(CHURAREN_GAME_RESULT_TEXT_ID)
     switch (result) {
       case 'win':
