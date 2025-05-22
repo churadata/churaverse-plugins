@@ -36,6 +36,9 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public setupMessageListenerRegister(ev: RegisterMessageListenerEvent<IMainScene>): void {
     this.messageListenerRegister = ev.messageListenerRegister
+  }
+
+  public getStore(): void {
     this.bossPluginStore = this.store.of('bossPlugin')
   }
 
