@@ -1,0 +1,18 @@
+{
+  "name": "@churaverse/churaren-plugins-server",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tsc",
+    "link:cvPackages": "sh npm_link_cvPackages.sh"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@churaverse/churaren-boss-plugin-server": "file:../churarenBossPlugin",
+    "@churaverse/churaren-core-plugin-server": "file:../churarenCorePlugin",
+    "@churaverse/game-plugin-server": "file:../../gamePlugin"
+  }
+}
