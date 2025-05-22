@@ -29,7 +29,7 @@ export class TimerContainer implements ITimerContainer {
         timerWindowElement.innerHTML = '0:00'
         // ゲーム終了処理を行う
         setTimeout(() => {
-          this.close()
+          this.hideTimer()
         }, 1000)
         return
       }
@@ -49,7 +49,7 @@ export class TimerContainer implements ITimerContainer {
     this.element.parentNode?.removeChild(this.element)
   }
 
-  public close(): void {
+  public hideTimer(): void {
     this.element.style.display = 'none'
   }
 }
