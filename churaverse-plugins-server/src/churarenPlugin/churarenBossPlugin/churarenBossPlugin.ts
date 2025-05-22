@@ -38,7 +38,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private mapPluginStore!: MapPluginStore
   private churarenGameInfo?: IGameInfo
-  private socketController!: SocketController
+  private socketController?: SocketController
   private readonly halfBossSize: number = CHURAREN_BOSS_SIZE / 2
 
   public listenEvent(): void {
@@ -96,9 +96,9 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     if (this.churarenGameInfo === undefined) return
     const worldMap = this.mapPluginStore.mapManager.currentMap
     const bossHp = this.churarenGameInfo.participantIds.length * 120
-    let startPos = worldMap.getRandomPoint()
+    let startPos = worldMap.getRandomSpawnPoint()
 
-    if (this.isBossWalkInMap(startPos, worldMap)) {
+    if (!this.isBossWalkInMap(startPos, worldMap)) {
       startPos = this.getMapCenterPosition(worldMap)
     }
     const boss = new Boss(uniqueId(), startPos, Date.now(), bossHp)
@@ -144,7 +144,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
       const dest = boss.position.copy()
       dest.gridX = position.gridX + direction.x * bossSpeedMultiplier
       dest.gridY = position.gridY + direction.y * bossSpeedMultiplier
-      if (!this.isBossWalkInMap(dest, currentMap)) {
+      if (this.isBossWalkInMap(dest, currentMap)) {
         const velocity = { x: direction.x * speed * bossSpeedMultiplier, y: direction.y * speed * bossSpeedMultiplier }
         this.networkPluginStore.messageSender.send(
           new BossWalkMessage({
