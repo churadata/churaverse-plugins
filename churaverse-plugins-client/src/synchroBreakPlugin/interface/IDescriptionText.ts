@@ -2,9 +2,7 @@ import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGame
 
 export interface IDescriptionText extends IGameUiComponent {
   open: () => void
-  setGameName: (name: string) => void
-  setGameOwnerName: (name: string) => void
-  setDescriptionText: (text: string) => void
+  setGameBaseInfo: (gameName: string, ownerName: string) => void
   setGameStartForHost: () => void
   setGameStartForGuest: () => void
   setTimeLimitSelection: (turn: number) => void

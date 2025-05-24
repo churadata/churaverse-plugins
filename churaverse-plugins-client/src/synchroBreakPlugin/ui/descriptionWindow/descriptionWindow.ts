@@ -10,12 +10,9 @@ export class DescriptionWindow implements IDescriptionText {
   private gameName: string = 'ゲーム'
   private gameOwnerName: string = 'ゲームオーナー'
 
-  public setGameName(name: string): void {
-    this.gameName = name
-  }
-
-  public setGameOwnerName(name: string): void {
-    this.gameOwnerName = name
+  public setGameBaseInfo(gameName: string, ownerName: string): void {
+    this.gameName = gameName
+    this.gameOwnerName = ownerName
   }
 
   public initialize(): void {
@@ -35,7 +32,7 @@ export class DescriptionWindow implements IDescriptionText {
    * 説明ウィンドウの文章を更新する
    * @param text 更新する文章
    */
-  public setDescriptionText(text: string): void {
+  private setDescriptionText(text: string): void {
     this.element.innerHTML = text
   }
 

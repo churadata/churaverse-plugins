@@ -28,7 +28,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
   protected readonly gameName = 'シンクロブレイク'
   private nyokkiActionMessage: string | undefined = undefined
-  private nyokkiStatus: NyokkiStatus = 'yet'
+  private ownNyokkiSatatus: NyokkiStatus = 'yet'
 
   private synchroBreakPluginStore!: SynchroBreakPluginStore
   private playerPluginStore!: PlayerPluginStore
@@ -119,13 +119,12 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.synchroBreakDialogManager.setGameAbortButtonText()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
     this.nyokkiActionMessage = undefined
-    this.nyokkiStatus = 'yet'
+    this.ownNyokkiSatatus = 'yet'
 
     if (this.gameOwnerId === undefined) return
     const gameOwnerName = this.playerPluginStore.players.get(this.gameOwnerId)?.name ?? 'ゲームオーナー'
     const descriptionWindow = this.getDescriptionWindow()
-    descriptionWindow.setGameName(this.gameName)
-    descriptionWindow.setGameOwnerName(gameOwnerName)
+    descriptionWindow.setGameBaseInfo(this.gameName, gameOwnerName)
     if (this.gameOwnerId === this.playerPluginStore.ownPlayerId) {
       descriptionWindow.setGameStartForHost()
       this.gamePluginStore.gameUiManager.getUi(this.gameId, 'turnSelectConfirm')?.open()
@@ -249,7 +248,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       descriptionWindow.setSynchroBreakStart(ev.remainingSeconds)
       this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.open()
     } else {
-      if (this.nyokkiStatus === 'yet') {
+      if (this.ownNyokkiSatatus === 'yet') {
         descriptionWindow.setSynchroBreakInProgress(ev.remainingSeconds)
       } else {
         descriptionWindow.setSynchroBreakInProgress(ev.remainingSeconds, ownPlayerName, this.nyokkiActionMessage)
@@ -273,6 +272,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
 
       // ニョッキアクションの実行結果をプレイヤーに通知する
       if (playerId === this.playerPluginStore.ownPlayerId) {
+        this.ownNyokkiSatatus = status
         const descriptionWindow = this.getDescriptionWindow()
         this.nyokkiActionMessage = ev.nyokkiLogText
         descriptionWindow.setNyokkiAction(ev.nyokkiLogText)
@@ -290,7 +290,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     if (this.isOwnPlayerMidwayParticipant) return
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.close()
     this.nyokkiActionMessage = undefined
-    this.nyokkiStatus = 'yet'
+    this.ownNyokkiSatatus = 'yet'
 
     const descriptionWindow = this.getDescriptionWindow()
     descriptionWindow.setSynchroBreakEnd()
