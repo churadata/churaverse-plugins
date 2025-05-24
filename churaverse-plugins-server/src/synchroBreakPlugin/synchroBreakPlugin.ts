@@ -1,6 +1,8 @@
-import { IMainScene } from 'churaverse-engine-server'
+import { IMainScene, EntityDespawnEvent } from 'churaverse-engine-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { CoreGamePlugin } from '@churaverse/game-plugin-server/domain/coreGamePlugin'
+import { GameAbortEvent } from '@churaverse/game-plugin-server/event/gameAbortEvent'
+import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
 import { SocketController } from './controller/socketController'
@@ -44,6 +46,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
+    this.bus.subscribeEvent('entityDespawn', this.onPlayerLeave)
     this.bus.subscribeEvent('synchroBreakTurnSelect', this.synchroBreakTurnSelect)
     this.bus.subscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
     this.bus.subscribeEvent('sendBetCoin', this.sendBetCoin)
@@ -57,6 +60,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
+    this.bus.unsubscribeEvent('entityDespawn', this.onPlayerLeave)
     this.bus.unsubscribeEvent('synchroBreakTurnSelect', this.synchroBreakTurnSelect)
     this.bus.unsubscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
     this.bus.unsubscribeEvent('sendBetCoin', this.sendBetCoin)
@@ -91,6 +95,17 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   protected handleGameTermination(): void {
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
+  }
+
+  private readonly onPlayerLeave = (ev: EntityDespawnEvent): void => {
+    if (!(ev.entity instanceof Player)) return
+    if (ev.entity.id === this.gameOwnerId) {
+      this.bus.post(new GameAbortEvent(this.gameId, ev.entity.id))
+    } else {
+      this.synchroBreakPluginStore.playersCoinRepository.delete(ev.entity.id)
+      this.synchroBreakPluginStore.betCoinRepository.delete(ev.entity.id)
+      this.synchroBreakPluginStore.nyokkiRepository.delete(ev.entity.id)
+    }
   }
 
   /**
