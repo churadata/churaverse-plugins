@@ -1,5 +1,4 @@
 import { Store, IEventBus, IMainScene } from 'churaverse-engine-server'
-import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 import { SynchroBreakPluginStore } from './defSynchroBreakPluginStore'
 import { Game } from '../logic/game'
 import { NyokkiRepository } from '../repository/nyokkiRepository'

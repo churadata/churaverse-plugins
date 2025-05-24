@@ -43,16 +43,13 @@ export class RankingBoard implements IRankingBoard {
   public element!: HTMLElement
   public readonly visible: boolean = false
   private rankingOpenButton!: HTMLElement
-  private turn!: HTMLDivElement
 
   public constructor(public readonly store: Store<IMainScene>) {}
 
   public initialize(): void {
     this.setupPopupButton()
     this.setupRankingBoard()
-    this.turn = document.createElement('div')
-    this.turn.id = RANKING_BOARD_ELEMENT_TURN_ID
-    this.element.appendChild(this.turn)
+
     domLayerSetting(this.element, 'lowest')
     this.element.addEventListener('click', () => {
       makeLayerHigherTemporary(this.element, 'lower')
@@ -108,9 +105,8 @@ export class RankingBoard implements IRankingBoard {
    * ターン数を更新する
    */
   public updateTurnNumber(turnNumber: number, allTurn: number): void {
-    this.turn.textContent = `${turnNumber}  /  ${allTurn} ターン`
     const boardElementTurn = DomManager.getElementById(RANKING_BOARD_ELEMENT_TURN_ID)
-    boardElementTurn.appendChild(this.turn)
+    boardElementTurn.textContent = `${turnNumber}  /  ${allTurn} ターン`
   }
 
   /**
