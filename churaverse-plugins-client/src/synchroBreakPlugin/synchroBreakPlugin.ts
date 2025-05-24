@@ -132,7 +132,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       descriptionWindow.setGameStartForHost()
       this.gamePluginStore.gameUiManager.getUi(this.gameId, 'turnSelectConfirm')?.open()
     } else {
-      descriptionWindow.open(`${this.gameName}が開始されました！<br>${gameOwnerName}さんがターンを入力中です。`)
+      descriptionWindow.setGameStartForGuest()
     }
   }
 
@@ -219,7 +219,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
 
     const descriptionWindow = this.getDescriptionWindow()
     if (ev.playerId === this.playerPluginStore.ownPlayerId) {
-      descriptionWindow.setBetCoinSelection(betCoins)
+      descriptionWindow.setBetCoinSelection(ev.betCoins)
     }
 
     this.synchroBreakPluginStore.playersCoinRepository.set(ev.playerId, ev.currentCoins)
@@ -268,7 +268,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       this.getRankingBoard.changeNyokkiStatus(nyokkiCollectionPlayerId, status)
 
       // ニョッキアクションの実行結果をプレイヤーに通知する
-      if (playerId === this.playerPluginStore.ownPlayerId) {
+      if (nyokkiCollectionPlayerId === this.playerPluginStore.ownPlayerId) {
         this.ownNyokkiSatatus = status
         const descriptionWindow = this.getDescriptionWindow()
         this.nyokkiActionMessage = ev.nyokkiLogText
@@ -276,7 +276,9 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       }
 
       // シンクロブレイクのニョッキアクションUIを表示させる。
-      this.synchroBreakPluginStore.synchroBreakIcons.get(playerId)?.handlePlayerSynchroBreakIcons(ev.order, status)
+      this.synchroBreakPluginStore.synchroBreakIcons
+        .get(nyokkiCollectionPlayerId)
+        ?.handlePlayerSynchroBreakIcons(ev.order, status)
     }
   }
 
@@ -291,7 +293,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
 
     const descriptionWindow = this.getDescriptionWindow()
     descriptionWindow.setSynchroBreakEnd()
-    const rankingBoard = this.getRankingBoard()
     const status: NyokkiStatus = 'nyokki'
     for (const noNyokkiPlayerId of ev.noNyokkiPlayerIds) {
       this.getRankingBoard.changeNyokkiStatus(noNyokkiPlayerId, status)
