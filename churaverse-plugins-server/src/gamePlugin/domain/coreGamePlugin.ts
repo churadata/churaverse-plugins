@@ -52,7 +52,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
-    this.bus.subscribeEvent('playerLeave', this.onPlayerLeave)
+    this.bus.unsubscribeEvent('playerLeave', this.onPlayerLeave)
   }
 
   private priorGameData(ev: PriorGameDataEvent): void {
@@ -104,6 +104,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     if (ev.id === undefined) return
 
     if (this.removeParticipant(ev.id)) {
+      this.sendParticipantUpdate()
       this.handlePlayerLeave(ev.id)
     }
   }
@@ -112,7 +113,6 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     const idx = this._participantIds.indexOf(playerId)
     if (idx === -1) return false
     this._participantIds.splice(idx, 1)
-    this.sendParticipantUpdate()
     return true
   }
 
@@ -125,5 +125,9 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     )
   }
 
+  /**
+   * プレイヤーがゲームから離脱した時の処理
+   * @param playerId 離脱したプレイヤーのID
+   */
   protected abstract handlePlayerLeave(playerId: string): void
 }

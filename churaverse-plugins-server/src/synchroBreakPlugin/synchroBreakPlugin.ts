@@ -45,8 +45,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.networkPluginStore = this.store.of('networkPlugin')
   }
 
-  protected handlePlayerLeave(playerId: string): void {}
-
   /**
    * シンクロブレイク特有の開始時に実行される処理
    */
@@ -65,6 +63,12 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
   }
+
+  /**
+   * プレイヤーがゲームから離脱した時の処理
+   * @param playerId 離脱したプレイヤーのID
+   */
+  protected handlePlayerLeave(playerId: string): void {}
 
   /**
    * タイムリミットが設定された時の処理
