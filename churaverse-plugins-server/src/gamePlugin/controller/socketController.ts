@@ -32,7 +32,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageListenerRegister.on('requestGameStart', this.gameStart.bind(this))
     ev.messageListenerRegister.on('requestGameEnd', this.gameEnd.bind(this))
     ev.messageListenerRegister.on('requestGameAbort', this.gameAbort.bind(this))
-    // @ts-expect-error
     ev.messageListenerRegister.on('playerLeave', this.playerLeave.bind(this))
   }
 
