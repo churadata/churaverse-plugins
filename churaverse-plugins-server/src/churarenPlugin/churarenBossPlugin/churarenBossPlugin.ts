@@ -215,9 +215,9 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
 
   private isBossWalkInMap(dest: Position, currentMap: WorldMap): boolean {
     return (
-      dest.x > this.halfBossSize ||
-      dest.x < currentMap.width - this.halfBossSize ||
-      dest.y > this.halfBossSize ||
+      dest.x > this.halfBossSize &&
+      dest.x < currentMap.width - this.halfBossSize &&
+      dest.y > this.halfBossSize &&
       dest.y < currentMap.height - this.halfBossSize
     )
   }
