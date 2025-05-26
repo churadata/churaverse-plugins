@@ -45,12 +45,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.unsubscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
   }
 
-  /**
-   * プレイヤーがゲームから離脱した時の処理
-   * @param playerId 離脱したプレイヤーのID
-   */
-  protected handlePlayerLeave(playerId: string): void {}
-
   private init(): void {
     this.synchroBreakDialogManager = new SynchroBreakDialogManager(this.store, this.bus)
     this.gameInfoStore = this.store.of('gameInfo')
@@ -93,6 +87,12 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.socketController.registerMessageListener()
     this.synchroBreakDialogManager.setGameAbortButtonText()
   }
+
+  /**
+   * プレイヤーがゲームから離脱した時の処理
+   * @param playerId 離脱したプレイヤーのID
+   */
+  protected handlePlayerLeave(playerId: string): void {}
 
   /**
    * タイムリミットが設定された際の処理
