@@ -29,8 +29,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.subscribeEvent('registerGameUi', this.registerGameUi.bind(this))
   }
 
-  protected handlePlayerLeave(id: string): void {}
-
   /**
    * ゲームが開始された時に登録されるイベントリスナー
    */
@@ -46,6 +44,12 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
   }
+
+  /**
+   * プレイヤーがゲームから離脱した時の処理
+   * @param playerId 離脱したプレイヤーのID
+   */
+  protected handlePlayerLeave(playerId: string): void {}
 
   private init(): void {
     this.synchroBreakDialogManager = new SynchroBreakDialogManager(this.store, this.bus)

@@ -101,12 +101,16 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private readonly updateGameParticipant = (ev: UpdateGameParticipantEvent): void => {
     if (ev.gameId !== this.gameId) return
 
-    const leaveId = this._participantIds.find((id) => !ev.participantIds.includes(id))
-    if (leaveId === undefined) return
+    const leavePlayerId = this._participantIds.find((id) => !ev.participantIds.includes(id))
+    if (leavePlayerId === undefined) return
 
     this._participantIds = ev.participantIds
-    this.handlePlayerLeave(leaveId)
+    this.handlePlayerLeave(leavePlayerId)
   }
 
+  /**
+   * プレイヤーがゲームから離脱した時の処理
+   * @param playerId 離脱したプレイヤーのID
+   */
   protected abstract handlePlayerLeave(playerId: string): void
 }
