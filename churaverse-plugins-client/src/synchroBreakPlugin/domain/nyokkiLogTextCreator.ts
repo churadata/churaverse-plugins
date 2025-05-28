@@ -51,7 +51,7 @@ export class NyokkiLogTextCreator implements INyokkiLogTextCreator {
   private generateSuccessLog(playerIds: string[], nyokkiTime: number): string {
     const playerName = this.getPlayerName(playerIds[0])
 
-    // ニョッキ実行時に基づいて成功メッセージを決定する
+    // 成功したメッセージをnyokkiTimeを基に生成する
     const seed = Math.floor(nyokkiTime / 100) % successLogEnding.length
     const message = successLogEnding[seed]
     return `${playerName}さん${message}`
@@ -63,7 +63,7 @@ export class NyokkiLogTextCreator implements INyokkiLogTextCreator {
   private generateFailureLog(playerIds: string[], nyokkiTime: number): string {
     let message = this.buildPlayerNamePhrase(playerIds)
 
-    // ニョッキ実行時に基づいて失敗メッセージを決定する
+    // 失敗したメッセージをnyokkiTimeを基に生成する
     const seed = Math.floor(nyokkiTime / 100) % failureLogEnding.length
     message += failureLogEnding[seed]
     return message
