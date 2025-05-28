@@ -1,9 +1,11 @@
 import { PlayerNyokkiStatusIcon } from '../ui/synchroBreakIcon/playerNyokkiStatusIcon'
 import { IPlayersCoinRepository } from '../interface/IPlayersCoinRepository'
+import { INyokkiLogTextCreator } from '../interface/INyokkiLogTextCreator'
 
 export interface SynchroBreakPluginStore {
   readonly synchroBreakIcons: Map<string, PlayerNyokkiStatusIcon>
   readonly playersCoinRepository: IPlayersCoinRepository
+  readonly nyokkiLogTextCreate: INyokkiLogTextCreator
   timeLimit: number | undefined
   gameTurn: number | undefined
 }

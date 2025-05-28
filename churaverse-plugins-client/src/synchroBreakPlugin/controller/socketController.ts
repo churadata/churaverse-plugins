@@ -103,12 +103,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   private readonly nyokkiActionResponse = (msg: NyokkiActionResponseMessage): void => {
     this.eventBus.post(
-      new NyokkiActionResponseEvent(
-        msg.data.sameTimePlayersId,
-        msg.data.isSuccess,
-        msg.data.nyokkiLogText,
-        msg.data.order
-      )
+      new NyokkiActionResponseEvent(msg.data.sameTimePlayersId, msg.data.isSuccess, msg.data.nyokkiTime, msg.data.order)
     )
   }
 

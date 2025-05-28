@@ -2,13 +2,10 @@ import { IMainScene } from 'churaverse-engine-client'
 import { BaseMessage } from '@churaverse/network-plugin-client/message/baseMessage'
 import { SendableObject } from '@churaverse/network-plugin-client/types/sendable'
 
-/**
- * @param
- */
 export interface NyokkiActionResponseData extends SendableObject {
   sameTimePlayersId: string[]
   isSuccess: boolean
-  nyokkiLogText: string
+  nyokkiTime: number
   order: number
 }
 

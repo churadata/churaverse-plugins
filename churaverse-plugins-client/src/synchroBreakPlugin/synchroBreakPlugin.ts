@@ -265,9 +265,16 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   private readonly nyokkiActionResponse = (ev: NyokkiActionResponseEvent): void => {
     if (this.isOwnPlayerMidwayParticipant) return
     const nyokkiCollectionPlayerIds = ev.sameTimePlayersId
-    const nyokkiLogText = ev.nyokkiLogText
+    const isSuccess = ev.isSuccess
+
+    const nyokkiLogText: string = this.synchroBreakPluginStore.nyokkiLogTextCreate.createNyokkiLogText(
+      nyokkiCollectionPlayerIds,
+      isSuccess,
+      ev.nyokkiTime
+    )
     this.gamePluginStore.gameLogRenderer.gameLog(nyokkiLogText, 0)
-    const status: NyokkiStatus = ev.isSuccess ? 'success' : 'nyokki'
+
+    const status: NyokkiStatus = isSuccess ? 'success' : 'nyokki'
     for (const nyokkiCollectionPlayerId of nyokkiCollectionPlayerIds) {
       this.getRankingBoard.changeNyokkiStatus(nyokkiCollectionPlayerId, status)
 
@@ -282,15 +289,22 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   private readonly nyokkiTurnEnd = (ev: NyokkiTurnEndEvent): void => {
     if (this.isOwnPlayerMidwayParticipant) return
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.close()
-
-    const descriptionWindow = this.getDescriptionWindow()
-    descriptionWindow.setDescriptionText(`シンクロブレイクのターンが終了しました！！！！`)
+    const noNyokkiPlayerIds = ev.noNyokkiPlayerIds
     const status: NyokkiStatus = 'nyokki'
-    for (const noNyokkiPlayerId of ev.noNyokkiPlayerIds) {
+    const descriptionWindow = this.getDescriptionWindow()
+
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.close()
+    descriptionWindow.setDescriptionText(`シンクロブレイクのターンが終了しました！！！！`)
+
+    if (noNyokkiPlayerIds.length === 0) return
+    for (const noNyokkiPlayerId of noNyokkiPlayerIds) {
       this.getRankingBoard.changeNyokkiStatus(noNyokkiPlayerId, status)
       this.synchroBreakPluginStore.synchroBreakIcons.get(noNyokkiPlayerId)?.handlePlayerSynchroBreakIcons(-1, status)
     }
+
+    const noNyokkiLogText: string =
+      this.synchroBreakPluginStore.nyokkiLogTextCreate.createNoNyokkiLogText(noNyokkiPlayerIds)
+    this.gamePluginStore.gameLogRenderer.gameLog(noNyokkiLogText, 100)
   }
 
   /**
