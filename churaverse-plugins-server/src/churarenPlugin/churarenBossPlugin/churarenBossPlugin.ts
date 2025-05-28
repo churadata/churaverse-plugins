@@ -1,6 +1,5 @@
 import {
   Direction,
-  EntityDespawnEvent,
   EntitySpawnEvent,
   IMainScene,
   LivingDamageEvent,
@@ -29,6 +28,7 @@ import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePl
 import { IGameInfo } from '@churaverse/game-plugin-server/interface/IGameInfo'
 import '@churaverse/churaren-core-plugin-server/event/churarenStartTimerEvent'
 import { ChurarenResultEvent } from '@churaverse/churaren-core-plugin-server/event/churarenResultEvent'
+import { BossDespawnMessage } from './message/bossDespawnMessage'
 
 const bossSpeedMultiplier = 2
 
@@ -186,9 +186,9 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     }
 
     if (boss.isDead) {
-      const bossDespawnEvent = new EntityDespawnEvent(boss)
+      const bossDespawnMessage = new BossDespawnMessage({ bossId: boss.bossId })
       this.bossPluginStore.bosses.delete(boss.bossId)
-      this.bus.post(bossDespawnEvent)
+      this.networkPluginStore.messageSender.send(bossDespawnMessage)
 
       const updateChurarenUi = new ChurarenResultEvent('win')
       this.bus.post(updateChurarenUi)
@@ -199,9 +199,9 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     this.bossPluginStore.bosses.getAllId().forEach((bossId) => {
       const boss = this.bossPluginStore.bosses.get(bossId)
       if (boss === undefined) return
-      const bossDespawnEvent = new EntityDespawnEvent(boss)
+      const bossDespawnMessage = new BossDespawnMessage({ bossId: boss.bossId })
       this.bossPluginStore.bosses.delete(boss.bossId)
-      this.bus.post(bossDespawnEvent)
+      this.networkPluginStore.messageSender.send(bossDespawnMessage)
     })
   }
 
