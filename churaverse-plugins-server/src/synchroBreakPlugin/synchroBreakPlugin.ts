@@ -49,7 +49,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * シンクロブレイク特有の開始時に実行される処理
    */
   protected handleGameStart(): void {
-    this.subscribeGameEvent()
     initSynchroBreakPluginStore(this.store)
     this.socketController.registerMessageListener()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
@@ -59,7 +58,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * シンクロブレイク特有の中断・終了時に実行される処理
    */
   protected handleGameTermination(): void {
-    this.unsubscribeGameEvent()
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
   }

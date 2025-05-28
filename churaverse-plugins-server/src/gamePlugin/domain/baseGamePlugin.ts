@@ -39,6 +39,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
 
   private onGameStart(ev: GameStartEvent): void {
     if (this.gamePluginStore.games.get(this.gameId)?.isActive === false) return
+    this.subscribeGameEvent()
     this.handleGameStart()
   }
 
