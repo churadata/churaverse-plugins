@@ -4,7 +4,6 @@ import { Game } from '../logic/game'
 import { NyokkiRepository } from '../repository/nyokkiRepository'
 import { BetCoinRepository } from '../repository/betCoinRepository'
 import { PlayersCoinRepository } from '../repository/playersCoinRepository'
-import { NyokkiLogTextCreate } from '../logic/nyokkiLogTextCreate'
 
 /**
  * SynchroBreakPluginStoreを初期化する関数
@@ -17,7 +16,6 @@ export function initSynchroBreakPluginStore(eventBus: IEventBus<IMainScene>, sto
     betCoinRepository: new BetCoinRepository(),
     timeLimit: undefined,
     turnSelect: undefined,
-    nyokkiLogTextCreate: new NyokkiLogTextCreate(store.of('playerPlugin').players),
   }
 
   store.setInit('synchroBreakPlugin', synchroBreakPluginStore)
