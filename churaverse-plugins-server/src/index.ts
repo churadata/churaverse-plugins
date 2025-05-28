@@ -7,3 +7,5 @@ export * from '@churaverse/player-plugin-server' //'./playerPlugin'
 export * from '@churaverse/shark-plugin-server' //'./sharkPlugin'
 export * from '@churaverse/textchat-plugin-server' //'./textChatPlugin'
 export * from '@churaverse/voicechat-plugin-server' //'./voiceChatPlugin'
+export * from '@churaverse/flare-plugin-server' //'./flarePlugin'
+
