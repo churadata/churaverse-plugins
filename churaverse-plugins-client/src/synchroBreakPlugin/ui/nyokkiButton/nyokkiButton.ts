@@ -52,7 +52,7 @@ export class NyokkiButton implements IGameUiComponent {
     const playerId = playerPluginStore.ownPlayerId
     const nyokkiMessage = new NyokkiMessage({ playerId })
     this.store.of('networkPlugin').messageSender.send(nyokkiMessage)
-    this.jump()
+    this.jumpOwnPlayer()
   }
 
   public open(): void {
@@ -70,7 +70,7 @@ export class NyokkiButton implements IGameUiComponent {
   /**
    * 自プレイヤーをジャンプさせる。
    */
-  private jump(): void {
+  private jumpOwnPlayer(): void {
     const playerPluginStore = this.store.of('playerPlugin')
     const playerId = playerPluginStore.ownPlayerId
     const currentPos = playerPluginStore.players.get(playerId)?.position
