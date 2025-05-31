@@ -58,7 +58,7 @@ export class DescriptionWindow implements IDescriptionText {
    * ターン選択後の文章更新処理
    * @param turn 選択されたターン数
    */
-  public setTimeLimitSelection(turn: number): void {
+  public setTurnSelectionForOwner(turn: number): void {
     this.setDescriptionText(`${turn}ターン選択しました。<br>制限時間(3~15)を選択してください。`)
   }
 
@@ -66,7 +66,7 @@ export class DescriptionWindow implements IDescriptionText {
    * ターン選択後の制限時間入力待ち文章更新処理
    * @param turn 選択されたターン数
    */
-  public setTimeLimitWaiting(turn: number): void {
+  public setTurnSelectionForGuest(turn: number): void {
     this.setDescriptionText(`${turn}ターン選択しました。<br>${this.gameOwnerName}さんが制限時間を入力中です。`)
   }
 
@@ -74,7 +74,7 @@ export class DescriptionWindow implements IDescriptionText {
    * 主催者サイドの制限時間入力後の文章更新処理
    * @param timeLimit 選択された制限時間
    */
-  public setTimeLimitConfirmed(timeLimit: string): void {
+  public setTimeLimitSelectionForOwner(timeLimit: string): void {
     this.setDescriptionText(`制限時間を${timeLimit}秒選択しました。<br>ベットコインを入力してください。`)
   }
 
@@ -82,7 +82,7 @@ export class DescriptionWindow implements IDescriptionText {
    * 参加者サイドの制限時間入力後の文章更新処理
    * @param timeLimit 選択された制限時間
    */
-  public setTimeLimitAcknowledged(timeLimit: string): void {
+  public setTimeLimitSelectionForGuest(timeLimit: string): void {
     this.setDescriptionText(`制限時間が${timeLimit}秒選択されました。<br>ベットコインを入力してください。`)
   }
 
@@ -114,10 +114,10 @@ export class DescriptionWindow implements IDescriptionText {
    * シンクロブレイク進行中の文章更新処理
    * @param countdown シンクロブレイク終了までのカウントダウン
    */
-  public setSynchroBreakInProgress(countdown: number, playerName?: string, nyokkiSuccessMessage?: string): void {
+  public setSynchroBreakInProgress(countdown: number, playerName?: string, nyokkiActionMessage?: string): void {
     const descriptionText = [`現在${this.gameName}進行中`, `残り${countdown}秒以内にボタンを押してください！`]
-    if (playerName !== undefined && nyokkiSuccessMessage !== undefined) {
-      descriptionText.splice(1, 0, nyokkiSuccessMessage)
+    if (playerName !== undefined && nyokkiActionMessage !== undefined) {
+      descriptionText.splice(1, 0, nyokkiActionMessage)
     }
 
     this.setDescriptionText(descriptionText.join('<br>'))

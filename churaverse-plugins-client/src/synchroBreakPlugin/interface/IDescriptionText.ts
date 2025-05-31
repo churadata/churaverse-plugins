@@ -5,10 +5,10 @@ export interface IDescriptionText extends IGameUiComponent {
   setGameBaseInfo: (gameName: string, ownerName: string) => void
   setGameStartForHost: () => void
   setGameStartForGuest: () => void
-  setTimeLimitSelection: (turn: number) => void
-  setTimeLimitWaiting: (turn: number) => void
-  setTimeLimitConfirmed: (timeLimit: string) => void
-  setTimeLimitAcknowledged: (timeLimit: string) => void
+  setTurnSelectionForOwner: (turn: number) => void
+  setTurnSelectionForGuest: (turn: number) => void
+  setTimeLimitSelectionForOwner: (timeLimit: string) => void
+  setTimeLimitSelectionForGuest: (timeLimit: string) => void
   setBetCoinSelection: (betCoin: number) => void
   setGameStartCountdown: (countdown: number) => void
   setSynchroBreakStart: (timeLimit: number) => void
