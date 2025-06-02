@@ -42,10 +42,8 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
         if (!this.isActive) return
         if (readyPlayerSize === churarenParticipants) {
           resolve()
-          console.log('All players are ready')
         } else if (timeOut <= 0) {
           resolve()
-          console.log('Timeout waiting for players to be ready')
         } else {
           setTimeout(() => {
             timeOut -= 1
