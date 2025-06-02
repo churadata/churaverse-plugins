@@ -21,18 +21,18 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
     this.gamePluginStore = this.store.of('gamePlugin')
   }
 
-  public async sequence(): Promise<void> {
-    await this.onPlayerReady()
+  public async runSequence(): Promise<void> {
+    await this.waitPlayerReady()
     if (!this.isActive) return
-    await this.countdown()
+    await this.startCountdown()
     if (!this.isActive) return
-    await this.timer()
+    await this.startTimer()
     if (!this.isActive) return
-    await this.timeOver()
+    await this.handleTimeOver()
   }
 
-  private async onPlayerReady(): Promise<void> {
-    let timeOut: number = TIME_OUT_SECONDS
+  private async waitPlayerReady(): Promise<void> {
+    let timeOutRemaining: number = TIME_OUT_SECONDS
     const churarenParticipants = this.gamePluginStore.games.get(this.gameId)?.participantIds.length
     if (churarenParticipants === undefined) return
     await new Promise<void>((resolve) => {
@@ -41,11 +41,11 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
         if (!this.isActive) return
         if (readyPlayerSize === churarenParticipants) {
           resolve()
-        } else if (timeOut <= 0) {
+        } else if (timeOutRemaining <= 0) {
           resolve()
         } else {
           setTimeout(() => {
-            timeOut -= 1
+            timeOutRemaining -= 1
             checkReady()
           }, 1000)
         }
@@ -54,7 +54,7 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
     })
   }
 
-  private async countdown(): Promise<void> {
+  private async startCountdown(): Promise<void> {
     this.eventBus.post(new ChurarenStartCountdownEvent())
     for (let i = COUNTDOWN_TIME_SECONDS; i > 0; i--) {
       if (!this.isActive) return
@@ -62,7 +62,7 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
     }
   }
 
-  private async timer(): Promise<void> {
+  private async startTimer(): Promise<void> {
     this.eventBus.post(new ChurarenStartTimerEvent())
     for (let i = TIME_LIMIT_MINUTES; i > 0; i--) {
       if (!this.isActive) return
@@ -70,7 +70,7 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
     }
   }
 
-  private async timeOver(): Promise<void> {
+  private async handleTimeOver(): Promise<void> {
     this.eventBus.post(new ChurarenResultEvent('timeOver'))
   }
 
