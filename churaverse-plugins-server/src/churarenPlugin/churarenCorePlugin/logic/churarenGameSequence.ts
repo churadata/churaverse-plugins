@@ -18,7 +18,6 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
     private readonly store: Store<IMainScene>,
     private readonly eventBus: IEventBus<IMainScene>
   ) {
-    this.gameId = gameId
     this.gamePluginStore = this.store.of('gamePlugin')
   }
 
