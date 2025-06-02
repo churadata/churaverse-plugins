@@ -37,7 +37,7 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
     if (churarenParticipants === undefined) return
     await new Promise<void>((resolve) => {
       const checkReady: () => void = () => {
-        const readyPlayerSize = this.store.of('churarenPlugin').readyPlayers.length()
+        const readyPlayerSize = this.store.of('churarenPlugin').readyPlayers.size
         if (!this.isActive) return
         if (readyPlayerSize === churarenParticipants) {
           resolve()

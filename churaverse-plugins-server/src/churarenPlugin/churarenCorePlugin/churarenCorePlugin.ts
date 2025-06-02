@@ -95,7 +95,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   }
 
   private async sequence(): Promise<void> {
-    await this.store.of('churarenPlugin').churarenGameSequence.sequence()
+    await this.store.of('churarenPlugin').churarenGameSequence.runSequence()
   }
 }
 
