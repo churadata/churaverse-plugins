@@ -72,6 +72,7 @@ export class BetCoinFormContainer implements IGameUiComponent {
     const minusButton = DomManager.getElementById(BET_COIN_DECREMENT_BUTTON_ID)
     minusButton.onclick = () => {
       const betCoins = this.inputFieldValue
+
       if (betCoins <= SYNCHRO_BREAK_MIN_BET_COIN) return
       this.inputFieldValue = betCoins - 1
     }

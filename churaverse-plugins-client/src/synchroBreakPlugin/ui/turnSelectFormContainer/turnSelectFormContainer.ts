@@ -2,7 +2,7 @@ import { IMainScene, Store, DomManager, domLayerSetting, makeLayerHigherTemporar
 import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { SelectTurnForm } from './component/SelectTurnForm'
-import { NyokkiTurnSelectMessage } from '../../message/nyokkiTurnSelectMessage'
+import { SynchroBreakTurnSelectMessage } from '../../message/synchroBreakTurnSelectMessage'
 
 /**  turn入力部分 */
 export const TURN_SELECT_FIELD_ID = 'turn-select-field-id'
@@ -55,7 +55,7 @@ export class TurnSelectFormContainer implements IGameUiComponent {
       const turnNumber = this.inputFieldValue
 
       if (turnNumber >= SYNCHRO_BREAK_MIN_TURN && turnNumber <= SYNCHRO_BREAK_MAX_TURN) {
-        this.networkPluginStore.messageSender.send(new NyokkiTurnSelectMessage({ playerId, allTurn: turnNumber }))
+        this.networkPluginStore.messageSender.send(new SynchroBreakTurnSelectMessage({ playerId, allTurn: turnNumber }))
 
         this.inputFieldValue = SYNCHRO_BREAK_MIN_TURN
         this.close()
