@@ -267,7 +267,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const nyokkiCollectionPlayerIds = ev.sameTimePlayersId
     const isSuccess = ev.isSuccess
 
-    const nyokkiLogText: string = this.synchroBreakPluginStore.nyokkiLogTextCreator.createNyokkiLogText(
+    const nyokkiLogText = this.synchroBreakPluginStore.nyokkiLogTextCreator.createNyokkiLogText(
       nyokkiCollectionPlayerIds,
       isSuccess,
       ev.nyokkiTime
@@ -302,8 +302,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       this.synchroBreakPluginStore.synchroBreakIcons.get(noNyokkiPlayerId)?.handlePlayerSynchroBreakIcons(-1, status)
     }
 
-    const noNyokkiLogText: string =
-      this.synchroBreakPluginStore.nyokkiLogTextCreator.createNoNyokkiLogText(noNyokkiPlayerIds)
+    const noNyokkiLogText = this.synchroBreakPluginStore.nyokkiLogTextCreator.createNoNyokkiLogText(noNyokkiPlayerIds)
     this.gamePluginStore.gameLogRenderer.gameLog(noNyokkiLogText, 100)
   }
 
