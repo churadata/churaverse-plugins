@@ -1,6 +1,4 @@
 import { Store, IMainScene } from 'churaverse-engine-client'
-import { Player } from '@churaverse/player-plugin-client/domain/player'
-import { PlayerNotExistsInPlayerRepositoryError } from '@churaverse/player-plugin-client/errors/playerNotExistsInPlayerRepositoryError'
 import { INyokkiLogTextCreator } from '../interface/INyokkiLogTextCreator'
 
 const successLog = [
@@ -49,7 +47,8 @@ export class NyokkiLogTextCreator implements INyokkiLogTextCreator {
    * ニョッキ成功時のログを生成する
    */
   private createSuccessLog(playerIds: string[], seed: number): string {
-    const playerName = this.getPlayerName(playerIds[0])
+    const playerName = this.store.of('playerPlugin').players.get(playerIds[0])?.name
+    if (playerName === undefined) return `ニョッキ成功！！！`
 
     // 成功したメッセージをseedを基に選択する
     const i = Math.floor(seed / 100) % successLog.length
@@ -84,21 +83,9 @@ export class NyokkiLogTextCreator implements INyokkiLogTextCreator {
    */
   private createPlayerNamePhrase(playerIds: string[]): string {
     return playerIds
-      .map((playerId, index) => {
-        const playerName = this.getPlayerName(playerId)
-        return index === playerIds.length - 1 ? `${playerName}さん` : `${playerName}さんと`
-      })
-      .join('')
-  }
-
-  /**
-   * プレイヤーidからプレイヤー名を取得
-   */
-  private getPlayerName(playerId: string): string {
-    const player: Player | undefined = this.store.of('playerPlugin').players.get(playerId)
-    if (player === undefined) {
-      throw new PlayerNotExistsInPlayerRepositoryError(playerId)
-    }
-    return player.name
+      .map((playerId) => this.store.of('playerPlugin').players.get(playerId)?.name)
+      .filter((playerName) => playerName !== undefined)
+      .map((playerName) => `${playerName}さん`)
+      .join('と')
   }
 }
