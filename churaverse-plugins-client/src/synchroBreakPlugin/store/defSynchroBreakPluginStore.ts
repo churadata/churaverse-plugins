@@ -5,7 +5,7 @@ import { INyokkiLogTextCreator } from '../interface/INyokkiLogTextCreator'
 export interface SynchroBreakPluginStore {
   readonly synchroBreakIcons: Map<string, PlayerNyokkiStatusIcon>
   readonly playersCoinRepository: IPlayersCoinRepository
-  readonly nyokkiLogTextCreate: INyokkiLogTextCreator
+  readonly nyokkiLogTextCreator: INyokkiLogTextCreator
   timeLimit: number | undefined
   gameTurn: number | undefined
 }

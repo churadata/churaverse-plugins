@@ -3,7 +3,7 @@ import { Player } from '@churaverse/player-plugin-client/domain/player'
 import { PlayerNotExistsInPlayerRepositoryError } from '@churaverse/player-plugin-client/errors/playerNotExistsInPlayerRepositoryError'
 import { INyokkiLogTextCreator } from '../interface/INyokkiLogTextCreator'
 
-const successLogEnding = [
+const successLog = [
   'はnyokkiに成功しました',
   '素晴らしい!!、nyokki成功',
   'nyokki成功。ナイス!!',
@@ -16,7 +16,7 @@ const successLogEnding = [
   'nyokki成功、賞金ゲット!!',
 ]
 
-const failureLogEnding = [
+const failureLog = [
   'はnyokkiに失敗しました。次は頑張って!!',
   'のnyokkiが被ったーー',
   '息ぴったし',
@@ -39,33 +39,33 @@ export class NyokkiLogTextCreator implements INyokkiLogTextCreator {
    */
   public createNyokkiLogText(playerIds: string[], isSuccess: boolean, nyokkiTime: number): string {
     if (isSuccess) {
-      return this.generateSuccessLog(playerIds, nyokkiTime)
+      return this.createSuccessLog(playerIds, nyokkiTime)
     } else {
-      return this.generateFailureLog(playerIds, nyokkiTime)
+      return this.createFailureLog(playerIds, nyokkiTime)
     }
   }
 
   /**
    * ニョッキ成功時のログを生成する
    */
-  private generateSuccessLog(playerIds: string[], nyokkiTime: number): string {
+  private createSuccessLog(playerIds: string[], seed: number): string {
     const playerName = this.getPlayerName(playerIds[0])
 
-    // 成功したメッセージをnyokkiTimeを基に生成する
-    const seed = Math.floor(nyokkiTime / 100) % successLogEnding.length
-    const message = successLogEnding[seed]
+    // 成功したメッセージをseedを基に選択する
+    const i = Math.floor(seed / 100) % successLog.length
+    const message = successLog[i]
     return `${playerName}さん${message}`
   }
 
   /**
    * ニョッキ失敗時のログを生成する
    */
-  private generateFailureLog(playerIds: string[], nyokkiTime: number): string {
-    let message = this.buildPlayerNamePhrase(playerIds)
+  private createFailureLog(playerIds: string[], seed: number): string {
+    let message = this.createPlayerNamePhrase(playerIds)
 
-    // 失敗したメッセージをnyokkiTimeを基に生成する
-    const seed = Math.floor(nyokkiTime / 100) % failureLogEnding.length
-    message += failureLogEnding[seed]
+    // 失敗したメッセージをseedを基に選択する
+    const i = Math.floor(seed / 100) % failureLog.length
+    message += failureLog[i]
     return message
   }
 
@@ -74,7 +74,7 @@ export class NyokkiLogTextCreator implements INyokkiLogTextCreator {
    * @param playerIds ニョッキアクションを未実行のプレイヤーplayerIdの配列
    */
   public createNoNyokkiLogText(playerIds: string[]): string {
-    let message = this.buildPlayerNamePhrase(playerIds)
+    let message = this.createPlayerNamePhrase(playerIds)
     message += 'ニョッキ不発...'
     return message
   }
@@ -82,7 +82,7 @@ export class NyokkiLogTextCreator implements INyokkiLogTextCreator {
   /**
    * プレイヤー名を結合した文字列を作成する
    */
-  private buildPlayerNamePhrase(playerIds: string[]): string {
+  private createPlayerNamePhrase(playerIds: string[]): string {
     return playerIds
       .map((playerId, index) => {
         const playerName = this.getPlayerName(playerId)
