@@ -1,5 +1,4 @@
 import { Store, IEventBus, IMainScene } from 'churaverse-engine-server'
-import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 import { GameIds } from '@churaverse/game-plugin-server/interface/gameIds'
 import { SynchroBreakPluginStore } from './defSynchroBreakPluginStore'
 import { Game } from '../logic/game'
