@@ -68,14 +68,13 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._gameOwnerId = ev.playerId
     this._participantIds = this.store.of('playerPlugin').players.getAllId()
 
-    const gameStartMessage = new ResponseGameStartMessage({ gameId: this.gameId, playerId: ev.playerId })
+    const gameStartMessage = new ResponseGameStartMessage({
+      gameId: this.gameId,
+      playerId: ev.playerId,
+      participantIds: this._participantIds,
+    })
     this.store.of('networkPlugin').messageSender.send(gameStartMessage)
 
-    const gameParticipantMessage = new UpdateGameParticipantMessage({
-      gameId: this.gameId,
-      participantIds: this.participantIds,
-    })
-    this.store.of('networkPlugin').messageSender.send(gameParticipantMessage)
     this.gamePluginStore.games.set(this.gameId, this)
   }
 

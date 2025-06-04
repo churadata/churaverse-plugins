@@ -46,7 +46,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   private gameStart(msg: ResponseGameStartMessage): void {
-    this.eventBus.post(new GameStartEvent(msg.data.gameId, msg.data.playerId))
+    this.eventBus.post(new GameStartEvent(msg.data.gameId, msg.data.playerId, msg.data.participantIds))
   }
 
   private gameEnd(msg: ResponseGameEndMessage): void {

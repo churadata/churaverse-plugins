@@ -73,7 +73,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._isActive = this.gameId === ev.gameId
     if (!this.isActive) return
     this._gameOwnerId = ev.playerId
-    this._participantIds = this.store.of('playerPlugin').players.getAllId()
+    this._participantIds = ev.participantIds
     this.gamePluginStore.gameUiManager.initializeAllUis(this.gameId)
     this.gamePluginStore.gameLogRenderer.gameStartLog(this.gameName, this.gameOwnerId ?? '')
     this.gameInfoStore.games.set(this.gameId, this)
