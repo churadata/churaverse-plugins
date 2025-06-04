@@ -17,7 +17,7 @@ import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPla
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { initFlarePluginStore } from './store/initFlarePluginStore'
 import { FlareRenderer } from './renderer/flareRenderer'
-import { Flare, FLARE_WALK_LIMIT_GRIDS } from './domain/flare'
+import { Flare, FLARE_SPREAD_LIMIT_GRIDS } from './domain/flare'
 import { IFlareRenderer } from './domain/IFlareRenderer'
 import { FlareSpawnMessage } from './message/flareSpawnMessage'
 import { SocketController } from './controller/socketController'
@@ -81,10 +81,10 @@ export class FlarePlugin extends BasePlugin<IMainScene> {
   }
 
   private start(ev: StartEvent): void {
-    this.keyboardStore.keySettingWindow.addKeyAction('ReleaseFlare', 'サメを射出')
+    this.keyboardStore.keySettingWindow.addKeyAction('ReleaseFlare', '炎を放出')
     this.playerPluginStore.deathLogRenderer.addDeathLogMessageBuilder(
       'flare',
-      (deathLog: DeathLog) => `炎の口へ ${deathLog.victim.name} がダイブ！ ${deathLog.killer.name} の勝利！`
+      (deathLog: DeathLog) => `炎で ${deathLog.victim.name} が焼き尽くされた！ ${deathLog.killer.name} の勝利！`
     )
     this.setupDebugScreen()
   }
@@ -115,16 +115,16 @@ export class FlarePlugin extends BasePlugin<IMainScene> {
       )
     }
 
-    this.walkFlare(flare, renderer)
+    this.spreadFlare(flare, renderer)
     this.updateDebugScreenFlareCount()
   }
 
-  public walkFlare(flare: Flare, render: IFlareRenderer): void {
+  public spreadFlare(flare: Flare, render: IFlareRenderer): void {
     const dest = flare.position.copy()
-    dest.x = flare.direction.x * FLARE_WALK_LIMIT_GRIDS * GRID_SIZE + flare.position.x
-    dest.y = flare.direction.y * FLARE_WALK_LIMIT_GRIDS * GRID_SIZE + flare.position.y
-    render.walk(flare.position, dest, flare.direction, (pos) => {
-      flare.walk(pos)
+    dest.x = flare.direction.x * FLARE_SPREAD_LIMIT_GRIDS * GRID_SIZE + flare.position.x
+    dest.y = flare.direction.y * FLARE_SPREAD_LIMIT_GRIDS * GRID_SIZE + flare.position.y
+    render.spread(flare.position, dest, flare.direction, (pos) => {
+      flare.spread(pos)
     })
   }
 

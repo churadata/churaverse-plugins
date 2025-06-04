@@ -1,7 +1,6 @@
-import { Entity, WeaponEntity, Position, Direction, GRID_SIZE } from 'churaverse-engine-client'
+import { Entity, WeaponEntity, Position, Direction } from 'churaverse-engine-client'
 
-export const FLARE_WALK_LIMIT_GRIDS = 6
-export const FLARE_WALK_LIMIT_MS = 2400
+export const FLARE_SPREAD_LIMIT_GRIDS = 6
 
 /**
  * flareクラス
@@ -26,7 +25,7 @@ export class Flare extends Entity implements WeaponEntity {
    * 移動
    * @param position 宛先
    */
-  public walk(position: Position): void {
+  public spread(position: Position): void {
     this.position.x = position.x
     this.position.y = position.y
   }

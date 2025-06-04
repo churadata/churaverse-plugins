@@ -27,7 +27,6 @@ export class KeyboardController extends BaseKeyboardController<IMainScene> {
   }
 
   private flareSpawn(): void {
-    console.log("flareSpawn")
     if (this.playerPluginStore.players.get(this.playerPluginStore.ownPlayerId)?.isDead ?? true) return
     const ownPlayerId = this.playerPluginStore.ownPlayerId
     const ownPlayer = this.playerPluginStore.players.get(ownPlayerId)

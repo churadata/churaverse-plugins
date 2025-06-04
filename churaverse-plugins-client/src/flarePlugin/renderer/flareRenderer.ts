@@ -1,4 +1,4 @@
-import { Direction, Position, layerSetting, vectorToName, FRAME_RATE} from 'churaverse-engine-client'
+import { Direction, Position, layerSetting, vectorToName, FRAME_RATE } from 'churaverse-engine-client'
 import { IFlareRenderer } from '../domain/IFlareRenderer'
 import { Scene } from 'phaser'
 import flareImage from '../assets/flare.png'
@@ -23,10 +23,10 @@ const DISPLAY_SIZE = 60
  * どの方向でも同じ 0～8 フレームを再生する
  */
 const _anims = new Map<string, { key: string; frameStart: number; frameEnd: number }>([
-  [vectorToName(Direction.down),  { key: FLARE_ANIM_KEY, frameStart: 0, frameEnd: 8 }],
-  [vectorToName(Direction.up),    { key: FLARE_ANIM_KEY, frameStart: 0, frameEnd: 8 }],
-  [vectorToName(Direction.left),  { key: FLARE_ANIM_KEY, frameStart: 0, frameEnd: 8 }],
-  [vectorToName(Direction.right), { key: FLARE_ANIM_KEY, frameStart: 0, frameEnd: 8 }],
+  [vectorToName(Direction.down), { key: 'flare_go_down', frameStart: 0, frameEnd: 8 }],
+  [vectorToName(Direction.up), { key: 'flare_go_up', frameStart: 0, frameEnd: 8 }],
+  [vectorToName(Direction.left), { key: 'flare_go_left', frameStart: 0, frameEnd: 8 }],
+  [vectorToName(Direction.right), { key: 'flare_go_right', frameStart: 0, frameEnd: 8 }],
 ])
 
 
@@ -40,21 +40,24 @@ export class FlareRenderer implements IFlareRenderer {
 
   public constructor(scene: Scene) {
     this.scene = scene
-    this.sprite = scene.add
-      .sprite(-100, -100, FLARE_TEXTURE_KEY, 0)
-      .setDisplaySize(DISPLAY_SIZE, DISPLAY_SIZE)
+    this.sprite = scene.add.sprite(
+      -100,
+      -100, 
+      FLARE_TEXTURE_KEY, 
+      0
+    ).setDisplaySize(DISPLAY_SIZE, DISPLAY_SIZE)
 
     // constructor 内のアニメーション登録部分
     _anims.forEach((cfg) => {
       if (!scene.anims.exists(cfg.key)) {
         scene.anims.create({
           key: cfg.key,
-          frames: scene.anims.generateFrameNumbers(FLARE_TEXTURE_KEY, {
+          frames: scene.anims.generateFrameNumbers(FLARE_ANIM_KEY, {
             start: cfg.frameStart,
-            end:   cfg.frameEnd,
+            end: cfg.frameEnd,
           }),
           frameRate: FRAME_RATE,
-          repeat:    0, // 一度だけ再生する場合
+          repeat: 0, 
         })
       }
     })
@@ -76,85 +79,96 @@ export class FlareRenderer implements IFlareRenderer {
   }
 
   /**
-   * 炎攻撃: 指定位置に炎を出現させ、アニメーション後に消滅
+   * 炎攻撃: 指定位置に炎を出現させ、アニメーション後に消滅 (ソースコードの walk メソッドのロジックを適用)
    * @param position 炎を出現させる位置
    * @param dest 使用しない（互換性のため残す）
    * @param direction 炎の方向
-   * @param onUpdate 位置更新時のコールバック
+   * @param onUpdate 位置更新時のコールバック (初期位置でのみ呼び出し)
    */
-  public walk(position: Position, dest: Position, direction: Direction, onUpdate: (pos: Position) => void): void {
-
-    // 初期位置を通知
+  
+  public spread(position: Position, dest: Position, direction: Direction, onUpdate: (pos: Position) => void): void {
     onUpdate(position)
 
-  // 前方6マスに爆発エフェクトを伝播（300ms間隔）
+    // 爆発エフェクトを伝播 
+    // this.sprite のアニメーションや表示管理は propagateExplosion 内で行う
     this.propagateExplosion(position, direction, 6, 300)
   }
 
-    public propagateExplosion(position: Position, direction: Direction, length: number, delayMs: number): void {
-      const offset = this.getDirectionOffset(direction)
-      
-      for (let i = 0; i < length; i++) {
-        const delay = delayMs * i
-        this.scene.time.delayedCall(delay, () => {
-          const explosionX = position.x + offset.x * i
-          const explosionY = position.y + offset.y * i
-          this.createFlare(explosionX, explosionY, direction)
-        })
-      }
+  /**
+   * 爆発を指定されたオフセットと遅延で伝播させます。
+   * また、this.sprite (メインスプライト) のアニメーションと表示管理もここで行います。
+   */
+  public propagateExplosion(position: Position, direction: Direction, length: number, delayMs: number): void {
+    const offset = this.getDirectionOffset(direction)
 
-    // アニメーション開始
-    const animKey = _anims.get(vectorToName(direction))?.key
+    // 個別の伝播する炎を生成
+    for (let i = 0; i < length; i++) {
+      const currentDelay = delayMs * i
+      this.scene.time.delayedCall(currentDelay, () => {
+        const explosionX = position.x + offset.x * i
+        const explosionY = position.y + offset.y * i
+        this.createFlare(explosionX, explosionY, direction)
+      })
+    }
+
+    // メインスプライト (this.sprite) のアニメーション処理 (ソースコードの propagateExplosion の挙動)
+    this.sprite.setPosition(position.x, position.y) // 攻撃位置に配置
+    this.sprite.setVisible(true)
+    this.sprite.active = true
+
+    const animKey = _anims.get(vectorToName(direction))?.key // FLARE_ANIM_KEY が取得される
     if (animKey !== undefined) {
       this.sprite.anims.play(animKey)
       
-      // アニメーション完了時に炎を消滅させる
-      this.sprite.once('animationcomplete', () => {
+      this.sprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
         this.sprite.setVisible(false)
         this.sprite.active = false
-        // 必要に応じてspriteを破棄する場合
-        // this.sprite.destroy()
-      })
+        this.sprite.destroy() 
+        })
     } else {
-      // アニメーションキーがない場合は即座に消滅
+      // アニメーションキーがない場合は即座に非表示・非アクティブ化
       this.sprite.setVisible(false)
       this.sprite.active = false
     }
   }
 
-  public dead(): void {
-    this.tween?.stop()
-    this.sprite.setVisible(false)
-    this.sprite.active = false
-    // 必要に応じて破棄
-    // this.sprite.destroy()
+  /**
+   * 指定された位置に炎スプライトを生成し、アニメーションさせ、完了後に破棄します。
+   */
+  private createFlare(x: number, y: number, direction: Direction): void {
+    const flame = this.scene.add
+      .sprite(x, y, FLARE_TEXTURE_KEY, 0)
+      .setDisplaySize(DISPLAY_SIZE, DISPLAY_SIZE)
+    layerSetting(flame, 'player', 20)
+
+    // _anims から取得する key は FLARE_ANIM_KEY になる
+    const animKey = _anims.get(vectorToName(direction))?.key 
+    if (animKey !== undefined) {
+      flame.anims.play(animKey)
+      flame.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+        flame.destroy()
+      })
+    } else {
+      // console.warn は維持、キーが見つからない場合は即座に破棄
+      console.warn(`Animation key for created flare not found for direction: ${vectorToName(direction)}. Destroying flare.`)
+      flame.destroy()
+    }
   }
 
   /**
-   * 追加関数: 方向に沿って炎をコマ遅れで連続表示する
-   * @param position  発射起点の座標（プレイヤー位置）
-   * @param direction 向き
-   * @param length    伝播させるマス数（デフォルト6）
-   * @param delayMs   各マスごとの遅延時間[ms]（デフォルト300）
+   * 方向に沿って炎をコマ遅れで連続表示する
    */
-  public propagate(
-    position: Position,
-    direction: Direction,
-    length: number = 6,
-    delayMs: number = 300
-  ): void {
+  public propagate(position: Position, direction: Direction, length: number = 6, delayMs: number = 300): void {
     const offset = this.getDirectionOffset(direction)
-  
+
     for (let i = 0; i <= length; i++) {
       const delay = delayMs * i
       const flameX = position.x + offset.x * i
       const flameY = position.y + offset.y * i
-  
-      // 最初の炎は二重生成（4フレーム後に同じ位置で再生成）
+
       this.scene.time.delayedCall(delay, () => {
         this.createFlare(flameX, flameY, direction)
-  
-        // 4フレーム後に同じ位置で再度炎を生成
+
         if (i === 0) {
           this.scene.time.delayedCall(delay + 4 * (1000 / FRAME_RATE), () => {
             this.createFlare(flameX, flameY, direction)
@@ -163,32 +177,30 @@ export class FlareRenderer implements IFlareRenderer {
       })
     }
   }
-  
-  private createFlare(x: number, y: number, direction: Direction): void {
-    const flame = this.scene.add
-      .sprite(x, y, FLARE_TEXTURE_KEY, 0)
-      .setDisplaySize(DISPLAY_SIZE, DISPLAY_SIZE)
-    layerSetting(flame, 'player', 20)
-  
-    const animKey = _anims.get(vectorToName(direction))!.key
-    flame.anims.play(animKey)
-    flame.once('animationcomplete', () => flame.destroy())
+
+  public dead(): void {
+    this.tween?.stop()
+    this.sprite.destroy()
   }
-  
 
   /**
-   * 追加関数: Directionごとの1マス分のピクセルオフセットを返す
-   * @param direction 向き
+   * Directionごとの1マス分のピクセルオフセットを返す (vectorToName を使用する改善版を維持)
    */
   public getDirectionOffset(direction: Direction): { x: number; y: number } {
-    switch (direction) {
-      case Direction.up:    return { x: 0,             y: -DISPLAY_SIZE }
-      case Direction.down:  return { x: 0,             y:  DISPLAY_SIZE }
-      case Direction.left:  return { x: -DISPLAY_SIZE, y: 0             }
-      case Direction.right: return { x:  DISPLAY_SIZE, y: 0             }
+    const offsetSize = DISPLAY_SIZE;
+    const directionName = vectorToName(direction);
+
+    switch (directionName) {
+      case vectorToName(Direction.up):
+        return { x: 0, y: -offsetSize };
+      case vectorToName(Direction.down):
+        return { x: 0, y: offsetSize };
+      case vectorToName(Direction.left):
+        return { x: -offsetSize, y: 0 };
+      case vectorToName(Direction.right):
+        return { x: offsetSize, y: 0 };
       default:
-      // 未知の direction が来たらエラーを投げして、必ず戻り値があるよう補強
-      throw new Error(`Invalid direction: ${direction}`)
+        throw new Error(`Invalid direction name: ${directionName} (from vector: ${JSON.stringify(direction)})`);
     }
   }
 }

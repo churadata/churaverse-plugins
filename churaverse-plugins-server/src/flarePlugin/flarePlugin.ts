@@ -52,7 +52,7 @@ import {
     private update(ev: UpdateEvent): void {
       moveFlares(ev.dt, this.flarePluginStore.flares, this.mapPluginStore.mapManager.currentMap)
       removeDieFlare(this.flarePluginStore.flares, (flareId: string) => {
-        const flareHitMessage = new FlareHitMessage({ flareId: flareId })
+        const flareHitMessage = new FlareHitMessage({ flareId })
         this.networkPluginStore.messageSender.send(flareHitMessage)
       })
     }
@@ -84,7 +84,7 @@ import {
       if (!(ev.entity instanceof Flare)) return
       const flare = ev.entity
       this.flarePluginStore.flares.set(flare.flareId, flare)
-      flare.walk(this.mapPluginStore.mapManager.currentMap)
+      flare.spread(this.mapPluginStore.mapManager.currentMap)
     }
   }
   

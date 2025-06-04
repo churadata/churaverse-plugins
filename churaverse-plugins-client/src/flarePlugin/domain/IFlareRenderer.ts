@@ -1,17 +1,17 @@
 import { Position, Direction } from 'churaverse-engine-client'
 
 /**
- * サメ描画のためのインタフェース
+ * 炎描画のためのインタフェース
  */
 export interface IFlareRenderer {
   setSpriteId: (id: string) => void
   /**
-   * walk Phaserのtweenによりアニメーションするため,座標の同期をonUpdateでさせる
+   * spread Phaserのtweenによりアニメーションするため,座標の同期をonUpdateでさせる
    * @param onUpdate updateごとに座標の通知
    */
-  walk: (position: Position, dest: Position, direction: Direction, onUpdate: (pos: Position) => void) => void
-  dead: () => void
-
+  spread: (position: Position, dest: Position, direction: Direction, onUpdate: (pos: Position) => void) => void
   // 追加：
-  propagate(position: Position, direction: Direction, length?: number, delayMs?: number): void
+  propagate: (position: Position, direction: Direction, length?: number, delayMs?: number) => void
+  
+  dead: () => void
 }
