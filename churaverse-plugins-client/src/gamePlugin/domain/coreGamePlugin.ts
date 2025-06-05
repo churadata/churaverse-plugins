@@ -96,9 +96,13 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._isActive = false
     this._gameOwnerId = undefined
     this._participantIds = []
-    this._isOwnPlayerMidwayParticipant = false
-    this.gamePluginStore.gameUiManager.removeAllUis(this.gameId)
     this.gameInfoStore.games.delete(this.gameId)
+
+    if (this.isOwnPlayerMidwayParticipant) {
+      this._isOwnPlayerMidwayParticipant = false
+    } else {
+      this.gamePluginStore.gameUiManager.removeAllUis(this.gameId)
+    }
   }
 
   private readonly onPlayerLeave = (ev: EntityDespawnEvent): void => {
