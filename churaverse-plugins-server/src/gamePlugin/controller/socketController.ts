@@ -11,8 +11,6 @@ import { RequestGameAbortMessage, ResponseGameAbortMessage } from '../message/ga
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
-import { PlayerLeaveMessage } from '@churaverse/player-plugin-server/message/playerLeaveMessage'
-import { PlayerLeaveEvent } from '@churaverse/player-plugin-server/event/playerLeaveEvent'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
@@ -50,9 +48,5 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   private gameEnd(msg: RequestGameEndMessage): void {
     this.eventBus.post(new GameEndEvent(msg.data.gameId))
-  }
-
-  private playerLeave(msg: PlayerLeaveMessage): void {
-    this.eventBus.post(new PlayerLeaveEvent(msg.data.playerId))
   }
 }

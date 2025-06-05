@@ -113,7 +113,7 @@ export function isPlayer(data: unknown): data is Player {
   // dataを一旦 Object.entriesみたいにして、dataのキーがPlayerのキーとあっているか確認する
   const playerKeys = Object.keys(data) as Array<keyof Player>
   const requiredKeys: Array<keyof Player> = ['id', 'role', 'spawnTime', 'isCollidable']
-
   const hasRequiredKeys = requiredKeys.every((key) => playerKeys.includes(key))
+
   return hasRequiredKeys
 }

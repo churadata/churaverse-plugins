@@ -8,7 +8,6 @@ import { GameIds } from '../interface/gameIds'
 import { IGameInfo } from '../interface/IGameInfo'
 import { GamePluginStore } from '../store/defGamePluginStore'
 import { BaseGamePlugin } from './baseGamePlugin'
-import { UpdateGameParticipantEvent } from '../event/updateGameParticipantEvent'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -49,7 +48,6 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     super.subscribeGameEvent()
     this.bus.subscribeEvent('gameAbort', this.gameAbort)
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
-    this.bus.subscribeEvent('updateGameParticipant', this.updateGameParticipant)
     this.bus.subscribeEvent('entityDespawn', this.onPlayerLeave)
   }
 
@@ -58,7 +56,6 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
     this.bus.unsubscribeEvent('entityDespawn', this.onPlayerLeave)
-    this.bus.unsubscribeEvent('updateGameParticipant', this.updateGameParticipant)
   }
 
   public getStores(): void {
@@ -106,26 +103,19 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
 
   private readonly onPlayerLeave = (ev: EntityDespawnEvent): void => {
     if (!isPlayer(ev.entity)) return
-    const playerId = ev.entity.id
-    this.removeParticipant(playerId)
+    const playerId: string = ev.entity.id
+    if (!this.removeParticipant(playerId)) return
     this.handlePlayerLeave(playerId)
   }
 
+  /**
+   * 退出したプレイヤーがゲーム参加者の場合、参加者リストから削除しtrueを返す
+   */
   private removeParticipant(playerId: string): boolean {
     const idx = this._participantIds.indexOf(playerId)
     if (idx === -1) return false
     this._participantIds.splice(idx, 1)
     return true
-  }
-
-  private readonly updateGameParticipant = (ev: UpdateGameParticipantEvent): void => {
-    if (ev.gameId !== this.gameId) return
-
-    const leavePlayerId = this._participantIds.find((id) => !ev.participantIds.includes(id))
-    if (leavePlayerId === undefined) return
-
-    this._participantIds = ev.participantIds
-    this.handlePlayerLeave(leavePlayerId)
   }
 
   /**

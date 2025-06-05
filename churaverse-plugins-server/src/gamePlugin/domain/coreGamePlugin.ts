@@ -99,13 +99,19 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.gamePluginStore.games.delete(this.gameId)
   }
 
+  /**
+   * 退出したプレイヤーがゲーム参加者の場合、参加者リストから削除しtrueを返す
+   */
   private readonly onPlayerLeave = (ev: EntityDespawnEvent): void => {
     if (isPlayer(ev.entity) === false) return
     const playerId: string = ev.entity.id
-    this.removeParticipant(playerId)
+    if (!this.removeParticipant(playerId)) return
     this.handlePlayerLeave(playerId)
   }
 
+  /**
+   * 退出したプレイヤーがゲーム参加者の場合、参加者リストから削除しtrueを返す
+   */
   private removeParticipant(playerId: string): boolean {
     const idx = this._participantIds.indexOf(playerId)
     if (idx === -1) return false
