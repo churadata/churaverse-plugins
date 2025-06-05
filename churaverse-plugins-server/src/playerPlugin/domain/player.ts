@@ -3,10 +3,11 @@ import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server
 import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
 import { PlayerColor } from '../types/playerColor'
 import { PlayerRole } from '../types/playerRole'
+import { IPlayer } from '../interface/IPlayer'
 
 export const PLAYER_RESPAWN_WAITING_TIME_MS = 2500
 
-export class Player extends LivingEntity implements ICollidableEntity {
+export class Player extends LivingEntity implements IPlayer, ICollidableEntity {
   public isCollidable = true
 
   public getRect(): IRectangle {
