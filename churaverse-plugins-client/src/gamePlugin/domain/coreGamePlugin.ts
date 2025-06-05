@@ -1,3 +1,5 @@
+import { EntityDespawnEvent } from 'churaverse-engine-client'
+import { isPlayer } from '@churaverse/player-plugin-client/domain/player'
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { GameStartEvent } from '../event/gameStartEvent'
@@ -48,12 +50,14 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.subscribeEvent('gameAbort', this.gameAbort)
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
     this.bus.subscribeEvent('updateGameParticipant', this.updateGameParticipant)
+    this.bus.subscribeEvent('entityDespawn', this.onPlayerLeave)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
+    this.bus.unsubscribeEvent('entityDespawn', this.onPlayerLeave)
     this.bus.unsubscribeEvent('updateGameParticipant', this.updateGameParticipant)
   }
 
@@ -98,6 +102,20 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._isOwnPlayerMidwayParticipant = false
     this.gamePluginStore.gameUiManager.removeAllUis(this.gameId)
     this.gameInfoStore.games.delete(this.gameId)
+  }
+
+  private readonly onPlayerLeave = (ev: EntityDespawnEvent): void => {
+    if (!isPlayer(ev.entity)) return
+    const playerId = ev.entity.id
+    this.removeParticipant(playerId)
+    this.handlePlayerLeave(playerId)
+  }
+
+  private removeParticipant(playerId: string): boolean {
+    const idx = this._participantIds.indexOf(playerId)
+    if (idx === -1) return false
+    this._participantIds.splice(idx, 1)
+    return true
   }
 
   private readonly updateGameParticipant = (ev: UpdateGameParticipantEvent): void => {

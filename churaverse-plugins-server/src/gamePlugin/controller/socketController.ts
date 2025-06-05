@@ -9,7 +9,6 @@ import { RequestGameEndMessage, ResponseGameEndMessage } from '../message/gameEn
 import { GameEndEvent } from '../event/gameEndEvent'
 import { RequestGameAbortMessage, ResponseGameAbortMessage } from '../message/gameAbortMessage'
 import { GameAbortEvent } from '../event/gameAbortEvent'
-import { UpdateGameParticipantMessage } from '../message/updateGameParticipantMessage'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
 import { PlayerLeaveMessage } from '@churaverse/player-plugin-server/message/playerLeaveMessage'
@@ -24,7 +23,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('responseGameEnd', ResponseGameEndMessage, 'allClients')
     ev.messageRegister.registerMessage('requestGameAbort', RequestGameAbortMessage, 'onlySelf')
     ev.messageRegister.registerMessage('responseGameAbort', ResponseGameAbortMessage, 'allClients')
-    ev.messageRegister.registerMessage('updateGameParticipant', UpdateGameParticipantMessage, 'allClients')
   }
 
   public registerMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
@@ -32,7 +30,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageListenerRegister.on('requestGameStart', this.gameStart.bind(this))
     ev.messageListenerRegister.on('requestGameEnd', this.gameEnd.bind(this))
     ev.messageListenerRegister.on('requestGameAbort', this.gameAbort.bind(this))
-    ev.messageListenerRegister.on('playerLeave', this.playerLeave.bind(this))
   }
 
   /**

@@ -3,11 +3,10 @@ import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server
 import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
 import { PlayerColor } from '../types/playerColor'
 import { PlayerRole } from '../types/playerRole'
-import { IPlayer } from '../interface/IPlayer'
 
 export const PLAYER_RESPAWN_WAITING_TIME_MS = 2500
 
-export class Player extends LivingEntity implements IPlayer, ICollidableEntity {
+export class Player extends LivingEntity implements ICollidableEntity {
   public isCollidable = true
 
   public getRect(): IRectangle {
@@ -101,4 +100,20 @@ export class Player extends LivingEntity implements IPlayer, ICollidableEntity {
     this.position.x += this._velocity.x * dt
     this.position.y += this._velocity.y * dt
   }
+}
+
+/**
+ * 外部Pluginから型チェックするためのユーザー定義型ガード関数
+ */
+export function isPlayer(data: unknown): data is Player {
+  if (data == null) {
+    return false
+  }
+
+  // dataを一旦 Object.entriesみたいにして、dataのキーがPlayerのキーとあっているか確認する
+  const playerKeys = Object.keys(data) as Array<keyof Player>
+  const requiredKeys: Array<keyof Player> = ['id', 'role', 'spawnTime', 'isCollidable']
+
+  const hasRequiredKeys = requiredKeys.every((key) => playerKeys.includes(key))
+  return hasRequiredKeys
 }

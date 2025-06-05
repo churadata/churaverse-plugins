@@ -1,6 +1,7 @@
 import { EntityDespawnEvent } from 'churaverse-engine-server'
 import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 import '@churaverse/network-plugin-server/store/defNetworkPluginStore'
+import { isPlayer } from '@churaverse/player-plugin-server/domain/player'
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { GameStartEvent } from '../event/gameStartEvent'
@@ -11,9 +12,7 @@ import { ResponseGameAbortMessage } from '../message/gameAbortMessage'
 import { ResponseGameEndMessage } from '../message/gameEndMessage'
 import { ResponseGameStartMessage } from '../message/gameStartMessage'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
-import { UpdateGameParticipantMessage } from '../message/updateGameParticipantMessage'
 import { BaseGamePlugin } from './baseGamePlugin'
-import { isPlayer } from '../util/playerTypeGuard'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -100,18 +99,9 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.gamePluginStore.games.delete(this.gameId)
   }
 
-  private sendParticipantUpdate(): void {
-    this.store.of('networkPlugin').messageSender.send(
-      new UpdateGameParticipantMessage({
-        gameId: this.gameId,
-        participantIds: this._participantIds,
-      })
-    )
-  }
-
   private readonly onPlayerLeave = (ev: EntityDespawnEvent): void => {
-    if (!isPlayer(ev.entity)) return
-    const playerId = ev.entity.id
+    if (isPlayer(ev.entity) === false) return
+    const playerId: string = ev.entity.id
     this.removeParticipant(playerId)
     this.handlePlayerLeave(playerId)
   }
