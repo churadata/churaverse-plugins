@@ -43,16 +43,13 @@ export class RankingBoard implements IRankingBoard {
   public element!: HTMLElement
   public readonly visible: boolean = false
   private rankingOpenButton!: HTMLElement
-  private turn!: HTMLDivElement
 
   public constructor(public readonly store: Store<IMainScene>) {}
 
   public initialize(): void {
     this.setupPopupButton()
     this.setupRankingBoard()
-    this.turn = document.createElement('div')
-    this.turn.id = RANKING_BOARD_ELEMENT_TURN_ID
-    this.element.appendChild(this.turn)
+
     domLayerSetting(this.element, 'lowest')
     this.element.addEventListener('click', () => {
       makeLayerHigherTemporary(this.element, 'lower')
@@ -108,16 +105,14 @@ export class RankingBoard implements IRankingBoard {
    * ターン数を更新する
    */
   public updateTurnNumber(turnNumber: number, allTurn: number): void {
-    this.turn.textContent = `${turnNumber}  /  ${allTurn} ターン`
     const boardElementTurn = DomManager.getElementById(RANKING_BOARD_ELEMENT_TURN_ID)
-    boardElementTurn.appendChild(this.turn)
+    boardElementTurn.textContent = `${turnNumber}  /  ${allTurn} ターン`
   }
 
   /**
    * プレイヤーの所持コイン数を変更する
    */
   public changePlayersCoin(playerId: string, coins: number): void {
-    if (!this.checkElementExist(RANKING_BOARD_CONTAINER_ID)) return
     const playerCoins = DomManager.getElementById(PLAYER_COINS_ID(playerId))
     if (playerCoins === null) return
     playerCoins.textContent = `${coins}コイン`
@@ -127,7 +122,6 @@ export class RankingBoard implements IRankingBoard {
    * プレイヤーのニョッキステータスを変更する
    */
   public changeNyokkiStatus(playrId: string, status: NyokkiStatus): void {
-    if (!this.checkElementExist(RANKING_BOARD_CONTAINER_ID)) return
     const playerNyokkiStatus = DomManager.getElementById(NYOKKI_STATUS_ID(playrId))
     if (playerNyokkiStatus === null) return
 
@@ -163,14 +157,6 @@ export class RankingBoard implements IRankingBoard {
     playerIds.forEach((playerId) => {
       this.changeNyokkiStatus(playerId, 'yet')
     })
-  }
-
-  /**
-   * ランキングボードの要素が存在するかどうかを確認する
-   */
-  private checkElementExist(elementId: string): boolean {
-    const element = document.getElementById(elementId)
-    return element !== null
   }
 
   /**

@@ -28,6 +28,14 @@ export class TimeLimitFormContainer implements IGameUiComponent {
   private timeLimitInputField!: HTMLInputElement
   private readonly networkPluginStore!: NetworkPluginStore<IMainScene>
 
+  private get inputFieldValue(): number {
+    return Number(this.timeLimitInputField.value)
+  }
+
+  private set inputFieldValue(value: number) {
+    this.timeLimitInputField.value = value.toString()
+  }
+
   public constructor(private readonly store: Store<IMainScene>) {
     this.networkPluginStore = this.store.of('networkPlugin')
   }
@@ -38,54 +46,46 @@ export class TimeLimitFormContainer implements IGameUiComponent {
     this.element.addEventListener('click', () => {
       makeLayerHigherTemporary(this.element, 'lower')
     })
-    this.setUpInputFields()
+    this.setupInputFields()
   }
 
   /**
    * 制限時間入力部分を設定する
    */
-  private setUpInputFields(): void {
+  private setupInputFields(): void {
     this.timeLimitInputField = DomManager.getElementById<HTMLInputElement>(TIME_LIMIT_INPUT_FIELD_ID)
 
     const sendButton = DomManager.getElementById(TIME_LIMIT_SEND_BUTTON_ID)
     sendButton.onclick = () => {
-      const timelineInputFieldValue = this.timeLimitInputField.value
       if (
-        Number(timelineInputFieldValue) >= SYNCHRO_BREAK_MIN_TIME_LIMIT &&
-        Number(timelineInputFieldValue) <= SYNCHRO_BREAK_MAX_TIME_LIMIT
+        this.inputFieldValue >= SYNCHRO_BREAK_MIN_TIME_LIMIT &&
+        this.inputFieldValue <= SYNCHRO_BREAK_MAX_TIME_LIMIT
       ) {
         const playerId = this.store.of('playerPlugin').ownPlayerId
         this.networkPluginStore.messageSender.send(
-          new TimeLimitConfirmMessage({ playerId, timeLimit: timelineInputFieldValue })
+          new TimeLimitConfirmMessage({ playerId, timeLimit: this.inputFieldValue.toString() })
         )
         this.close()
       } else {
-        this.timeLimitInputField.value = SYNCHRO_BREAK_MIN_TIME_LIMIT.toString()
+        this.inputFieldValue = SYNCHRO_BREAK_MIN_TIME_LIMIT
       }
     }
 
     const plusButton = DomManager.getElementById(TIME_LIMIT_INCREMENT_BUTTON_ID)
     plusButton.onclick = () => {
-      const value: number = Number(this.timeLimitInputField.value)
-      if (value < SYNCHRO_BREAK_MAX_TIME_LIMIT) {
-        const incrementedNum: string = (value + 1).toString()
-        this.timeLimitInputField.value = incrementedNum
-      }
+      if (this.inputFieldValue >= SYNCHRO_BREAK_MAX_TIME_LIMIT) return
+      this.inputFieldValue++
     }
 
     const minusButton = DomManager.getElementById(TIME_LIMIT_DECREMENT_BUTTON_ID)
     minusButton.onclick = () => {
-      if (Number(this.timeLimitInputField.value) <= 0) return
-      const value: number = Number(this.timeLimitInputField.value)
-      if (value > SYNCHRO_BREAK_MIN_TIME_LIMIT) {
-        const decrementedNum: string = (value - 1).toString()
-        this.timeLimitInputField.value = decrementedNum
-      }
+      if (this.inputFieldValue <= SYNCHRO_BREAK_MIN_TIME_LIMIT) return
+      this.inputFieldValue--
     }
   }
 
   public open(): void {
-    this.timeLimitInputField.value = SYNCHRO_BREAK_MIN_TIME_LIMIT.toString()
+    this.inputFieldValue = SYNCHRO_BREAK_MIN_TIME_LIMIT
     this.element.style.display = 'flex'
   }
 

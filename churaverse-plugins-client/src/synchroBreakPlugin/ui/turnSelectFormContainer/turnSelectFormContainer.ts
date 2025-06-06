@@ -2,7 +2,7 @@ import { IMainScene, Store, DomManager, domLayerSetting, makeLayerHigherTemporar
 import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { SelectTurnForm } from './component/SelectTurnForm'
-import { NyokkiTurnSelectMessage } from '../../message/nyokkiTurnSelectMessage'
+import { SynchroBreakTurnSelectMessage } from '../../message/synchroBreakTurnSelectMessage'
 
 /**  turn入力部分 */
 export const TURN_SELECT_FIELD_ID = 'turn-select-field-id'
@@ -16,11 +16,23 @@ export const TURN_SELECT_DECREASE_BUTTON_ID = 'turn-select-decrease'
 /** turn数送信ボタン */
 export const TURN_SELECT_SEND_BUTTON_ID = 'turn-select-send'
 
+// turn数の最大値と最小値
+export const SYNCHRO_BREAK_MAX_TURN = 10
+export const SYNCHRO_BREAK_MIN_TURN = 1
+
 export class TurnSelectFormContainer implements IGameUiComponent {
   public element!: HTMLElement
   public readonly visible = false
   private turnSelectInputField!: HTMLInputElement
   private readonly networkPluginStore!: NetworkPluginStore<IMainScene>
+
+  private get inputFieldValue(): number {
+    return Number(this.turnSelectInputField.value)
+  }
+
+  private set inputFieldValue(value: number) {
+    this.turnSelectInputField.value = value.toString()
+  }
 
   public constructor(public readonly store: Store<IMainScene>) {
     this.networkPluginStore = this.store.of('networkPlugin')
@@ -34,45 +46,39 @@ export class TurnSelectFormContainer implements IGameUiComponent {
       makeLayerHigherTemporary(this.element, 'lower')
     })
 
-    this.setUpInputFields(this.store.of('playerPlugin').ownPlayerId)
+    this.setupInputFields(this.store.of('playerPlugin').ownPlayerId)
   }
 
   /**
    * ターン数選択フォームの入力部分を設定する
    */
-  private setUpInputFields(playerId: string): void {
+  private setupInputFields(playerId: string): void {
     this.turnSelectInputField = DomManager.getElementById<HTMLInputElement>(TURN_SELECT_FIELD_ID)
 
     const sendButton = DomManager.getElementById(TURN_SELECT_SEND_BUTTON_ID)
     sendButton.onclick = () => {
-      if (this.turnSelectInputField.value !== '') {
-        const turnNumber = Number(this.turnSelectInputField.value)
-        this.networkPluginStore.messageSender.send(new NyokkiTurnSelectMessage({ playerId, allTurn: turnNumber }))
-
-        this.turnSelectInputField.value = ''
-        this.close()
-      }
+      this.networkPluginStore.messageSender.send(
+        new SynchroBreakTurnSelectMessage({ playerId, allTurn: this.inputFieldValue })
+      )
+      this.inputFieldValue = SYNCHRO_BREAK_MIN_TURN
+      this.close()
     }
 
     const plusButton = DomManager.getElementById(TURN_SELECT_INCREASE_BUTTON_ID)
     plusButton.onclick = () => {
-      const value: number = Number(this.turnSelectInputField.value)
-      if (value >= 10) return
-      const incrementedNum: string = (value + 1).toString()
-      this.turnSelectInputField.value = incrementedNum
+      if (this.inputFieldValue >= SYNCHRO_BREAK_MAX_TURN) return
+      this.inputFieldValue++
     }
 
     const minusButton = DomManager.getElementById(TURN_SELECT_DECREASE_BUTTON_ID)
     minusButton.onclick = () => {
-      if (Number(this.turnSelectInputField.value) <= 1) return
-      const value: number = Number(this.turnSelectInputField.value)
-      const decrementedNum: string = (value - 1).toString()
-      this.turnSelectInputField.value = decrementedNum
+      if (this.inputFieldValue <= SYNCHRO_BREAK_MIN_TURN) return
+      this.inputFieldValue--
     }
   }
 
   public open(): void {
-    this.turnSelectInputField.value = '1'
+    this.inputFieldValue = SYNCHRO_BREAK_MIN_TURN
     this.element.style.display = 'flex'
   }
 
