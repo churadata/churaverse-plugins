@@ -76,9 +76,6 @@ import {
     if (flare.hitTargets.has(player.id)) return
     flare.hitTargets.add(player.id)   // 初めてそのプレイヤーにヒットしたならそれを記録
   
-    // isDead を立てない
-    // flare.isDead = true  ← 触らない
-  
     const cause = new FlareDamageCause(flare)
     const dmgEv = new LivingDamageEvent(player, cause, flare.power)
     this.bus.post(dmgEv)
