@@ -81,7 +81,7 @@ export class FlarePlugin extends BasePlugin<IMainScene> {
   }
 
   private start(ev: StartEvent): void {
-    this.keyboardStore.keySettingWindow.addKeyAction('ReleaseFlare', '炎を放出')
+    this.keyboardStore.keySettingWindow.addKeyAction('releaseFlare', '炎を放出')
     this.playerPluginStore.deathLogRenderer.addDeathLogMessageBuilder(
       'flare',
       (deathLog: DeathLog) => `炎で ${deathLog.victim.name} が焼き尽くされた！ ${deathLog.killer.name} の勝利！`

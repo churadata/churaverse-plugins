@@ -19,11 +19,11 @@ export class KeyboardController extends BaseKeyboardController<IMainScene> {
   }
 
   public registerKeyAction(ev: RegisterKeyActionEvent<IMainScene>): void {
-    ev.keyActionRegister.registerKeyAction(new KeyAction('ReleaseFlare', 'F', 'inGame', 300))
+    ev.keyActionRegister.registerKeyAction(new KeyAction('releaseFlare', 'F', 'inGame', 300))
   }
 
   public registerKeyActionListener(ev: RegisterKeyActionListenerEvent<IMainScene>): void {
-    ev.keyActionListenerRegister.on('ReleaseFlare', this.flareSpawn.bind(this))
+    ev.keyActionListenerRegister.on('releaseFlare', this.flareSpawn.bind(this))
   }
 
   private flareSpawn(): void {

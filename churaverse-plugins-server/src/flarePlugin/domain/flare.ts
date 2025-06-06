@@ -28,6 +28,7 @@ export class Flare extends Entity implements ICollidableEntity, WeaponEntity {
   public readonly power = 50
   public readonly spawnTime: number
   private _velocity: Vector
+  public readonly hitTargets = new Set<string>() // すでに炎が当たったプレイヤーのidを保持する
 
   public constructor (flareId: string, ownerId: string, position: Position, direction: Direction, spawnTime: number) {
     super(position, direction)

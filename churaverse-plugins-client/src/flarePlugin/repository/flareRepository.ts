@@ -22,7 +22,7 @@ export class FlareRepository {
     return Array.from(this.flares.keys())
   }
 
-  get size(): number {
+  public get size(): number {
     return this.flares.size
   }
 }

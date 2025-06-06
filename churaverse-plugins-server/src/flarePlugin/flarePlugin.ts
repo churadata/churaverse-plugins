@@ -65,26 +65,31 @@ import {
       )
     }
   
-    private flareHitPlayer(flare: Flare, player: Player): void {
-      // 炎を発射したプレイヤー自身との衝突は無視
-      if (flare.ownerId === player.id) return
+  /**
+   * フレアがプレイヤーに衝突したときの処理
+   */
+  private flareHitPlayer(flare: Flare, player: Player): void {
+    if (flare.ownerId === player.id) return
+    if (player.isDead) return
   
-      if (player.isDead) return
+    // 既にこのプレイヤーには当てているならスキップ
+    if (flare.hitTargets.has(player.id)) return
+    flare.hitTargets.add(player.id)   // 初めてそのプレイヤーにヒットしたならそれを記録
   
-      // プレイヤーと衝突した炎は消える
-      flare.isDead = true
+    // isDead を立てない
+    // flare.isDead = true  ← 触らない
   
-      // 炎衝突イベントの発火
-      const flareDamageCause = new FlareDamageCause(flare)
-      const livingDamageEvent = new LivingDamageEvent(player, flareDamageCause, flare.power)
-      this.bus.post(livingDamageEvent)
-    }
-  
-    private spawnFlare(ev: EntitySpawnEvent): void {
-      if (!(ev.entity instanceof Flare)) return
-      const flare = ev.entity
-      this.flarePluginStore.flares.set(flare.flareId, flare)
-      flare.spread(this.mapPluginStore.mapManager.currentMap)
-    }
+    const cause = new FlareDamageCause(flare)
+    const dmgEv = new LivingDamageEvent(player, cause, flare.power)
+    this.bus.post(dmgEv)
   }
+  
+
+  private spawnFlare(ev: EntitySpawnEvent): void {
+    if (!(ev.entity instanceof Flare)) return
+    const flare = ev.entity
+    this.flarePluginStore.flares.set(flare.flareId, flare)
+    flare.spread(this.mapPluginStore.mapManager.currentMap)
+  }
+}
   

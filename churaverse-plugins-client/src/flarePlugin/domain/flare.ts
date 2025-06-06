@@ -11,7 +11,7 @@ export class Flare extends Entity implements WeaponEntity {
   public flareId: string
   public ownerId: string
   public spawnTime: number
-  readonly id: string
+  public readonly id: string
 
   public constructor(flareId: string, ownerId: string, position: Position, direction: Direction, spawnTime: number) {
     super(position, direction)

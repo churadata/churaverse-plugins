@@ -2,6 +2,6 @@ import { KeyAction } from '@churaverse/keyboard-plugin-client/keyAction/keyActio
 
 declare module '@churaverse/keyboard-plugin-client/keyAction/keyActions' {
   export interface MainKeyActionMap {
-    ReleaseFlare: KeyAction
+    releaseFlare: KeyAction
   }
 }

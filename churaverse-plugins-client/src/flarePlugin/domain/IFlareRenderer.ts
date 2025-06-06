@@ -10,8 +10,5 @@ export interface IFlareRenderer {
    * @param onUpdate updateごとに座標の通知
    */
   spread: (position: Position, dest: Position, direction: Direction, onUpdate: (pos: Position) => void) => void
-  // 追加：
-  propagate: (position: Position, direction: Direction, length?: number, delayMs?: number) => void
-  
   dead: () => void
 }

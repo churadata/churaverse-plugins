@@ -155,29 +155,6 @@ export class FlareRenderer implements IFlareRenderer {
     }
   }
 
-  /**
-   * 方向に沿って炎をコマ遅れで連続表示する
-   */
-  public propagate(position: Position, direction: Direction, length: number = 6, delayMs: number = 300): void {
-    const offset = this.getDirectionOffset(direction)
-
-    for (let i = 0; i <= length; i++) {
-      const delay = delayMs * i
-      const flameX = position.x + offset.x * i
-      const flameY = position.y + offset.y * i
-
-      this.scene.time.delayedCall(delay, () => {
-        this.createFlare(flameX, flameY, direction)
-
-        if (i === 0) {
-          this.scene.time.delayedCall(delay + 4 * (1000 / FRAME_RATE), () => {
-            this.createFlare(flameX, flameY, direction)
-          })
-        }
-      })
-    }
-  }
-
   public dead(): void {
     this.tween?.stop()
     this.sprite.destroy()
