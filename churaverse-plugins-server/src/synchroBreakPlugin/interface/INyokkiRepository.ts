@@ -1,7 +1,7 @@
 import { Nyokki } from '../model/nyokki'
 
 export interface INyokkiRepository {
-  set: (playerId: string, nyokki: Nyokki | undefined) => void
+  set: (playerId: string, nyokki: Nyokki) => void
   delete: (playerId: string) => void
   get: (playerId: string) => Nyokki | undefined
   addNyokki: (playerId: string, isSuccess: boolean) => void

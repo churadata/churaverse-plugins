@@ -3,14 +3,14 @@ import { CVEvent, IMainScene } from 'churaverse-engine-client'
 /**
  * ターン終了時のイベント
  */
-export class NyokkiTurnEndEvent extends CVEvent<IMainScene> {
+export class SynchroBreakTurnEndEvent extends CVEvent<IMainScene> {
   public constructor(public readonly noNyokkiPlayerIds: string[]) {
-    super('nyokkiTurnEnd', true)
+    super('synchroBreakTurnEnd', true)
   }
 }
 
 declare module 'churaverse-engine-client' {
   export interface CVMainEventMap {
-    nyokkiTurnEnd: NyokkiTurnEndEvent
+    synchroBreakTurnEnd: SynchroBreakTurnEndEvent
   }
 }
