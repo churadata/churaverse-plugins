@@ -3,6 +3,7 @@ import { Scene } from 'phaser'
 import { CoreGamePlugin } from '@churaverse/game-plugin-client/domain/coreGamePlugin'
 import { RegisterGameUiEvent } from '@churaverse/game-plugin-client/event/registerGameUiEvent'
 import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
+import { PlayerRendererNotFoundError } from '@churaverse/player-plugin-client/errors/playerRendererNotFoundError'
 import { UpdateGameParticipantEvent } from '@churaverse/game-plugin-client/event/updateGameParticipantEvent'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { SynchroBreakDialogManager } from './ui/startWindow/synchroBreakDialogManager'
@@ -163,7 +164,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       this.coinViewerIconUis.set(playerId, coinViewer)
 
       const playerRenderer = this.store.of('playerPlugin').playerRenderers.get(playerId)
-      if (playerRenderer === undefined) throw new Error('playerRenderer is not found')
+      if (playerRenderer === undefined) throw new PlayerRendererNotFoundError()
       const playerSynchroBreakIcon = new PlayerNyokkiStatusIcon(this.scene, playerRenderer)
       this.synchroBreakPluginStore.synchroBreakIcons.set(playerId, playerSynchroBreakIcon)
     }

@@ -1,6 +1,7 @@
 import { Scene } from 'phaser'
 import { IMainScene, Store } from 'churaverse-engine-client'
 import '@churaverse/player-plugin-client/store/defPlayerPluginStore'
+import { PlayerRendererNotFoundError } from '@churaverse/player-plugin-client/errors/playerRendererNotFoundError'
 import { CoinViewer } from './coinViewer'
 
 /**
@@ -10,7 +11,7 @@ export class CoinViewerIcon {
   public readonly coinViewer?: CoinViewer
   public constructor(scene: Scene, store: Store<IMainScene>, playerId: string) {
     const playerRenderer = store.of('playerPlugin').playerRenderers.get(playerId)
-    if (playerRenderer === undefined) throw new Error('playerRenderer is undefined')
+    if (playerRenderer === undefined) throw new PlayerRendererNotFoundError()
 
     this.coinViewer = new CoinViewer(scene, playerRenderer)
   }
