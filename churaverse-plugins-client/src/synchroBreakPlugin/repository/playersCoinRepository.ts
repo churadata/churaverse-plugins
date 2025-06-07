@@ -1,4 +1,5 @@
 import { IPlayersCoinRepository } from '../interface/IPlayersCoinRepository'
+import { PlayerCoinNotFoundError } from '../errors/PlayerCoinNotFoundError'
 
 export class PlayersCoinRepository implements IPlayersCoinRepository {
   private readonly playerCoins = new Map<string, number>()
@@ -10,7 +11,7 @@ export class PlayersCoinRepository implements IPlayersCoinRepository {
   public get(playerId: string): number {
     const coins = this.playerCoins.get(playerId)
     if (coins === undefined) {
-      throw new Error('playerIdがplayersCoinRepositoryに存在しません')
+      throw new PlayerCoinNotFoundError(playerId)
     }
     return coins
   }
