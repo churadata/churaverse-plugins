@@ -13,6 +13,7 @@
   "dependencies": {
     "churaverse-engine-server": "file:../../../../churaverse-engine/churaverse-engine-server",
     "@churaverse/network-plugin-server": "file:../networkPlugin",
-    "@churaverse/game-plugin-server": "file:../gamePlugin"
+    "@churaverse/game-plugin-server": "file:../gamePlugin",
+    "@churaverse/player-plugin-server": "file:../playerPlugin"
   }
 }

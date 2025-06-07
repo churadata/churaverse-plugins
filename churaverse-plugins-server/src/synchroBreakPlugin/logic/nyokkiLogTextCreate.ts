@@ -1,4 +1,5 @@
 import { IPlayerRepository } from '@churaverse/player-plugin-server/domain/IPlayerRepository'
+import { PlayerNotExistsInPlayerRepositoryError } from '@churaverse/player-plugin-server/errors/playerNotExistsInPlayerRepositoryError'
 import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { INyokkiLogTextCreate } from '../interface/INyokkiLogTextCreate'
 
@@ -44,7 +45,7 @@ export class NyokkiLogTextCreate implements INyokkiLogTextCreate {
    */
   private nyokkiSafeLog(playerIds: string[]): string {
     const playerName: Player | undefined = this.players.get(playerIds[0])
-    if (playerName === undefined) throw new Error('nyokkiアクションでプレイヤーIDの取得に失敗')
+    if (playerName === undefined) throw new PlayerNotExistsInPlayerRepositoryError(playerIds[0])
     const message = nyokkiSafeLogEnding[Math.floor(Math.random() * nyokkiSafeLogEnding.length)]
     return `${playerName.name}さん${message}`
   }
@@ -56,7 +57,7 @@ export class NyokkiLogTextCreate implements INyokkiLogTextCreate {
     let message: string = ''
     for (let i = 0; i < playerIds.length; i++) {
       const playerName: Player | undefined = this.players.get(playerIds[i])
-      if (playerName === undefined) throw new Error('nyokkiアクションでプレイヤーIDの取得に失敗')
+      if (playerName === undefined) throw new PlayerNotExistsInPlayerRepositoryError(playerIds[i])
       // 最後のプレイヤー名は'と'を省く
       if (i === playerIds.length - 1) {
         message += `${playerName.name}さん`
