@@ -1,5 +1,5 @@
 import { IPlayersCoinRepository } from '../interface/IPlayersCoinRepository'
-import { PlayerCoinNotFoundError } from '../errors/PlayerCoinNotFoundError'
+import { PlayerCoinNotFoundError } from '../errors/playerCoinNotFoundError'
 
 export class PlayersCoinRepository implements IPlayersCoinRepository {
   private readonly playerCoins = new Map<string, number>()
