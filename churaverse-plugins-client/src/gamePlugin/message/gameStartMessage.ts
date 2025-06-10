@@ -17,7 +17,7 @@ export class RequestGameStartMessage extends BaseMessage<IMainScene> {
   }
 }
 
-export interface ResponseGameStartDate extends SendableObject {
+export interface ResponseGameStartData extends SendableObject {
   gameId: GameIds
   playerId: string
   participantIds: string[]
@@ -27,7 +27,7 @@ export interface ResponseGameStartDate extends SendableObject {
  * サーバーからクライアントへのゲーム開始レスポンスメッセージ
  */
 export class ResponseGameStartMessage extends BaseMessage<IMainScene> {
-  public constructor(public readonly data: ResponseGameStartDate) {
+  public constructor(public readonly data: ResponseGameStartData) {
     super('responseGameStart', data)
   }
 }
