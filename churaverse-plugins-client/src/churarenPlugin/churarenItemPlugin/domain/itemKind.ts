@@ -3,10 +3,12 @@ import waterOreImage from '../assets/waterOre.png'
 import grassOreImage from '../assets/grassOre.png'
 import herbImage from '../assets/herb.png'
 
+export const itemKinds = ['fireOre', 'waterOre', 'grassOre', 'herb'] as const
+
 /**
  * アイテムの種類
  */
-export type ItemKind = 'fireOre' | 'waterOre' | 'grassOre' | 'herb'
+export type ItemKind = (typeof itemKinds)[number]
 
 export const materialItemImage: Record<ItemKind, string> = {
   fireOre: fireOreImage,

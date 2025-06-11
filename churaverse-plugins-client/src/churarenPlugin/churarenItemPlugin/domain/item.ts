@@ -2,7 +2,6 @@ import { Direction, Entity, Position } from 'churaverse-engine-client'
 import { ItemKind } from './itemKind'
 
 export class Item extends Entity {
-  public readonly timeLimit = 1000 // ms
   public itemId: string
   public spawnTime: number
   public kind: ItemKind
