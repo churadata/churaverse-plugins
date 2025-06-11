@@ -1,4 +1,4 @@
-## Churaverse Plugin: Churaren Item Plugins (Server)
+## Churaverse Plugin: Churaren Plugins (Server)
 
 ### Description
 
