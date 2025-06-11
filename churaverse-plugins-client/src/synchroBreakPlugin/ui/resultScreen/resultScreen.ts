@@ -23,7 +23,6 @@ export class ResultScreen implements INyokkiResultScreen {
   private gamePluginStore!: GamePluginStore
 
   public readonly visible: boolean = false
-  // private node!: HTMLElement
 
   public constructor(
     private readonly store: Store<IMainScene>,
@@ -44,7 +43,6 @@ export class ResultScreen implements INyokkiResultScreen {
   public createResultRanking(): void {
     this.element.style.display = ''
     this.resultScreenContainer.innerHTML = ''
-    // this.createResultRankingList(playersElementsArray)
 
     // ランキングボードを削除
     const rankingBoard = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')
@@ -78,7 +76,9 @@ export class ResultScreen implements INyokkiResultScreen {
     sortedPlayers.forEach((player) => {
       const playerName = this.store.of('playerPlugin').players.get(player.playerId)?.name
       if (playerName === undefined) return
-      const playerListElement = this.resultList(currentRank, playerName, player.coins)
+      const playerListElement = DomManager.jsxToDom(
+        ResultRankingListItem({ rank: currentRank, playerName, coinValue: player.coins })
+      )
       this.resultScreenContainer.appendChild(playerListElement)
 
       if (player.coins !== previousCoins) {
@@ -88,14 +88,6 @@ export class ResultScreen implements INyokkiResultScreen {
     })
 
     this.createExitButton()
-  }
-
-  /**
-   * 受け取った順位とプレイヤー名とコインの枚数の行を作成
-   */
-  private resultList(rank: number, playerName: string, coinValue: number): HTMLElement {
-    const row = DomManager.jsxToDom(ResultRankingListItem({ rank, playerName, coinValue }))
-    return row
   }
 
   /**
