@@ -11,11 +11,7 @@ export class ReadyPlayerRepository implements IReadyPlayerRepository {
     this.readyPlayers.delete(playerId)
   }
 
-  public length(): number {
-    return this.readyPlayers.size
-  }
-
-  public isExists(playerId: string): boolean {
+  public has(playerId: string): boolean {
     return this.readyPlayers.has(playerId)
   }
 
@@ -25,5 +21,9 @@ export class ReadyPlayerRepository implements IReadyPlayerRepository {
 
   public clear(): void {
     this.readyPlayers.clear()
+  }
+
+  public get size(): number {
+    return this.readyPlayers.size
   }
 }

@@ -35,7 +35,7 @@ export class CountdownWindow implements ICountdownWindow {
     if (this.countdownTime === 0) {
       countdownElement.innerHTML = 'START!'
     } else if (this.countdownTime === -1) {
-      this.close()
+      this.hideCountdown()
     } else {
       countdownElement.innerHTML = `開始まで<br> ${this.countdownTime} 秒`
     }
@@ -48,12 +48,11 @@ export class CountdownWindow implements ICountdownWindow {
     }
   }
 
-  private close(): void {
+  public hideCountdown(): void {
     this.element.style.display = 'none'
   }
 
   public remove(): void {
-    this.close()
     this.element.parentNode?.removeChild(this.element)
   }
 }

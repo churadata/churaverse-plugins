@@ -1,3 +1,3 @@
 export interface IChurarenGameSequence {
-  sequence: () => Promise<void>
+  runSequence: () => Promise<void>
 }

@@ -60,9 +60,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
     initChurarenPluginStore(this.gameId, this.store, this.bus)
     this.socketController?.registerMessageListener()
     this.sequence()
-      .then(() => {
-        console.log('sequence done')
-      })
+      .then(() => {})
       .catch((err) => {
         console.error(err)
         this.bus.post(new GameEndEvent(this.gameId))
@@ -97,7 +95,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   }
 
   private async sequence(): Promise<void> {
-    await this.store.of('churarenPlugin').churarenGameSequence.sequence()
+    await this.store.of('churarenPlugin').churarenGameSequence.runSequence()
   }
 }
 

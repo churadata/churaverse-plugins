@@ -39,7 +39,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.messageListenerRegister.off('churarenPlayerReady', this.onChurarenPlayerReady)
   }
 
-  public onChurarenPlayerReady = (msg: ChurarenPlayerReadyMessage): void => {
+  private readonly onChurarenPlayerReady = (msg: ChurarenPlayerReadyMessage): void => {
     this.store.of('churarenPlugin').readyPlayers.set(msg.data.playerId)
   }
 }
