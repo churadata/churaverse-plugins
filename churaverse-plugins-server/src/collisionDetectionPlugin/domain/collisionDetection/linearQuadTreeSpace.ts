@@ -79,7 +79,7 @@ export class LinearQuadTreeSpace {
    */
   public getLinearIndex(id: string): number | undefined {
     const linearIndexList = this.linearIndexList.get(id)
-    console.debug(this.linearIndexList, id, linearIndexList)
+    // console.debug(this.linearIndexList, id, linearIndexList)
     if (linearIndexList !== undefined) {
       return linearIndexList
     } else {
