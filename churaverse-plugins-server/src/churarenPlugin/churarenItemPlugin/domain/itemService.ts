@@ -38,7 +38,7 @@ export function sendGeneratedItems(
   const itemsMap: ChurarenItemInfoMap = {}
   const itemNum = Math.min(participantNum * multiplier + baseOffset, maxItemNum)
   for (let i = 0; i < itemNum; i++) {
-    const item = new Item(uniqueId(), worldMap.getRandomSpawnPoint(), Date.now(), getRandomItemKind())
+    const item = new Item(uniqueId(), worldMap.getRandomPoint(), Date.now(), getRandomItemKind())
     if (items.get(item.id) !== undefined) continue
     itemsMap[item.id] = itemInfoToSendableObject(item)
     items.set(item.id, item)

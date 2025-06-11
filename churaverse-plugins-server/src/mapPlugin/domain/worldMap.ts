@@ -4,6 +4,7 @@ export type LayerName = 'Collision' | 'Spawn' | 'Base'
 
 export class WorldMap {
   private readonly spawnablePoint: number[][] = []
+  private readonly walkablePoint: number[][] = []
 
   public constructor(
     public readonly mapId: string,
@@ -16,6 +17,7 @@ export class WorldMap {
     public readonly layerProperty: Map<string, boolean[][]>
   ) {
     this.spawnablePoint = this.getSpawnablePoint()
+    this.walkablePoint = this.getWalkablePoint()
   }
 
   /**
@@ -59,5 +61,46 @@ export class WorldMap {
     }
     // スポーン可能な座標のインデックス情報を返す
     return trueIndices
+  }
+
+  public getWalkablePoint(): number[][] {
+    const collisionLayerArray = this.layerProperty.get('Collision')
+    const freePoints: number[][] = []
+    if (collisionLayerArray !== undefined) {
+      for (let y = 0; y < this.height; y++) {
+        for (let x = 0; x < this.width; x++) {
+          if (collisionLayerArray[x]?.[y] !== undefined) {
+            if (!collisionLayerArray[x][y]) {
+              freePoints.push([x, y])
+            }
+          }
+        }
+      }
+    }
+
+    return freePoints
+  }
+
+  /**
+   * ランダムな座標を取得するメソッド
+   * @param execludeCollision (optional) true: 侵入不可マスを除外するか
+   */
+  public getRandomPoint(execludeCollision: boolean = true): Position {
+    // デフォルトでは、侵入不可マスを除外する
+    if (!execludeCollision) {
+      const randomX = Math.floor(Math.random() * this.width)
+      const randomY = Math.floor(Math.random() * this.height)
+      return new Position(randomX, randomY)
+    }
+
+    if (this.walkablePoint.length === 0) {
+      throw new Error('walkableな座標が存在しません')
+    }
+
+    const [i, j] = this.walkablePoint[Math.floor(Math.random() * this.walkablePoint.length)]
+    const randomPos = new Position(0, 0)
+    randomPos.gridX = j
+    randomPos.gridY = i
+    return randomPos
   }
 }
