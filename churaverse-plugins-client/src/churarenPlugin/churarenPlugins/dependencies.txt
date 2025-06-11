@@ -1,1 +1,2 @@
 @churaverse/churaren-core-plugin-client
+@churaverse/churaren-item-plugin-client
