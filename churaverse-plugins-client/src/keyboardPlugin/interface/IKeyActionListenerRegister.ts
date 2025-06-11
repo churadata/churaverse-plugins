@@ -9,4 +9,11 @@ export interface IKeyActionListenerRegister<Scene extends Scenes> {
    * @param listener KeyAction発行時に実行するcallback
    */
   on: <KeyActType extends KeyActionType<Scene> & string>(type: KeyActType, listener: IKeyActionListener) => void
+
+  /**
+   * KeyActionの条件が満たされたときに実行するlistenerを解除する
+   * @param type listenerと紐付けるKeyActionのtype
+   * @param listener 解除するcallback
+   */
+  off: <KeyActType extends KeyActionType<Scene> & string>(type: KeyActType, listener: IKeyActionListener) => void
 }

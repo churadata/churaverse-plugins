@@ -1,16 +1,18 @@
-import { SettingSection } from '@churaverse/core-ui-plugin-client/settingDialog/settingSection'
 import { PopupKeySettingWindowButtonComponent } from './components/PopupKeySettingWindowButtonComponent'
 import { DomManager } from 'churaverse-engine-client'
 import { ISettingDialog } from '@churaverse/core-ui-plugin-client/interface/ISettingDialog'
 import { IKeyboardSettingPopUpWindow } from '../interface/IKeySettingPopUpWindow'
-import { KeyboardPluginStore } from '../../store/defKeyboardPluginStore'
+
 /**
  * キーバインドフォームを開くボタン要素のid
  */
 export const POPUP_KEY_SETTING_WINDOW_BUTTON_ID = 'keySettingForm-open-button'
 
 export class PopUpKeySettingWindowButton {
-  public constructor(settingDialog: ISettingDialog, private readonly popupWindow: IKeyboardSettingPopUpWindow) {
+  public constructor(
+    settingDialog: ISettingDialog,
+    private readonly popupWindow: IKeyboardSettingPopUpWindow
+  ) {
     const content = DomManager.jsxToDom(PopupKeySettingWindowButtonComponent())
     settingDialog.addContent('keyboardSetting', content)
 
@@ -33,11 +35,5 @@ export class PopUpKeySettingWindowButton {
     button.onclick = () => {
       this.popUpWindow()
     }
-  }
-}
-
-declare module '../../../coreUiPlugin/settingDialog/settingDialog' {
-  export interface SettingDialogSectionMap {
-    keyboardSetting: SettingSection
   }
 }
