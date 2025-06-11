@@ -26,12 +26,12 @@ export class BetCoinFormContainer implements IGameUiComponent {
 
   public constructor(private readonly store: Store<IMainScene>) {}
 
-  public get inputFieldValue(): number {
+  private get inputFieldValue(): number {
     const value = Number(this.betCoinInputField.value)
     return isNaN(value) ? SYNCHRO_BREAK_MIN_BET_COIN : value
   }
 
-  public set inputFieldValue(value: number) {
+  private set inputFieldValue(value: number) {
     this.betCoinInputField.value = value.toString()
   }
 
@@ -51,7 +51,7 @@ export class BetCoinFormContainer implements IGameUiComponent {
       const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
       const betCoins = this.inputFieldValue
 
-      if (betCoins >= SYNCHRO_BREAK_MIN_BET_COIN && betCoins <= ownPlayerCoins) {
+      if (SYNCHRO_BREAK_MIN_BET_COIN <= betCoins && betCoins <= ownPlayerCoins) {
         this.store.of('networkPlugin').messageSender.send(new SendBetCoinMessage({ playerId: ownPlayerId, betCoins }))
         this.inputFieldValue = SYNCHRO_BREAK_MIN_BET_COIN
         this.close()

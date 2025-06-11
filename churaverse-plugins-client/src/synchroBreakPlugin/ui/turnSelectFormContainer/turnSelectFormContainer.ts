@@ -26,12 +26,12 @@ export class TurnSelectFormContainer implements IGameUiComponent {
   private turnSelectInputField!: HTMLInputElement
   private readonly networkPluginStore!: NetworkPluginStore<IMainScene>
 
-  public get inputFieldValue(): number {
+  private get inputFieldValue(): number {
     const value = Number(this.turnSelectInputField.value)
     return isNaN(value) ? SYNCHRO_BREAK_MIN_TURN : value
   }
 
-  public set inputFieldValue(value: number) {
+  private set inputFieldValue(value: number) {
     this.turnSelectInputField.value = value.toString()
   }
 
@@ -54,7 +54,7 @@ export class TurnSelectFormContainer implements IGameUiComponent {
     sendButton.onclick = () => {
       const turnNumber = this.inputFieldValue
 
-      if (turnNumber >= SYNCHRO_BREAK_MIN_TURN && turnNumber <= SYNCHRO_BREAK_MAX_TURN) {
+      if (SYNCHRO_BREAK_MIN_TURN <= turnNumber && turnNumber <= SYNCHRO_BREAK_MAX_TURN) {
         this.networkPluginStore.messageSender.send(new SynchroBreakTurnSelectMessage({ playerId, allTurn: turnNumber }))
 
         this.inputFieldValue = SYNCHRO_BREAK_MIN_TURN

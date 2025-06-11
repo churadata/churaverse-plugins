@@ -28,12 +28,12 @@ export class TimeLimitFormContainer implements IGameUiComponent {
   private timeLimitInputField!: HTMLInputElement
   private readonly networkPluginStore!: NetworkPluginStore<IMainScene>
 
-  public get inputFieldValue(): number {
+  private get inputFieldValue(): number {
     const value = Number(this.timeLimitInputField.value)
     return isNaN(value) ? SYNCHRO_BREAK_MIN_TIME_LIMIT : value
   }
 
-  public set inputFieldValue(value: number) {
+  private set inputFieldValue(value: number) {
     this.timeLimitInputField.value = value.toString()
   }
 
@@ -55,7 +55,7 @@ export class TimeLimitFormContainer implements IGameUiComponent {
     sendButton.onclick = () => {
       const timeLimitValue = this.inputFieldValue
 
-      if (timeLimitValue >= SYNCHRO_BREAK_MIN_TIME_LIMIT && timeLimitValue <= SYNCHRO_BREAK_MAX_TIME_LIMIT) {
+      if (SYNCHRO_BREAK_MIN_TIME_LIMIT <= timeLimitValue && timeLimitValue <= SYNCHRO_BREAK_MAX_TIME_LIMIT) {
         const playerId = this.store.of('playerPlugin').ownPlayerId
         this.networkPluginStore.messageSender.send(
           new TimeLimitConfirmMessage({ playerId, timeLimit: timeLimitValue.toString() })
