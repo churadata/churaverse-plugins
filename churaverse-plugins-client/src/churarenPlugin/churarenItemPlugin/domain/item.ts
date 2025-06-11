@@ -1,0 +1,16 @@
+import { Direction, Entity, Position } from 'churaverse-engine-client'
+import { ItemKind } from './itemKind'
+
+export class Item extends Entity {
+  public readonly timeLimit = 1000 // ms
+  public itemId: string
+  public spawnTime: number
+  public kind: ItemKind
+
+  public constructor(itemId: string, position: Position, spawnTime: number, kind: ItemKind) {
+    super(position, Direction.down)
+    this.itemId = itemId
+    this.spawnTime = spawnTime
+    this.kind = kind
+  }
+}
