@@ -7,7 +7,8 @@ import { SynchroBreakTurnStartEvent } from '../event/synchroBreakTurnStartEvent'
 import { SynchroBreakPluginStore } from '../store/defSynchroBreakPluginStore'
 import { SynchroBreakStartCountMessage } from '../message/synchroBreakStartCountMessage'
 import { SynchroBreakTurnTimerMessage } from '../message/synchroBreakTurnTimerMessage'
-import { SynchroBreakResultEvent } from '../event/synchroBreakResultEvent'
+import { SynchroBreakResultMessage } from '../message/synchroBreakResultMessage'
+import { UpdatePlayersCoinMessage } from '../message/updatePlayersCoinMessage'
 
 export class Game implements IGame {
   private synchroBreakPluginStore!: SynchroBreakPluginStore
@@ -70,17 +71,20 @@ export class Game implements IGame {
   private async finishTurn(): Promise<void> {
     const turnSelect = this.synchroBreakPluginStore.turnSelect
     if (turnSelect === undefined) return
+
+    const synchroBreakTurnEnd = new SynchroBreakTurnEndEvent()
+    this.eventBus.post(synchroBreakTurnEnd)
+
+    // ニョッキしなかったプレイヤーのFBを与えるため、1秒待機
+    await this.delay(1000)
+
     if (turnSelect <= this.turnCountNumber) {
       this.turnCountNumber = 1
-      const synchroBreakResult = new SynchroBreakResultEvent()
-      this.eventBus.post(synchroBreakResult)
+      const sortedPlayersCoin = this.synchroBreakPluginStore.playersCoinRepository.sortedPlayerCoins()
+      this.networkPluginStore.messageSender.send(new UpdatePlayersCoinMessage({ playersCoin: sortedPlayersCoin }))
+      this.networkPluginStore.messageSender.send(new SynchroBreakResultMessage())
     } else {
       this.turnCountNumber++
-      const synchroBreakTurnEnd = new SynchroBreakTurnEndEvent()
-      this.eventBus.post(synchroBreakTurnEnd)
-
-      // ニョッキしなかったプレイヤーのFBを与えるため、1秒待機
-      await this.delay(1000)
 
       const synchroBreakTurnStart = new SynchroBreakTurnStartEvent(this.turnCountNumber)
       this.eventBus.post(synchroBreakTurnStart)

@@ -44,23 +44,6 @@ export class ResultScreen implements ISynchroBreakResultScreen {
     this.element.style.display = ''
     this.resultScreenContainer.innerHTML = ''
 
-    // ランキングボードを削除
-    const rankingBoard = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')
-    if (rankingBoard === undefined) throw new Error('rankingBoard is not found')
-    rankingBoard.remove()
-
-    // nyokkiButtonを削除
-    const nyokkiButton = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')
-    if (nyokkiButton === undefined) throw new Error('nyokkiButton is not found')
-    nyokkiButton.remove()
-
-    // 説明ウィンドウの文章変更処理
-    const descriptionWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')
-    if (descriptionWindow === undefined) throw new Error('descriptionWindow is not found')
-    descriptionWindow.setDescriptionText(
-      '〜最終ランキング〜</br>お疲れ様でした。</br>閉じるボタンを押すと通常のちゅらバースに戻ります。'
-    )
-
     this.createResultRankingList()
   }
 

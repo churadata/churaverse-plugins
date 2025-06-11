@@ -16,7 +16,6 @@ import { UpdatePlayersCoinMessage } from './message/updatePlayersCoinMessage'
 import { SendBetCoinResponseMessage } from './message/sendBetCoinResponseMessage'
 import { SynchroBreakTurnStartEvent } from './event/synchroBreakTurnStartEvent'
 import { SynchroBreakTurnStartMessage } from './message/synchroBreakTurnStartMessage'
-import { SynchroBreakResultMessage } from './message/synchroBreakResultMessage'
 import { SynchroBreakEndEvent } from './event/synchroBreakEndEvent'
 import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
 
@@ -54,7 +53,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.subscribeEvent('nyokki', this.nyokkiAction)
     this.bus.subscribeEvent('synchroBreakTurnEnd', this.synchroBreakTurnEnd)
     this.bus.subscribeEvent('synchroBreakTurnStart', this.synchroBreakTurnStart)
-    this.bus.subscribeEvent('synchroBreakResult', this.synchroBreakResult)
     this.bus.subscribeEvent('synchroBreakEnd', this.synchroBreakEnd)
   }
 
@@ -69,7 +67,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.unsubscribeEvent('nyokki', this.nyokkiAction)
     this.bus.unsubscribeEvent('synchroBreakTurnEnd', this.synchroBreakTurnEnd)
     this.bus.unsubscribeEvent('synchroBreakTurnStart', this.synchroBreakTurnStart)
-    this.bus.unsubscribeEvent('synchroBreakResult', this.synchroBreakResult)
     this.bus.unsubscribeEvent('synchroBreakEnd', this.synchroBreakEnd)
   }
 
@@ -104,6 +101,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
 
   /**
    * 結果ウィンドウの閉じるボタンを押した時に実行される処理
+   * シンクロブレイク参加者全員が閉じるボタンを押した際にゲームが終了する。
    */
   private readonly synchroBreakEnd = (ev: SynchroBreakEndEvent): void => {
     const playerId: string = ev.playerId
@@ -240,16 +238,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.calculateResultPlayersCoin()
 
     this.resetTurnRepository()
-  }
-
-  /**
-   * プレイヤーに結果画面を表示させる。
-   */
-  private readonly synchroBreakResult = (): void => {
-    this.calculateResultPlayersCoin()
-    const sortedPlayersCoin = this.synchroBreakPluginStore.playersCoinRepository.sortedPlayerCoins()
-    this.networkPluginStore.messageSender.send(new UpdatePlayersCoinMessage({ playersCoin: sortedPlayersCoin }))
-    this.networkPluginStore.messageSender.send(new SynchroBreakResultMessage())
   }
 
   /**
