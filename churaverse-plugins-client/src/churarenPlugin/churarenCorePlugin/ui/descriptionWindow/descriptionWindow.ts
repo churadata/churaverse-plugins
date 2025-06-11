@@ -30,14 +30,6 @@ export class DescriptionWindow implements IDescriptionWindow {
     this.element.parentNode?.removeChild(this.element)
   }
 
-  /**
-   * 説明ウィンドウの文章を更新する
-   * @param text 更新する文章
-   */
-  public setDescriptionText(text: string): void {
-    this.element.innerHTML = text
-  }
-
   private setSendReadyButton(playerId: string): void {
     const sendReadyButton = DomManager.getElementById(CHURAREN_GAME_START_BUTTON_ID)
     sendReadyButton.onclick = () => {
@@ -45,5 +37,9 @@ export class DescriptionWindow implements IDescriptionWindow {
       const sendChurarenReadyMessage = new ChurarenPlayerReadyMessage({ playerId })
       this.networkPluginStore.messageSender.send(sendChurarenReadyMessage)
     }
+  }
+
+  public hideDescription(): void {
+    this.element.style.display = 'none'
   }
 }

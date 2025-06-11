@@ -82,19 +82,19 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   }
 
   private readonly startCountdown = (): void => {
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.DESCRIPTION_WINDOW)?.remove()
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.DESCRIPTION_WINDOW)?.hideDescription()
     const countdownWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.COUNTDOWN_WINDOW)
     countdownWindow?.startCountdown()
   }
 
   private readonly startTimer = (): void => {
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.COUNTDOWN_WINDOW)?.remove()
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.COUNTDOWN_WINDOW)?.hideCountdown()
     const timerContainer = this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.TIMER_CONTAINER)
     timerContainer?.startTimer()
   }
 
   private readonly resultChurarenUi = (ev: ChurarenResultEvent): void => {
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.TIMER_CONTAINER)?.remove()
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.TIMER_CONTAINER)?.hideTimer()
     const resultWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.RESULT_WINDOW)
     resultWindow?.showResult(ev.resultType)
   }

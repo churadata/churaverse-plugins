@@ -42,7 +42,10 @@ export class ResultWindow implements IResultWindow {
   }
 
   public remove(): void {
-    this.element.style.display = 'none'
     this.element.parentNode?.removeChild(this.element)
+  }
+
+  public hideResult(): void {
+    this.element.style.display = 'none'
   }
 }
