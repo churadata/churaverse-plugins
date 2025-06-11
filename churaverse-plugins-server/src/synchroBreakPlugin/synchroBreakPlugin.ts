@@ -16,6 +16,8 @@ import { UpdatePlayersCoinMessage } from './message/updatePlayersCoinMessage'
 import { SendBetCoinResponseMessage } from './message/sendBetCoinResponseMessage'
 import { SynchroBreakTurnStartEvent } from './event/synchroBreakTurnStartEvent'
 import { SynchroBreakTurnStartMessage } from './message/synchroBreakTurnStartMessage'
+import { IGameSequence } from './interface/IGameSequence'
+import { GameSequence } from './logic/gameSequence'
 
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
@@ -23,6 +25,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private synchroBreakPluginStore!: SynchroBreakPluginStore
   private socketController!: SocketController
+  private gameSequence!: IGameSequence
   private sameTimePlayers: string[] = []
   private readonly nyokkiDurationTime = 100
   private readonly initialPlayerCoins = 100
@@ -73,10 +76,10 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * シンクロブレイク特有の開始時に実行される処理
    */
   protected handleGameStart(): void {
-    initSynchroBreakPluginStore(this.gameId, this.bus, this.store)
+    initSynchroBreakPluginStore(this.store)
     this.socketController.registerMessageListener()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
-    this.synchroBreakPluginStore.game.setSynchroBreakPluginStore()
+    this.gameSequence = new GameSequence(this.gameId, this.bus, this.store)
     for (const playerId of this.participantIds) {
       this.synchroBreakPluginStore.playersCoinRepository.set(playerId, this.initialPlayerCoins)
     }
@@ -132,7 +135,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const betCoinPlayerNumber = this.synchroBreakPluginStore.betCoinRepository.getBetCoinPlayerCount()
     const totalPlayerNum = this.participantIds.length
     if (betCoinPlayerNumber >= totalPlayerNum) {
-      this.synchroBreakPluginStore.game.processTurnSequence().catch((error) => {
+      this.gameSequence.processTurnSequence().catch((error) => {
         console.error('ゲーム開始確認処理でエラーが発生しました:', error)
       })
     }

@@ -4,15 +4,15 @@ import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
 import { GamePluginStore } from '@churaverse/game-plugin-server/store/defGamePluginStore'
 import { GameIds } from '@churaverse/game-plugin-server/interface/gameIds'
-import { IGame } from '../interface/IGame'
+import { IGameSequence } from '../interface/IGameSequence'
 import { SynchroBreakTurnEndEvent } from '../event/synchroBreakTurnEndEvent'
 import { SynchroBreakTurnStartEvent } from '../event/synchroBreakTurnStartEvent'
 import { SynchroBreakPluginStore } from '../store/defSynchroBreakPluginStore'
 import { SynchroBreakStartCountMessage } from '../message/synchroBreakStartCountMessage'
 import { SynchroBreakTurnTimerMessage } from '../message/synchroBreakTurnTimerMessage'
 
-export class Game implements IGame {
-  private synchroBreakPluginStore!: SynchroBreakPluginStore
+export class GameSequence implements IGameSequence {
+  private readonly synchroBreakPluginStore!: SynchroBreakPluginStore
   private readonly gamePluginStore: GamePluginStore
   private readonly networkPluginStore: NetworkPluginStore<IMainScene>
   private turnCountNumber: number = 1
@@ -22,12 +22,9 @@ export class Game implements IGame {
     private readonly eventBus: IEventBus<IMainScene>,
     private readonly store: Store<IMainScene>
   ) {
+    this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
     this.gamePluginStore = this.store.of('gamePlugin')
     this.networkPluginStore = this.store.of('networkPlugin')
-  }
-
-  public setSynchroBreakPluginStore(): void {
-    this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
   }
 
   public async processTurnSequence(): Promise<void> {
