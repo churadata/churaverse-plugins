@@ -23,7 +23,7 @@ const spriteFrames: FrameInfo[] = [
   { name: '2nd', x: 67, y: 0, width: 48, height: 44 },
   { name: '3rd', x: 0, y: 0, width: 48, height: 42 },
   { name: 'under4th', x: 0, y: 43, width: 66, height: 62 },
-]
+] as const
 
 /**
  * プレイヤー一人分のコンポーネント
