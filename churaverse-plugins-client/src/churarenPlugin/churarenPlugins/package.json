@@ -35,6 +35,7 @@
   "license": "MIT",
   "dependencies": {
     "@churaverse/churaren-core-plugin-client": "file:../churarenCorePlugin",
+    "@churaverse/churaren-item-plugin-client": "file:../churarenItemPlugin",
     "@churaverse/game-plugin-client": "file:../../gamePlugin"
   }
 }
