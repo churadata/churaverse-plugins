@@ -137,12 +137,14 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * シンクロブレイク特有の中断・終了時に実行される処理
    */
   protected handleGameTermination(): void {
-    resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
     this.synchroBreakDialogManager.setGameStartButtonText()
 
-    this.removeBetCoinUi()
-    this.resetPlayerNyokkiIcon()
+    if (!this.isOwnPlayerMidwayParticipant) {
+      resetSynchroBreakPluginStore(this.store)
+      this.removeBetCoinUi()
+      this.resetPlayerNyokkiIcon()
+    }
   }
 
   /**
