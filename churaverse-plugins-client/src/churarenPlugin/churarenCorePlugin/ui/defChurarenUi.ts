@@ -1,4 +1,4 @@
-import { ICountdownWindow, IDescriptionWindow, IResultWindow, ITimerContainer } from "../interface/IChurarenUiComponent"
+import { ICountdownWindow, IDescriptionWindow, IResultWindow, ITimerContainer } from '../interface/IChurarenUiComponent'
 
 export const CHURAREN_UI_KEYS = {
   DESCRIPTION_WINDOW: 'descriptionWindow',
