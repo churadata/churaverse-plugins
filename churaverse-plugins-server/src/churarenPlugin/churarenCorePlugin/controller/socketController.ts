@@ -14,7 +14,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
     ev.messageRegister.registerMessage('churarenPlayerReady', ChurarenPlayerReadyMessage, 'onlyServer')
     ev.messageRegister.registerMessage('churarenStartCountdown', ChurarenStartCountdownMessage, 'allClients')
-    ev.messageRegister.registerMessage('churarenStartTimer', ChurarenStartTimerMessage, 'onlyServer')
+    ev.messageRegister.registerMessage('churarenStartTimer', ChurarenStartTimerMessage, 'allClients')
     ev.messageRegister.registerMessage('churarenResult', ChurarenResultMessage, 'allClients')
   }
 
