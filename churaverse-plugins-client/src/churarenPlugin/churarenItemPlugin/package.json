@@ -1,5 +1,5 @@
 {
-  "name": "@churaverse/churaren-plugins-client",
+  "name": "@churaverse/churaren-item-plugin-client",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
@@ -35,7 +35,9 @@
   "license": "MIT",
   "dependencies": {
     "@churaverse/churaren-core-plugin-client": "file:../churarenCorePlugin",
-    "@churaverse/churaren-item-plugin-client": "file:../churarenItemPlugin",
-    "@churaverse/game-plugin-client": "file:../../gamePlugin"
+    "@churaverse/game-plugin-client": "file:../../gamePlugin",
+    "@churaverse/network-plugin-client": "file:../../networkPlugin",
+    "churaverse-engine-client": "file:../../../../../churaverse-engine/churaverse-engine-client",
+    "phaser": "^3.80.1"
   }
 }
