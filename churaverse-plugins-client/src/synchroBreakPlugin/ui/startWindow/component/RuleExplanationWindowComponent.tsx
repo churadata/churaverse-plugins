@@ -28,7 +28,7 @@ const ruleEntries = [
     frame: { x: 0, y: 0, width: 790, height: 498 },
     displaySize: { width: 200, height: 110 },
   },
-]
+] as const
 
 const ruleDescriptionSize = { width: 790, height: 1064 }
 
