@@ -22,8 +22,8 @@ export const TimeLimitForm: JSXFunc = () => {
         defaultValue={SYNCHRO_BREAK_MIN_TIME_LIMIT}
         min={SYNCHRO_BREAK_MIN_TIME_LIMIT}
         max={SYNCHRO_BREAK_MAX_TIME_LIMIT}
+        step={1}
         id={TIME_LIMIT_INPUT_FIELD_ID}
-        readOnly
       />
       <button className={style.incrementButton} id={TIME_LIMIT_INCREMENT_BUTTON_ID} />
       <button className={style.sendButton} id={TIME_LIMIT_SEND_BUTTON_ID}>
