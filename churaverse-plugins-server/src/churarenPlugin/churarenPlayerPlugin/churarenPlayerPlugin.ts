@@ -127,9 +127,8 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   }
 
   private readonly getItem = (ev: GetChurarenItemEvent): void => {
-    // TODO:錬金アイテムを持っている場合、素材アイテムは入手できない
-    // アイテムボックスにアイテムを追加できるか確認
     if (this.churarenPlayerStore.ghostModePlayers.has(ev.playerId)) return
+    if (this.playerItemStore.alchemyItem.get(ev.playerId) !== undefined) return
     const itemCount = this.playerItemStore.materialItems.getAllItem(ev.playerId).length
     if (itemCount >= MAX_ITEMS) return
     this.playerItemStore.materialItems.set(ev.playerId, ev.item)
