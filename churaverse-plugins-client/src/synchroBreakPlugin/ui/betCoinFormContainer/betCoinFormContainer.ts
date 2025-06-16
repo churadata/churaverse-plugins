@@ -49,6 +49,7 @@ export class BetCoinFormContainer implements IGameUiComponent {
     const sendButton = DomManager.getElementById(BET_COIN_SEND_BUTTON_ID)
     sendButton.onclick = () => {
       const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
+
       if (
         this.inputFieldValue >= SYNCHRO_BREAK_MIN_BET_COIN &&
         this.inputFieldValue <= SYNCHRO_BREAK_MAX_BET_COIN &&
@@ -66,7 +67,7 @@ export class BetCoinFormContainer implements IGameUiComponent {
     const plusButton = DomManager.getElementById(BET_COIN_INCREMENT_BUTTON_ID)
     plusButton.onclick = () => {
       const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
-      
+
       if (this.inputFieldValue >= ownPlayerCoins || this.inputFieldValue >= SYNCHRO_BREAK_MAX_BET_COIN) return
 
       this.inputFieldValue++

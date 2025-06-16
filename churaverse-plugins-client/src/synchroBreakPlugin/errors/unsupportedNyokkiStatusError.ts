@@ -2,6 +2,6 @@ import { GamePluginError } from '@churaverse/game-plugin-client/errors/gamePlugi
 
 export class UnsupportedNyokkiStatusError extends GamePluginError {
   public constructor(status: string) {
-    super(`ステータス: ${status}はNyokkiStatusに存在しません`)
+    super(`[シンクロブレイク] ステータス: ${status}はNyokkiStatusに存在しません`)
   }
 }
