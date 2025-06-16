@@ -164,4 +164,14 @@ export class KeyboardSettingPopUpWindow implements IKeyboardSettingPopUpWindow {
 
     this.setupInput(keyAction.type, keyCode)
   }
+
+  public removeKeyAction(type: CanSettingKeyActType): void {
+    const row = DomManager.getElementById<HTMLTableRowElement>(KEY_SETTING_TABLE_ROW_ID(type))
+    if (row !== undefined) {
+      this.inputTable.removeChild(row)
+    }
+
+    this.willBindingKeys.delete(type)
+    this.currentBindingKeys.delete(type)
+  }
 }
