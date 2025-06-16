@@ -188,16 +188,22 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     if (player === undefined) return
     const speed = ev.speed ?? GRID_SIZE / GRID_WALK_DURATION_MS
 
-    // TODO: 錬金アイテムを持っている場合の処理を追加
-    const itemBoxes = this.playerItemStore.materialItems.getAllItem(ev.id)
-    itemBoxes.forEach((item: Item, index: number) => {
-      if (item === undefined) return
-      const renderer = this.playerItemStore.materialItemRenderers.get(item.itemId)
+    const alchemyItem = this.playerItemStore.alchemyItem.get(ev.id)
+    if (alchemyItem !== undefined) {
+      const renderer = this.playerItemStore.alchemyItemRenderers.get(alchemyItem.itemId)
       const dest = player.position.copy()
-      dest.x -= player.direction.x * (40 + index * 40)
-      dest.y -= player.direction.y * (40 + index * 40)
-      this.setupChase(renderer, item, dest, speed)
-    })
+      this.setupChase(renderer, alchemyItem, dest, speed)
+    } else {
+      const itemBoxes = this.playerItemStore.materialItems.getAllItem(ev.id)
+      itemBoxes.forEach((item: Item, index: number) => {
+        if (item === undefined) return
+        const renderer = this.playerItemStore.materialItemRenderers.get(item.itemId)
+        const dest = player.position.copy()
+        dest.x -= player.direction.x * (40 + index * 40)
+        dest.y -= player.direction.y * (40 + index * 40)
+        this.setupChase(renderer, item, dest, speed)
+      })
+    }
   }
 
   private updateItemBox(playerId: string): void {
