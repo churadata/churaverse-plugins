@@ -1,5 +1,5 @@
 import { IPlayersCoinRepository } from '../interface/IPlayersCoinRepository'
-import { SynchroBreakPlayerCoinsNotFoundError } from '../errors/synchroBreakPlayerCoinNotFoundError'
+import { SynchroBreakPlayerCoinsNotFoundError } from '../errors/synchroBreakPlayerCoinsNotFoundError'
 
 /**
  * playerIdとプレイヤーの所持コイン枚数を保存する
