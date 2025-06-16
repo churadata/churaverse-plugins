@@ -1,4 +1,5 @@
 import { IBetCoinRepository } from '../interface/IBetCoinRepository'
+import { SynchroBreakBetCoinsNotFoundError } from '../errors/synchroBreakBetCoinsNotFoundError'
 
 /**
  * ベットしたコインを管理するリポジトリ
@@ -10,8 +11,12 @@ export class BetCoinRepository implements IBetCoinRepository {
     this.playerBetCoins.set(playerId, betCoin)
   }
 
-  public get(playerId: string): number | undefined {
-    return this.playerBetCoins.get(playerId)
+  public get(playerId: string): number {
+    const betCoin = this.playerBetCoins.get(playerId)
+    if (betCoin === undefined) {
+      throw new SynchroBreakBetCoinsNotFoundError(playerId)
+    }
+    return betCoin
   }
 
   public delete(playerId: string): void {
