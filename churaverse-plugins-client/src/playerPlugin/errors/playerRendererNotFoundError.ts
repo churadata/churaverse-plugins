@@ -1,7 +1,7 @@
 import { PlayerPluginError } from './playerPluginError'
 
 export class PlayerRendererNotFoundError extends PlayerPluginError {
-  public constructor() {
-    super('playerRendererが見つかりませんでした。')
+  public constructor(playerId: string) {
+    super(`playerId: ${playerId}のplayerRendererが存在しない`)
   }
 }

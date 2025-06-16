@@ -164,7 +164,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       this.coinViewerIconUis.set(playerId, coinViewer)
 
       const playerRenderer = this.store.of('playerPlugin').playerRenderers.get(playerId)
-      if (playerRenderer === undefined) throw new PlayerRendererNotFoundError()
+      if (playerRenderer === undefined) throw new PlayerRendererNotFoundError(playerId)
       const playerSynchroBreakIcon = new PlayerNyokkiStatusIcon(this.scene, playerRenderer)
       this.synchroBreakPluginStore.synchroBreakIcons.set(playerId, playerSynchroBreakIcon)
     }

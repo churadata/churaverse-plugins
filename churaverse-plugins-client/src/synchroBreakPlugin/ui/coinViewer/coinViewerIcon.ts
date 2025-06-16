@@ -11,7 +11,7 @@ export class CoinViewerIcon {
   public readonly coinViewer?: CoinViewer
   public constructor(scene: Scene, store: Store<IMainScene>, playerId: string) {
     const playerRenderer = store.of('playerPlugin').playerRenderers.get(playerId)
-    if (playerRenderer === undefined) throw new PlayerRendererNotFoundError()
+    if (playerRenderer === undefined) throw new PlayerRendererNotFoundError(playerId)
 
     this.coinViewer = new CoinViewer(scene, playerRenderer)
   }

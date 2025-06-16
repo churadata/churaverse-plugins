@@ -48,6 +48,7 @@ import { PlayerPositionDebugScreen, PlayerPositionGridDebugScreen } from './debu
 import { PlayerRoleDebugScreen } from './debugScreen/playerRoleDebugScreen'
 import { GRID_WALK_DURATION_MS, Player } from './domain/player'
 import { OwnPlayerUndefinedError } from './errors/ownPlayerUndefinedError'
+import { PlayerRendererNotFoundError } from './errors/playerRendererNotFoundError'
 import { PlayerColorChangeEvent } from './event/playerColorChangeEvent'
 import { PlayerDieEvent } from './event/playerDieEvent'
 import { PlayerNameChangeEvent } from './event/playerNameChangeEvent'
@@ -180,7 +181,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     )
     this.bus.post(new EntitySpawnEvent(player))
     const renderer = this.playerPluginStore.playerRenderers.get(this.playerPluginStore.ownPlayerId)
-    if (renderer === undefined) throw Error('ownPlayerRenderer is undefined')
+    if (renderer === undefined) throw new PlayerRendererNotFoundError(this.playerPluginStore.ownPlayerId)
     this.uiStore.focusTargetRepository.addFocusTarget(renderer)
     renderer.focus()
     this.utilStore.focusedRenderer = renderer
@@ -238,7 +239,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
       player.color,
       player.hp
     )
-    if (renderer === undefined) throw Error('playerRenderer is undefined')
+    if (renderer === undefined) throw new PlayerRendererNotFoundError(player.id)
     this.playerPluginStore.playerRenderers.set(player.id, renderer)
   }
 
