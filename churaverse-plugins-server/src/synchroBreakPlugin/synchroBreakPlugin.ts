@@ -146,7 +146,8 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   private readonly nyokkiAction = (ev: NyokkiEvent): void => {
     const playerId = ev.playerId
-    const nyokki = new Nyokki(playerId, Date.now())
+    const nyokkiTime = Date.now()
+    const nyokki = new Nyokki(playerId, nyokkiTime)
     this.synchroBreakPluginStore.nyokkiRepository.set(playerId, nyokki)
 
     const sameTimePlayerNum = this.sameTimePlayers.length
@@ -154,7 +155,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       this.sameTimePlayers.push(playerId)
 
       setTimeout(() => {
-        this.nyokkiActionResponse()
+        this.nyokkiActionResponse(nyokkiTime)
       }, this.nyokkiDurationTime)
     } else {
       this.sameTimePlayers.push(playerId)
@@ -164,7 +165,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   /**
    * ニョッキアクションの結果を返す
    */
-  private nyokkiActionResponse(): void {
+  private nyokkiActionResponse(nyokkiTime: number): void {
     const sameTimePlayersId = this.sameTimePlayers
 
     // isSuccessがtrueならば成功, falseならば失敗
@@ -173,18 +174,13 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       this.synchroBreakPluginStore.nyokkiRepository.addNyokki(playerId, isSuccess)
     })
 
-    const nyokkiLogText = this.synchroBreakPluginStore.nyokkiLogTextCreate.nyokkiLogTextCreate(
-      sameTimePlayersId,
-      isSuccess
-    )
-
     const playerOrders = this.synchroBreakPluginStore.nyokkiRepository.playerOrders()
 
     const order = playerOrders.indexOf(this.sameTimePlayers[0]) + 1
     const nyokkiActionMessage = new NyokkiActionResponseMessage({
       sameTimePlayersId,
       isSuccess,
-      nyokkiLogText,
+      nyokkiTime,
       order,
     })
     this.networkPluginStore.messageSender.send(nyokkiActionMessage)
