@@ -18,7 +18,7 @@ declare module '@churaverse/game-plugin-client/gameUiManager' {
       timeLimitConfirm: TimeLimitFormContainer
       betCoinConfirm: BetCoinFormContainer
       nyokkiButton: NyokkiButton
-      synchroBreakResultScreen: ResultScreen
+      resultScreen: ResultScreen
     }
   }
 }

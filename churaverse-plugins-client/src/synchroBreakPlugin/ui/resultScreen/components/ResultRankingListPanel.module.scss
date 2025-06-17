@@ -1,4 +1,16 @@
-.resultRankingList {
-  padding: 100px;
-  width: 80vw;
+.playerList {
+  position: absolute;
+  top: 10%;
+  margin-left: 10%;
+  margin-right: 10%;
+  margin-top: 15%;
+  width: 95%;
+  height: 60%;
+  font-size: 25px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.playerList::-webkit-scrollbar {
+  display: none;
 }

@@ -20,8 +20,8 @@ export const SelectTurnForm: JSXFunc = () => {
         defaultValue={SYNCHRO_BREAK_MIN_TURN}
         min={SYNCHRO_BREAK_MIN_TURN}
         max={SYNCHRO_BREAK_MAX_TURN}
+        step={1}
         id={TURN_SELECT_FIELD_ID}
-        readOnly
       ></input>
       <button className={style.incrementButton} id={TURN_SELECT_INCREASE_BUTTON_ID}></button>
       <button className={style.sendButton} id={TURN_SELECT_SEND_BUTTON_ID}>

@@ -54,6 +54,7 @@ export class ResultScreen implements ISynchroBreakResultScreen {
     const sortedPlayers = this.store.of('synchroBreakPlugin').playersCoinRepository.getPlayersSortedByCoins()
     let currentRank = 1
     let previousCoins = sortedPlayers[0].coins ?? 0
+    this.resultScreenContainer.style.display = 'block'
 
     sortedPlayers.forEach((player) => {
       const playerName = this.store.of('playerPlugin').players.get(player.playerId)?.name
@@ -62,20 +63,14 @@ export class ResultScreen implements ISynchroBreakResultScreen {
       if (player.coins !== previousCoins) {
         currentRank++
       }
-      const playerListElement = this.resultList(currentRank, playerName, player.coins)
-      this.element.appendChild(playerListElement)
+      const playerListElement = DomManager.jsxToDom(
+        ResultRankingListItem({ rank: currentRank, playerName, coinValue: player.coins })
+      )
+      this.resultScreenContainer.appendChild(playerListElement)
       previousCoins = player.coins
     })
 
     this.createExitButton()
-  }
-
-  /**
-   * 受け取った順位とプレイヤー名とコインの枚数の行を作成
-   */
-  private resultList(rank: number, playerName: string, coinValue: number): HTMLElement {
-    const row = DomManager.jsxToDom(ResultRankingListItem({ rank, playerName, coinValue }))
-    return row
   }
 
   /**

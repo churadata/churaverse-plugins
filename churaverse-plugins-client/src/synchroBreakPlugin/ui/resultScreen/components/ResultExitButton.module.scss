@@ -1,14 +1,27 @@
+@import url('https://fonts.googleapis.com/css2?family=Dela+Gothic+One&display=swap');
+
 .resultExitButton:not(.defaultStyle) {
+  position: absolute;
   padding: 10px 20px;
-  background-color: rgb(10, 10, 200);
-  color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 25px;
+  width: 16vh;
+  height: 5.5vh;
+  top: 84.3%;
+  left: 39.3%;
+  color: white;
+  background-color: #dc934a;
+  font-family: 'Dela Gothic One';
+
+  /* 中央に配置 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
-    background-color: rgba(10, 60, 240, 0.5);
+    background-color: #cd7f32;
   }
 
   &:focus {

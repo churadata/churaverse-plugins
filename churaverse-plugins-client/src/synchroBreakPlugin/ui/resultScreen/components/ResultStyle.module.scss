@@ -2,20 +2,26 @@
   position: absolute;
   row-gap: 10px;
   padding: 10px;
-  background-color: white;
+  background-image: url('../../../assets//final_rankingBoard.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   border-radius: 14px;
-  box-shadow: 0 10px 15px 0 rgba(0, 0, 0, 0.2);
+  box-shadow: 50px;
 
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%); /* 要素を中央に配置するためのトランスフォーム */
-  width: 40vw;
-  height: 50vh;
-  max-height: calc(85vh - 130px);
-  overflow: scroll;
+  transform: translate(-50%, -50%);
+  width: 69vh;
+  height: 82vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
   font-size: 40px;
 }
 
+.container::-webkit-scrollbar {
+  display: none;
+}
 .dialogLabel {
   border-left: solid var(--c-primary) 5px;
   padding-left: 12px;
