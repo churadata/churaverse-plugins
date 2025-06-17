@@ -12,7 +12,7 @@ const successLog = [
   '完璧なnyokki',
   'nyokki成功',
   'nyokki成功、賞金ゲット!!',
-]
+] as const
 
 const failureLog = [
   'はnyokkiに失敗しました。次は頑張って!!',
@@ -25,7 +25,7 @@ const failureLog = [
   'nyokki失敗、また挑戦しよう',
   '残念、nyokkiはうまくいきませんでした',
   'のnyokki失敗',
-]
+] as const
 
 export class NyokkiLogTextCreator implements INyokkiLogTextCreator {
   public constructor(private readonly store: Store<IMainScene>) {}
@@ -60,12 +60,12 @@ export class NyokkiLogTextCreator implements INyokkiLogTextCreator {
    * ニョッキ失敗時のログを生成する
    */
   private createFailureLog(playerIds: string[], seed: number): string {
-    let message = this.createPlayerNamePhrase(playerIds)
+    const playerNames = this.createPlayerNamePhrase(playerIds)
 
     // 失敗したメッセージをseedを基に選択する
     const i = Math.floor(seed / 100) % failureLog.length
-    message += failureLog[i]
-    return message
+    const message = failureLog[i]
+    return `${playerNames}${message}`
   }
 
   /**
@@ -73,9 +73,8 @@ export class NyokkiLogTextCreator implements INyokkiLogTextCreator {
    * @param playerIds ニョッキアクションを未実行のプレイヤーplayerIdの配列
    */
   public createNoNyokkiLogText(playerIds: string[]): string {
-    let message = this.createPlayerNamePhrase(playerIds)
-    message += 'ニョッキ不発...'
-    return message
+    const playerNames = this.createPlayerNamePhrase(playerIds)
+    return `${playerNames}ニョッキ不発...`
   }
 
   /**
