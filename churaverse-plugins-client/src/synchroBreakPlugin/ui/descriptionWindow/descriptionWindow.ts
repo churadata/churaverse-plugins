@@ -38,8 +38,8 @@ export class DescriptionWindow implements IDescriptionWindow {
    * ゲーム開始時参加者サイドの文章更新処理
    */
   public displayGameStartForGuest(): void {
-    this.open()
     this.setDescriptionText(`${this.gameName}が開始されました！<br>${this.gameOwnerName}さんがターンを入力中です。`)
+    this.open()
   }
 
   /**
