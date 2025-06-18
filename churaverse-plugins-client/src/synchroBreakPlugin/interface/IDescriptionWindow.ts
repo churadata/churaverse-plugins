@@ -1,6 +1,6 @@
 import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
 
-export interface IDescriptionText extends IGameUiComponent {
+export interface IDescriptionWindow extends IGameUiComponent {
   setGameBaseInfo: (gameName: string, ownerName: string) => void
   displayGameStartForOwner: () => void
   displayGameStartForGuest: () => void

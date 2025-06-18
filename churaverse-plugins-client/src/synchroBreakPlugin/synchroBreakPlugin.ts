@@ -12,7 +12,7 @@ import { NyokkiTurnSelectEvent } from './event/nyokkiTurnSelectEvent'
 import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
 import { SendBetCoinResponseEvent } from './event/sendBetCoinResponseEvent'
 import { registerSynchroBreakUi } from './ui/registerSynchroBreakUi'
-import { IDescriptionText } from './interface/IDescriptionText'
+import { IDescriptionWindow } from './interface/IDescriptionWindow'
 import { PlayerNyokkiStatusIcon } from './ui/synchroBreakIcon/playerNyokkiStatusIcon'
 import { CoinViewer } from './ui/coinViewer/coinViewer'
 import { CoinViewerIcon } from './ui/coinViewer/coinViewerIcon'
@@ -325,7 +325,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   /**
    * ゲームの説明ウィンドウを取得する
    */
-  private get descriptionWindow(): IDescriptionText {
+  private get descriptionWindow(): IDescriptionWindow {
     const descriptionWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')
     if (descriptionWindow === undefined) throw new Error('descriptionWindow is not found')
     return descriptionWindow

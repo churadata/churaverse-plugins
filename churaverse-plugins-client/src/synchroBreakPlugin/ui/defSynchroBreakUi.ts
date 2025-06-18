@@ -1,4 +1,4 @@
-import { IDescriptionText } from '../interface/IDescriptionText'
+import { IDescriptionWindow } from '../interface/IDescriptionWindow'
 import { IRankingBoard } from '../interface/IRankingBoard'
 import { TurnSelectFormContainer } from './turnSelectFormContainer/turnSelectFormContainer'
 import { TimeLimitFormContainer } from './timeLimitFormContainer/timeLimitFormContainer'
@@ -11,7 +11,7 @@ import { NyokkiButton } from './nyokkiButton/nyokkiButton'
 declare module '@churaverse/game-plugin-client/gameUiManager' {
   export interface GameUiMap {
     synchroBreak: {
-      descriptionText: IDescriptionText
+      descriptionWindow: IDescriptionWindow
       rankingBoard: IRankingBoard
       turnSelectConfirm: TurnSelectFormContainer
       timeLimitConfirm: TimeLimitFormContainer

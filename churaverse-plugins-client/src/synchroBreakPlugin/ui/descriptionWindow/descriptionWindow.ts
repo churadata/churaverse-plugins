@@ -1,9 +1,9 @@
 import { DomManager, domLayerSetting } from 'churaverse-engine-client'
 import { DescriptionWindowComponent } from './component/DescriptionWindowComponent'
 import '@churaverse/game-plugin-client/gameUiManager'
-import { IDescriptionText } from '../../interface/IDescriptionText'
+import { IDescriptionWindow } from '../../interface/IDescriptionWindow'
 
-export class DescriptionWindow implements IDescriptionText {
+export class DescriptionWindow implements IDescriptionWindow {
   public element!: HTMLElement
   public visible: boolean = false
   private descriptionText: string = ''

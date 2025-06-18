@@ -19,7 +19,7 @@ export function registerSynchroBreakUi(
   gameId: GameIds,
   gameUiRegister: GameUiRegister
 ): void {
-  gameUiRegister.registerGameUi(gameId, 'descriptionText', new DescriptionWindow())
+  gameUiRegister.registerGameUi(gameId, 'descriptionWindow', new DescriptionWindow())
   gameUiRegister.registerGameUi(gameId, 'rankingBoard', new RankingBoard(store))
   gameUiRegister.registerGameUi(gameId, 'turnSelectConfirm', new TurnSelectFormContainer(store))
   gameUiRegister.registerGameUi(gameId, 'timeLimitConfirm', new TimeLimitFormContainer(store))
