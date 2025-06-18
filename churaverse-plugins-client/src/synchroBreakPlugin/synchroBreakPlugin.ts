@@ -355,7 +355,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   }
 
   /**
-   * 閉じるボタンが押された時のゲーム終了処理
+   * 結果ウィンドウの閉じるボタンを押した時に実行される処理
    */
   private readonly synchroBreakEnd = (ev: SynchroBreakEndEvent): void => {
     if (ev.playerId !== this.playerPluginStore.ownPlayerId) return
