@@ -87,6 +87,6 @@ export class ResultScreen implements ISynchroBreakResultScreen {
    * 結果画面を削除する
    */
   public remove(): void {
-    this.element.style.display = 'none'
+    this.element.remove()
   }
 }
