@@ -344,20 +344,13 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * ゲーム終了後の結果ウィンドウ表示処理
    */
   private readonly showSynchroBreakResult = (): void => {
-    const rankingBoard = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')
-    if (rankingBoard === undefined) throw new Error('rankingBoard is not found')
-    rankingBoard.remove()
-
-    const nyokkiButton = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')
-    if (nyokkiButton === undefined) throw new Error('nyokkiButton is not found')
-    nyokkiButton.remove()
-
-    const descriptionWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')
-    if (descriptionWindow === undefined) throw new Error('descriptionWindow is not found')
-    descriptionWindow.setDescriptionText(
-      '〜最終ランキング〜</br>お疲れ様でした。</br>閉じるボタンを押すと通常のちゅらバースに戻ります。'
-    )
-
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')?.remove()
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.remove()
+    this.gamePluginStore.gameUiManager
+      .getUi(this.gameId, 'descriptionWindow')
+      ?.setDescriptionText(
+        '〜最終ランキング〜</br>お疲れ様でした。</br>閉じるボタンを押すと通常のちゅらバースに戻ります。'
+      )
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'resultScreen')?.createResultRanking()
   }
 
