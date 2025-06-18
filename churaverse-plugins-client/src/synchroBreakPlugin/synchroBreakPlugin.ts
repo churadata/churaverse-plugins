@@ -7,7 +7,7 @@ import { UpdateGameParticipantEvent } from '@churaverse/game-plugin-client/event
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { SynchroBreakDialogManager } from './ui/startWindow/synchroBreakDialogManager'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
-import { SynchroBreakGameTurnNotFoundError } from './errors/synchroBreakGameTurnNotFoundError'
+import { SynchroBreakPluginError } from './errors/synchroBreakPluginError'
 import { SynchroBreakUiNotFoundError } from './errors/synchroBreakUiNotFoundError'
 import { SocketController } from './controller/socketController'
 import { SynchroBreakTurnSelectEvent } from './event/synchroBreakTurnSelectEvent'
@@ -322,7 +322,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betCoinConfirm')?.open()
 
     const gameTurn = this.synchroBreakPluginStore.gameTurn
-    if (gameTurn === undefined) throw new SynchroBreakGameTurnNotFoundError()
+    if (gameTurn === undefined) throw new SynchroBreakPluginError('ターン情報が存在しません')
     this.getRankingBoard.updateTurnNumber(ev.turnNumber, gameTurn)
   }
 

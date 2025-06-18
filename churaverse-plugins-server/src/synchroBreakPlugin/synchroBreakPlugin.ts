@@ -3,7 +3,7 @@ import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defN
 import { CoreGamePlugin } from '@churaverse/game-plugin-server/domain/coreGamePlugin'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
-import { SynchroBreakTurnSelectNotFoundError } from './errors/synchroBreakTurnSelectNotFoundError'
+import { SynchroBreakPluginError } from './errors/synchroBreakPluginError'
 import { SocketController } from './controller/socketController'
 import { SynchroBreakTurnSelectEvent } from './event/synchroBreakTurnSelectEvent'
 import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
@@ -209,7 +209,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const noNyokkiPlayerIds = this.participantIds.filter((playerId) => !nyokkiRepository.includes(playerId))
     const synchroBreakTurnSelect = this.synchroBreakPluginStore.turnSelect
 
-    if (synchroBreakTurnSelect === undefined) throw new SynchroBreakTurnSelectNotFoundError()
+    if (synchroBreakTurnSelect === undefined) throw new SynchroBreakPluginError('ターン情報が存在しません')
     const synchroBreakTurnEndMessage = new SynchroBreakTurnEndMessage({
       noNyokkiPlayerIds,
     })
