@@ -159,6 +159,15 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   }
 
   /**
+   * プレイヤーがゲームから離脱した時の処理
+   * @param playerId 離脱したプレイヤーのID
+   */
+  protected handlePlayerLeave(playerId: string): void {
+    this.synchroBreakPluginStore.playerCoins.delete(playerId)
+    this.getRankingBoard.updateRanking()
+  }
+
+  /**
    * ゲームの参加者が更新された時の処理
    */
   private readonly handleGameParticipant = (ev: UpdateGameParticipantEvent): void => {

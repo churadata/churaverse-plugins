@@ -1,4 +1,4 @@
-import { IMainScene, EntityDespawnEvent } from 'churaverse-engine-server'
+import { IMainScene } from 'churaverse-engine-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { CoreGamePlugin } from '@churaverse/game-plugin-server/domain/coreGamePlugin'
 import { GameAbortEvent } from '@churaverse/game-plugin-server/event/gameAbortEvent'
@@ -50,7 +50,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
-    this.bus.subscribeEvent('entityDespawn', this.onPlayerLeave)
     this.bus.subscribeEvent('synchroBreakTurnSelect', this.synchroBreakTurnSelect)
     this.bus.subscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
     this.bus.subscribeEvent('sendBetCoin', this.sendBetCoin)
@@ -64,7 +63,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
-    this.bus.unsubscribeEvent('entityDespawn', this.onPlayerLeave)
     this.bus.unsubscribeEvent('synchroBreakTurnSelect', this.synchroBreakTurnSelect)
     this.bus.unsubscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
     this.bus.unsubscribeEvent('sendBetCoin', this.sendBetCoin)
@@ -101,14 +99,16 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.socketController.unregisterMessageListener()
   }
 
-  private readonly onPlayerLeave = (ev: EntityDespawnEvent): void => {
-    if (!(ev.entity instanceof Player)) return
-    if (ev.entity.id === this.gameOwnerId) {
-      this.bus.post(new GameAbortEvent(this.gameId, ev.entity.id))
+  /**
+   * プレイヤーがゲームから離脱した時の処理
+   * @param playerId 離脱したプレイヤーのID
+   */
+  protected handlePlayerLeave(playerId: string): void {
+    if (playerId === this.gameOwnerId) {
+      // 管理者が退出した場合、シンクロブレイクは中断する。
+      this.bus.post(new GameAbortEvent(this.gameId, playerId))
     } else {
-      this.synchroBreakPluginStore.playersCoinRepository.delete(ev.entity.id)
-      this.synchroBreakPluginStore.betCoinRepository.delete(ev.entity.id)
-      this.synchroBreakPluginStore.nyokkiRepository.delete(ev.entity.id)
+      this.synchroBreakPluginStore.playersCoinRepository.delete(playerId)
     }
   }
 
