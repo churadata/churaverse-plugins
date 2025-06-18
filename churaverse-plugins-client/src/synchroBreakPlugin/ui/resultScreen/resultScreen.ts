@@ -3,7 +3,6 @@ import { ResultRankingListItem } from './components/ResultRankingListItem'
 import { ResultRankingListPanel } from './components/ResultRankingListPanel'
 import { ResultExitButton } from './components/ResultExitButton'
 import { ISynchroBreakResultScreen } from '../../interface/ISynchroBreakResultScreen'
-import { GamePluginStore } from '@churaverse/game-plugin-client/store/defGamePluginStore'
 import { SynchroBreakEndEvent } from '../../event/synchroBreakEndEvent'
 
 // resultRankingのID
@@ -20,7 +19,6 @@ export class ResultScreen implements ISynchroBreakResultScreen {
 
   public element!: HTMLElement
   private resultScreenContainer!: HTMLElement
-  private gamePluginStore!: GamePluginStore
 
   public readonly visible: boolean = false
 
@@ -34,7 +32,6 @@ export class ResultScreen implements ISynchroBreakResultScreen {
     domLayerSetting(this.element, 'highest')
     this.resultScreenContainer = DomManager.getElementById(RESULT_LIST_ID)
     this.resultScreenContainer.style.display = 'none'
-    this.gamePluginStore = this.store.of('gamePlugin')
   }
 
   /**
@@ -90,6 +87,6 @@ export class ResultScreen implements ISynchroBreakResultScreen {
    * 結果画面を削除する
    */
   public remove(): void {
-    this.resultScreenContainer.remove()
+    this.element.style.display = 'none'
   }
 }

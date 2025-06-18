@@ -22,6 +22,10 @@ export class DescriptionWindow implements IDescriptionWindow {
     this.descriptionText = ''
   }
 
+  public close(): void {
+    this.element.style.display = 'none'
+  }
+
   /**
    * 説明ウィンドウの文章を更新する
    * @param text 更新する文章

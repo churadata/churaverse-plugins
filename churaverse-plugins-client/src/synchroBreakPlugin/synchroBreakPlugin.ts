@@ -148,8 +148,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
 
     if (!this.isOwnPlayerMidwayParticipant) {
       resetSynchroBreakPluginStore(this.store)
-      this.removeBetCoinUi()
-      this.resetPlayerNyokkiIcon()
+      this.removeSynchroBreakIcons()
     }
   }
 
@@ -367,7 +366,9 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   private readonly synchroBreakEnd = (ev: SynchroBreakEndEvent): void => {
     if (ev.playerId !== this.playerPluginStore.ownPlayerId) return
-    this.gamePluginStore.gameUiManager.removeAllUis(this.gameId)
+    this.removeSynchroBreakIcons()
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')?.remove()
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')?.close()
     this.store.of('networkPlugin').messageSender.send(new SynchroBreakEndMessage({ playerId: ev.playerId }))
   }
 
@@ -387,6 +388,14 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const rankingBoard = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')
     if (rankingBoard === undefined) throw new Error('rankingBoard is not found')
     return rankingBoard
+  }
+
+  /**
+   * プレイヤーの周囲のアイコンを削除する
+   */
+  private removeSynchroBreakIcons(): void {
+    this.resetPlayerNyokkiIcon()
+    this.removeBetCoinUi()
   }
 
   /**
