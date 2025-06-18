@@ -7,8 +7,6 @@ import { UpdateGameParticipantEvent } from '@churaverse/game-plugin-client/event
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { SynchroBreakDialogManager } from './ui/startWindow/synchroBreakDialogManager'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
-import { SynchroBreakGameTurnNotFoundError } from './errors/synchroBreakGameTurnNotFoundError'
-import { SynchroBreakUiNotFoundError } from './errors/synchroBreakUiNotFoundError'
 import { SocketController } from './controller/socketController'
 import { SynchroBreakTurnSelectEvent } from './event/synchroBreakTurnSelectEvent'
 import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
@@ -331,7 +329,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betCoinConfirm')?.open()
 
     const gameTurn = this.synchroBreakPluginStore.gameTurn
-    if (gameTurn === undefined) throw new SynchroBreakGameTurnNotFoundError()
+    if (gameTurn === undefined) throw new Error('gameTurn is not found')
     this.getRankingBoard.updateTurnNumber(ev.turnNumber, gameTurn)
   }
 
@@ -351,7 +349,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   private getDescriptionWindow(): IDescriptionWindow {
     const descriptionWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')
-    if (descriptionWindow === undefined) throw new SynchroBreakUiNotFoundError('descriptionWindow')
+    if (descriptionWindow === undefined) throw new Error('descriptionWindow is not found')
     return descriptionWindow
   }
 
@@ -360,7 +358,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   private get getRankingBoard(): IRankingBoard {
     const rankingBoard = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')
-    if (rankingBoard === undefined) throw new SynchroBreakUiNotFoundError('rankingBoard')
+    if (rankingBoard === undefined) throw new Error('rankingBoard is not found')
     return rankingBoard
   }
 

@@ -1,5 +1,4 @@
 import { IPlayersCoinRepository } from '../interface/IPlayersCoinRepository'
-import { SynchroBreakPlayerCoinsNotFoundError } from '../errors/synchroBreakPlayerCoinsNotFoundError'
 
 export class PlayersCoinRepository implements IPlayersCoinRepository {
   private readonly playerCoins = new Map<string, number>()
@@ -11,7 +10,7 @@ export class PlayersCoinRepository implements IPlayersCoinRepository {
   public get(playerId: string): number {
     const coins = this.playerCoins.get(playerId)
     if (coins === undefined) {
-      throw new SynchroBreakPlayerCoinsNotFoundError(playerId)
+      throw new Error('playerIdがplayersCoinRepositoryに存在しません')
     }
     return coins
   }
