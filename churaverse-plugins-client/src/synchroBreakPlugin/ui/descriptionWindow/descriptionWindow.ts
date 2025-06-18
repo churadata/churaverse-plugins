@@ -138,6 +138,15 @@ export class DescriptionWindow implements IDescriptionWindow {
     this.setDescriptionText(descriptionText.join('<br>'))
   }
 
+  /**
+   * 結果ウィンドウ表示時のメッセージ表示
+   */
+  public displayResultMessage(): void {
+    this.setDescriptionText(
+      '〜最終ランキング〜</br>お疲れ様でした。</br>閉じるボタンを押すと通常のちゅらバースに戻ります。'
+    )
+  }
+
   private open(): void {
     this.element.style.display = 'flex'
   }

@@ -15,4 +15,5 @@ export interface IDescriptionWindow extends IGameUiComponent {
   displaySynchroBreakEnd: () => void
   displayTurnStart: (turnNumber: number) => void
   displayNyokkiAction: (text: string) => void
+  displayResultMessage: () => void
 }
