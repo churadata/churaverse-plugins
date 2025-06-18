@@ -5,7 +5,7 @@ import { SendableObject } from '@churaverse/network-plugin-server/types/sendable
 export interface NyokkiActionResponseData extends SendableObject {
   sameTimePlayersId: string[]
   isSuccess: boolean
-  nyokkiLogText: string
+  nyokkiTime: number
   order: number
 }
 
