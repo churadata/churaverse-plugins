@@ -2,7 +2,7 @@ import { IMainScene, Store, DomManager, domLayerSetting, makeLayerHigherTemporar
 import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { SelectTurnForm } from './component/SelectTurnForm'
-import { NyokkiTurnSelectMessage } from '../../message/nyokkiTurnSelectMessage'
+import { SynchroBreakTurnSelectMessage } from '../../message/synchroBreakTurnSelectMessage'
 
 /**  turn入力部分 */
 export const TURN_SELECT_FIELD_ID = 'turn-select-field-id'
@@ -27,7 +27,8 @@ export class TurnSelectFormContainer implements IGameUiComponent {
   private readonly networkPluginStore!: NetworkPluginStore<IMainScene>
 
   private get inputFieldValue(): number {
-    return Number(this.turnSelectInputField.value)
+    const value = Number(this.turnSelectInputField.value)
+    return isNaN(value) ? SYNCHRO_BREAK_MIN_TURN : value
   }
 
   private set inputFieldValue(value: number) {
@@ -39,13 +40,7 @@ export class TurnSelectFormContainer implements IGameUiComponent {
   }
 
   public initialize(): void {
-    this.element = DomManager.addJsxDom(SelectTurnForm())
-
-    domLayerSetting(this.element, 'lowest')
-    this.element.addEventListener('click', () => {
-      makeLayerHigherTemporary(this.element, 'lower')
-    })
-
+    this.setTurnSelectFormContainer()
     this.setupInputFields(this.store.of('playerPlugin').ownPlayerId)
   }
 
@@ -57,28 +52,45 @@ export class TurnSelectFormContainer implements IGameUiComponent {
 
     const sendButton = DomManager.getElementById(TURN_SELECT_SEND_BUTTON_ID)
     sendButton.onclick = () => {
-      this.networkPluginStore.messageSender.send(
-        new NyokkiTurnSelectMessage({ playerId, allTurn: this.inputFieldValue })
-      )
-      this.inputFieldValue = SYNCHRO_BREAK_MIN_TURN
-      this.close()
+      const turnNumber = this.inputFieldValue
+
+      if (SYNCHRO_BREAK_MIN_TURN <= turnNumber && turnNumber <= SYNCHRO_BREAK_MAX_TURN) {
+        this.networkPluginStore.messageSender.send(new SynchroBreakTurnSelectMessage({ playerId, allTurn: turnNumber }))
+
+        this.inputFieldValue = SYNCHRO_BREAK_MIN_TURN
+        this.close()
+      } else {
+        this.inputFieldValue = SYNCHRO_BREAK_MIN_TURN
+      }
     }
 
     const plusButton = DomManager.getElementById(TURN_SELECT_INCREASE_BUTTON_ID)
     plusButton.onclick = () => {
-      if (this.inputFieldValue >= SYNCHRO_BREAK_MAX_TURN) return
-      this.inputFieldValue++
+      const turnNumber = this.inputFieldValue
+
+      if (turnNumber >= SYNCHRO_BREAK_MAX_TURN) return
+      this.inputFieldValue = turnNumber + 1
     }
 
     const minusButton = DomManager.getElementById(TURN_SELECT_DECREASE_BUTTON_ID)
     minusButton.onclick = () => {
-      if (this.inputFieldValue <= SYNCHRO_BREAK_MIN_TURN) return
-      this.inputFieldValue--
+      const turnNumber = this.inputFieldValue
+
+      if (turnNumber <= SYNCHRO_BREAK_MIN_TURN) return
+      this.inputFieldValue = turnNumber - 1
     }
   }
 
+  private setTurnSelectFormContainer(): void {
+    this.element = DomManager.addJsxDom(SelectTurnForm())
+    domLayerSetting(this.element, 'lowest')
+    this.element.addEventListener('click', () => {
+      makeLayerHigherTemporary(this.element, 'lower')
+    })
+    this.close()
+  }
+
   public open(): void {
-    this.inputFieldValue = SYNCHRO_BREAK_MIN_TURN
     this.element.style.display = 'flex'
   }
 
