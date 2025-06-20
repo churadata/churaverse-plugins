@@ -4,7 +4,6 @@ import { CoreGamePlugin } from '@churaverse/game-plugin-client/domain/coreGamePl
 import { RegisterGameUiEvent } from '@churaverse/game-plugin-client/event/registerGameUiEvent'
 import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { PlayerRendererNotFoundError } from '@churaverse/player-plugin-client/errors/playerRendererNotFoundError'
-import { UpdateGameParticipantEvent } from '@churaverse/game-plugin-client/event/updateGameParticipantEvent'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { SynchroBreakDialogManager } from './ui/startWindow/synchroBreakDialogManager'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
@@ -59,7 +58,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
-    this.bus.subscribeEvent('updateGameParticipant', this.handleGameParticipant)
     this.bus.subscribeEvent('synchroBreakTurnSelect', this.synchroBreakTurnSelect)
     this.bus.subscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
     this.bus.subscribeEvent('sendBetCoinResponse', this.sendBetCoinResponse)
@@ -76,7 +74,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
-    this.bus.unsubscribeEvent('updateGameParticipant', this.handleGameParticipant)
     this.bus.unsubscribeEvent('synchroBreakTurnSelect', this.synchroBreakTurnSelect)
     this.bus.unsubscribeEvent('timeLimitConfirm', this.timeLimitConfirm)
     this.bus.unsubscribeEvent('sendBetCoinResponse', this.sendBetCoinResponse)
@@ -122,6 +119,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     initSynchroBreakPluginStore(this.store)
     this.socketController.registerMessageListener()
     this.synchroBreakDialogManager.setGameAbortButtonText()
+    this.initSynchroBreakPlayerIcons()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
     this.nyokkiActionMessage = undefined
     this.ownNyokkiSatatus = 'yet'
@@ -163,9 +161,9 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   protected handlePlayerLeave(playerId: string): void {}
 
   /**
-   * ゲームの参加者が更新された時の処理
+   * シンクロブレイク参加プレイヤーのUIアイコンを初期化する
    */
-  private readonly handleGameParticipant = (ev: UpdateGameParticipantEvent): void => {
+  private initSynchroBreakPlayerIcons(): void {
     for (const playerId of this.participantIds) {
       const coinViewer = new CoinViewerIcon(this.scene, this.store, playerId)
       this.coinViewerIconUis.set(playerId, coinViewer)
