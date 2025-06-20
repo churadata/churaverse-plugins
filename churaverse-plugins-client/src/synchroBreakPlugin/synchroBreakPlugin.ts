@@ -95,6 +95,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   private init(): void {
     this.synchroBreakDialogManager = new SynchroBreakDialogManager(this.store, this.bus)
     this.coinViewerIconUis = new Map<string, CoinViewerIcon>()
+    this.gameInfoStore = this.store.of('gameInfo')
     this.gamePluginStore = this.store.of('gamePlugin')
     this.playerPluginStore = this.store.of('playerPlugin')
   }
@@ -140,6 +141,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * シンクロブレイク特有の中断・終了時に実行される処理
    */
   protected handleGameTermination(): void {
+    resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
     this.synchroBreakDialogManager.setGameStartButtonText()
 
@@ -154,10 +156,11 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * シンクロブレイク特有の途中参加時の処理
    */
   protected handleMidwayParticipant(): void {
-    this.subscribeGameEvent()
     this.socketController.registerMessageListener()
     this.synchroBreakDialogManager.setGameAbortButtonText()
   }
+
+  protected handlePlayerLeave(playerId: string): void {}
 
   /**
    * ゲームの参加者が更新された時の処理

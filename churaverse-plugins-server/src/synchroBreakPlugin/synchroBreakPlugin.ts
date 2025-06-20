@@ -96,6 +96,8 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.socketController.unregisterMessageListener()
   }
 
+  protected handlePlayerLeave(playerId: string): void {}
+
   /**
    * ターンが設定された時の処理
    */
