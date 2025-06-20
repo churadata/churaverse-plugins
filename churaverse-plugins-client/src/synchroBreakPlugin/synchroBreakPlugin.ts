@@ -119,8 +119,8 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     initSynchroBreakPluginStore(this.store)
     this.socketController.registerMessageListener()
     this.synchroBreakDialogManager.setGameAbortButtonText()
-    this.initSynchroBreakPlayerIcons()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
+    this.initSynchroBreakPlayerIcons()
     this.nyokkiActionMessage = undefined
     this.ownNyokkiSatatus = 'yet'
 
