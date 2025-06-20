@@ -158,7 +158,13 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.synchroBreakDialogManager.setGameAbortButtonText()
   }
 
-  protected handlePlayerLeave(playerId: string): void {}
+  /**
+   * プレイヤーがゲームから離脱した時の処理
+   * @param playerId 離脱したプレイヤーのID
+   */
+  protected handlePlayerLeave(playerId: string): void {
+    this.synchroBreakPluginStore.playersCoinRepository.delete(playerId)
+  }
 
   /**
    * シンクロブレイク参加プレイヤーのUIアイコンを初期化する
