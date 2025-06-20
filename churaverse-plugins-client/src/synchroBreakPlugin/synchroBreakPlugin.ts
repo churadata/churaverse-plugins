@@ -164,7 +164,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   protected handlePlayerLeave(playerId: string): void {
     this.synchroBreakPluginStore.playersCoinRepository.delete(playerId)
-    this.getRankingBoard.updateRanking()
   }
 
   /**
