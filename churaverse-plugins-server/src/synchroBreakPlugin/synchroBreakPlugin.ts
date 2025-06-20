@@ -97,6 +97,8 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.socketController.unregisterMessageListener()
   }
 
+  protected handlePlayerLeave(playerId: string): void {}
+
   /**
    * プレイヤーがゲームから離脱した時の処理
    * @param playerId 離脱したプレイヤーのID
