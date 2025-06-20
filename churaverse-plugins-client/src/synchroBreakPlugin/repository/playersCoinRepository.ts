@@ -1,4 +1,5 @@
 import { IPlayersCoinRepository } from '../interface/IPlayersCoinRepository'
+import { PlayerRendererNotFoundError } from '@churaverse/player-plugin-client/errors/playerRendererNotFoundError'
 
 export class PlayersCoinRepository implements IPlayersCoinRepository {
   private readonly playerCoins = new Map<string, number>()
@@ -10,7 +11,7 @@ export class PlayersCoinRepository implements IPlayersCoinRepository {
   public get(playerId: string): number {
     const coins = this.playerCoins.get(playerId)
     if (coins === undefined) {
-      throw new Error('playerIdがplayersCoinRepositoryに存在しません')
+      throw new PlayerRendererNotFoundError(playerId)
     }
     return coins
   }
