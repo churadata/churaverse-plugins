@@ -1,5 +1,5 @@
 import { IPlayersCoinRepository } from '../interface/IPlayersCoinRepository'
-import { SynchroBreakPlayerCoinsNotFoundError } from '../errors/synchroBreakPlayerCoinsNotFoundError'
+import { PlayerRendererNotFoundError } from '@churaverse/player-plugin-client/errors/playerRendererNotFoundError'
 
 export class PlayersCoinRepository implements IPlayersCoinRepository {
   private readonly playerCoins = new Map<string, number>()
@@ -11,7 +11,7 @@ export class PlayersCoinRepository implements IPlayersCoinRepository {
   public get(playerId: string): number {
     const coins = this.playerCoins.get(playerId)
     if (coins === undefined) {
-      throw new SynchroBreakPlayerCoinsNotFoundError(playerId)
+      throw new PlayerRendererNotFoundError(playerId)
     }
     return coins
   }

@@ -1,6 +1,5 @@
 import { Scene } from 'phaser'
 import { IPlayerRenderer } from '@churaverse/player-plugin-client/domain/IPlayerRenderer'
-import { UnsupportedNyokkiStatusError } from '../../errors/unsupportedNyokkiStatusError'
 import { NyokkiStatus } from '../../type/nyokkiStatus'
 
 import RANK_FRAME_PATH from '../../assets/nyokkiOrderIcons/rankFrame.png'
@@ -93,7 +92,7 @@ export class PlayerNyokkiStatusIcon {
         this.resetStatusIcon()
         break
       default:
-        throw new UnsupportedNyokkiStatusError(status)
+        throw new Error('received unsupported nyokki status')
     }
   }
 

@@ -1,6 +1,7 @@
 import { IMainScene } from 'churaverse-engine-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { CoreGamePlugin } from '@churaverse/game-plugin-server/domain/coreGamePlugin'
+import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
 import { SynchroBreakPluginError } from './errors/synchroBreakPluginError'
@@ -98,6 +99,19 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   }
 
   /**
+   * プレイヤーがゲームから離脱した時の処理
+   * @param playerId 離脱したプレイヤーのID
+   */
+  protected handlePlayerLeave(playerId: string): void {
+    if (playerId === this.gameOwnerId) {
+      // 管理者が退出した場合、シンクロブレイクは終了する。
+      this.bus.post(new GameEndEvent(this.gameId))
+    } else {
+      this.synchroBreakPluginStore.playersCoinRepository.delete(playerId)
+    }
+  }
+
+  /**
    * ターンが設定された時の処理
    */
   private readonly synchroBreakTurnSelect = (ev: SynchroBreakTurnSelectEvent): void => {
@@ -120,6 +134,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.synchroBreakPluginStore.betCoinRepository.set(playerId, betCoins)
 
     const coins = this.synchroBreakPluginStore.playersCoinRepository.get(playerId)
+    if (coins === undefined) throw new Error('coins is undefined')
 
     const currentCoins = coins - betCoins
     this.synchroBreakPluginStore.playersCoinRepository.set(playerId, currentCoins)
@@ -243,6 +258,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   private calculateCoins(playerId: string): number {
     const currentCoins = this.synchroBreakPluginStore.playersCoinRepository.get(playerId)
+    if (currentCoins === undefined) throw new Error('currentCoins is undefined')
 
     const player: Nyokki | undefined = this.synchroBreakPluginStore.nyokkiRepository.get(playerId)
     if (player === undefined) return currentCoins
@@ -250,6 +266,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const betCoins = this.synchroBreakPluginStore.betCoinRepository.get(playerId)
     const totalPlayerNum = this.participantIds.length
     const playerOrder: string[] = this.synchroBreakPluginStore.nyokkiRepository.playerOrders()
+    if (betCoins === undefined) throw new Error('betCoins is undefined')
     const orderIndex = playerOrder.indexOf(playerId)
 
     // ニョッキに成功した場合はコインの増加量を計算し、失敗した場合は現在のコイン数をそのまま返す
