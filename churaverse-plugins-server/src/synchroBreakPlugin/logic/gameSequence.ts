@@ -46,6 +46,7 @@ export class GameSequence implements IGameSequence {
     await this.delay(1000)
 
     for (let remainingSeconds = 3; remainingSeconds > 0; remainingSeconds--) {
+      if (!this.isActive) return
       const synchroBreakStartCountMessage = new SynchroBreakStartCountMessage({ remainingSeconds })
       this.networkPluginStore.messageSender.send(synchroBreakStartCountMessage)
 
@@ -61,6 +62,7 @@ export class GameSequence implements IGameSequence {
     const turnTimer = this.synchroBreakPluginStore.timeLimit
     if (turnTimer === undefined) return
     for (let remainingSeconds = turnTimer; remainingSeconds > 0; remainingSeconds--) {
+      if (!this.isActive) return
       const synchroBreakTurnTimerMessage = new SynchroBreakTurnTimerMessage({ remainingSeconds })
       this.networkPluginStore.messageSender.send(synchroBreakTurnTimerMessage)
 
