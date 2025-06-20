@@ -167,7 +167,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   }
 
   /**
-   * ゲームの参加者が更新された時の処理
    * シンクロブレイク参加プレイヤーのUIアイコンを初期化する
    */
   private initSynchroBreakPlayerIcons(): void {
