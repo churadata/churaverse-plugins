@@ -81,7 +81,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * シンクロブレイク特有の途中参加時の処理
    */
   protected handleMidwayParticipant(): void {
-    this.subscribeGameEvent()
     this.socketController.registerMessageListener()
     this.synchroBreakDialogManager.setGameAbortButtonText()
   }
