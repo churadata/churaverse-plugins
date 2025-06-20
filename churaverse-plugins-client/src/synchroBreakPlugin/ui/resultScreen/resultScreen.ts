@@ -57,9 +57,7 @@ export class ResultScreen implements INyokkiResultScreen {
     // 説明ウィンドウの文章変更処理
     const descriptionWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')
     if (descriptionWindow === undefined) throw new Error('descriptionWindow is not found')
-    descriptionWindow.setDescriptionText(
-      '〜最終ランキング〜</br>お疲れ様でした。</br>閉じるボタンを押すと通常のちゅらバースに戻ります。'
-    )
+    descriptionWindow.displayResultMessage()
 
     this.createResultRankingList()
   }
