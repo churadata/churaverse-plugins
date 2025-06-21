@@ -359,11 +359,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   private readonly showSynchroBreakResult = (): void => {
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')?.remove()
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.remove()
-    this.gamePluginStore.gameUiManager
-      .getUi(this.gameId, 'descriptionWindow')
-      ?.setDescriptionText(
-        '〜最終ランキング〜</br>お疲れ様でした。</br>閉じるボタンを押すと通常のちゅらバースに戻ります。'
-      )
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')?.displayResultMessage()
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'resultScreen')?.createResultRanking()
   }
 
