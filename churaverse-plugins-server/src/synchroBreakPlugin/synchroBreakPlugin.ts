@@ -28,7 +28,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   private socketController!: SocketController
   private gameSequence!: IGameSequence
   private sameTimePlayers: string[] = []
-  private finishedPlayers: string[] = []
   private readonly nyokkiDurationTime = 100
   private readonly initialPlayerCoins = 100
 
@@ -82,7 +81,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.socketController.registerMessageListener()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
     this.gameSequence = new GameSequence(this.gameId, this.bus, this.store)
-    this.finishedPlayers = []
     for (const playerId of this.participantIds) {
       this.synchroBreakPluginStore.playersCoinRepository.set(playerId, this.initialPlayerCoins)
     }
