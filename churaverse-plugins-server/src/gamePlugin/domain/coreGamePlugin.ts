@@ -13,6 +13,7 @@ import { ResponseGameEndMessage } from '../message/gameEndMessage'
 import { ResponseGameStartMessage } from '../message/gameStartMessage'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
 import { BaseGamePlugin } from './baseGamePlugin'
+import { GamePlayerQuitEvent } from '../event/gamePlayerQuitEvent'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -46,6 +47,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.subscribeEvent('gameAbort', this.gameAbort)
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
     this.bus.subscribeEvent('entityDespawn', this.onPlayerLeave)
+    this.bus.subscribeEvent('gamePlayerQuit', this.onPlayerQuitGame)
   }
 
   protected unsubscribeGameEvent(): void {
@@ -53,6 +55,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
     this.bus.unsubscribeEvent('entityDespawn', this.onPlayerLeave)
+    this.bus.unsubscribeEvent('gamePlayerQuit', this.onPlayerQuitGame)
   }
 
   private priorGameData(ev: PriorGameDataEvent): void {
@@ -100,7 +103,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   }
 
   /**
-   * 退出したプレイヤーがゲーム参加者の場合、参加者リストから削除しtrueを返す
+   * ちゅらバースから退出したプレイヤーがゲーム参加者の場合、参加者リストから削除しtrueを返す
    */
   private readonly onPlayerLeave = (ev: EntityDespawnEvent): void => {
     if (isPlayer(ev.entity) === false) return
@@ -108,6 +111,23 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     if (!this.removeParticipant(playerId)) return
     this.handlePlayerLeave(playerId)
   }
+
+  /**
+   * プレイヤーがちゅらバースから退出した時の処理
+   * @param playerId 退出したプレイヤーのID
+   */
+  protected abstract handlePlayerLeave(playerId: string): void
+
+  private readonly onPlayerQuitGame = (ev: GamePlayerQuitEvent): void => {
+    if (!this.removeParticipant(ev.playerId)) return
+    this.handlePlayerQuitGame(ev.playerId)
+  }
+
+  /**
+   * プレイヤーが参加中のゲームから離脱した時の処理
+   * @param playerId ゲームから離脱したプレイヤーのID
+   */
+  protected abstract handlePlayerQuitGame(playerId: string): void
 
   /**
    * 退出したプレイヤーがゲーム参加者の場合、参加者リストから削除しtrueを返す
@@ -118,10 +138,4 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._participantIds.splice(idx, 1)
     return true
   }
-
-  /**
-   * プレイヤーがゲームから離脱した時の処理
-   * @param playerId 離脱したプレイヤーのID
-   */
-  protected abstract handlePlayerLeave(playerId: string): void
 }

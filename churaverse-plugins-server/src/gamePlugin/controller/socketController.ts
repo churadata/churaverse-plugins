@@ -11,6 +11,8 @@ import { RequestGameAbortMessage, ResponseGameAbortMessage } from '../message/ga
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
+import { GamePlayerQuitMessage } from '../message/gamePlayerQuitMessage'
+import { GamePlayerQuitEvent } from '../event/gamePlayerQuitEvent'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
@@ -21,6 +23,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('responseGameEnd', ResponseGameEndMessage, 'allClients')
     ev.messageRegister.registerMessage('requestGameAbort', RequestGameAbortMessage, 'onlySelf')
     ev.messageRegister.registerMessage('responseGameAbort', ResponseGameAbortMessage, 'allClients')
+    ev.messageRegister.registerMessage('gamePlayerQuit', GamePlayerQuitMessage, 'onlySelf')
   }
 
   public registerMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
@@ -28,6 +31,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageListenerRegister.on('requestGameStart', this.gameStart.bind(this))
     ev.messageListenerRegister.on('requestGameEnd', this.gameEnd.bind(this))
     ev.messageListenerRegister.on('requestGameAbort', this.gameAbort.bind(this))
+    ev.messageListenerRegister.on('gamePlayerQuit', this.gamePlayerQuit.bind(this))
   }
 
   /**
@@ -48,5 +52,9 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   private gameEnd(msg: RequestGameEndMessage): void {
     this.eventBus.post(new GameEndEvent(msg.data.gameId))
+  }
+
+  private gamePlayerQuit(msg: GamePlayerQuitMessage): void {
+    this.eventBus.post(new GamePlayerQuitEvent(msg.data.gameId, msg.data.playerId))
   }
 }

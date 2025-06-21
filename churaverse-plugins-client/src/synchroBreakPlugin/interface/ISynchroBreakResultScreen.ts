@@ -1,5 +1,5 @@
 import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
 
-export interface INyokkiResultScreen extends IGameUiComponent {
+export interface ISynchroBreakResultScreen extends IGameUiComponent {
   createResultRanking: () => void
 }

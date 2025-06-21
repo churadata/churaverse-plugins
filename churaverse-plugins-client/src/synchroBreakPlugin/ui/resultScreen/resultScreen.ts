@@ -2,9 +2,8 @@ import { Store, IMainScene, DomManager, domLayerSetting, IEventBus } from 'chura
 import { ResultRankingListItem } from './components/ResultRankingListItem'
 import { ResultRankingListPanel } from './components/ResultRankingListPanel'
 import { ResultExitButton } from './components/ResultExitButton'
-import { INyokkiResultScreen } from '../../interface/INyokkiResultScreen'
-import { GamePluginStore } from '@churaverse/game-plugin-client/store/defGamePluginStore'
-import { GameEndEvent } from '@churaverse/game-plugin-client/event/gameEndEvent'
+import { ISynchroBreakResultScreen } from '../../interface/ISynchroBreakResultScreen'
+import { GamePlayerQuitEvent } from '@churaverse/game-plugin-client/event/gamePlayerQuitEvent'
 
 // resultRankingのID
 export const RESULT_LIST_ID = 'result-list'
@@ -15,12 +14,11 @@ export const RESULT_CONTAINER_ID = 'result-container'
  */
 export const ROW_CONTENT_CONTAINER_CLASS_NAME = 'result-ranking-list-row-container'
 
-export class ResultScreen implements INyokkiResultScreen {
+export class ResultScreen implements ISynchroBreakResultScreen {
   protected readonly gameId = 'synchroBreak'
 
   public element!: HTMLElement
   private resultScreenContainer!: HTMLElement
-  private gamePluginStore!: GamePluginStore
 
   public readonly visible: boolean = false
 
@@ -34,7 +32,6 @@ export class ResultScreen implements INyokkiResultScreen {
     domLayerSetting(this.element, 'highest')
     this.resultScreenContainer = DomManager.getElementById(RESULT_LIST_ID)
     this.resultScreenContainer.style.display = 'none'
-    this.gamePluginStore = this.store.of('gamePlugin')
   }
 
   /**
@@ -43,21 +40,6 @@ export class ResultScreen implements INyokkiResultScreen {
   public createResultRanking(): void {
     this.element.style.display = ''
     this.resultScreenContainer.innerHTML = ''
-
-    // ランキングボードを削除
-    const rankingBoard = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')
-    if (rankingBoard === undefined) throw new Error('rankingBoard is not found')
-    rankingBoard.remove()
-
-    // nyokkiButtonを削除
-    const nyokkiButton = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')
-    if (nyokkiButton === undefined) throw new Error('nyokkiButton is not found')
-    nyokkiButton.remove()
-
-    // 説明ウィンドウの文章変更処理
-    const descriptionWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')
-    if (descriptionWindow === undefined) throw new Error('descriptionWindow is not found')
-    descriptionWindow.displayResultMessage()
 
     this.createResultRankingList()
   }
@@ -71,17 +53,17 @@ export class ResultScreen implements INyokkiResultScreen {
     let previousCoins = sortedPlayers[0].coins ?? 0
     this.resultScreenContainer.style.display = 'block'
 
-    sortedPlayers.forEach((player) => {
+    sortedPlayers.forEach((player, index) => {
       const playerName = this.store.of('playerPlugin').players.get(player.playerId)?.name
       if (playerName === undefined) return
+
+      if (index > 0 && player.coins < previousCoins) {
+        currentRank = index + 1
+      }
       const playerListElement = DomManager.jsxToDom(
         ResultRankingListItem({ rank: currentRank, playerName, coinValue: player.coins })
       )
       this.resultScreenContainer.appendChild(playerListElement)
-
-      if (player.coins !== previousCoins) {
-        currentRank++
-      }
       previousCoins = player.coins
     })
 
@@ -95,7 +77,8 @@ export class ResultScreen implements INyokkiResultScreen {
     const exitButton = DomManager.jsxToDom(ResultExitButton())
     this.element.appendChild(exitButton)
     exitButton.addEventListener('click', () => {
-      this.eventBus.post(new GameEndEvent(this.gameId))
+      const playerId = this.store.of('playerPlugin').ownPlayerId
+      this.eventBus.post(new GamePlayerQuitEvent(this.gameId, playerId))
       this.remove()
     })
   }
@@ -104,6 +87,6 @@ export class ResultScreen implements INyokkiResultScreen {
    * 結果画面を削除する
    */
   public remove(): void {
-    this.resultScreenContainer.remove()
+    this.element.remove()
   }
 }

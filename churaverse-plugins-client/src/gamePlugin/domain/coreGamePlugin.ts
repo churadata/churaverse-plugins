@@ -1,5 +1,6 @@
-import { EntityDespawnEvent } from 'churaverse-engine-client'
+import { EntityDespawnEvent, IMainScene } from 'churaverse-engine-client'
 import { isPlayer } from '@churaverse/player-plugin-client/domain/player'
+import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { GameStartEvent } from '../event/gameStartEvent'
@@ -8,6 +9,8 @@ import { GameIds } from '../interface/gameIds'
 import { IGameInfo } from '../interface/IGameInfo'
 import { GamePluginStore } from '../store/defGamePluginStore'
 import { BaseGamePlugin } from './baseGamePlugin'
+import { GamePlayerQuitEvent } from '../event/gamePlayerQuitEvent'
+import { GamePlayerQuitMessage } from '../message/gamePlayerQuitMessage'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -20,6 +23,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private _participantIds: string[] = []
   private _isOwnPlayerMidwayParticipant: boolean = false
   protected gamePluginStore!: GamePluginStore
+  private networkPluginStore!: NetworkPluginStore<IMainScene>
 
   public get isActive(): boolean {
     return this._isActive
@@ -49,6 +53,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.subscribeEvent('gameAbort', this.gameAbort)
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
     this.bus.subscribeEvent('entityDespawn', this.onPlayerLeave)
+    this.bus.subscribeEvent('gamePlayerQuit', this.onPlayerQuitGame)
   }
 
   protected unsubscribeGameEvent(): void {
@@ -56,10 +61,12 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
     this.bus.unsubscribeEvent('entityDespawn', this.onPlayerLeave)
+    this.bus.unsubscribeEvent('gamePlayerQuit', this.onPlayerQuitGame)
   }
 
   public getStores(): void {
     this.gamePluginStore = this.store.of('gamePlugin')
+    this.networkPluginStore = this.store.of('networkPlugin')
   }
 
   private priorGameData(ev: PriorGameDataEvent): void {
@@ -113,6 +120,25 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   }
 
   /**
+   * プレイヤーがちゅらバースから退出した時の処理
+   * @param playerId 退出したプレイヤーのID
+   */
+  protected abstract handlePlayerLeave(playerId: string): void
+
+  private readonly onPlayerQuitGame = (ev: GamePlayerQuitEvent): void => {
+    if (!this.removeParticipant(ev.playerId)) return
+    const gamePlayerQuitMessage = new GamePlayerQuitMessage({ gameId: ev.gameId, playerId: ev.playerId })
+    this.networkPluginStore.messageSender.send(gamePlayerQuitMessage)
+    this.handlePlayerQuitGame(ev.playerId)
+  }
+
+  /**
+   * プレイヤーが参加中のゲームから離脱した時の処理
+   * @param playerId ゲームから離脱したプレイヤーのID
+   */
+  protected abstract handlePlayerQuitGame(playerId: string): void
+
+  /**
    * 退出したプレイヤーがゲーム参加者の場合、参加者リストから削除しtrueを返す
    */
   private removeParticipant(playerId: string): boolean {
@@ -121,10 +147,4 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._participantIds.splice(idx, 1)
     return true
   }
-
-  /**
-   * プレイヤーがゲームから離脱した時の処理
-   * @param playerId 離脱したプレイヤーのID
-   */
-  protected abstract handlePlayerLeave(playerId: string): void
 }

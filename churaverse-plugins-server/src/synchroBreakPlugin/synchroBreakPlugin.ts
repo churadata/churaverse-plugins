@@ -98,7 +98,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   }
 
   /**
-   * プレイヤーがゲームから離脱した時の処理
+   * 参加者がちゅらバースから退出した時の処理
    * @param playerId 離脱したプレイヤーのID
    */
   protected handlePlayerLeave(playerId: string): void {
@@ -107,6 +107,16 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       this.bus.post(new GameEndEvent(this.gameId))
     } else {
       this.synchroBreakPluginStore.playersCoinRepository.delete(playerId)
+    }
+  }
+
+  /**
+   * 参加者がシンクロブレイクを離脱した時の処理
+   * 結果ウィンドの閉じるボタンを押した時に実行される
+   */
+  protected handlePlayerQuitGame(playerId: string): void {
+    if (this.participantIds.length <= 0) {
+      this.bus.post(new GameEndEvent(this.gameId))
     }
   }
 

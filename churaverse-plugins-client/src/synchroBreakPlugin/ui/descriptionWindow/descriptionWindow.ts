@@ -19,6 +19,10 @@ export class DescriptionWindow implements IDescriptionWindow {
     this.descriptionText = ''
   }
 
+  public close(): void {
+    this.element.style.display = 'none'
+  }
+
   public setGameBaseInfo(gameName: string, ownerName: string): void {
     this.gameName = gameName
     this.gameOwnerName = ownerName

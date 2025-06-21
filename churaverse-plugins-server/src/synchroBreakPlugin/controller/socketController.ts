@@ -18,6 +18,7 @@ import { NyokkiActionResponseMessage } from '../message/nyokkiActionResponseMess
 import { SynchroBreakTurnEndMessage } from '../message/synchroBreakTurnEndMessage'
 import { SynchroBreakTurnStartMessage } from '../message/synchroBreakTurnStartMessage'
 import { UpdatePlayersCoinMessage } from '../message/updatePlayersCoinMessage'
+import { SynchroBreakResultMessage } from '../message/synchroBreakResultMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
@@ -38,6 +39,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('synchroBreakTurnEnd', SynchroBreakTurnEndMessage, 'allClients')
     ev.messageRegister.registerMessage('synchroBreakTurnStart', SynchroBreakTurnStartMessage, 'allClients')
     ev.messageRegister.registerMessage('updatePlayersCoin', UpdatePlayersCoinMessage, 'allClients')
+    ev.messageRegister.registerMessage('synchroBreakResult', SynchroBreakResultMessage, 'allClients')
   }
 
   /**

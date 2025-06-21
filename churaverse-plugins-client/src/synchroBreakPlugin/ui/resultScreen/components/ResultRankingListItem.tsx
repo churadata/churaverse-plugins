@@ -20,9 +20,9 @@ export interface FrameInfo {
 
 const spriteFrames: FrameInfo[] = [
   { name: '1st', x: 67, y: 45, width: 48, height: 42 },
-  { name: '2nd', x: 67, y: 0, width: 48, height: 44 },
+  { name: '2nd', x: 67, y: 0, width: 48, height: 42 },
   { name: '3rd', x: 0, y: 0, width: 48, height: 42 },
-  { name: 'under4th', x: 0, y: 43, width: 66, height: 62 },
+  { name: 'under4th', x: 0, y: 43, width: 48, height: 42 },
 ] as const
 
 /**
@@ -58,7 +58,8 @@ export const ResultRankingListItem: JSXFunc<Props> = ({ rank, playerName, coinVa
           style={{
             width: `${frame.width}px`,
             height: `${frame.height}px`,
-            backgroundImage: `url(${resultCrownIcons})`,
+            // ランクが3位以内の場合のみ背景画像を設定し、それ以外は背景をなくす
+            backgroundImage: rank <= 3 ? `url(${resultCrownIcons})` : 'none',
             backgroundPosition: `-${frame.x}px -${frame.y}px`,
           }}
         ></div>
