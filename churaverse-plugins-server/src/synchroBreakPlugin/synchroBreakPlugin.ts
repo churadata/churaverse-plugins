@@ -1,6 +1,7 @@
 import { IMainScene } from 'churaverse-engine-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { CoreGamePlugin } from '@churaverse/game-plugin-server/domain/coreGamePlugin'
+import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
 import { SocketController } from './controller/socketController'
@@ -17,7 +18,6 @@ import { SendBetCoinResponseMessage } from './message/sendBetCoinResponseMessage
 import { SynchroBreakTurnStartEvent } from './event/synchroBreakTurnStartEvent'
 import { SynchroBreakTurnStartMessage } from './message/synchroBreakTurnStartMessage'
 import { SynchroBreakEndEvent } from './event/synchroBreakEndEvent'
-import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
 import { IGameSequence } from './interface/IGameSequence'
 import { GameSequence } from './logic/gameSequence'
 
@@ -100,6 +100,19 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   protected handleGameTermination(): void {
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
+  }
+
+  /**
+   * プレイヤーがゲームから離脱した時の処理
+   * @param playerId 離脱したプレイヤーのID
+   */
+  protected handlePlayerLeave(playerId: string): void {
+    if (playerId === this.gameOwnerId) {
+      // 管理者が退出した場合、シンクロブレイクは終了する。
+      this.bus.post(new GameEndEvent(this.gameId))
+    } else {
+      this.synchroBreakPluginStore.playersCoinRepository.delete(playerId)
+    }
   }
 
   /**
