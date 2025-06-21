@@ -1,7 +1,7 @@
-import { GamePluginError } from '@churaverse/game-plugin-client/errors/gamePluginError'
+import { SynchroBreakPluginError } from './synchroBreakPluginError'
 
-export class SynchroBreakUiNotFoundError extends GamePluginError {
+export class SynchroBreakUiNotFoundError extends SynchroBreakPluginError {
   public constructor(componentName: string) {
-    super(`[シンクロブレイク] ${componentName}のUIコンポーネントが存在しません`)
+    super(`${componentName}のUIコンポーネントが存在しません`)
   }
 }

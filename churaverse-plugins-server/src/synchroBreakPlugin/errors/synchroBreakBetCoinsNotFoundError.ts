@@ -1,7 +1,7 @@
-import { GamePluginError } from '@churaverse/game-plugin-server/errors/gamePluginError'
+import { SynchroBreakPluginError } from './synchroBreakPluginError'
 
-export class SynchroBreakBetCoinsNotFoundError extends GamePluginError {
+export class SynchroBreakBetCoinsNotFoundError extends SynchroBreakPluginError {
   public constructor(playerId: string) {
-    super(`[シンクロブレイク] playerId: ${playerId}のベットコイン情報が存在しません`)
+    super(`playerId: ${playerId}のベットコイン情報が存在しません`)
   }
 }

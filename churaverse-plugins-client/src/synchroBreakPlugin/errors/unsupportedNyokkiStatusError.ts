@@ -1,7 +1,7 @@
-import { GamePluginError } from '@churaverse/game-plugin-client/errors/gamePluginError'
+import { SynchroBreakPluginError } from './synchroBreakPluginError'
 
-export class UnsupportedNyokkiStatusError extends GamePluginError {
+export class UnsupportedNyokkiStatusError extends SynchroBreakPluginError {
   public constructor(status: string) {
-    super(`[シンクロブレイク] ステータス: ${status}はNyokkiStatusに存在しません`)
+    super(`ステータス: ${status}はNyokkiStatusに存在しません`)
   }
 }
