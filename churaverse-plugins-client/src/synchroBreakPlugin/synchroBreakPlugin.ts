@@ -355,7 +355,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   private get descriptionWindow(): IDescriptionWindow {
     const descriptionWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')
-    if (descriptionWindow === undefined) throw new Error('descriptionWindow is not found')
+    if (descriptionWindow === undefined) throw new SynchroBreakUiNotFoundError('descriptionWindow')
     return descriptionWindow
   }
 
@@ -364,7 +364,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   private get getRankingBoard(): IRankingBoard {
     const rankingBoard = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')
-    if (rankingBoard === undefined) throw new Error('rankingBoard is not found')
+    if (rankingBoard === undefined) throw new SynchroBreakUiNotFoundError('rankingBoard')
     return rankingBoard
   }
 
