@@ -17,7 +17,6 @@ import { UpdatePlayersCoinMessage } from './message/updatePlayersCoinMessage'
 import { SendBetCoinResponseMessage } from './message/sendBetCoinResponseMessage'
 import { SynchroBreakTurnStartEvent } from './event/synchroBreakTurnStartEvent'
 import { SynchroBreakTurnStartMessage } from './message/synchroBreakTurnStartMessage'
-import { SynchroBreakEndEvent } from './event/synchroBreakEndEvent'
 import { IGameSequence } from './interface/IGameSequence'
 import { GameSequence } from './logic/gameSequence'
 
@@ -56,7 +55,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.subscribeEvent('nyokki', this.nyokkiAction)
     this.bus.subscribeEvent('synchroBreakTurnEnd', this.synchroBreakTurnEnd)
     this.bus.subscribeEvent('synchroBreakTurnStart', this.synchroBreakTurnStart)
-    this.bus.subscribeEvent('synchroBreakEnd', this.synchroBreakEnd)
   }
 
   /**
@@ -70,7 +68,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.unsubscribeEvent('nyokki', this.nyokkiAction)
     this.bus.unsubscribeEvent('synchroBreakTurnEnd', this.synchroBreakTurnEnd)
     this.bus.unsubscribeEvent('synchroBreakTurnStart', this.synchroBreakTurnStart)
-    this.bus.unsubscribeEvent('synchroBreakEnd', this.synchroBreakEnd)
   }
 
   private init(): void {
@@ -103,7 +100,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   }
 
   /**
-   * プレイヤーがゲームから離脱した時の処理
+   * 参加者がちゅらバースから退出した時の処理
    * @param playerId 離脱したプレイヤーのID
    */
   protected handlePlayerLeave(playerId: string): void {
@@ -116,14 +113,11 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   }
 
   /**
-   * 結果ウィンドウの閉じるボタンを押した時に実行される処理
-   * シンクロブレイク参加者全員が閉じるボタンを押した際にゲームが終了する。
+   * 参加者がシンクロブレイクを離脱した時の処理
+   * 結果ウィンドの閉じるボタンを押した時に実行される
    */
-  private readonly synchroBreakEnd = (ev: SynchroBreakEndEvent): void => {
-    const playerId: string = ev.playerId
-    if (this.finishedPlayers.includes(playerId)) return
-    this.finishedPlayers.push(playerId)
-    if (this.finishedPlayers.length >= this.participantIds.length) {
+  protected handlePlayerQuitGame(playerId: string): void {
+    if (this.participantIds.length <= 0) {
       this.bus.post(new GameEndEvent(this.gameId))
     }
   }

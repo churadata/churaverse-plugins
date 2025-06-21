@@ -24,8 +24,6 @@ import { SynchroBreakTurnStartEvent } from './event/synchroBerakTurnStartEvent'
 import { UpdatePlayersCoinEvent } from './event/updatePlayersCoinEvent'
 import { NyokkiStatus } from './type/nyokkiStatus'
 import { IRankingBoard } from './interface/IRankingBoard'
-import { SynchroBreakEndEvent } from './event/synchroBreakEndEvent'
-import { SynchroBreakEndMessage } from './message/synchroBreakEndMessage'
 
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
@@ -70,7 +68,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.subscribeEvent('synchroBreakTurnStart', this.synchroBreakTurnStart)
     this.bus.subscribeEvent('updatePlayersCoin', this.updatePlayersCoin)
     this.bus.subscribeEvent('synchroBreakResult', this.showSynchroBreakResult)
-    this.bus.subscribeEvent('synchroBreakEnd', this.synchroBreakEnd)
   }
 
   /**
@@ -88,7 +85,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.unsubscribeEvent('synchroBreakTurnStart', this.synchroBreakTurnStart)
     this.bus.unsubscribeEvent('updatePlayersCoin', this.updatePlayersCoin)
     this.bus.unsubscribeEvent('synchroBreakResult', this.showSynchroBreakResult)
-    this.bus.unsubscribeEvent('synchroBreakEnd', this.synchroBreakEnd)
   }
 
   private phaserSceneInit(ev: PhaserSceneInit): void {
@@ -164,11 +160,21 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   }
 
   /**
-   * プレイヤーがゲームから離脱した時の処理
-   * @param playerId 離脱したプレイヤーのID
+   * プレイヤーがちゅらバースから退出した時の処理
+   * @param playerId 退出したプレイヤーのID
    */
   protected handlePlayerLeave(playerId: string): void {
     this.synchroBreakPluginStore.playersCoinRepository.delete(playerId)
+  }
+
+  /**
+   * 参加者がシンクロブレイクを離脱した時の処理
+   * 結果ウィンドの閉じるボタンを押した時に実行される
+   */
+  protected handlePlayerQuitGame(playerId: string): void {
+    this.removeSynchroBreakIcons()
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')?.remove()
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')?.close()
   }
 
   /**
@@ -361,17 +367,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.remove()
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')?.displayResultMessage()
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'resultScreen')?.createResultRanking()
-  }
-
-  /**
-   * 結果ウィンドウの閉じるボタンを押した時に実行される処理
-   */
-  private readonly synchroBreakEnd = (ev: SynchroBreakEndEvent): void => {
-    if (ev.playerId !== this.playerPluginStore.ownPlayerId) return
-    this.removeSynchroBreakIcons()
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')?.remove()
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')?.close()
-    this.store.of('networkPlugin').messageSender.send(new SynchroBreakEndMessage({ playerId: ev.playerId }))
   }
 
   /**

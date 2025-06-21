@@ -3,7 +3,7 @@ import { ResultRankingListItem } from './components/ResultRankingListItem'
 import { ResultRankingListPanel } from './components/ResultRankingListPanel'
 import { ResultExitButton } from './components/ResultExitButton'
 import { ISynchroBreakResultScreen } from '../../interface/ISynchroBreakResultScreen'
-import { SynchroBreakEndEvent } from '../../event/synchroBreakEndEvent'
+import { GamePlayerQuitEvent } from '@churaverse/game-plugin-client/event/gamePlayerQuitEvent'
 
 // resultRankingのID
 export const RESULT_LIST_ID = 'result-list'
@@ -78,7 +78,7 @@ export class ResultScreen implements ISynchroBreakResultScreen {
     this.element.appendChild(exitButton)
     exitButton.addEventListener('click', () => {
       const playerId = this.store.of('playerPlugin').ownPlayerId
-      this.eventBus.post(new SynchroBreakEndEvent(playerId))
+      this.eventBus.post(new GamePlayerQuitEvent(this.gameId, playerId))
       this.remove()
     })
   }

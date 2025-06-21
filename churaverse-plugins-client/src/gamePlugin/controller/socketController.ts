@@ -10,6 +10,7 @@ import { RequestGameAbortMessage, ResponseGameAbortMessage } from '../message/ga
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
+import { GamePlayerQuitMessage } from '../message/gamePlayerQuitMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   public constructor(eventBus: IEventBus<IMainScene>, store: Store<IMainScene>) {
@@ -24,6 +25,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('responseGameEnd', ResponseGameEndMessage, 'dest=onlySelf')
     ev.messageRegister.registerMessage('requestGameAbort', RequestGameAbortMessage, 'lastOnly')
     ev.messageRegister.registerMessage('responseGameAbort', ResponseGameAbortMessage, 'dest=onlySelf')
+    ev.messageRegister.registerMessage('gamePlayerQuit', GamePlayerQuitMessage, 'lastOnly')
   }
 
   public registerMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
