@@ -1,5 +1,7 @@
+import { EntityDespawnEvent } from 'churaverse-engine-server'
 import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 import '@churaverse/network-plugin-server/store/defNetworkPluginStore'
+import { isPlayer } from '@churaverse/player-plugin-server/domain/player'
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { GameStartEvent } from '../event/gameStartEvent'
@@ -10,7 +12,6 @@ import { ResponseGameAbortMessage } from '../message/gameAbortMessage'
 import { ResponseGameEndMessage } from '../message/gameEndMessage'
 import { ResponseGameStartMessage } from '../message/gameStartMessage'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
-import { UpdateGameParticipantMessage } from '../message/updateGameParticipantMessage'
 import { BaseGamePlugin } from './baseGamePlugin'
 
 /**
@@ -44,12 +45,14 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     super.subscribeGameEvent()
     this.bus.subscribeEvent('gameAbort', this.gameAbort)
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
+    this.bus.subscribeEvent('entityDespawn', this.onPlayerLeave)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
+    this.bus.unsubscribeEvent('entityDespawn', this.onPlayerLeave)
   }
 
   private priorGameData(ev: PriorGameDataEvent): void {
@@ -65,14 +68,13 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._gameOwnerId = ev.playerId
     this._participantIds = this.store.of('playerPlugin').players.getAllId()
 
-    const gameStartMessage = new ResponseGameStartMessage({ gameId: this.gameId, playerId: ev.playerId })
+    const gameStartMessage = new ResponseGameStartMessage({
+      gameId: this.gameId,
+      playerId: ev.playerId,
+      participantIds: this._participantIds,
+    })
     this.store.of('networkPlugin').messageSender.send(gameStartMessage)
 
-    const gameParticipantMessage = new UpdateGameParticipantMessage({
-      gameId: this.gameId,
-      participantIds: this.participantIds,
-    })
-    this.store.of('networkPlugin').messageSender.send(gameParticipantMessage)
     this.gamePluginStore.games.set(this.gameId, this)
   }
 
@@ -96,4 +98,30 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._participantIds = []
     this.gamePluginStore.games.delete(this.gameId)
   }
+
+  /**
+   * 退出したプレイヤーがゲーム参加者の場合、参加者リストから削除しtrueを返す
+   */
+  private readonly onPlayerLeave = (ev: EntityDespawnEvent): void => {
+    if (isPlayer(ev.entity) === false) return
+    const playerId: string = ev.entity.id
+    if (!this.removeParticipant(playerId)) return
+    this.handlePlayerLeave(playerId)
+  }
+
+  /**
+   * 退出したプレイヤーがゲーム参加者の場合、参加者リストから削除しtrueを返す
+   */
+  private removeParticipant(playerId: string): boolean {
+    const idx = this._participantIds.indexOf(playerId)
+    if (idx === -1) return false
+    this._participantIds.splice(idx, 1)
+    return true
+  }
+
+  /**
+   * プレイヤーがゲームから離脱した時の処理
+   * @param playerId 離脱したプレイヤーのID
+   */
+  protected abstract handlePlayerLeave(playerId: string): void
 }
