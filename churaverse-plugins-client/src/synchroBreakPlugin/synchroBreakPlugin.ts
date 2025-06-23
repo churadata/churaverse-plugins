@@ -1,5 +1,4 @@
-import { BaseGamePlugin } from '@churaverse/game-plugin-client/domain/baseGamePlugin'
-import { GamePluginStore } from '@churaverse/game-plugin-client/store/defGamePluginStore'
+import { CoreGamePlugin } from '@churaverse/game-plugin-client/domain/coreGamePlugin'
 import { RegisterGameUiEvent } from '@churaverse/game-plugin-client/event/registerGameUiEvent'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { SynchroBreakDialogManager } from './ui/startWindow/synchroBreakDialogManager'
@@ -8,12 +7,11 @@ import { SocketController } from './controller/socketController'
 import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
 import { registerSynchroBreakUi } from './ui/registerSynchroBreakUi'
 
-export class SynchroBreakPlugin extends BaseGamePlugin {
-  protected readonly gameId = 'synchroBreak'
+export class SynchroBreakPlugin extends CoreGamePlugin {
+  public readonly gameId = 'synchroBreak'
   protected readonly gameName = 'シンクロブレイク'
 
   private synchroBreakPluginStore!: SynchroBreakPluginStore
-  private gamePluginStore!: GamePluginStore
   private synchroBreakDialogManager!: SynchroBreakDialogManager
   private socketController!: SocketController
 
@@ -49,6 +47,7 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
 
   private init(): void {
     this.synchroBreakDialogManager = new SynchroBreakDialogManager(this.store, this.bus)
+    this.gameInfoStore = this.store.of('gameInfo')
     this.gamePluginStore = this.store.of('gamePlugin')
   }
 
@@ -63,7 +62,6 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    * シンクロブレイク特有の開始時に実行される処理
    */
   protected handleGameStart(): void {
-    this.subscribeGameEvent()
     initSynchroBreakPluginStore(this.store)
     this.socketController.registerMessageListener()
     this.synchroBreakDialogManager.setGameAbortButtonText()
@@ -74,7 +72,6 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    * シンクロブレイク特有の中断・終了時に実行される処理
    */
   protected handleGameTermination(): void {
-    this.unsubscribeGameEvent()
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
     this.synchroBreakDialogManager.setGameStartButtonText()
@@ -84,10 +81,11 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    * シンクロブレイク特有の途中参加時の処理
    */
   protected handleMidwayParticipant(): void {
-    this.subscribeGameEvent()
     this.socketController.registerMessageListener()
     this.synchroBreakDialogManager.setGameAbortButtonText()
   }
+
+  protected handlePlayerLeave(playerId: string): void {}
 
   /**
    * タイムリミットが設定された際の処理
