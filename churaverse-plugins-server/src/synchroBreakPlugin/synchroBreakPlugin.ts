@@ -1,13 +1,13 @@
 import { IMainScene } from 'churaverse-engine-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
-import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
+import { CoreGamePlugin } from '@churaverse/game-plugin-server/domain/coreGamePlugin'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
 import { SocketController } from './controller/socketController'
 import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
 
-export class SynchroBreakPlugin extends BaseGamePlugin {
-  protected readonly gameId = 'synchroBreak'
+export class SynchroBreakPlugin extends CoreGamePlugin {
+  public readonly gameId = 'synchroBreak'
 
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private synchroBreakPluginStore!: SynchroBreakPluginStore
@@ -49,7 +49,6 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    * シンクロブレイク特有の開始時に実行される処理
    */
   protected handleGameStart(): void {
-    this.subscribeGameEvent()
     initSynchroBreakPluginStore(this.store)
     this.socketController.registerMessageListener()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
@@ -59,10 +58,11 @@ export class SynchroBreakPlugin extends BaseGamePlugin {
    * シンクロブレイク特有の中断・終了時に実行される処理
    */
   protected handleGameTermination(): void {
-    this.unsubscribeGameEvent()
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
   }
+
+  protected handlePlayerLeave(playerId: string): void {}
 
   /**
    * タイムリミットが設定された時の処理
