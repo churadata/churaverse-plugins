@@ -113,7 +113,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
 
   /**
    * 参加者がシンクロブレイクを離脱した時の処理
-   * 結果ウィンドの閉じるボタンを押した時に実行される
+   * 結果ウィンドウの閉じるボタンを押した時に実行される
    */
   protected handlePlayerQuitGame(playerId: string): void {
     if (this.participantIds.length <= 0) {
