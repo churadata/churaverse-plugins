@@ -16,4 +16,5 @@ export interface IDescriptionWindow extends IGameUiComponent {
   displayTurnStart: (turnNumber: number) => void
   displayNyokkiAction: (text: string) => void
   displayResultMessage: () => void
+  close: () => void
 }
