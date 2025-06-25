@@ -1,3 +1,4 @@
+import { AlchemyItemManager } from '../alchemyItemManager'
 import { IAlchemyPotRenderer } from '../domain/IAlchemyPotRenderer'
 import { IAlchemyPotRendererFactory } from '../domain/IAlchemyPotRendererFactory'
 import { AlchemyPotRepository } from '../repository/alchemyPotRepository'
@@ -12,4 +13,5 @@ export interface AlchemyPluginStore {
   alchemyPots: AlchemyPotRepository
   alchemyPotRenderers: Map<string, IAlchemyPotRenderer>
   alchemyPotRendererFactory: IAlchemyPotRendererFactory
+  alchemyItemManager: AlchemyItemManager
 }

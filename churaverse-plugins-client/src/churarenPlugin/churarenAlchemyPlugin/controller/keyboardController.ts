@@ -43,6 +43,7 @@ export class KeyboardController extends BaseKeyboardController<IMainScene> {
     })
   }
 
+  // キーアクションによって呼び出される処理
   private readonly useAlchemyItem = (): void => {
     if (this.playerPluginStore.players.get(this.playerPluginStore.ownPlayerId)?.isDead ?? true) return
     const ownPlayerId = this.playerPluginStore.ownPlayerId

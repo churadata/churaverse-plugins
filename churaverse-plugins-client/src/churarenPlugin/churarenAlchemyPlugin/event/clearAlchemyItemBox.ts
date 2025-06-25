@@ -1,8 +1,5 @@
 import { CVEvent, IMainScene } from 'churaverse-engine-client'
 
-/**
- * Rendererを作って、登録するイベント
- */
 export class ClearAlchemyItemBoxEvent extends CVEvent<IMainScene> {
   public constructor(public readonly playerId: string) {
     super('clearAlchemyItemBox', true)
