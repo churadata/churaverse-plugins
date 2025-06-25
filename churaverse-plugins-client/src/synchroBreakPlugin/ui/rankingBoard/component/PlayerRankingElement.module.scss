@@ -1,0 +1,68 @@
+.boardElementContainer {
+  display: flex;
+  flex-direction: row;
+  text-align: center;
+  gap: 10px;
+  font-size: 0.9em;
+  width: 100%;
+  padding: 10px 0;
+  border-bottom: 1px solid lightsteelblue;
+  align-items: center;
+  justify-content: center;
+}
+
+.boardElementContainer > div {
+  flex: 2;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.boardElementContainer > .playerId {
+  flex: 2;
+}
+
+.boardElementContainer > .status {
+  flex: 2;
+}
+
+.boardElementContainer:last-child {
+  border-bottom: none;
+}
+
+.status {
+  padding: 5px 10px;
+  border-radius: 8px;
+  color: white;
+  text-align: center;
+}
+
+/* 各ステータスに対する色の設定 */
+[data-status='yet'] {
+  background-color: rgb(3, 185, 0);
+}
+
+[data-status='success'] {
+  background-color: rgb(2, 184, 216);
+}
+
+[data-status='nyokki'] {
+  background-color: rgb(255, 0, 174);
+}
+
+.gold {
+  color: gold;
+}
+
+.silver {
+  color: silver;
+}
+
+.bronze {
+  color: #cd7f32;
+}
+
+.black {
+  color: black;
+}
