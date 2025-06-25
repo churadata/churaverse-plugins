@@ -1,6 +1,5 @@
 import { AlchemyPotMap, AlchemyPotInfo } from '../message/alchemyPotSpawnMessage'
 import { AlchemyItem } from './alchemyItem'
-import { AlchemyItemKind } from './alchemyItemKind'
 import { AlchemyPot } from './alchemyPot'
 import { uniqueId } from '@churaverse/churaren-core-plugin-server'
 import { IAlchemyPotRepository } from './IAlchemyPotRepository'
@@ -10,6 +9,7 @@ import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
 import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
 import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { Position, Vector } from 'churaverse-engine-server'
+import { AlchemyItemKind } from './alchemyItemKind'
 
 /**
  *  alchemyPotsの生成をfrontendに通知する
@@ -140,7 +140,7 @@ function createAlchemyItem(type: string, kind1: string): AlchemyItem {
       itemType = 'blackHole'
       break
     default:
-      itemType = 'blackHole'
+      itemType = 'blackHole' // デフォルトのアイテム
   }
 
   return new AlchemyItem(uniqueId(), new Position(0, 0), Date.now(), itemType)

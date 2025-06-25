@@ -15,6 +15,7 @@ import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { MAX_ITEMS } from '@churaverse/churaren-player-plugin-server/churarenPlayerPlugin'
 import { PlayerItemsStore } from '@churaverse/churaren-player-plugin-server/store/defPlayerItemsStore'
 import '@churaverse/churaren-core-plugin-server/event/churarenStartTimerEvent'
+import { ClearAlchemyItemBoxEvent } from './event/clearAlchemyItemBoxEvent'
 
 export class ChurarenAlchemyPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -48,19 +49,23 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
     this.bus.subscribeEvent('churarenStartTimer', this.sendSpawnAlchemy)
+    this.bus.subscribeEvent('clearAlchemyItemBox', this.clearAlchemyItem)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('churarenStartTimer', this.sendSpawnAlchemy)
+    this.bus.unsubscribeEvent('clearAlchemyItemBox', this.clearAlchemyItem)
   }
 
   protected handleGameStart(): void {
     this.playerItemStore = this.store.of('playerItemStore')
+    this.socketController?.registerMessageListener()
   }
 
   protected handleGameTermination(): void {
     this.alchemyPluginStore.alchemyPot.clear()
+    this.socketController?.unregisterMessageListener()
   }
 
   private readonly sendSpawnAlchemy = (): void => {
@@ -100,5 +105,9 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
 
     const alchemizeMessage = new AlchemizeMessage(alchemizeData)
     this.networkPluginStore.messageSender.send(alchemizeMessage)
+  }
+
+  private readonly clearAlchemyItem = (ev: ClearAlchemyItemBoxEvent): void => {
+    this.playerItemStore.alchemyItem.delete(ev.playerId)
   }
 }
