@@ -373,6 +373,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * ゲーム終了後の結果ウィンドウ表示処理
    */
   private readonly showSynchroBreakResult = (): void => {
+    if (this.isOwnPlayerMidwayParticipant) return
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')?.remove()
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.remove()
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')?.displayResultMessage()
