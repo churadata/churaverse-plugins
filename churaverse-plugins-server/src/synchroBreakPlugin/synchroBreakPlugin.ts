@@ -108,6 +108,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       this.bus.post(new GameEndEvent(this.gameId))
     } else {
       this.synchroBreakPluginStore.playersCoinRepository.delete(playerId)
+      this.synchroBreakPluginStore.betCoinRepository.delete(playerId)
     }
   }
 
