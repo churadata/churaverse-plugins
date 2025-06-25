@@ -66,16 +66,20 @@ export class DescriptionWindow implements IDescriptionWindow {
    * 主催者サイドの制限時間入力後の文章更新処理
    * @param timeLimit 選択された制限時間
    */
-  public displayTimeLimitSelectionForOwner(timeLimit: string): void {
-    this.setDescriptionText(`制限時間を${timeLimit}秒選択しました。<br>ベットコインを入力してください。`)
+  public displayTimeLimitSelectionForOwner(timeLimit: string, ownCoins: number): void {
+    this.setDescriptionText(
+      `制限時間を${timeLimit}秒選択しました。<br>ベットコインを入力してください。<br>所持コイン数:${ownCoins}`
+    )
   }
 
   /**
    * 参加者サイドの制限時間入力後の文章更新処理
    * @param timeLimit 選択された制限時間
    */
-  public displayTimeLimitSelectionForGuest(timeLimit: string): void {
-    this.setDescriptionText(`制限時間が${timeLimit}秒選択されました。<br>ベットコインを入力してください。`)
+  public displayTimeLimitSelectionForGuest(timeLimit: string, ownCoins: number): void {
+    this.setDescriptionText(
+      `制限時間が${timeLimit}秒選択されました。<br>ベットコインを入力してください。<br>所持コイン数:${ownCoins}`
+    )
   }
 
   /**
@@ -126,9 +130,9 @@ export class DescriptionWindow implements IDescriptionWindow {
    * ターン終了の文章更新処理
    * @param turnNumber 残りターン数
    */
-  public displayTurnStart(turnNumber: number): void {
+  public displayTurnStart(turnNumber: number, ownCoins: number): void {
     this.setDescriptionText(
-      `ターンが終了しました。<br>残り${turnNumber}ターンです。<br>ベットコインを入力してください。`
+      `残り${turnNumber}ターンです。<br>ベットコインを入力してください。<br>所持コイン数:${ownCoins}`
     )
   }
 

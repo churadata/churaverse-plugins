@@ -7,9 +7,9 @@ import BET_COIN_NUMBER_PATH from '../../assets/betCoin/bet_coin_number.png'
 const TEXTURE_BET_ICON = 'bet_icon'
 const TEXTURE_BET_COIN_NUMBER = 'bet_coin_number_icon'
 
-const betUiPosX = 80
-const betUiPosY = 25
-const numberIconPosX = 11
+const betUiPosX = 81
+const betUiPosY = 26
+const numberIconPosX = 12
 const numberIconPosY = 12
 
 export class CoinViewer {

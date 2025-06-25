@@ -219,10 +219,13 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     if (this.isOwnPlayerMidwayParticipant) return
     this.synchroBreakPluginStore.timeLimit = Number(ev.timeLimit)
 
+    const ownPlayerId = this.playerPluginStore.ownPlayerId
+    const ownCoins = this.synchroBreakPluginStore.playersCoinRepository.get(ownPlayerId)
+
     if (this.gameOwnerId === this.playerPluginStore.ownPlayerId) {
-      this.descriptionWindow.displayTimeLimitSelectionForOwner(ev.timeLimit)
+      this.descriptionWindow.displayTimeLimitSelectionForOwner(ev.timeLimit, ownCoins)
     } else {
-      this.descriptionWindow.displayTimeLimitSelectionForGuest(ev.timeLimit)
+      this.descriptionWindow.displayTimeLimitSelectionForGuest(ev.timeLimit, ownCoins)
     }
 
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betCoinConfirm')?.open()
@@ -342,11 +345,16 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     if (this.isOwnPlayerMidwayParticipant) return
     this.resetPlayerNyokkiIcon()
     this.removeBetCoinUi()
-    this.descriptionWindow.displayTurnStart(ev.turnNumber)
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betCoinConfirm')?.open()
+    const ownPlayerId = this.playerPluginStore.ownPlayerId
+    const ownCoins = this.synchroBreakPluginStore.playersCoinRepository.get(ownPlayerId)
 
     const gameTurn = this.synchroBreakPluginStore.gameTurn
     if (gameTurn === undefined) throw new SynchroBreakPluginError('ターン情報が存在しません')
+
+    const turnLeft = gameTurn - ev.turnNumber + 1
+    this.descriptionWindow.displayTurnStart(turnLeft, ownCoins)
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betCoinConfirm')?.open()
+
     this.getRankingBoard.updateTurnNumber(ev.turnNumber, gameTurn)
   }
 
