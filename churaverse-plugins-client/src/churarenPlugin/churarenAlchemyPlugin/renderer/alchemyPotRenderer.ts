@@ -6,7 +6,7 @@ import { IAlchemyPotRenderer } from '../domain/IAlchemyPotRenderer'
 /**
  * alchemyのテクスチャーキー
  */
-const ALCHEMY_TEXTURE_KEY = 'alchemy'
+const ALCHEMY_POT_TEXTURE_KEY = 'alchemyPot'
 
 /**
  * 表示時の縦横のサイズ
@@ -28,7 +28,7 @@ export class AlchemyPotRenderer implements IAlchemyPotRenderer {
         // 画面外に配置
         -100,
         -100,
-        ALCHEMY_TEXTURE_KEY,
+        ALCHEMY_POT_TEXTURE_KEY,
         0
       )
       .setDisplaySize(DISPLAY_SIZE, DISPLAY_SIZE)
@@ -37,7 +37,7 @@ export class AlchemyPotRenderer implements IAlchemyPotRenderer {
   }
 
   public static loadAssets(scene: Scene): void {
-    scene.load.image(ALCHEMY_TEXTURE_KEY, AlchemyImage)
+    scene.load.image(ALCHEMY_POT_TEXTURE_KEY, AlchemyImage)
   }
 
   public spawn(source: Position): void {

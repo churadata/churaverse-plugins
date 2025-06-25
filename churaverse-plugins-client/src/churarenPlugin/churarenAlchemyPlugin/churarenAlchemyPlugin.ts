@@ -14,12 +14,14 @@ import { AlchemyPotRenderer } from './renderer/alchemyPotRenderer'
 import { initAlchemyPluginStore, resetAlchemyPluginStore } from './store/initAlchemyPluginStore'
 import { AlchemizeEvent } from './event/alchemizeEvent'
 import { AlchemyItem } from './domain/alchemyItem'
-import { CreateAlchemyRendererEvent } from './event/createAlchemyRendererEvent'
-import { alchemyItemImage } from './domain/alchemyItemKind'
 import { AlchemyPotSpawnEvent } from './event/alchemyPotSpawnEvent'
+import { ClearAlchemyItemBoxEvent } from './event/clearAlchemyItemBox'
+import { ClearAlchemyItemBoxMessage } from './message/clearAlchemyItemBoxMessage'
+import { AlchemyItemKind } from './domain/alchemyItemKind'
 
 export class ChurarenAlchemyPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
+  private scene!: Phaser.Scene
   private alchemyPluginStore!: AlchemyPluginStore
   private rendererFactory?: AlchemyPotRendererFactory
   private networkPluginStore!: NetworkPluginStore<IMainScene>
@@ -60,7 +62,8 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
   }
 
   private phaserSceneInit(ev: PhaserSceneInit): void {
-    this.rendererFactory = new AlchemyPotRendererFactory(ev.scene)
+    this.scene = ev.scene
+    this.rendererFactory = new AlchemyPotRendererFactory(this.scene)
   }
 
   private loadAssets(ev: PhaserLoadAssets): void {
@@ -79,16 +82,18 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
     super.subscribeGameEvent()
     this.bus.subscribeEvent('alchemyPotSpawn', this.spawnAlchemyPot)
     this.bus.subscribeEvent('alchemize', this.alchemize)
+    this.bus.subscribeEvent('clearAlchemyItemBox', this.clearAlchemyItem)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('alchemyPotSpawn', this.spawnAlchemyPot)
     this.bus.unsubscribeEvent('alchemize', this.alchemize)
+    this.bus.unsubscribeEvent('clearAlchemyItemBox', this.clearAlchemyItem)
   }
 
   protected handleGameStart(): void {
-    initAlchemyPluginStore(this.store, this.rendererFactory)
+    initAlchemyPluginStore(this.scene, this.store, this.rendererFactory)
     this.playerItemStore = this.store.of('playerItemStore')
     this.alchemyPluginStore = this.store.of('alchemyPlugin')
     this.setupKeyAction()
@@ -131,15 +136,32 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
 
     const alchemyItem = new AlchemyItem(ev.itemId, ev.kind)
     this.playerItemStore.alchemyItem.set(ev.playerId, alchemyItem)
-    const createAlchemyRendererEvent = new CreateAlchemyRendererEvent(ev.itemId, alchemyItem.kind)
-    this.bus.post(createAlchemyRendererEvent)
+    const renderer = this.alchemyPluginStore.alchemyItemManager?.get(ev.kind).rendererFactory.build()
+    if (renderer === undefined) return
+    this.playerItemStore.alchemyItemRenderers.set(ev.itemId, renderer)
     if (ev.playerId !== this.playerPluginStore.ownPlayerId) return
-    this.changeItemBox(ev.playerId)
+    this.changeItemBox(ev.kind)
   }
 
-  private changeItemBox(playerId: string): void {
-    const alchemyItem = this.playerItemStore.alchemyItem.get(playerId)
-    const itemImagePaths = alchemyItem != null ? (alchemyItemImage[alchemyItem.kind] ?? '') : ''
+  private readonly clearAlchemyItem = (ev: ClearAlchemyItemBoxEvent): void => {
+    const alchemyItem = this.playerItemStore.alchemyItem.get(ev.playerId)
+    if (alchemyItem == null) return
+    const renderer = this.playerItemStore.alchemyItemRenderers.get(alchemyItem.itemId)
+    if (renderer === undefined) return
+    renderer.destroy()
+    this.playerItemStore.alchemyItem.delete(ev.playerId)
+    this.playerItemStore.alchemyItemRenderers.delete(alchemyItem.itemId)
+    this.playerItemStore.alchemyItemBoxContainer.updateAlchemyItemBox('')
+
+    if (ev.playerId === this.playerPluginStore.ownPlayerId) {
+      const clearAlchemyItemBoxData = { playerId: ev.playerId }
+      const clearAlchemyItemBoxMessage = new ClearAlchemyItemBoxMessage(clearAlchemyItemBoxData)
+      this.networkPluginStore.messageSender.send(clearAlchemyItemBoxMessage)
+    }
+  }
+
+  public changeItemBox(kind: AlchemyItemKind): void {
+    const itemImagePaths = this.alchemyPluginStore.alchemyItemManager?.get(kind)?.image ?? ''
     this.playerItemStore.materialItemBoxContainer.updateMaterialItemBox([])
     this.playerItemStore.alchemyItemBoxContainer.updateAlchemyItemBox(itemImagePaths)
   }

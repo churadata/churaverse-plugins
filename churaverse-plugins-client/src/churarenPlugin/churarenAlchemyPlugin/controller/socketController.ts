@@ -10,6 +10,7 @@ import { AlchemyPot } from '../domain/alchemyPot'
 import { AlchemizeEvent } from '../event/alchemizeEvent'
 import { ClearAlchemyItemBoxEvent } from '../event/clearAlchemyItemBox'
 import { AlchemyPotSpawnEvent } from '../event/alchemyPotSpawnEvent'
+import { AlchemyItemKind } from '../domain/alchemyItemKind'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
@@ -29,18 +30,18 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   public registerMessageListener(): void {
-    this.messageListenerRegister.on('alchemyPotSpawn', this.alchemyPotSpawn.bind(this))
+    this.messageListenerRegister.on('alchemyPotSpawn', this.alchemySpawn.bind(this))
     this.messageListenerRegister.on('alchemize', this.alchemize.bind(this))
     this.messageListenerRegister.on('clearAlchemyItemBox', this.clearAlchemyItemBox.bind(this))
   }
 
   public unregisterMessageListener(): void {
-    this.messageListenerRegister.off('alchemyPotSpawn', this.alchemyPotSpawn.bind(this))
+    this.messageListenerRegister.off('alchemyPotSpawn', this.alchemySpawn.bind(this))
     this.messageListenerRegister.off('alchemize', this.alchemize.bind(this))
     this.messageListenerRegister.off('clearAlchemyItemBox', this.clearAlchemyItemBox.bind(this))
   }
 
-  private readonly alchemyPotSpawn = (msg: AlchemyPotSpawnMessage): void => {
+  private readonly alchemySpawn = (msg: AlchemyPotSpawnMessage): void => {
     const alcheyPots: AlchemyPot[] = []
     for (const [potId, potInfo] of Object.entries(msg.data.pots)) {
       alcheyPots.push(this.setAlchemhyPot(potId, potInfo))
@@ -57,7 +58,12 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   private readonly alchemize = (msg: AlchemizeMessage): void => {
     const data = msg.data
-    const alchmizeEvent = new AlchemizeEvent(data.playerId, data.itemId, data.kind, data.deletedItemIds)
+    const alchmizeEvent = new AlchemizeEvent(
+      data.playerId,
+      data.itemId,
+      data.kind as AlchemyItemKind,
+      data.deletedItemIds
+    )
     this.eventBus.post(alchmizeEvent)
   }
 
