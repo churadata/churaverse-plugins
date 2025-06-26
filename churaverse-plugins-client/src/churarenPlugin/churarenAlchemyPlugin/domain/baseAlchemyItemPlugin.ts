@@ -11,7 +11,6 @@ import { AlchemyItemKind } from './alchemyItemKind'
  */
 export abstract class BaseAlchemyItemPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
-  protected alchemyItemManager!: AlchemyItemManager
   protected abstract alchemyItemKind: AlchemyItemKind
   protected abstract alchemyItem: IAlchemyItem
 
