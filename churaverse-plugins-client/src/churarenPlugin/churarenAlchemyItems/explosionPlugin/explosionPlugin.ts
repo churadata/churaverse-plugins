@@ -111,7 +111,7 @@ export class ExplosionPlugin extends BaseAlchemyItemPlugin {
     this.explosionPluginStore.explosions.set(explosion.explosionId, explosion)
     this.explosionPluginStore.explosionAttackRenderers.set(explosion.explosionId, renderer)
     // 他のプレイヤーに爆発の出現を送信する
-    if (explosion.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) {
+    if (explosion.ownerId === this.playerPluginStore.ownPlayerId) {
       this.networkStore.messageSender.send(
         new ExplosionSpawnMessage({
           explosionId: explosion.explosionId,
@@ -130,7 +130,7 @@ export class ExplosionPlugin extends BaseAlchemyItemPlugin {
   // 爆発の出現を受信した時の処理
   private readonly spawnExplosion = (ev: EntitySpawnEvent): void => {
     if (!(ev.entity instanceof Explosion)) return
-    if (ev.entity.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) return
+    if (ev.entity.ownerId === this.playerPluginStore.ownPlayerId) return
     const explosion = ev.entity
     const renderer = this.explosionPluginStore.explosionAttackRendererFactory.build()
     this.explosionPluginStore.explosions.set(explosion.explosionId, explosion)
