@@ -26,8 +26,8 @@ export class Explosion extends AlchemyItem implements WeaponEntity {
   public isDead = false
   public explosionId: string
   public spawnTime: number
+  // TODO: `ChurarenWeaponEntity`をimplementsした際に、ownerIdを`churarenWeaponOwnerId`に変更し、idは`explosionId`に統合される
   public readonly id: string
-  // TODO: `ChurarenWeaponEntity`をimplementsした際に、ownerIdを`churarenWeaponOwnerId`に変更する
   public ownerId: string
 
   public constructor(
