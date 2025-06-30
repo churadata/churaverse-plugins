@@ -39,7 +39,7 @@
     "@churaverse/data-persistence-plugin-client": "~0.1.0",
     "@churaverse/debug-screen-plugin-client": "~0.1.0",
     "@churaverse/keyboard-plugin-client": "~0.1.0",
-    "@churaverse/player-plugin-client": "~0.1.1",
+    "@churaverse/player-plugin-client": "file:../playerPlugin",
     "@churaverse/map-plugin-client": "~0.1.0",
     "@churaverse/network-plugin-client": "file:../networkPlugin",
     "@churaverse/title-plugin-client": "~0.1.0",

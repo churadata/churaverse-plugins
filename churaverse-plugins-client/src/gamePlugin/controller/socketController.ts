@@ -8,10 +8,9 @@ import { RequestGameEndMessage, ResponseGameEndMessage } from '../message/gameEn
 import { GameEndEvent } from '../event/gameEndEvent'
 import { RequestGameAbortMessage, ResponseGameAbortMessage } from '../message/gameAbortMessage'
 import { GameAbortEvent } from '../event/gameAbortEvent'
-import { UpdateGameParticipantMessage } from '../message/updateGameParticipantMessage'
-import { UpdateGameParticipantEvent } from '../event/updateGameParticipantEvent'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
+import { GamePlayerQuitMessage } from '../message/gamePlayerQuitMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   public constructor(eventBus: IEventBus<IMainScene>, store: Store<IMainScene>) {
@@ -26,7 +25,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('responseGameEnd', ResponseGameEndMessage, 'dest=onlySelf')
     ev.messageRegister.registerMessage('requestGameAbort', RequestGameAbortMessage, 'lastOnly')
     ev.messageRegister.registerMessage('responseGameAbort', ResponseGameAbortMessage, 'dest=onlySelf')
-    ev.messageRegister.registerMessage('updateGameParticipant', UpdateGameParticipantMessage, 'queue')
+    ev.messageRegister.registerMessage('gamePlayerQuit', GamePlayerQuitMessage, 'lastOnly')
   }
 
   public registerMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
@@ -34,7 +33,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageListenerRegister.on('responseGameStart', this.gameStart.bind(this))
     ev.messageListenerRegister.on('responseGameEnd', this.gameEnd.bind(this))
     ev.messageListenerRegister.on('responseGameAbort', this.gameAbort.bind(this))
-    ev.messageListenerRegister.on('updateGameParticipant', this.gameParticipant.bind(this))
   }
 
   /**
@@ -46,7 +44,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   private gameStart(msg: ResponseGameStartMessage): void {
-    this.eventBus.post(new GameStartEvent(msg.data.gameId, msg.data.playerId))
+    this.eventBus.post(new GameStartEvent(msg.data.gameId, msg.data.playerId, msg.data.participantIds))
   }
 
   private gameEnd(msg: ResponseGameEndMessage): void {
@@ -55,9 +53,5 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   private gameAbort(msg: ResponseGameAbortMessage): void {
     this.eventBus.post(new GameAbortEvent(msg.data.gameId, msg.data.playerId))
-  }
-
-  private gameParticipant(msg: UpdateGameParticipantMessage): void {
-    this.eventBus.post(new UpdateGameParticipantEvent(msg.data.gameId, msg.data.participantIds))
   }
 }
