@@ -48,6 +48,7 @@ import { PlayerPositionDebugScreen, PlayerPositionGridDebugScreen } from './debu
 import { PlayerRoleDebugScreen } from './debugScreen/playerRoleDebugScreen'
 import { GRID_WALK_DURATION_MS, Player } from './domain/player'
 import { OwnPlayerUndefinedError } from './errors/ownPlayerUndefinedError'
+import { PlayerRendererNotFoundError } from './errors/playerRendererNotFoundError'
 import { PlayerColorChangeEvent } from './event/playerColorChangeEvent'
 import { PlayerDieEvent } from './event/playerDieEvent'
 import { PlayerNameChangeEvent } from './event/playerNameChangeEvent'
@@ -177,11 +178,11 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
       recievedPlayerData.spawnTime
     )
     this.bus.post(new EntitySpawnEvent(player))
-    const renderer = this.playerPluginStore.playerRenderers.get(this.playerPluginStore.ownPlayerId)
-    if (renderer === undefined) throw Error('ownPlayerRenderer is undefined')
-    this.uiStore.focusTargetRepository.addFocusTarget(renderer)
-    renderer.focus()
-    this.utilStore.focusedRenderer = renderer
+    const playerRenderer = this.playerPluginStore.playerRenderers.get(this.playerPluginStore.ownPlayerId)
+    if (playerRenderer === undefined) throw new PlayerRendererNotFoundError(this.playerPluginStore.ownPlayerId)
+    this.uiStore.focusTargetRepository.addFocusTarget(playerRenderer)
+    playerRenderer.focus()
+    this.utilStore.focusedRenderer = playerRenderer
   }
 
   private setupDebugScreen(): void {
@@ -229,15 +230,15 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
       this.joinLeaveLogRenderer?.join(player.id, player.name)
     }
 
-    const renderer = this.rendererFactory?.build(
+    const playerRenderer = this.rendererFactory?.build(
       player.position,
       player.direction,
       player.name,
       player.color,
       player.hp
     )
-    if (renderer === undefined) throw Error('playerRenderer is undefined')
-    this.playerPluginStore.playerRenderers.set(player.id, renderer)
+    if (playerRenderer === undefined) throw new PlayerRendererNotFoundError(player.id)
+    this.playerPluginStore.playerRenderers.set(player.id, playerRenderer)
   }
 
   private onPlayerLeave(ev: EntityDespawnEvent): void {
@@ -245,10 +246,10 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     if (ev.entity.id !== this.playerPluginStore.ownPlayerId) {
       this.joinLeaveLogRenderer?.leave(ev.entity.id, ev.entity.name ?? 'name')
     }
-    const renderer = this.playerPluginStore.playerRenderers.get(ev.entity.id)
-    if (renderer !== undefined) {
+    const playerRenderer = this.playerPluginStore.playerRenderers.get(ev.entity.id)
+    if (playerRenderer !== undefined) {
       this.playerPluginStore.players.delete(ev.entity.id)
-      renderer.destroy()
+      playerRenderer.destroy()
       this.playerPluginStore.playerRenderers.delete(ev.entity.id)
     }
   }
