@@ -28,7 +28,9 @@ export class SynchroBreakIcon extends TopBarIconRenderer {
     })
   }
 
-  /** buttonが押されたときの動作 */
+  /**
+   * buttonが押されたときの動作
+   */
   public onClick(isActive: boolean): void {
     if (isActive) {
       this.switcher.close()
