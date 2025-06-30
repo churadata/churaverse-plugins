@@ -71,18 +71,19 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   protected handleGameTermination(): void {
     this.socketController?.unregisterMessageListener()
     this.churarenDialogManager?.setGameStartButtonText()
-    this.gamePluginStore.gameUiManager.removeAllUis(this.gameId)
   }
 
   /**
    * 途中参加時の処理
    */
   protected handleMidwayParticipant(): void {
-    this.socketController?.registerMessageListener()
     this.churarenDialogManager?.setGameAbortButtonText()
+    this.unsubscribeGameEvent()
   }
 
-  protected handlePlayerLeave(playerId: string): void {}
+  protected handlePlayerLeave(playerId: string): void {
+    this.bus.post(new GamePlayerQuitEvent(this.gameId, playerId))
+  }
 
   protected handlePlayerQuitGame(playerId: string): void {}
 
@@ -104,7 +105,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
     resultWindow?.showResult(ev.resultType)
     resultWindow?.buttonElement.addEventListener('click', () => {
       this.bus.post(new GamePlayerQuitEvent(this.gameId, this.store.of('playerPlugin').ownPlayerId))
-      resultWindow?.remove()
+      resultWindow.remove()
     })
   }
 }
