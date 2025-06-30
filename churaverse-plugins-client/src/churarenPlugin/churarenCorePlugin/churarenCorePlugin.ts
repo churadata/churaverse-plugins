@@ -7,6 +7,7 @@ import { registerChurarenUi } from './ui/registerChurarenUi'
 import { CHURAREN_UI_KEYS } from './ui/defChurarenUi'
 import { BaseGamePlugin } from '@churaverse/game-plugin-client/domain/baseGamePlugin'
 import { ChurarenResultEvent } from './event/churarenResultEvent'
+import { GamePlayerQuitEvent } from '@churaverse/game-plugin-client/event/gamePlayerQuitEvent'
 
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -81,6 +82,10 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
     this.churarenDialogManager?.setGameAbortButtonText()
   }
 
+  protected handlePlayerLeave(playerId: string): void {}
+
+  protected handlePlayerQuitGame(playerId: string): void {}
+
   private readonly startCountdown = (): void => {
     this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.DESCRIPTION_WINDOW)?.hideDescription()
     const countdownWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.COUNTDOWN_WINDOW)
@@ -97,6 +102,10 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
     this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.TIMER_CONTAINER)?.hideTimer()
     const resultWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.RESULT_WINDOW)
     resultWindow?.showResult(ev.resultType)
+    resultWindow?.buttonElement.addEventListener('click', () => {
+      this.bus.post(new GamePlayerQuitEvent(this.gameId, this.store.of('playerPlugin').ownPlayerId))
+      resultWindow?.remove()
+    })
   }
 }
 
