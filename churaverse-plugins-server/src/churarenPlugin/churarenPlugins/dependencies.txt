@@ -1,3 +1,4 @@
 @churaverse/churaren-core-plugin-server
 @churaverse/churaren-item-plugin-server
 @churaverse/churaren-player-plugin-server
+@churaverse/churaren-alchemy-plugin-server
