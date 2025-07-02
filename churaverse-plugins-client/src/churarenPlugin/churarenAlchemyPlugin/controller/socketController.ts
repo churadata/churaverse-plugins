@@ -30,15 +30,15 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   public registerMessageListener(): void {
-    this.messageListenerRegister.on('alchemyPotSpawn', this.alchemySpawn.bind(this))
-    this.messageListenerRegister.on('alchemize', this.alchemize.bind(this))
-    this.messageListenerRegister.on('clearAlchemyItemBox', this.clearAlchemyItemBox.bind(this))
+    this.messageListenerRegister.on('alchemyPotSpawn', this.alchemySpawn)
+    this.messageListenerRegister.on('alchemize', this.alchemize)
+    this.messageListenerRegister.on('clearAlchemyItemBox', this.clearAlchemyItemBox)
   }
 
   public unregisterMessageListener(): void {
-    this.messageListenerRegister.off('alchemyPotSpawn', this.alchemySpawn.bind(this))
-    this.messageListenerRegister.off('alchemize', this.alchemize.bind(this))
-    this.messageListenerRegister.off('clearAlchemyItemBox', this.clearAlchemyItemBox.bind(this))
+    this.messageListenerRegister.off('alchemyPotSpawn', this.alchemySpawn)
+    this.messageListenerRegister.off('alchemize', this.alchemize)
+    this.messageListenerRegister.off('clearAlchemyItemBox', this.clearAlchemyItemBox)
   }
 
   private readonly alchemySpawn = (msg: AlchemyPotSpawnMessage): void => {
