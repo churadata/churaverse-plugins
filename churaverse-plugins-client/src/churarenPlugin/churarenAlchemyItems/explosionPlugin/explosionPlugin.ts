@@ -89,7 +89,9 @@ export class ExplosionPlugin extends BaseAlchemyItemPlugin {
     this.socketController?.unregisterMessageListener()
   }
 
-  protected handleMidwayParticipant(): void {}
+  protected handleMidwayParticipant(): void {
+    this.unsubscribeGameEvent()
+  }
 
   // 爆発アイテムを使った時の処理
   protected readonly useAlchemyItem = (ev: UseAlchemyItemEvent): void => {

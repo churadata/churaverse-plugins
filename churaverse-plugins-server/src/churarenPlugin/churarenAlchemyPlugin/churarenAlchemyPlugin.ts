@@ -85,6 +85,8 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
   }
 
   private alchemize(alchemy: AlchemyPot, player: Player): void {
+    const game = this.gamePluginStore.games.get(this.gameId)
+    if (game === undefined || !game.participantIds.includes(player.id)) return
     const itemBoxes = this.playerItemStore.materialItems
     const items = itemBoxes.getAllItem(player.id)
     if (items.length !== MAX_ITEMS) {

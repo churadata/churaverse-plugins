@@ -100,6 +100,9 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
   }
 
   private getItem(item: Item, player: Player): void {
+    if (this.churarenGameInfo === undefined) return
+    // プレイヤーが参加者でない場合は何もしない
+    if (!this.churarenGameInfo.participantIds.includes(player.id)) return
     const getItemEvent = new GetChurarenItemEvent(player.id, item)
     this.bus.post(getItemEvent)
   }
