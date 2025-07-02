@@ -153,9 +153,9 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
     renderer.destroy()
     this.playerItemStore.alchemyItem.delete(ev.playerId)
     this.playerItemStore.alchemyItemRenderers.delete(alchemyItem.itemId)
-    this.playerItemStore.alchemyItemBoxContainer.updateAlchemyItemBox('')
 
     if (ev.playerId === this.playerPluginStore.ownPlayerId) {
+      this.playerItemStore.alchemyItemBoxContainer.updateAlchemyItemBox('')
       const clearAlchemyItemBoxData = { playerId: ev.playerId }
       const clearAlchemyItemBoxMessage = new ClearAlchemyItemBoxMessage(clearAlchemyItemBoxData)
       this.networkPluginStore.messageSender.send(clearAlchemyItemBoxMessage)
