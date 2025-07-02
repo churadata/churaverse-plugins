@@ -13,7 +13,7 @@ import { DropChurarenItemEvent } from './event/dropChurarenItemEvent'
 import { PlayerItemsStore } from './store/defPlayerItemsStore'
 import { initPlayerItemStore, resetPlayerItemStore } from './store/initPlayerItemsStore'
 import { InvicibleTimeMessage } from './message/invicibleTimeMessage'
-import { Player } from '@churaverse/player-plugin-server/domain/player'
+import { isPlayer, Player } from '@churaverse/player-plugin-server/domain/player'
 import { ChurarenResultEvent } from '@churaverse/churaren-core-plugin-server/event/churarenResultEvent'
 
 export const MAX_ITEMS = 3
@@ -102,6 +102,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   }
 
   private readonly skipDamage = (ev: LivingDamageEvent): void => {
+    // TODO: ちゅられん特有の敵との衝突によるダメージのみ処理を行うように条件を追加
     if (!this.isActive) return
     const player = ev.target as Player
     if (player === undefined) return
@@ -156,7 +157,8 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   private readonly onChurarenDamageFromBoss = (ev: LivingDamageEvent): void => {
     // TODO: ボスから受けたダメージをclientに送信する処理の実装
 
-    const player = ev.target as Player
+    if (!isPlayer(ev.target)) return
+    const player = ev.target
     if (player.isDead) {
       this.changeGhostPlayer(player)
     }
