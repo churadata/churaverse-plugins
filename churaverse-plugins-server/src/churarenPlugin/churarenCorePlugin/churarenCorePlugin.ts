@@ -9,8 +9,9 @@ import { ChurarenResultEvent } from './event/churarenResultEvent'
 import { ChurarenStartCountdownMessage } from './message/churarenStartCountdownMessage'
 import { ChurarenStartTimerMessage } from './message/churarenStartTimerMessage'
 import { ChurarenResultMessage } from './message/churarenResultMessage'
+import { GamePlayerQuitEvent } from '@churaverse/game-plugin-server/event/gamePlayerQuitEvent'
 
-const RESULT_DISPLAY_TIME_SECONDS = 5 // 結果表示時間(sec)
+const RESULT_DISPLAY_TIME_SECONDS = 15 // 結果表示時間(sec)
 
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -34,9 +35,9 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    */
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
-    this.bus.subscribeEvent('churarenStartCountdown', this.countdown)
-    this.bus.subscribeEvent('churarenStartTimer', this.timer)
-    this.bus.subscribeEvent('churarenResult', this.churarenResult)
+    this.bus.subscribeEvent('churarenStartCountdown', this.sendStartCountdown)
+    this.bus.subscribeEvent('churarenStartTimer', this.sendStartTimer)
+    this.bus.subscribeEvent('churarenResult', this.sendChurarenResult)
   }
 
   /**
@@ -44,9 +45,9 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    */
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
-    this.bus.unsubscribeEvent('churarenStartCountdown', this.countdown)
-    this.bus.unsubscribeEvent('churarenStartTimer', this.timer)
-    this.bus.unsubscribeEvent('churarenResult', this.churarenResult)
+    this.bus.unsubscribeEvent('churarenStartCountdown', this.sendStartCountdown)
+    this.bus.unsubscribeEvent('churarenStartTimer', this.sendStartTimer)
+    this.bus.unsubscribeEvent('churarenResult', this.sendChurarenResult)
   }
 
   private init(): void {
@@ -75,11 +76,26 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
     this.socketController?.unregisterMessageListener()
   }
 
-  private readonly countdown = (): void => {
+  protected handlePlayerLeave(playerId: string): void {
+    if (playerId === this.gameOwnerId || this.participantIds.length <= 0) {
+      this.bus.post(new GameEndEvent(this.gameId))
+    } else {
+      if (!this.isActive) return
+      this.bus.post(new GamePlayerQuitEvent(this.gameId, playerId))
+    }
+  }
+
+  protected handlePlayerQuitGame(playerId: string): void {
+    if (this.participantIds.length <= 0) {
+      this.bus.post(new GameEndEvent(this.gameId))
+    }
+  }
+
+  private readonly sendStartCountdown = (): void => {
     this.networkPluginStore.messageSender.send(new ChurarenStartCountdownMessage())
   }
 
-  private readonly timer = (): void => {
+  private readonly sendStartTimer = (): void => {
     this.networkPluginStore.messageSender.send(new ChurarenStartTimerMessage())
   }
 
@@ -87,9 +103,10 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    * 結果を表示する処理 \
    * `RESULT_DISPLAY_TIME_SECONDS`秒後にゲームを終了する
    */
-  private readonly churarenResult = (ev: ChurarenResultEvent): void => {
+  private readonly sendChurarenResult = (ev: ChurarenResultEvent): void => {
     this.networkPluginStore.messageSender.send(new ChurarenResultMessage({ resultType: ev.resultType }))
     setTimeout(() => {
+      if (!this.isActive) return
       this.bus.post(new GameEndEvent(this.gameId))
     }, RESULT_DISPLAY_TIME_SECONDS * 1000)
   }
