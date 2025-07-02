@@ -24,6 +24,7 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private churarenGameInfo?: IGameInfo
   private socketController!: SocketController
+  private itemGenerateIntervalId?: NodeJS.Timeout
 
   public listenEvent(): void {
     super.listenEvent()
@@ -71,6 +72,7 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
   }
 
   protected handleGameTermination(): void {
+    this.clearItemGenerateInterval()
     this.itemPluginStore.items.clear()
   }
 
@@ -86,7 +88,7 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
           this.networkPluginStore.messageSender.send(itemSpawnMessage)
         }
       )
-      setTimeout(generateItemsLoop, ITEM_GENERATE_INTERVAL_MS)
+      this.itemGenerateIntervalId = setTimeout(generateItemsLoop, ITEM_GENERATE_INTERVAL_MS)
     }
     generateItemsLoop()
   }
@@ -108,8 +110,16 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
   }
 
   private readonly removeAllItems = (): void => {
+    this.clearItemGenerateInterval()
     const itemIds = this.itemPluginStore.items.getAllId()
     this.networkPluginStore.messageSender.send(new ChurarenItemDespawnMessage({ itemIds }))
     this.itemPluginStore.items.clear()
+  }
+
+  private clearItemGenerateInterval(): void {
+    if (this.itemGenerateIntervalId !== undefined) {
+      clearTimeout(this.itemGenerateIntervalId)
+      this.itemGenerateIntervalId = undefined
+    }
   }
 }

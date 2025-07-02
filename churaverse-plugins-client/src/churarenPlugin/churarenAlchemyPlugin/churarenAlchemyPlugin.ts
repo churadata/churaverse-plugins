@@ -103,7 +103,6 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
   }
 
   protected handleGameTermination(): void {
-    resetAlchemyPluginStore(this.store)
     this.alchemyPluginStore.alchemyPotRenderers.forEach((renderer) => {
       if (renderer === undefined) return
       renderer.destroy()
@@ -111,6 +110,7 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
     this.keyboardController?.unregisterKeyActionListener()
     this.socketController?.unregisterMessageListener()
     this.resetKeyAction()
+    resetAlchemyPluginStore(this.store)
   }
 
   protected handleMidwayParticipant(): void {

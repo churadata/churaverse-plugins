@@ -22,13 +22,11 @@ const DISPLAY_SIZE = 40
 export class ItemRenderer implements IItemRenderer {
   private readonly scene: Scene
   private readonly image: Phaser.GameObjects.Image
-  private readonly itemBoxContainer: Phaser.GameObjects.Container
   private tween?: Phaser.Tweens.Tween
   private readonly textureKey: string
 
   public constructor(scene: Scene, kind: ItemKind) {
     this.scene = scene
-    this.itemBoxContainer = this.scene.add.container(0, 0)
     this.textureKey = `${ITEM_TEXTURE_KEY_PREFIX}_${kind}`
 
     this.image = scene.add
@@ -82,6 +80,5 @@ export class ItemRenderer implements IItemRenderer {
    */
   public destroy(): void {
     this.image.destroy()
-    this.itemBoxContainer.destroy()
   }
 }
