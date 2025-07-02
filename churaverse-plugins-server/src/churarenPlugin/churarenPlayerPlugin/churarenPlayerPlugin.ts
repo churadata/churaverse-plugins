@@ -148,8 +148,8 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   }
 
   private deleteItems(playerId: string): void {
-    // TODO: 錬金アイテムも削除する
     this.playerItemStore.materialItems.clear(playerId)
+    this.playerItemStore.alchemyItem.delete(playerId)
   }
 
   private readonly onChurarenDamageFromBoss = (ev: LivingDamageEvent): void => {
