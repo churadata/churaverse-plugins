@@ -113,7 +113,9 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
     this.resetKeyAction()
   }
 
-  protected handleMidwayParticipant(): void {}
+  protected handleMidwayParticipant(): void {
+    this.unsubscribeGameEvent()
+  }
 
   private readonly spawnAlchemyPot = (ev: AlchemyPotSpawnEvent): void => {
     ev.alchemyPots.forEach((pot) => {
