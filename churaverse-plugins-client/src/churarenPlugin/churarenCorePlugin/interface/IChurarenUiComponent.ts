@@ -20,4 +20,5 @@ export interface ITimerContainer extends IGameUiComponent {
 export interface IResultWindow extends IGameUiComponent {
   showResult: (result: ChurarenGameResultType) => void
   hideResult: () => void
+  buttonElement: HTMLElement
 }
