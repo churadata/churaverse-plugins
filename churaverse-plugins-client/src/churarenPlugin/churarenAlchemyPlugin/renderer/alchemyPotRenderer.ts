@@ -1,5 +1,5 @@
 import { Scene } from 'phaser'
-import AlchemyImage from '../assets/alchemyPot.png'
+import alchemyPotImage from '../assets/alchemyPot.png'
 import { Position } from 'churaverse-engine-client'
 import { IAlchemyPotRenderer } from '../domain/IAlchemyPotRenderer'
 
@@ -35,7 +35,7 @@ export class AlchemyPotRenderer implements IAlchemyPotRenderer {
   }
 
   public static loadAssets(scene: Scene): void {
-    scene.load.image(ALCHEMY_POT_TEXTURE_KEY, AlchemyImage)
+    scene.load.image(ALCHEMY_POT_TEXTURE_KEY, alchemyPotImage)
   }
 
   public spawn(source: Position): void {
