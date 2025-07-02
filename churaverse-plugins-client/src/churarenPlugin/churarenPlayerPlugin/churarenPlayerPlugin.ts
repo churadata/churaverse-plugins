@@ -141,7 +141,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
 
   private readonly onChurarenResult = (): void => {
     this.playerItemStore.materialItemBoxContainer.hide()
-    // TODO: 錬金アイテムのコンテナも非表示にする
+    this.playerItemStore.alchemyItemBoxContainer.hide()
     this.clearPlayerItemBox()
   }
 
