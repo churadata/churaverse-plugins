@@ -79,6 +79,8 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   protected handleMidwayParticipant(): void {
     this.churarenDialogManager?.setGameAbortButtonText()
     this.unsubscribeGameEvent()
+    // `gameAbort` や `gameEnd` イベントを受け取るために再度イベントを登録
+    super.subscribeGameEvent()
   }
 
   protected handlePlayerLeave(playerId: string): void {
