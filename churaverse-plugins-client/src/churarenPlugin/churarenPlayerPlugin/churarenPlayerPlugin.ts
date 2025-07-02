@@ -90,6 +90,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('playerWalk', this.onPlayerWalk)
     this.bus.subscribeEvent('playerRespawn', this.changeGhostMode, 'LOW')
     this.bus.subscribeEvent('playerNameChange', this.onChangePlayerName)
+    this.bus.subscribeEvent('churarenResult', this.onChurarenResult)
   }
 
   protected unsubscribeGameEvent(): void {
@@ -101,6 +102,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.unsubscribeEvent('playerWalk', this.onPlayerWalk)
     this.bus.unsubscribeEvent('playerRespawn', this.changeGhostMode)
     this.bus.unsubscribeEvent('playerNameChange', this.onChangePlayerName)
+    this.bus.unsubscribeEvent('churarenResult', this.onChurarenResult)
   }
 
   protected handleGameStart(): void {
@@ -127,7 +129,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.playerItemStore.materialItemBoxContainer.remove()
     this.playerItemStore.alchemyItemBoxContainer.remove()
     this.churarenPlayerStore.ghostPlayerListUi.remove()
-    this.clearPlayerItemBox()
     this.revivalPlayer()
     this.ghostModeIndicatorUi?.ghostModeIcon.deactivate()
     resetChurarenPlayersStore(this.store)
@@ -136,6 +137,12 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
 
   protected handleMidwayParticipant(): void {
     this.unsubscribeGameEvent()
+  }
+
+  private readonly onChurarenResult = (): void => {
+    this.playerItemStore.materialItemBoxContainer.hide()
+    this.playerItemStore.alchemyItemBoxContainer.hide()
+    this.clearPlayerItemBox()
   }
 
   private readonly changeGhostMode = (ev: PlayerRespawnEvent): void => {
@@ -237,6 +244,8 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
       this.playerItemStore.alchemyItemRenderers.forEach((renderer) => {
         renderer.destroy()
       })
+      this.playerItemStore.materialItems.clearAll()
+      this.playerItemStore.alchemyItem.clear()
     } else {
       const materialItems = [...this.playerItemStore.materialItems.getAllItem(playerId)]
       materialItems.forEach((item) => {
