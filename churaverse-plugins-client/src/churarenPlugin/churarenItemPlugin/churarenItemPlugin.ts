@@ -69,7 +69,7 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
   }
 
   public handleMidwayParticipant(): void {
-    this.setupChurarenItemPlugin()
+    this.unsubscribeGameEvent()
   }
 
   private readonly spawnItem = (ev: ChurarenItemSpawnEvent): void => {
