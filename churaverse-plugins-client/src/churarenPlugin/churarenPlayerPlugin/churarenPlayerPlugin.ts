@@ -90,6 +90,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('playerWalk', this.onPlayerWalk)
     this.bus.subscribeEvent('playerRespawn', this.changeGhostMode, 'LOW')
     this.bus.subscribeEvent('playerNameChange', this.onChangePlayerName)
+    this.bus.subscribeEvent('churarenResult', this.onChurarenResult)
   }
 
   protected unsubscribeGameEvent(): void {
@@ -101,6 +102,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.unsubscribeEvent('playerWalk', this.onPlayerWalk)
     this.bus.unsubscribeEvent('playerRespawn', this.changeGhostMode)
     this.bus.unsubscribeEvent('playerNameChange', this.onChangePlayerName)
+    this.bus.unsubscribeEvent('churarenResult', this.onChurarenResult)
   }
 
   protected handleGameStart(): void {
@@ -125,7 +127,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.socketController?.unregisterMessageListener()
     this.playerItemStore.materialItemBoxContainer.remove()
     this.churarenPlayerStore.ghostPlayerListUi.remove()
-    this.clearPlayerItemBox()
     this.revivalPlayer()
     this.ghostModeIndicatorUi?.ghostModeIcon.deactivate()
     resetChurarenPlayersStore(this.store)
@@ -134,6 +135,12 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
 
   protected handleMidwayParticipant(): void {
     this.unsubscribeGameEvent()
+  }
+
+  private readonly onChurarenResult = (): void => {
+    this.playerItemStore.materialItemBoxContainer.hide()
+    // TODO: 錬金アイテムのコンテナも非表示にする
+    this.clearPlayerItemBox()
   }
 
   private readonly changeGhostMode = (ev: PlayerRespawnEvent): void => {
@@ -226,6 +233,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
       this.playerItemStore.materialItemRenderers.forEach((renderer) => {
         renderer.destroy()
       })
+      this.playerItemStore.materialItems.clearAll()
       // TODO: 錬金アイテムの削除処理を追加
     } else {
       const materialItems = [...this.playerItemStore.materialItems.getAllItem(playerId)]
