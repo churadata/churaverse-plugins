@@ -134,7 +134,9 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     resetPlayerItemStore(this.store)
   }
 
-  protected handleMidwayParticipant(): void {}
+  protected handleMidwayParticipant(): void {
+    this.unsubscribeGameEvent()
+  }
 
   private readonly changeGhostMode = (ev: PlayerRespawnEvent): void => {
     if (!this.isActive) return
