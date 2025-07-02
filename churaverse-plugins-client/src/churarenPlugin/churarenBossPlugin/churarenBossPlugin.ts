@@ -85,7 +85,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   }
 
   public handleMidwayParticipant(): void {
-    this.subscribeGameEvent()
+    this.unsubscribeGameEvent()
   }
 
   public spawnBoss = (ev: EntitySpawnEvent): void => {
