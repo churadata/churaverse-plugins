@@ -4,7 +4,7 @@ import { layerSetting, Position } from 'churaverse-engine-client'
 import { IAlchemyPotRenderer } from '../domain/IAlchemyPotRenderer'
 
 /**
- * alchemyのテクスチャーキー
+ * alchemyPotのテクスチャーキー
  */
 const ALCHEMY_POT_TEXTURE_KEY = 'alchemyPot'
 
@@ -14,7 +14,7 @@ const ALCHEMY_POT_TEXTURE_KEY = 'alchemyPot'
 const DISPLAY_SIZE = 70
 
 /**
- * Alchemy描画クラス
+ * AlchemyPot描画クラス
  */
 export class AlchemyPotRenderer implements IAlchemyPotRenderer {
   private readonly scene: Scene
