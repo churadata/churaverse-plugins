@@ -127,6 +127,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.socketController?.unregisterMessageListener()
     this.playerItemStore.materialItemBoxContainer.remove()
     this.churarenPlayerStore.ghostPlayerListUi.remove()
+    this.clearPlayerItemBox()
     this.revivalPlayer()
     this.ghostModeIndicatorUi?.ghostModeIcon.deactivate()
     resetChurarenPlayersStore(this.store)
