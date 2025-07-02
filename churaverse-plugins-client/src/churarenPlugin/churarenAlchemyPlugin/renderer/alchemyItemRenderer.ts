@@ -9,7 +9,7 @@ import { AlchemyItemKind } from '../domain/alchemyItemKind'
 const ITEM_TEXTURE_KEY_PREFIX = `alchemyItem`
 
 /**
- * Item描画クラス
+ * AlchemyItem描画クラス
  */
 export class AlchemyItemRenderer implements IAlchemyItemRenderer {
   private readonly scene: Scene
