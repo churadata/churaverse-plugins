@@ -1,6 +1,6 @@
 import { Scene } from 'phaser'
 import AlchemyImage from '../assets/alchemyPot.png'
-import { layerSetting, Position } from 'churaverse-engine-client'
+import { Position } from 'churaverse-engine-client'
 import { IAlchemyPotRenderer } from '../domain/IAlchemyPotRenderer'
 
 /**
@@ -32,8 +32,6 @@ export class AlchemyPotRenderer implements IAlchemyPotRenderer {
         0
       )
       .setDisplaySize(DISPLAY_SIZE, DISPLAY_SIZE)
-
-    layerSetting(this.image, 'player', 10)
   }
 
   public static loadAssets(scene: Scene): void {
