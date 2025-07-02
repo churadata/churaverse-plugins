@@ -65,12 +65,14 @@ export class ExplosionPlugin extends BaseAlchemyItemPlugin {
 
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
+    this.bus.subscribeEvent('useAlchemyItem', this.useAlchemyItem)
     this.bus.subscribeEvent('entitySpawn', this.spawnExplosion)
     this.bus.subscribeEvent('entityDespawn', this.dieExplosion)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
+    this.bus.unsubscribeEvent('useAlchemyItem', this.useAlchemyItem)
     this.bus.unsubscribeEvent('entitySpawn', this.spawnExplosion)
     this.bus.unsubscribeEvent('entityDespawn', this.dieExplosion)
   }
@@ -94,7 +96,7 @@ export class ExplosionPlugin extends BaseAlchemyItemPlugin {
   }
 
   // 爆発アイテムを使った時の処理
-  protected readonly useAlchemyItem = (ev: UseAlchemyItemEvent): void => {
+  protected useAlchemyItem = (ev: UseAlchemyItemEvent): void => {
     if (ev.alchemyItem.kind !== 'explosion') return
     const renderer = this.explosionPluginStore.explosionAttackRendererFactory.build()
     const gap = 65
