@@ -164,6 +164,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   private onCollisionPlayer(boss: Boss, player: Player): void {
     if (player.isDead) return
     if (!boss.isCollidable) return
+    if (this.churarenGameInfo === undefined || !this.churarenGameInfo.participantIds.includes(player.id)) return
     const collisionBossDamageCause = new CollisionBossDamageCause(boss)
     const livingDamageEvent = new LivingDamageEvent(player, collisionBossDamageCause, boss.power)
     this.bus.post(livingDamageEvent)
