@@ -1,0 +1,1 @@
+@churaverse/churaren-explosion-plugin-client
