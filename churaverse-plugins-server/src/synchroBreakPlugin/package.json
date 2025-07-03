@@ -11,8 +11,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "churaverse-engine-server": "file:../../../../churaverse-engine/churaverse-engine-server",
-    "@churaverse/network-plugin-server": "file:../networkPlugin",
-    "@churaverse/game-plugin-server": "file:../gamePlugin"
+    "churaverse-engine-server": "~0.1.1",
+    "@churaverse/network-plugin-server": "~0.1.4",
+    "@churaverse/game-plugin-server": "~0.1.0"
   }
 }
