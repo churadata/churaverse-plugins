@@ -1,3 +1,0 @@
-@churaverse/game-plugin-client
-@churaverse/core-ui-plugin-client
-@churaverse/network-plugin-client
