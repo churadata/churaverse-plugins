@@ -14,7 +14,6 @@ import { ExplosionAttackRendererFactory } from './renderer/explosionAttackRender
 import { initExplosionPluginStore, resetExplosionPluginStore } from './store/initExplosionPluginStore'
 import { ExplosionPluginStore } from './store/defExplosionPluginStore'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
-import { AlchemyPluginStore } from '@churaverse/churaren-alchemy-plugin-client/store/defAlchemyPluginStore'
 import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { explosion, Explosion, EXPLOSION_ITEM, EXPLOSION_WALK_LIMIT_GRIDS } from './domain/explosion'
 import { UseAlchemyItemEvent } from '@churaverse/churaren-alchemy-plugin-client/event/useAlchemyItemEvent'
@@ -23,13 +22,11 @@ import { ExplosionSpawnMessage } from './message/explosionSpawnMessage'
 import { Sendable } from '@churaverse/network-plugin-client/types/sendable'
 import { IExplosionAttackRenderer } from './domain/IExplosionAttckRenderer'
 import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-client/domain/baseAlchemyItemPlugin'
-import '@churaverse/churaren-core-plugin-client/churarenCorePlugin'
 
 export class ExplosionPlugin extends BaseAlchemyItemPlugin {
   private attackRendererFactory?: ExplosionAttackRendererFactory
   private explosionPluginStore!: ExplosionPluginStore
   private playerPluginStore!: PlayerPluginStore
-  private alchemyPluginStore!: AlchemyPluginStore
   private networkStore!: NetworkPluginStore<IMainScene>
   private socketController?: SocketController
   protected alchemyItemKind = explosion
@@ -79,11 +76,9 @@ export class ExplosionPlugin extends BaseAlchemyItemPlugin {
 
   protected handleGameStart(): void {
     initExplosionPluginStore(this.store, this.attackRendererFactory)
-    this.alchemyPluginStore = this.store.of('alchemyPlugin')
     this.explosionPluginStore = this.store.of('churarenExplosionPlugin')
     this.socketController?.getStores()
     this.socketController?.registerMessageListener()
-    this.alchemyPluginStore.alchemyItemManager.set(this.alchemyItemKind, this.alchemyItem)
   }
 
   protected handleGameTermination(): void {
