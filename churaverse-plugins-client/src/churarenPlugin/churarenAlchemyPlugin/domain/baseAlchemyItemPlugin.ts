@@ -5,6 +5,8 @@ import { AlchemyItemManager } from '../alchemyItemManager'
 import { UseAlchemyItemEvent } from '../event/useAlchemyItemEvent'
 import { IAlchemyItem } from './IAlchemyItem'
 import { AlchemyItemKind } from './alchemyItemKind'
+import '@churaverse/churaren-core-plugin-client/churarenCorePlugin'
+import '../store/defAlchemyPluginStore'
 
 /**
  * 錬金アイテムのプラグインのベースクラス
@@ -19,8 +21,22 @@ export abstract class BaseAlchemyItemPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('phaserLoadAssets', this.loadAlchemyItemAssets.bind(this))
   }
 
+  protected subscribeGameEvent(): void {
+    super.subscribeGameEvent()
+    this.bus.subscribeEvent('churarenStartCountdown', this.setupAlchemyItem)
+  }
+
+  protected unsubscribeGameEvent(): void {
+    super.unsubscribeGameEvent()
+    this.bus.unsubscribeEvent('churarenStartCountdown', this.setupAlchemyItem)
+  }
+
   private loadAlchemyItemAssets(ev: PhaserLoadAssets): void {
     AlchemyItemManager.loadAssets(ev.scene, this.alchemyItemKind, this.alchemyItem.image)
+  }
+
+  private readonly setupAlchemyItem = (): void => {
+    this.store.of('alchemyPlugin').alchemyItemManager.set(this.alchemyItemKind, this.alchemyItem)
   }
 
   /**

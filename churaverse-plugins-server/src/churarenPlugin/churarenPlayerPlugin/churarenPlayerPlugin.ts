@@ -110,12 +110,12 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     if (this.inviciblePlayersList.includes(player.id)) {
       ev.cancel()
     } else {
+      this.changeInvincible(player.id)
       const invicibleTimeMessage = new InvicibleTimeMessage({
         playerId: player.id,
         invicibleTime: this.INVICIBLE_TIME,
       })
       this.networkPluginStore.messageSender.send(invicibleTimeMessage)
-      this.changeInvincible(player.id)
     }
   }
 
