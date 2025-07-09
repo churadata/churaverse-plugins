@@ -5,7 +5,7 @@ import { ChurarenAlchemyPlugin } from '@churaverse/churaren-alchemy-plugin-clien
 import '@churaverse/churaren-core-plugin-client/ui/defChurarenUi'
 import { alchemyItems } from '@churaverse/churaren-alchemy-items-client'
 
-export const churarenPlugins = [
+export const churarenPlugins: any[] = [
   ChurarenCorePlugin,
   ChurarenItemPlugin,
   ChurarenPlayerPlugin,
