@@ -88,6 +88,14 @@ export class Player extends LivingEntity {
   }
 
   /**
+   * HPを回復する処理
+   * @param healAmount 回復量
+   */
+  public heal(healAmount: number): void {
+    this.hp = Math.min(this.hp + healAmount, DEFAULT_HP)
+  }
+
+  /**
    * Player復活の関数
    * @param position 復活時の位置
    */
