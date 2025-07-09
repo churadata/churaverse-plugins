@@ -45,9 +45,9 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
 
   private getPriorGameData(ev: PriorGameDataEvent): void {
     if (!this.isActive) return
-    this.handleMidwayParticipant()
     // 途中参加者はonGameStartではなく、getPriorGameDataでsubscribeGameEventする
     this.subscribeGameEvent()
+    this.handleMidwayParticipant()
   }
 
   private onGameStart(ev: GameStartEvent): void {
