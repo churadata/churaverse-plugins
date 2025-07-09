@@ -15,6 +15,7 @@ import { initPlayerItemStore, resetPlayerItemStore } from './store/initPlayerIte
 import { InvicibleTimeMessage } from './message/invicibleTimeMessage'
 import { isPlayer, Player } from '@churaverse/player-plugin-server/domain/player'
 import { ChurarenResultEvent } from '@churaverse/churaren-core-plugin-server/event/churarenResultEvent'
+import { PlayerHealEvent } from './event/playerHealEvent'
 
 export const MAX_ITEMS = 3
 
@@ -52,6 +53,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('dropChurarenItem', this.dropItem)
     this.bus.subscribeEvent('livingDamage', this.onChurarenDamageFromBoss)
     this.bus.subscribeEvent('livingDamage', this.skipDamage, 'HIGH')
+    this.bus.subscribeEvent('playerHeal', this.onLivingHeal)
   }
 
   protected unsubscribeGameEvent(): void {
@@ -60,6 +62,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.unsubscribeEvent('dropChurarenItem', this.dropItem)
     this.bus.unsubscribeEvent('livingDamage', this.onChurarenDamageFromBoss)
     this.bus.unsubscribeEvent('livingDamage', this.skipDamage)
+    this.bus.unsubscribeEvent('playerHeal', this.onLivingHeal)
   }
 
   protected handleGameStart(): void {
@@ -161,5 +164,10 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     if (player.isDead) {
       this.changeGhostPlayer(player)
     }
+  }
+
+  private readonly onLivingHeal = (ev: PlayerHealEvent): void => {
+    const player = this.playerPluginStore.players.get(ev.id)
+    player?.heal(ev.healAmount)
   }
 }
