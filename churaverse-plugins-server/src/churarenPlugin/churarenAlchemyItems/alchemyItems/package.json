@@ -11,6 +11,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@churaverse/churaren-alchemy-plugin-server": "file:../healingPotionPlugin"
+    "@churaverse/churaren-healing-potion-plugin-server": "file:../healingPotionPlugin"
   }
 }
