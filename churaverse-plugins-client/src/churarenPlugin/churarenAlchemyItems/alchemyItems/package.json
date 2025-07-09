@@ -33,5 +33,7 @@
   "module": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "@churaverse/churaren-healing-potion-plugin-client": "file:../healingPotionPlugin"
+  }
 }
