@@ -80,6 +80,10 @@ export class Player extends LivingEntity implements ICollidableEntity {
     this.hp -= amount
   }
 
+  public heal(amount: number): void {
+    this.hp = Math.min(this.hp + amount, 100)
+  }
+
   public respawn(position: Position): void {
     this.teleport(position)
     this.hp = 100
