@@ -5,6 +5,7 @@ import { GamePluginStore } from '@churaverse/game-plugin-server/store/defGamePlu
 import { ChurarenStartCountdownEvent } from '../event/churarenStartCountdownEvent'
 import { ChurarenStartTimerEvent } from '../event/churarenStartTimerEvent'
 import { ChurarenResultEvent } from '../event/churarenResultEvent'
+import { PlayerHealData, PlayerHealMessage } from '@churaverse/churaren-player-plugin-server/message/playerHealMessage'
 
 const TIME_OUT_SECONDS = 30 // プレイヤーの準備確認のタイムアウト時間(秒)
 const COUNTDOWN_TIME_SECONDS = 3 // カウントダウン時間(秒)
@@ -22,6 +23,7 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
   }
 
   public async runSequence(): Promise<void> {
+    await this.refillPlayersHp()
     await this.waitPlayerReady()
     if (!this.isActive) return
     await this.startCountdown()
@@ -29,6 +31,21 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
     await this.startTimer()
     if (!this.isActive) return
     await this.handleTimeOver()
+  }
+
+  private async refillPlayersHp(): Promise<void> {
+    const maxHP = 100
+    this.gamePluginStore.games.get(this.gameId)?.participantIds.forEach((id) => {
+      const player = this.store.of('playerPlugin').players.get(id)
+      if (player === undefined) return
+      player.hp = maxHP
+      const playerHealData: PlayerHealData = {
+        playerId: player.id,
+        healAmount: maxHP,
+      }
+      const playerHealMessage = new PlayerHealMessage(playerHealData)
+      this.store.of('networkPlugin').messageSender.send(playerHealMessage)
+    })
   }
 
   private async waitPlayerReady(): Promise<void> {
