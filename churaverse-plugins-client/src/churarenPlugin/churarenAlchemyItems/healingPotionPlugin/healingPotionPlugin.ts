@@ -4,8 +4,6 @@ import { UseAlchemyItemEvent } from '@churaverse/churaren-alchemy-plugin-client/
 import { initHealingPotionPluginStore, resetHealingPotionPluginStore } from './store/initHealingPotionPluginStore'
 import { HealingPotionPluginStore } from './store/defHealingPotionPluginStore'
 import { ClearAlchemyItemBoxEvent } from '@churaverse/churaren-alchemy-plugin-client/event/clearAlchemyItemBox'
-import '@churaverse/network-plugin-client/store/defNetworkPluginStore'
-import '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { UseHealingPotionMessage } from './message/useHealingPotionMessage'
 import { SocketController } from './controller/socketController'
 
