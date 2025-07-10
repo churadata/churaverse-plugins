@@ -122,8 +122,6 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     this.bus.subscribeEvent('playerNameChange', this.onChangePlayerName.bind(this))
     this.bus.subscribeEvent('playerColorChange', this.onChangePlayerColor.bind(this))
     this.bus.subscribeEvent('livingDamage', this.onLivingDamage.bind(this))
-    this.bus.subscribeEvent('playerDie', this.onDiePlayer.bind(this))
-    this.bus.subscribeEvent('playerRespawn', this.onRespawnPlayer.bind(this))
     this.bus.subscribeEvent('dumpDebugData', this.dumpDebugData.bind(this))
   }
 

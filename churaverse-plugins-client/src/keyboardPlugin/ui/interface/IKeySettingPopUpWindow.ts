@@ -10,4 +10,9 @@ export interface IKeyboardSettingPopUpWindow {
    * @param order 数字が大きいほど下に配置される
    */
   addKeyAction: (type: CanSettingKeyActType, description: string, order?: number) => void
+  /**
+   * キーバインド設定ウィンドウで表示するキーバインドを削除する
+   * @param type 削除するKeyActionのType名
+   */
+  removeKeyAction: (type: CanSettingKeyActType) => void
 }

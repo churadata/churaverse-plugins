@@ -461,4 +461,32 @@ export class PlayerRenderer implements IPlayerRenderer {
   public addToPlayerFrontContainer(child: Phaser.GameObjects.GameObject): void {
     this.playerFrontContainer.add(child)
   }
+
+  /**
+   * プレイヤーの透明度を設定する
+   * @param alpha 透明度(0-1)
+   */
+  public setSpriteAlpha(alpha: number): void {
+    this.playerContainer.alpha = alpha
+  }
+
+  /**
+   * プレイヤーを点滅させる。一回の点滅は200ms
+   * @param blinkTime 点滅の時間
+   */
+  public blinkPlayer(blinkTime: number): void {
+    this.scene.tweens.add({
+      targets: this.playerContainer,
+      alpha: { start: 0, to: 1 },
+      duration: 100,
+      repeat: blinkTime / 200,
+      yoyo: true,
+      onComplete: () => {
+        this.playerContainer.alpha = 1
+      },
+      onStop: () => {
+        this.playerContainer.alpha = 1
+      },
+    })
+  }
 }
