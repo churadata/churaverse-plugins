@@ -34,6 +34,7 @@
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "dependencies": {
-    "@churaverse/churaren-healing-potion-plugin-client": "file:../healingPotionPlugin"
+    "@churaverse/churaren-healing-potion-plugin-client": "file:../healingPotionPlugin",
+    "@churaverse/churaren-revival-item-plugin-client": "file:../revivalItemPlugin"
   }
 }
