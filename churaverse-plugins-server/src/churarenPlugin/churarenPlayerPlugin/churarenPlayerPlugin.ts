@@ -92,15 +92,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     }
   }
 
-  private clearGhostModePlayers(): void {
-    this.churarenPlayerStore.ghostModePlayers.getAllId().forEach((playerId) => {
-      const player = this.playerPluginStore.players.get(playerId)
-      if (player === undefined) return
-      player.isCollidable = true
-    })
-    this.churarenPlayerStore.ghostModePlayers.clear()
-  }
-
   private readonly skipDamage = (ev: LivingDamageEvent): void => {
     // TODO: ちゅられん特有の敵との衝突によるダメージのみ処理を行うように条件を追加
     if (!this.isActive) return
@@ -117,14 +108,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
       })
       this.networkPluginStore.messageSender.send(invicibleTimeMessage)
     }
-  }
-
-  // 無敵のプレイヤーを追加
-  private changeInvincible(playerId: string): void {
-    this.inviciblePlayersList.push(playerId)
-    setTimeout(() => {
-      this.inviciblePlayersList.shift()
-    }, this.INVICIBLE_TIME)
   }
 
   private readonly getItem = (ev: GetChurarenItemEvent): void => {
@@ -148,11 +131,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.playerItemStore.materialItems.delete(player.id, ev.itemId)
   }
 
-  private deleteItems(playerId: string): void {
-    this.playerItemStore.materialItems.clear(playerId)
-    this.playerItemStore.alchemyItem.delete(playerId)
-  }
-
   private readonly onChurarenDamageFromBoss = (ev: LivingDamageEvent): void => {
     // TODO: ボスから受けたダメージをclientに送信する処理の実装
 
@@ -161,5 +139,27 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     if (player.isDead) {
       this.changeGhostPlayer(player)
     }
+  }
+
+  private clearGhostModePlayers(): void {
+    this.churarenPlayerStore.ghostModePlayers.getAllId().forEach((playerId) => {
+      const player = this.playerPluginStore.players.get(playerId)
+      if (player === undefined) return
+      player.isCollidable = true
+    })
+    this.churarenPlayerStore.ghostModePlayers.clear()
+  }
+
+  private deleteItems(playerId: string): void {
+    this.playerItemStore.materialItems.clear(playerId)
+    this.playerItemStore.alchemyItem.delete(playerId)
+  }
+
+  // 無敵のプレイヤーを追加
+  private changeInvincible(playerId: string): void {
+    this.inviciblePlayersList.push(playerId)
+    setTimeout(() => {
+      this.inviciblePlayersList.shift()
+    }, this.INVICIBLE_TIME)
   }
 }
