@@ -162,7 +162,7 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
     }
   }
 
-  public changeItemBox(kind: AlchemyItemKind): void {
+  private changeItemBox(kind: AlchemyItemKind): void {
     const itemImagePaths = this.alchemyPluginStore.alchemyItemManager?.get(kind)?.image ?? ''
     this.playerItemStore.materialItemBoxContainer.updateMaterialItemBox([])
     this.playerItemStore.alchemyItemBoxContainer.updateAlchemyItemBox(itemImagePaths)
