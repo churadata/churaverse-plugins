@@ -1,5 +1,5 @@
 import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-client/domain/baseAlchemyItemPlugin'
-import { healignPotion, HEALING_POTION_ITEM, HealingPotion } from './domain/healingPotion'
+import { HEALING_POTION_ITEM, HealingPotion } from './domain/healingPotion'
 import { UseAlchemyItemEvent } from '@churaverse/churaren-alchemy-plugin-client/event/useAlchemyItemEvent'
 import { initHealingPotionPluginStore, resetHealingPotionPluginStore } from './store/initHealingPotionPluginStore'
 import { HealingPotionPluginStore } from './store/defHealingPotionPluginStore'
@@ -10,7 +10,6 @@ import { SocketController } from './controller/socketController'
 export class HealingPotionPlugin extends BaseAlchemyItemPlugin {
   private healingPotionPluginStore!: HealingPotionPluginStore
   private socketController?: SocketController
-  protected alchemyItemKind = healignPotion
   protected alchemyItem = HEALING_POTION_ITEM
 
   public listenEvent(): void {
