@@ -148,6 +148,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.clearPlayerItemBox()
     this.ghostModeIndicatorUi?.ghostModeIcon.deactivate()
     this.churarenPlayerStore.ghostPlayerListUi.updateGhostPlayerList([])
+    this.showAllGhostPlayers()
   }
 
   private readonly changeGhostMode = (ev: PlayerRespawnEvent): void => {
