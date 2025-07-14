@@ -238,6 +238,23 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.updateGhostPlayerList()
   }
 
+  private readonly onPlayerHeal = (ev: PlayerHealEvent): void => {
+    const player = this.playerPluginStore.players.get(ev.id)
+    const renderer = this.playerPluginStore.playerRenderers.get(ev.id)
+    if (player === undefined || renderer === undefined) return
+    player.heal(ev.healAmount)
+    renderer.heal(ev.healAmount, player.hp)
+  }
+
+  private readonly onPlayerRevival = (ev: PlayerRevivalEvent): void => {
+    this.churarenPlayerStore.ghostModePlayerRepository.delete(ev.id)
+    const player = this.playerPluginStore.players.get(ev.id)
+    if (player === undefined) return
+    this.revivalPlayer(player.id)
+    this.ghostModeIndicatorUi?.ghostModeIcon.deactivate()
+    this.updateGhostPlayerList()
+  }
+
   private setupChase(
     renderer: any,
     item: { position: { x: number; y: number } },
@@ -307,22 +324,5 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   private updateGhostPlayerList(): void {
     const playerNames = this.churarenPlayerStore.ghostModePlayerRepository.getPlayerNames()
     this.churarenPlayerStore.ghostPlayerListUi.updateGhostPlayerList(playerNames)
-  }
-
-  private readonly onPlayerHeal = (ev: PlayerHealEvent): void => {
-    const player = this.playerPluginStore.players.get(ev.id)
-    const renderer = this.playerPluginStore.playerRenderers.get(ev.id)
-    if (player === undefined || renderer === undefined) return
-    player.heal(ev.healAmount)
-    renderer.heal(ev.healAmount, player.hp)
-  }
-
-  private readonly onPlayerRevival = (ev: PlayerRevivalEvent): void => {
-    this.churarenPlayerStore.ghostModePlayerRepository.delete(ev.id)
-    const player = this.playerPluginStore.players.get(ev.id)
-    if (player === undefined) return
-    this.revivalPlayer(player.id)
-    this.ghostModeIndicatorUi?.ghostModeIcon.deactivate()
-    this.updateGhostPlayerList()
   }
 }
