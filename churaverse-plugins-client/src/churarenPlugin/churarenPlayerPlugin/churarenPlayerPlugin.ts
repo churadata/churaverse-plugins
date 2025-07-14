@@ -139,8 +139,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   }
 
   private readonly onChurarenResult = (): void => {
-    this.playerItemStore.materialItemBoxContainer.hide()
-    // TODO: 錬金アイテムのコンテナも非表示にする
+    this.hideItemBox()
     this.clearPlayerItemBox()
   }
 
@@ -154,7 +153,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.churarenPlayerStore.ghostModePlayerRepository.set(player.id, player)
     if (this.playerPluginStore.ownPlayerId === player.id) {
       this.ghostModeIndicatorUi?.ghostModeIcon.activate()
-      this.playerItemStore.materialItemBoxContainer.hide()
+      this.hideItemBox()
     }
     this.changeGhostPlayer(player.id)
     this.updateGhostPlayerList()
@@ -283,5 +282,10 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   private updateGhostPlayerList(): void {
     const playerNames = this.churarenPlayerStore.ghostModePlayerRepository.getPlayerNames()
     this.churarenPlayerStore.ghostPlayerListUi.updateGhostPlayerList(playerNames)
+  }
+
+  private hideItemBox(): void {
+    this.playerItemStore.materialItemBoxContainer.hide()
+    // TODO: 錬金アイテムのコンテナも非表示にする
   }
 }
