@@ -2,7 +2,7 @@ import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-clien
 import { UseAlchemyItemEvent } from '@churaverse/churaren-alchemy-plugin-client/event/useAlchemyItemEvent'
 import { ClearAlchemyItemBoxEvent } from '@churaverse/churaren-alchemy-plugin-client/event/clearAlchemyItemBox'
 import { SocketController } from './controller/socketController'
-import { REVIVAL_ITEM, RevivalItem, revivalItem } from './domain/revivalItem'
+import { REVIVAL_ITEM, RevivalItem } from './domain/revivalItem'
 import { initRevivalPluginStore, resetRevivalPluginStore } from './store/initRevivalPluginStore'
 import { RevivalItemPluginStore } from './store/defRevivalItemPluginStore'
 import { UseRevivalItemMessage } from './message/useRevivalItemMessage'
@@ -10,7 +10,6 @@ import { UseRevivalItemMessage } from './message/useRevivalItemMessage'
 export class RevivalItemPlugin extends BaseAlchemyItemPlugin {
   private revivalItemPluginStore!: RevivalItemPluginStore
   private socketController?: SocketController
-  protected alchemyItemKind = revivalItem
   protected alchemyItem = REVIVAL_ITEM
 
   public listenEvent(): void {

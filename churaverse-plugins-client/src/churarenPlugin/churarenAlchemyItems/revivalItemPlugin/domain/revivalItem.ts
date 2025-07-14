@@ -4,11 +4,10 @@ import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/
 import { Direction, Position } from 'churaverse-engine-client'
 import revivalItemImage from '../assets/revivalItem.png'
 
-const DISPLAY_SIZE = 80
 export const revivalItem: AlchemyItemKind = 'revivalItem'
 export const REVIVAL_ITEM: IAlchemyItem = {
+  kind: 'revivalItem',
   image: revivalItemImage,
-  displaySize: DISPLAY_SIZE,
 }
 
 /**
@@ -27,7 +26,7 @@ export class RevivalItem extends AlchemyItem {
     direction: Direction,
     spawnTime: number
   ) {
-    super(revivalItemId, revivalItem)
+    super(revivalItemId, REVIVAL_ITEM.kind)
     this.revivalItemId = revivalItemId
     this.ownerId = ownerId
     this.position = position
