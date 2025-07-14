@@ -179,7 +179,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.itemPluginStore.items.delete(ev.itemId)
     this.itemPluginStore.itemRenderers.delete(ev.itemId)
     if (ev.playerId === this.playerPluginStore.ownPlayerId) {
-      this.updateItemBox(ev.playerId)
+      this.updateMaterialItemBox(ev.playerId)
     }
   }
 
@@ -208,7 +208,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.playerItemStore.materialItems.delete(ev.playerId, ev.itemId)
 
     if (ev.playerId === this.playerPluginStore.ownPlayerId) {
-      this.updateItemBox(ev.playerId)
+      this.updateMaterialItemBox(ev.playerId)
       const dropItemData: DropChurarenItemData = { playerId: ev.playerId, itemId: ev.itemId }
       const dropItemMessage = new DropChurarenItemMessage(dropItemData)
       this.networkPluginStore.messageSender.send(dropItemMessage)
@@ -261,7 +261,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     }
   }
 
-  private updateItemBox(playerId: string): void {
+  private updateMaterialItemBox(playerId: string): void {
     const itemBoxes = this.playerItemStore.materialItems.getAllItem(playerId)
     const itemImageList = itemBoxes.map((item) => materialItemImage[item.kind])
     this.playerItemStore.materialItemBoxContainer.updateMaterialItemBox(itemImageList)
