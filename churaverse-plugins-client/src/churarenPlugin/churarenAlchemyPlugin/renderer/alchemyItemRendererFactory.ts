@@ -7,11 +7,10 @@ import { AlchemyItemKind } from '../domain/alchemyItemKind'
 export class AlchemyItemRendererFactory implements IAlchemyItemRendererFactory {
   public constructor(
     private readonly scene: Scene,
-    private readonly kind: AlchemyItemKind,
-    private readonly displaySize: number
+    private readonly kind: AlchemyItemKind
   ) {}
 
   public build(): IAlchemyItemRenderer {
-    return new AlchemyItemRenderer(this.scene, this.kind, this.displaySize)
+    return new AlchemyItemRenderer(this.scene, this.kind)
   }
 }

@@ -17,7 +17,7 @@ import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-clien
 import '@churaverse/churaren-core-plugin-client/churarenCorePlugin'
 import { TornadoAttackRendererFactory } from './renderer/tornadoAttackRendererFactory'
 import { TornadoPluginStore } from './store/defTornadoPluginStore'
-import { Tornado, tornado, TORNADO_ITEM, TORNADO_SPEED, TORNADO_WALK_LIMIT_MS } from './domain/tornado'
+import { Tornado, TORNADO_ITEM, TORNADO_SPEED, TORNADO_WALK_LIMIT_MS } from './domain/tornado'
 import { TornadoAttackRenderer } from './renderer/tornadoAttackRenderer'
 import { initTornadoPluginStore, resetTornadoPluginStore } from './store/initTornadoPluginStore'
 import { TornadoSpawnMessage } from './message/tornadoSpawnMessage'
@@ -29,7 +29,6 @@ export class TornadoPlugin extends BaseAlchemyItemPlugin {
   private playerPluginStore!: PlayerPluginStore
   private networkStore!: NetworkPluginStore<IMainScene>
   private socketController?: SocketController
-  protected alchemyItemKind = tornado
   protected alchemyItem = TORNADO_ITEM
 
   public listenEvent(): void {

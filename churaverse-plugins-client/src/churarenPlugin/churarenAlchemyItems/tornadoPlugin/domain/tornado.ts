@@ -4,15 +4,14 @@ import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/
 import { Direction, GRID_SIZE, Position, WeaponEntity } from 'churaverse-engine-client'
 import tornadoImage from '../assets/tornado.png'
 
-const DISPLAY_SIZE = 100
 export const TORNADO_WALK_LIMIT_GRIDS = 5
 export const TORNADO_WALK_LIMIT_MS = 500
 export const TORNADO_SPEED = (TORNADO_WALK_LIMIT_GRIDS * GRID_SIZE) / TORNADO_WALK_LIMIT_MS
 export const tornado: AlchemyItemKind = 'tornado'
 export const TORNADO_ITEM: IAlchemyItem = {
+  kind: 'tornado',
   image: tornadoImage,
-  displaySize: DISPLAY_SIZE,
-} as const
+}
 
 /**
  * Tornadoクラスの定義
@@ -23,12 +22,12 @@ export class Tornado extends AlchemyItem implements WeaponEntity {
   public isDead = false
   public tornadoId: string
   public spawnTime: number
-  // TODO: `ChurarenWeaponEntity`をimplementsした際に、ownerIdを`churarenWeaponOwnerId`に変更し、idは`explosionId`に統合される
+  // TODO: `ChurarenWeaponEntity`をimplementsした際に、ownerIdを`churarenWeaponOwnerId`に変更し、idは`tornadoId`に統合される
   public readonly id: string
   public ownerId: string
 
   public constructor(tornadoId: string, ownerId: string, position: Position, direction: Direction, spawnTime: number) {
-    super(tornadoId, tornado)
+    super(tornadoId, TORNADO_ITEM.kind)
     this.id = tornadoId
     this.tornadoId = tornadoId
     this.ownerId = ownerId
