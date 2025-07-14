@@ -250,7 +250,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.churarenPlayerStore.ghostModePlayerRepository.delete(ev.id)
     const player = this.playerPluginStore.players.get(ev.id)
     if (player === undefined) return
-    this.revivalPlayer(player.id)
+    this.showPlayer(player.id)
     this.ghostModeIndicatorUi?.ghostModeIcon.deactivate()
     this.updateGhostPlayerList()
   }
