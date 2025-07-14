@@ -17,9 +17,13 @@ export class RevivalItemPlugin extends BaseGamePlugin {
   }
 
   // `UseRevivalItemEvent`は、`ChurarenPlayerPlugin`が処理する
-  protected subscribeGameEvent(): void {}
+  protected subscribeGameEvent(): void {
+    super.subscribeGameEvent()
+  }
 
-  protected unsubscribeGameEvent(): void {}
+  protected unsubscribeGameEvent(): void {
+    super.unsubscribeGameEvent()
+  }
 
   protected handleGameStart(): void {
     this.socketController?.registerMessageListener()
