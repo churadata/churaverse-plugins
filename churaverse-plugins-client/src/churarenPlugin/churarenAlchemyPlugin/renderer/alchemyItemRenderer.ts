@@ -8,6 +8,8 @@ import { AlchemyItemKind } from '../domain/alchemyItemKind'
  */
 const ITEM_TEXTURE_KEY_PREFIX = `alchemyItem`
 
+const DISPLAY_SIZE = 80
+
 /**
  * AlchemyItem描画クラス
  */
@@ -17,7 +19,7 @@ export class AlchemyItemRenderer implements IAlchemyItemRenderer {
   private readonly textureKey: string
   private tween?: Phaser.Tweens.Tween
 
-  public constructor(scene: Scene, kind: AlchemyItemKind, DISPLAY_SIZE: number) {
+  public constructor(scene: Scene, kind: AlchemyItemKind) {
     this.scene = scene
     this.textureKey = `${ITEM_TEXTURE_KEY_PREFIX}_${kind}`
     this.image = scene.add
