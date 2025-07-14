@@ -39,7 +39,9 @@ export class RevivalItemPlugin extends BaseAlchemyItemPlugin {
     resetRevivalPluginStore(this.store)
   }
 
-  protected handleMidwayParticipant(): void {}
+  protected handleMidwayParticipant(): void {
+    this.unsubscribeGameEvent()
+  }
 
   protected useAlchemyItem = (ev: UseAlchemyItemEvent): void => {
     if (ev.alchemyItem.kind !== 'revivalItem') return
