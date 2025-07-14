@@ -136,15 +136,6 @@ export class ExplosionPlugin extends BaseAlchemyItemPlugin {
     this.walkExplosion(explosion, renderer)
   }
 
-  private walkExplosion(explosion: Explosion, render: IExplosionAttackRenderer): void {
-    const dest = explosion.position.copy()
-    dest.x = explosion.direction.x * EXPLOSION_WALK_LIMIT_GRIDS * GRID_SIZE + explosion.position.x
-    dest.y = explosion.direction.y * EXPLOSION_WALK_LIMIT_GRIDS * GRID_SIZE + explosion.position.y
-    render.walk(explosion.position, dest, (pos) => {
-      explosion.walk(pos)
-    })
-  }
-
   private readonly dieExplosion = (ev: EntityDespawnEvent): void => {
     if (!(ev.entity instanceof Explosion)) return
     const explosionId = ev.entity.explosionId
@@ -154,5 +145,14 @@ export class ExplosionPlugin extends BaseAlchemyItemPlugin {
     explosionAttackRenderer?.dead()
     this.explosionPluginStore.explosions.delete(explosionId)
     this.explosionPluginStore.explosionAttackRenderers.delete(explosionId)
+  }
+
+  private walkExplosion(explosion: Explosion, render: IExplosionAttackRenderer): void {
+    const dest = explosion.position.copy()
+    dest.x = explosion.direction.x * EXPLOSION_WALK_LIMIT_GRIDS * GRID_SIZE + explosion.position.x
+    dest.y = explosion.direction.y * EXPLOSION_WALK_LIMIT_GRIDS * GRID_SIZE + explosion.position.y
+    render.walk(explosion.position, dest, (pos) => {
+      explosion.walk(pos)
+    })
   }
 }
