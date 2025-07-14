@@ -4,11 +4,10 @@ import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/
 import { Direction, Position } from 'churaverse-engine-client'
 import healingPotionImage from '../assets/healingPotion.png'
 
-const DISPLAY_SIZE = 80
 export const healignPotion: AlchemyItemKind = 'healingPotion'
 export const HEALING_POTION_ITEM: IAlchemyItem = {
+  kind: 'healingPotion',
   image: healingPotionImage,
-  displaySize: DISPLAY_SIZE,
 }
 
 /**
@@ -28,7 +27,7 @@ export class HealingPotion extends AlchemyItem {
     direction: Direction,
     spawnTime: number
   ) {
-    super(healingPotionId, healignPotion)
+    super(healingPotionId, HEALING_POTION_ITEM.kind)
     this.healingPotionId = healingPotionId
     this.ownerId = ownerId
     this.position = position
