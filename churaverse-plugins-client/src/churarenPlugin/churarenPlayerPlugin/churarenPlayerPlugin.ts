@@ -250,8 +250,12 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     const player = this.playerPluginStore.players.get(ev.id)
     if (player === undefined) return
     this.showPlayer(player.id)
-    this.ghostModeIndicatorUi?.ghostModeIcon.deactivate()
     this.updateGhostPlayerList()
+    if (player.id === this.playerPluginStore.ownPlayerId) {
+      this.ghostModeIndicatorUi?.ghostModeIcon.deactivate()
+      this.playerItemStore.materialItemBoxContainer.show()
+      this.playerItemStore.alchemyItemBoxContainer.show()
+    }
   }
 
   private setupChase(
