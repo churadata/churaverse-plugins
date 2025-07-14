@@ -67,16 +67,16 @@ export class ExplosionPlugin extends BaseGamePlugin {
     })
   }
 
-  // TODO: CV-706のマージ後に`Boss`との衝突後のコールバックを実装する
-  private explosionHit(explosion: Explosion, boss: any): void {}
-
-  // TODO: CV-706のマージ後に`boss`との衝突判定を有効化する
-  private registerOnOverlapBoss(ev: RegisterOnOverlapEvent): void {}
-
   private readonly spawnExplosion = (ev: EntitySpawnEvent): void => {
     if (!(ev.entity instanceof Explosion)) return
     const explosion = ev.entity
     this.explosionPluginStore.explosions.set(explosion.explosionId, explosion)
     explosion.walk(this.mapPluginStore.mapManager.currentMap)
   }
+
+  // TODO: CV-706のマージ後に`Boss`との衝突後のコールバックを実装する
+  private explosionHit(explosion: Explosion, boss: any): void {}
+
+  // TODO: CV-706のマージ後に`boss`との衝突判定を有効化する
+  private registerOnOverlapBoss(ev: RegisterOnOverlapEvent): void {}
 }
