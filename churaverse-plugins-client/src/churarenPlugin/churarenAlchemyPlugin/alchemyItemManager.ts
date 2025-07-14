@@ -21,7 +21,7 @@ export class AlchemyItemManager {
     if (this.items.has(kind)) {
       throw new Error(`Item of kind ${kind} already exists`)
     }
-    const rendererFactory = new AlchemyItemRendererFactory(this.scene, kind, item.displaySize)
+    const rendererFactory = new AlchemyItemRendererFactory(this.scene, kind)
     this.items.set(kind, { ...item, rendererFactory })
   }
 

@@ -152,7 +152,7 @@ function createAlchemyItem(type: string, kind1: string): AlchemyItem {
 const alchemyItemMapAllSame: Record<string, AlchemyItemKind> = {
   fireOre: 'flamePillar',
   waterOre: 'waterRing',
-  grassOre: 'flamePillar',
+  grassOre: 'tornado',
   herb: 'revivalItem',
 }
 
