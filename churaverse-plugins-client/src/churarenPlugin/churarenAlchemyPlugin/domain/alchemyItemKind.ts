@@ -3,6 +3,7 @@ export type AlchemyItemKind =
   | 'flamePillar'
   | 'waterRing'
   | 'iceArrow'
+  | 'tornado'
   | 'trap'
   | 'blackHole'
   | 'revivalItem'
