@@ -2,19 +2,16 @@ import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/a
 import { Direction, GRID_SIZE, Position, WeaponEntity } from 'churaverse-engine-client'
 import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/IAlchemyItem'
 import explosionImage from '../assets/explosion.png'
-import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind'
 
 /**
  * 表示時の縦横のサイズ
  */
-const DISPLAY_SIZE = 100
 export const EXPLOSION_WALK_LIMIT_GRIDS = 1
 export const EXPLOSION_WALK_LIMIT_MS = 600
 export const EXPLOSION_SPEED = (EXPLOSION_WALK_LIMIT_GRIDS * GRID_SIZE) / EXPLOSION_WALK_LIMIT_MS
-export const explosion: AlchemyItemKind = 'explosion'
 export const EXPLOSION_ITEM: IAlchemyItem = {
+  kind: 'explosion',
   image: explosionImage,
-  displaySize: DISPLAY_SIZE,
 } as const
 
 /**
@@ -37,7 +34,7 @@ export class Explosion extends AlchemyItem implements WeaponEntity {
     direction: Direction,
     spawnTime: number
   ) {
-    super(explosionId, explosion)
+    super(explosionId, EXPLOSION_ITEM.kind)
     this.id = explosionId
     this.explosionId = explosionId
     this.ownerId = ownerId

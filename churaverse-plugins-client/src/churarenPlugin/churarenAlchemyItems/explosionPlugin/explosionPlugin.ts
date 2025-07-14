@@ -15,7 +15,7 @@ import { initExplosionPluginStore, resetExplosionPluginStore } from './store/ini
 import { ExplosionPluginStore } from './store/defExplosionPluginStore'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
-import { explosion, Explosion, EXPLOSION_ITEM, EXPLOSION_WALK_LIMIT_GRIDS } from './domain/explosion'
+import { Explosion, EXPLOSION_ITEM, EXPLOSION_WALK_LIMIT_GRIDS } from './domain/explosion'
 import { UseAlchemyItemEvent } from '@churaverse/churaren-alchemy-plugin-client/event/useAlchemyItemEvent'
 import { ClearAlchemyItemBoxEvent } from '@churaverse/churaren-alchemy-plugin-client/event/clearAlchemyItemBox'
 import { ExplosionSpawnMessage } from './message/explosionSpawnMessage'
@@ -29,7 +29,6 @@ export class ExplosionPlugin extends BaseAlchemyItemPlugin {
   private playerPluginStore!: PlayerPluginStore
   private networkStore!: NetworkPluginStore<IMainScene>
   private socketController?: SocketController
-  protected alchemyItemKind = explosion
   protected alchemyItem = EXPLOSION_ITEM
 
   public listenEvent(): void {
