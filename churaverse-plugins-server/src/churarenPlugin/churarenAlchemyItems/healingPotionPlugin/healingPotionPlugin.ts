@@ -17,9 +17,13 @@ export class HealingPotionPlugin extends BaseGamePlugin {
   }
 
   // 回復は`ChruarenPlayerPlugin`で行っている
-  protected subscribeGameEvent(): void {}
+  protected subscribeGameEvent(): void {
+    super.subscribeGameEvent()
+  }
 
-  protected unsubscribeGameEvent(): void {}
+  protected unsubscribeGameEvent(): void {
+    super.unsubscribeGameEvent()
+  }
 
   protected handleGameStart(): void {
     this.socketController?.registerMessageListener()
