@@ -136,7 +136,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.playerItemStore.alchemyItemBoxContainer.remove()
     this.churarenPlayerStore.ghostPlayerListUi.remove()
     this.clearPlayerItemBox()
-    this.revivalPlayer()
+    this.showAllGhostPlayers()
     this.ghostModeIndicatorUi?.ghostModeIcon.deactivate()
     resetChurarenPlayersStore(this.store)
     resetPlayerItemStore(this.store)
@@ -166,15 +166,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     }
     this.changeGhostPlayer(player.id)
     this.updateGhostPlayerList()
-  }
-
-  private changeGhostPlayer(playerId: string): void {
-    this.playerPluginStore.playerRenderers.get(playerId)?.setSpriteAlpha(0.4)
-  }
-
-  private updateGhostPlayerList(): void {
-    const playerNames = this.churarenPlayerStore.ghostModePlayerRepository.getPlayerNames()
-    this.churarenPlayerStore.ghostPlayerListUi.updateGhostPlayerList(playerNames)
   }
 
   private readonly onInvicibleTime = (ev: InvicibleTimeEvent): void => {
@@ -222,12 +213,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     }
   }
 
-  private updateItemBox(playerId: string): void {
-    const itemBoxes = this.playerItemStore.materialItems.getAllItem(playerId)
-    const itemImageList = itemBoxes.map((item) => materialItemImage[item.kind])
-    this.playerItemStore.materialItemBoxContainer.updateMaterialItemBox(itemImageList)
-  }
-
   private readonly dropItem = (ev: DropChurarenItemEvent): void => {
     const renderer = this.playerItemStore.materialItemRenderers.get(ev.itemId)
     if (renderer == null) return
@@ -240,6 +225,30 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
       const dropItemData: DropChurarenItemData = { playerId: ev.playerId, itemId: ev.itemId }
       const dropItemMessage = new DropChurarenItemMessage(dropItemData)
       this.networkPluginStore.messageSender.send(dropItemMessage)
+    }
+  }
+
+  private readonly logPlayerDeathByBoss = (ev: LivingDamageEvent): void => {
+    // TODO: プレイヤーがボスによって死亡した時のログを流す
+    //  (churarenBossPluginのChurarenEnemyDamageCauseかどうかを判定する)
+  }
+
+  private readonly onChangePlayerName = (ev: PlayerNameChangeEvent): void => {
+    if (!this.isActive) return
+    this.updateGhostPlayerList()
+  }
+
+  private setupChase(
+    renderer: any,
+    item: { position: { x: number; y: number } },
+    dest: { x: number; y: number },
+    speed: number
+  ): void {
+    if (renderer !== undefined && renderer !== null && typeof renderer.chase === 'function') {
+      renderer.chase(dest, speed, (pos: { x: number; y: number }) => {
+        item.position.x = pos.x
+        item.position.y = pos.y
+      })
     }
   }
 
@@ -275,38 +284,29 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     }
   }
 
-  private setupChase(
-    renderer: any,
-    item: { position: { x: number; y: number } },
-    dest: { x: number; y: number },
-    speed: number
-  ): void {
-    if (renderer !== undefined && renderer !== null && typeof renderer.chase === 'function') {
-      renderer.chase(dest, speed, (pos: { x: number; y: number }) => {
-        item.position.x = pos.x
-        item.position.y = pos.y
-      })
-    }
+  private updateItemBox(playerId: string): void {
+    const itemBoxes = this.playerItemStore.materialItems.getAllItem(playerId)
+    const itemImageList = itemBoxes.map((item) => materialItemImage[item.kind])
+    this.playerItemStore.materialItemBoxContainer.updateMaterialItemBox(itemImageList)
   }
 
-  private revivalPlayer(playerId?: string): void {
-    if (playerId === undefined) {
-      this.churarenPlayerStore.ghostModePlayerRepository.getAllId().forEach((id) => {
-        this.revivalPlayer(id)
-      })
-      return
-    }
+  private showPlayer(playerId: string): void {
     this.playerPluginStore.playerRenderers.get(playerId)?.setSpriteAlpha(1)
   }
 
-  private readonly logPlayerDeathByBoss = (ev: LivingDamageEvent): void => {
-    // TODO: プレイヤーがボスによって死亡した時のログを流す
-    //  (churarenBossPluginのChurarenEnemyDamageCauseかどうかを判定する)
+  private showAllGhostPlayers(): void {
+    this.churarenPlayerStore.ghostModePlayerRepository.getAllId().forEach((id) => {
+      this.showPlayer(id)
+    })
   }
 
-  private readonly onChangePlayerName = (ev: PlayerNameChangeEvent): void => {
-    if (!this.isActive) return
-    this.updateGhostPlayerList()
+  private changeGhostPlayer(playerId: string): void {
+    this.playerPluginStore.playerRenderers.get(playerId)?.setSpriteAlpha(0.4)
+  }
+
+  private updateGhostPlayerList(): void {
+    const playerNames = this.churarenPlayerStore.ghostModePlayerRepository.getPlayerNames()
+    this.churarenPlayerStore.ghostPlayerListUi.updateGhostPlayerList(playerNames)
   }
 
   private readonly onPlayerHeal = (ev: PlayerHealEvent): void => {
