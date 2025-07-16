@@ -1,12 +1,11 @@
 import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItem'
 import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind'
 import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/IAlchemyItem'
-import { Direction, GRID_SIZE, Position, WeaponEntity } from 'churaverse-engine-client'
+import { Direction, Position, WeaponEntity } from 'churaverse-engine-client'
 import tornadoImage from '../assets/tornado.png'
 
 export const TORNADO_WALK_LIMIT_GRIDS = 5
 export const TORNADO_WALK_LIMIT_MS = 500
-export const TORNADO_SPEED = (TORNADO_WALK_LIMIT_GRIDS * GRID_SIZE) / TORNADO_WALK_LIMIT_MS
 export const tornado: AlchemyItemKind = 'tornado'
 export const TORNADO_ITEM: IAlchemyItem = {
   kind: 'tornado',
