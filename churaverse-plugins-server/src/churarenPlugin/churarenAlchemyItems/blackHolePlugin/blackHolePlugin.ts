@@ -17,6 +17,7 @@ export class BlackHolePlugin extends BaseGamePlugin {
   private socketController?: SocketController
 
   public listenEvent(): void {
+    super.listenEvent()
     this.bus.subscribeEvent('init', this.init.bind(this))
 
     this.socketController = new SocketController(this.bus, this.store)
