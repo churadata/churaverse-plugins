@@ -6,6 +6,7 @@ import { CountdownWindow } from './countdownWindow/countdownWindow'
 import { TimerContainer } from './timerContainer/timerContainer'
 import { ResultWindow } from './resultWindow/resultWindow'
 import { CHURAREN_UI_KEYS } from './defChurarenUi'
+
 /**
  * churarenのUIを登録する
  */
