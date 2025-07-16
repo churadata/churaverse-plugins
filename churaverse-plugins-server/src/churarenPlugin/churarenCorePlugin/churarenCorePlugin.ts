@@ -100,7 +100,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   }
 
   /**
-   * 結果を表示する処理 \
+   * 結果を表示する処理
    * `RESULT_DISPLAY_TIME_SECONDS`秒後にゲームを終了する
    */
   private readonly sendChurarenResult = (ev: ChurarenResultEvent): void => {
