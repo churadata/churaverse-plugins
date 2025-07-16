@@ -82,8 +82,11 @@ export class BlackHolePlugin extends BaseAlchemyItemPlugin {
   }
 
   protected handleGameTermination(): void {
-    resetBlackHolePluginStore(this.store)
     this.socketController?.unregisterMessageListener()
+    this.blackHolePluginStore.blackHoleAttackRenderers.forEach((renderer) => {
+      renderer.dead()
+    })
+    resetBlackHolePluginStore(this.store)
   }
 
   protected handleMidwayParticipant(): void {
