@@ -1,13 +1,18 @@
 import { Scene } from 'phaser'
-import blackHoleAttackImage from '../assets/blackHole.png'
+import blackHoleAttackImage from '../assets/blackHoleAttack.png'
 import { IBlackHoleAttackRenderer } from '../domain/IBlackHoleAttackRenderer'
 import { BLACK_HOLE_MOVE_LIMIT_MS } from '../domain/blackHole'
-import { FRAME_RATE, Position } from 'churaverse-engine-client'
+import { FRAME_RATE, layerSetting, Position } from 'churaverse-engine-client'
 
 /**
  * ブラックホールアタックのテクスチャキー
  */
-const BLACK_HOLE_TEXTURE_KEY = 'blackHoleAttack'
+const BLACK_HOLE_ATTACK_TEXTURE_KEY = 'blackHoleAttack'
+
+/**
+ * ブラックホールアタックのアニメーションキー
+ */
+const BLACK_HOLE_ATTACK_ANIM_KEY = 'blackHoleAttack'
 
 /**
  * 表示時の縦横のサイズ
@@ -33,7 +38,7 @@ export class BlackHoleAttackRenderer implements IBlackHoleAttackRenderer {
         // 初期座標は画面外に設定しておく
         -100,
         -100,
-        BLACK_HOLE_TEXTURE_KEY,
+        BLACK_HOLE_ATTACK_TEXTURE_KEY,
         // アニメーションの番号
         0
       )
@@ -41,19 +46,20 @@ export class BlackHoleAttackRenderer implements IBlackHoleAttackRenderer {
 
     scene.anims.create({
       key: _anims[0].key,
-      frames: scene.anims.generateFrameNames(BLACK_HOLE_TEXTURE_KEY, {
+      frames: scene.anims.generateFrameNames(BLACK_HOLE_ATTACK_ANIM_KEY, {
         start: _anims[0].frameStart,
         end: _anims[0].frameEnd,
       }),
       frameRate: FRAME_RATE,
       repeat: -1,
-      hideOnComplete: false,
     })
+
+    layerSetting(this.sprite, 'player', 20)
   }
 
   // 基本アイテムのテクスチャのロード
   public static loadAssets(scene: Scene): void {
-    scene.load.spritesheet(BLACK_HOLE_TEXTURE_KEY, blackHoleAttackImage, {
+    scene.load.spritesheet(BLACK_HOLE_ATTACK_TEXTURE_KEY, blackHoleAttackImage, {
       frameWidth: 150,
       frameHeight: 150,
     })
@@ -62,8 +68,8 @@ export class BlackHoleAttackRenderer implements IBlackHoleAttackRenderer {
   public move(pos: Position, dest: Position, onUpdate: (pos: Position) => void): void {
     this.sprite.active = true
     const src = pos.copy()
-    this.tween = this.scene.tweens.add({
-      targets: this.sprite,
+    this.tween = this.scene.add.tween({
+      targets: [this.sprite],
       x: {
         getStart: () => src.x,
         getEnd: () => dest.x,
@@ -84,6 +90,12 @@ export class BlackHoleAttackRenderer implements IBlackHoleAttackRenderer {
       ease: 'Sine.easeInOut',
       yoyo: true,
     })
+
+    // アニメーション開始
+    const animKey = _anims[0].key
+    if (animKey !== undefined) {
+      this.sprite.anims.play(animKey)
+    }
   }
 
   public dead(): void {
