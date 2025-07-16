@@ -10,5 +10,7 @@
     "link:cvPackages": "sh npm_link_cvPackages.sh"
   },
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "@churaverse/churaren-black-hole-plugin-server": "file:../blackHolePlugin"
+  }
 }
