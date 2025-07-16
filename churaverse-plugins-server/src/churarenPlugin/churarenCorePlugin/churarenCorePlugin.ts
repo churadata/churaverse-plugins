@@ -60,12 +60,10 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   protected handleGameStart(): void {
     initChurarenPluginStore(this.gameId, this.store, this.bus)
     this.socketController?.registerMessageListener()
-    this.sequence()
-      .then(() => {})
-      .catch((err) => {
-        console.error(err)
-        this.bus.post(new GameEndEvent(this.gameId))
-      })
+    this.sequence().catch((err) => {
+      console.error(err)
+      this.bus.post(new GameEndEvent(this.gameId))
+    })
   }
 
   /**
