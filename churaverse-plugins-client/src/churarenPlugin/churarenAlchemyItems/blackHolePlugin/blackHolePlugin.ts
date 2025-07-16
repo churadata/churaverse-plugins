@@ -45,10 +45,6 @@ export class BlackHolePlugin extends BaseAlchemyItemPlugin {
       'registerMessageListener',
       this.socketController.setupRegisterMessageListener.bind(this.socketController)
     )
-
-    this.bus.subscribeEvent('useAlchemyItem', this.useAlchemyItem.bind(this))
-    this.bus.subscribeEvent('entitySpawn', this.spawnBlackHole.bind(this))
-    this.bus.subscribeEvent('entityDespawn', this.dieBlackHole.bind(this))
   }
 
   private phaserSceneInit(ev: PhaserSceneInit): void {

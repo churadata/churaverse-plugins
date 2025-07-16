@@ -35,6 +35,7 @@ export class BlackHole extends AlchemyItem implements WeaponEntity {
     this.id = blackHoleId
     this.blackHoleId = blackHoleId
     this.ownerId = ownerId
+    this.position = position
     this.spawnTime = spawnTime
     this.direction = direction
   }
