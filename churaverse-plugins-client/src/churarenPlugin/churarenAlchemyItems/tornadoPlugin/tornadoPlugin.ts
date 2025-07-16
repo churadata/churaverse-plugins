@@ -2,6 +2,7 @@ import { SocketController } from './controller/socketController'
 import {
   EntityDespawnEvent,
   EntitySpawnEvent,
+  GRID_SIZE,
   IMainScene,
   PhaserLoadAssets,
   PhaserSceneInit,
@@ -17,7 +18,7 @@ import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-clien
 import '@churaverse/churaren-core-plugin-client/churarenCorePlugin'
 import { TornadoAttackRendererFactory } from './renderer/tornadoAttackRendererFactory'
 import { TornadoPluginStore } from './store/defTornadoPluginStore'
-import { Tornado, TORNADO_ITEM, TORNADO_SPEED, TORNADO_WALK_LIMIT_MS } from './domain/tornado'
+import { Tornado, TORNADO_ITEM, TORNADO_WALK_LIMIT_GRIDS } from './domain/tornado'
 import { TornadoAttackRenderer } from './renderer/tornadoAttackRenderer'
 import { initTornadoPluginStore, resetTornadoPluginStore } from './store/initTornadoPluginStore'
 import { TornadoSpawnMessage } from './message/tornadoSpawnMessage'
@@ -130,8 +131,6 @@ export class TornadoPlugin extends BaseAlchemyItemPlugin {
     const renderer = this.tornadoPluginStore.tornadoAttackRendererFactory.build()
     this.tornadoPluginStore.tornados.set(tornado.tornadoId, tornado)
     this.tornadoPluginStore.tornadoAttackRenderers.set(tornado.tornadoId, renderer)
-    const clearAlchemyItemBoxEvent = new ClearAlchemyItemBoxEvent(this.playerPluginStore.ownPlayerId)
-    this.bus.post(clearAlchemyItemBoxEvent)
     this.walkTornado(tornado, renderer)
   }
 
@@ -148,7 +147,7 @@ export class TornadoPlugin extends BaseAlchemyItemPlugin {
 
   private walkTornado(tornado: Tornado, render: ITornadoAttackRenderer): void {
     const totalSteps = 10 // アニメーションの総ステップ数
-    const moveDistance = TORNADO_SPEED * TORNADO_WALK_LIMIT_MS // 1ステップあたりの移動距離
+    const moveDistance = TORNADO_WALK_LIMIT_GRIDS * GRID_SIZE // 1ステップあたりの移動距離
 
     let stepIndex = 0 // 現在のステップ数
 
