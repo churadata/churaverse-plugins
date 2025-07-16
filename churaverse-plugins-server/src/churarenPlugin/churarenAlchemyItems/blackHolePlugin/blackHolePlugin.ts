@@ -26,7 +26,6 @@ export class BlackHolePlugin extends BaseGamePlugin {
       this.socketController.setupRegisterMessageListener.bind(this.socketController)
     )
 
-    this.bus.subscribeEvent('entitySpawn', this.spawnBlackHole.bind(this))
     this.bus.subscribeEvent('registerOnOverlap', this.registerOnOverlap.bind(this))
   }
 
