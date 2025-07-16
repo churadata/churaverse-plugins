@@ -41,15 +41,15 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.messageListenerRegister.off('churarenResult', this.churarenResult)
   }
 
-  public churarenStartCountdown = (): void => {
+  private readonly churarenStartCountdown = (): void => {
     this.eventBus.post(new ChurarenStartCountdownEvent())
   }
 
-  public churarenStartTimer = (): void => {
+  private readonly churarenStartTimer = (): void => {
     this.eventBus.post(new ChurarenStartTimerEvent())
   }
 
-  public churarenResult = (msg: ChurarenResultMessage): void => {
+  private readonly churarenResult = (msg: ChurarenResultMessage): void => {
     this.eventBus.post(new ChurarenResultEvent(msg.data.resultType))
   }
 }
