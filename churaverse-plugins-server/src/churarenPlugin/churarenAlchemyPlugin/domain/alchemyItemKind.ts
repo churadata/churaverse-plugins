@@ -1,0 +1,10 @@
+export type AlchemyItemKind =
+  | 'explosion'
+  | 'flamePillar'
+  | 'waterRing'
+  | 'iceArrow'
+  | 'tornado'
+  | 'trap'
+  | 'blackHole'
+  | 'revivalItem'
+  | 'healingPotion'
