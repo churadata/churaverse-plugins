@@ -10,5 +10,7 @@
     "link:cvPackages": "sh npm_link_cvPackages.sh"
   },
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "@churaverse/churaren-ice-arrow-plugin-server": "file:../iceArrowPlugin"
+  }
 }
