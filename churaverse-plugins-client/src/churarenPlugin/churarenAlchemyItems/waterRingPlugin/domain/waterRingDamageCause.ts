@@ -1,14 +1,12 @@
-import { WeaponDamageCause } from '../../../../../domain/model/weaponDamageCause'
-import { ChurarenWeaponDamageCause } from '../../../model/churarenWeaponDamageCause'
-import { ChurarenWeaponEntity } from '../../../model/churarenWeaponEntity'
+import { WeaponDamageCause, WeaponEntity } from 'churaverse-engine-client'
 
-export class WaterRingDamageCause extends ChurarenWeaponDamageCause {
-  public constructor(public readonly waterRing: ChurarenWeaponEntity) {
+export class WaterRingDamageCause extends WeaponDamageCause {
+  public constructor(public readonly waterRing: WeaponEntity) {
     super('waterRing', waterRing)
   }
 }
 
-declare module '../../../../../domain/model/damageCause' {
+declare module 'churaverse-engine-client' {
   export interface DamageCauseMap {
     waterRing: WeaponDamageCause
   }

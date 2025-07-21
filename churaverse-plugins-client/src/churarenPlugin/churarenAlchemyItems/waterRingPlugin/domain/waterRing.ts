@@ -6,7 +6,7 @@ import waterRingImage from '../assets/waterRing.gif'
 
 export const waterRing: AlchemyItemKind = 'waterRing'
 export const WATER_RING_ITEM: IAlchemyItem = {
-  kind: 'waterRing',
+  displaySize: 100,
   image: waterRingImage,
 } as const
 
