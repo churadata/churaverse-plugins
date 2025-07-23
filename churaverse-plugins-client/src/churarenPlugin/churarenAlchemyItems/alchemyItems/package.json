@@ -34,6 +34,6 @@
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "dependencies": {
-    "@churaverse/churaren-water-ring-plugin-client": "file:../WaterRingPlugin"
+    "@churaverse/churaren-water-ring-plugin-client": "file:../waterRingPlugin"
   }
 }

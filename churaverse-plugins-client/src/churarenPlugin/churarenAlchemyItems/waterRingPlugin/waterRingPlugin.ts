@@ -15,7 +15,7 @@ import { initWaterRingPluginStore, resetWaterRingPluginStore } from './store/ini
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { Sendable } from '@churaverse/network-plugin-client/types/sendable'
 import { WaterRingPluginStore } from './store/defWaterRingPluginStore'
-import { WaterRing, WATER_RING_ITEM, waterRing } from './domain/waterRing'
+import { WaterRing, WATER_RING_ITEM } from './domain/waterRing'
 import { WaterRingSpawnMessage } from './message/waterRingSpawnMessage'
 import { SocketController } from './controller/socketController'
 import { ClearAlchemyItemBoxEvent } from '@churaverse/churaren-alchemy-plugin-client/event/clearAlchemyItemBox'
@@ -32,7 +32,6 @@ export class WaterRingPlugin extends BaseAlchemyItemPlugin {
   private playerPluginStore!: PlayerPluginStore
   private networkStore!: NetworkPluginStore<IMainScene>
   private socketController?: SocketController
-  protected alchemyItemKind = waterRing
   protected alchemyItem = WATER_RING_ITEM
 
   public listenEvent(): void {
@@ -91,6 +90,7 @@ export class WaterRingPlugin extends BaseAlchemyItemPlugin {
   protected handleGameTermination(): void {
     resetWaterRingPluginStore(this.store)
     this.socketController?.unregisterMessageListener()
+    this.clearWaterRing()
   }
 
   protected handleMidwayParticipant(): void {
@@ -166,7 +166,7 @@ export class WaterRingPlugin extends BaseAlchemyItemPlugin {
     const waterRingAttackRenderer = this.waterRingPluginStore.waterRingAttackRenderers.get(waterRing.waterRingId)
     waterRing?.die()
     waterRingAttackRenderer?.dead()
-    this.waterRingPluginStore.waterRings.delete(waterRing.itemId)
+    this.waterRingPluginStore.waterRings.delete(waterRing.waterRingId)
   }
 
   // 水の輪の出現を受信した時の処理
