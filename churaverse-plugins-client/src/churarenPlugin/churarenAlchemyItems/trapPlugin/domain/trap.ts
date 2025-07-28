@@ -23,6 +23,8 @@ export class Trap extends AlchemyItem implements WeaponEntity {
     this.id = trapId
     this.trapId = trapId
     this.ownerId = ownerId
+    this.position = position
+    this.direction = direction
     this.spawnTime = spawnTime
   }
 }

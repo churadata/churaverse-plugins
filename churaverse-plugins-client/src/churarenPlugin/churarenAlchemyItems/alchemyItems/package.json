@@ -34,6 +34,6 @@
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "dependencies": {
-    "@churaverse/trap-plugin-client": "file:../trapPlugin"
+    "@churaverse/churaren-trap-plugin-client": "file:../trapPlugin"
   }
 }
