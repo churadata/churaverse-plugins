@@ -1,3 +1,3 @@
-import { TrapPlugin } from '@churaverse/trap-plugin-server'
+import { TrapPlugin } from '@churaverse/churaren-trap-plugin-server'
 
 export const alchemyItems = [TrapPlugin]

@@ -11,6 +11,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@churaverse/trap-plugin-server": "file:../trapPlugin"
+    "@churaverse/churaren-trap-plugin-server": "file:../trapPlugin"
   }
 }
