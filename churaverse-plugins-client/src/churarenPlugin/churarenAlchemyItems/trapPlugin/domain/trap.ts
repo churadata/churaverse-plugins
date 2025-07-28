@@ -17,8 +17,6 @@ export class Trap extends AlchemyItem implements WeaponEntity {
   public readonly id: string
   public spawnTime: number
   public ownerId: string
-  public position: Position
-  public direction: Direction
 
   public constructor(trapId: string, ownerId: string, position: Position, direction: Direction, spawnTime: number) {
     super(trapId, TRAP_ITEM.kind)
