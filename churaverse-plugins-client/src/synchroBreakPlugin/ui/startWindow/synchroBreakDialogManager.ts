@@ -4,7 +4,7 @@ import { GamePluginStore } from '@churaverse/game-plugin-client/store/defGamePlu
 import { PopupSynchroBreakRule } from './popupSynchroBreakRule'
 
 /**
- * 画面上部に並ぶアイコンにシンクロブレイクアイコンを追加するクラス
+ * ゲームリストにシンクロブレイクを追加するクラス
  */
 export class SynchroBreakDialogManager {
   private readonly gamePluginStore: GamePluginStore
