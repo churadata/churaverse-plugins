@@ -28,7 +28,7 @@ export abstract class GameDescriptionWindow implements IGameDescriptionWindow {
     this.setupCloseButton()
   }
 
-  public createGameDetail(detail: HTMLElement): void {
+  public createGameDescription(detail: HTMLElement): void {
     const container = DomManager.getElementById(GAME_DESCRIPTION_CONTAINER_ID(this.gameId))
     container.appendChild(detail)
   }
