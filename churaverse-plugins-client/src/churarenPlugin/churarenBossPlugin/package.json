@@ -1,5 +1,5 @@
 {
-  "name": "@churaverse/churaren-core-plugin-client",
+  "name": "@churaverse/churaren-boss-plugin-client",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
@@ -34,11 +34,12 @@
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "dependencies": {
+    "@churaverse/churaren-core-plugin-client": "file:../churarenCorePlugin",
     "@churaverse/core-ui-plugin-client": "^0.1.1",
     "@churaverse/debug-screen-plugin-client": "~0.1.0",
     "@churaverse/game-plugin-client": "file:../../gamePlugin",
     "@churaverse/network-plugin-client": "file:../../networkPlugin",
-    "@churaverse/player-plugin-client": "~0.1.0",
+    "@churaverse/player-plugin-client": "^0.1.2",
     "churaverse-engine-client": "file:../../../../../churaverse-engine/churaverse-engine-client",
     "phaser": "^3.80.1"
   }
