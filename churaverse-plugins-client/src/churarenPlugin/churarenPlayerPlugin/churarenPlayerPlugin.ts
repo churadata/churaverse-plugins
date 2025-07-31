@@ -190,8 +190,8 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     const speed = ev.speed ?? GRID_SIZE / GRID_WALK_DURATION_MS
 
     // TODO: 錬金アイテムを持っている場合の処理を追加
-    const itemBoxes = this.playerItemStore.materialItems.getAllItem(ev.id)
-    itemBoxes.forEach((item: Item, index: number) => {
+    const items = this.playerItemStore.materialItems.getAllItem(ev.id)
+    items.forEach((item: Item, index: number) => {
       if (item === undefined) return
       const renderer = this.playerItemStore.materialItemRenderers.get(item.itemId)
       const dest = player.position.copy()
