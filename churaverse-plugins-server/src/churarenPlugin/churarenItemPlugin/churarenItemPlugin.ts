@@ -60,10 +60,9 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
   }
 
   private readonly update = (): void => {
-    removeItems(this.itemPluginStore.items, (itemIds: string[]) => {
-      const itemDespawnMessage = new ChurarenItemDespawnMessage({ itemIds })
-      this.networkPluginStore.messageSender.send(itemDespawnMessage)
-    })
+    const itemIds = removeItems(this.itemPluginStore.items)
+    const itemDespawnMessage = new ChurarenItemDespawnMessage({ itemIds })
+    this.networkPluginStore.messageSender.send(itemDespawnMessage)
   }
 
   protected handleGameStart(): void {

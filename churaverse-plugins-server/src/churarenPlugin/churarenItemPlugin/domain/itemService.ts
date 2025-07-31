@@ -10,7 +10,7 @@ import { ChurarenItemInfo, ChurarenItemInfoMap } from '../message/churarenItemSp
 /**
  * 時間経過済みのアイテムを削除する
  */
-export function removeItems(items: IItemRepository, onDelete: (itemIds: string[]) => void): void {
+export function removeItems(items: IItemRepository): string[] {
   const deleteItems: string[] = []
   items.getAllId().forEach((itemId) => {
     const item = items.get(itemId)
@@ -19,7 +19,7 @@ export function removeItems(items: IItemRepository, onDelete: (itemIds: string[]
       deleteItems.push(itemId)
     }
   })
-  onDelete(deleteItems)
+  return deleteItems
 }
 
 /**
