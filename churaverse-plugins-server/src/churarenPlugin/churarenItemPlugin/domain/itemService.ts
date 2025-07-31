@@ -7,10 +7,6 @@ import { SendableObject } from '@churaverse/network-plugin-server/types/sendable
 import { uniqueId } from '@churaverse/churaren-core-plugin-server'
 import { ChurarenItemInfo, ChurarenItemInfoMap } from '../message/churarenItemSpawnMessage'
 
-const multiplier = 3 // プレイヤー数に掛ける倍率
-const baseOffset = 10 // 基本オフセット値
-const maxItemNum = 40 // 最大アイテム数
-
 /**
  * 時間経過済みのアイテムを削除する
  */
@@ -35,6 +31,9 @@ export function sendGeneratedItems(
   worldMap: WorldMap,
   sendItem: (itemsMap: ChurarenItemInfoMap) => void
 ): void {
+  const multiplier = 3 // プレイヤー数に掛ける倍率
+  const baseOffset = 10 // 基本オフセット値
+  const maxItemNum = 40 // 最大アイテム数
   const itemsMap: ChurarenItemInfoMap = {}
   const itemNum = Math.min(participantNum * multiplier + baseOffset, maxItemNum)
   for (let i = 0; i < itemNum; i++) {
