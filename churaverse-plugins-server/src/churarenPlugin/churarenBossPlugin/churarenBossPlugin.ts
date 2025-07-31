@@ -39,7 +39,6 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   private mapPluginStore!: MapPluginStore
   private churarenGameInfo?: IGameInfo
   private socketController?: SocketController
-  private readonly halfBossSize: number = CHURAREN_BOSS_SIZE / 2
 
   public listenEvent(): void {
     super.listenEvent()
@@ -140,7 +139,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     const position = boss.position.copy()
 
     // 移動先が画面外なら、ボスの行動を再生成
-    for (const direction of this.getShuffleDirection()) {
+    for (const direction of this.getShuffledDirection()) {
       const dest = boss.position.copy()
       dest.gridX = position.gridX + direction.x * bossSpeedMultiplier
       dest.gridY = position.gridY + direction.y * bossSpeedMultiplier
@@ -215,22 +214,23 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   }
 
   private isBossWalkInMap(dest: Position, currentMap: WorldMap): boolean {
+    const halfBossSize = CHURAREN_BOSS_SIZE / 2
     return (
-      dest.x > this.halfBossSize &&
-      dest.x < currentMap.width - this.halfBossSize &&
-      dest.y > this.halfBossSize &&
-      dest.y < currentMap.height - this.halfBossSize
+      dest.x > halfBossSize &&
+      dest.x < currentMap.width - halfBossSize &&
+      dest.y > halfBossSize &&
+      dest.y < currentMap.height - halfBossSize
     )
   }
 
-  private getShuffleDirection(): Direction[] {
+  private getShuffledDirection(): Direction[] {
     const directions = [Direction.up, Direction.down, Direction.left, Direction.right]
     return directions.sort(() => Math.random() - 0.5)
   }
 
   private getMapCenterPosition(currentMap: WorldMap): Position {
     const centerX = currentMap.width / 2
-    const cernterY = currentMap.height / 2
-    return new Position(centerX, cernterY)
+    const centerY = currentMap.height / 2
+    return new Position(centerX, centerY)
   }
 }
