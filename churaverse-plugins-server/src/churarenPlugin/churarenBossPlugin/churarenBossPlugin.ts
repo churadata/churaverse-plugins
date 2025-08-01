@@ -29,8 +29,10 @@ import { IGameInfo } from '@churaverse/game-plugin-server/interface/IGameInfo'
 import '@churaverse/churaren-core-plugin-server/event/churarenStartTimerEvent'
 import { ChurarenResultEvent } from '@churaverse/churaren-core-plugin-server/event/churarenResultEvent'
 import { BossDespawnMessage } from './message/bossDespawnMessage'
+import { BossAttackRequestEvent } from './event/bossAttackRequestEvent'
 
 const bossSpeedMultiplier = 2
+const BOSS_ATTACK_CYCLE = 2 // 攻撃周期
 
 export class ChurarenBossPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -117,6 +119,9 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     if (!(ev.entity instanceof Boss)) return
     const boss = ev.entity
     this.bossPluginStore.bosses.set(boss.bossId, boss)
+
+    let actionCycleCounter = 0
+
     const bossWalkLoop = (): void => {
       if (
         this.churarenGameInfo === undefined ||
@@ -124,6 +129,12 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
         !this.churarenGameInfo.isActive
       )
         return
+
+      // 攻撃周期ごとに攻撃イベントを発火
+      if (actionCycleCounter % BOSS_ATTACK_CYCLE === 0) {
+        this.bus.post(new BossAttackRequestEvent(boss.bossId, boss.position.copy()))
+      }
+      actionCycleCounter++
       this.updateBossPosition(boss.bossId)
       setTimeout(bossWalkLoop, CHURAREN_BOSS_WALK_DURATION_MS)
     }

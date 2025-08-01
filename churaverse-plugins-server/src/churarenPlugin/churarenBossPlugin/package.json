@@ -16,7 +16,7 @@
     "@churaverse/game-plugin-server": "file:../../gamePlugin",
     "@churaverse/map-plugin-server": "file:../../mapPlugin",
     "@churaverse/network-plugin-server": "file:../../networkPlugin",
-    "@churaverse/player-plugin-server": "^0.1.2",
+    "@churaverse/player-plugin-server": "file:../../playerPlugin",
     "churaverse-engine-server": "file:../../../../../churaverse-engine/churaverse-engine-server"
   }
 }

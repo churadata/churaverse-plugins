@@ -67,7 +67,8 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
     if (this.churarenGameInfo === undefined || boss === undefined) return
     // ボスのentityを生成
     const bossId = boss.bossId
-    sendSpawnedBossAttack(this.networkPluginStore.messageSender, this.bus, boss.position, bossId)
+    const position = boss.position.copy()
+    sendSpawnedBossAttack(this.networkPluginStore.messageSender, this.bus, position, bossId)
   }
 
   private readonly update = (ev: UpdateEvent): void => {
