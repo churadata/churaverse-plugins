@@ -2,6 +2,7 @@ import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server
 import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
 import { Position, Direction, Vector, Entity } from 'churaverse-engine-server'
 import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
+import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-server'
 
 export const CHURAREN_BOSS_ATTACK_LIMIT_GRIDS = 25
 export const CHURAREN_BOSS_ATTACK_LIMIT_MS = 5000
@@ -10,7 +11,7 @@ const CHURAREN_BOSS_ATTACK_SIZE = 100
 /**
  * ChurarenBossAttackクラス
  */
-export class BossAttack extends Entity implements ICollidableEntity {
+export class BossAttack extends Entity implements ICollidableEntity, ChurarenWeaponEntity {
   public isCollidable = true
   public getRect(): IRectangle {
     return {
@@ -28,6 +29,7 @@ export class BossAttack extends Entity implements ICollidableEntity {
   public readonly power = 30
   private _isDead = false
   public readonly bossAttackId: string
+  public churarenWeaponOwnerId: string
   public readonly churarenEnemyOwnerId: string // ボスのId
   public readonly spawnTime: number
   private _velocity: Vector
@@ -46,6 +48,7 @@ export class BossAttack extends Entity implements ICollidableEntity {
     this.bossAttackId = bossAttackId
     this.churarenEnemyOwnerId = ownerId
     this.spawnTime = spawnTime
+    this.churarenWeaponOwnerId = ownerId
 
     // attackするまでは停止
     this._velocity = { x: 0, y: 0 }

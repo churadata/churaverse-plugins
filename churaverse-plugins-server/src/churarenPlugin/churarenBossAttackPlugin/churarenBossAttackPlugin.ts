@@ -1,5 +1,4 @@
-import { IMainScene, EntitySpawnEvent, UpdateEvent, LivingDamageEvent, Vector } from 'churaverse-engine-server'
-import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
+import { IMainScene, EntitySpawnEvent, UpdateEvent, LivingDamageEvent } from 'churaverse-engine-server'
 import { BossAttackPluginStore } from './store/defBossAttackPluginStore'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { initBossAttackPluginStore } from './store/initBossAttackPluginStore'
@@ -8,13 +7,12 @@ import { BossAttackDamageCause } from './domain/bossAttackDamageCause'
 import { SocketController } from './controller/socketController'
 import { MapPluginStore } from '@churaverse/map-plugin-server/store/defMapPluginStore'
 import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
-import { moveBossAttacks, removeDieBossAttack } from './domain/bossAttackService'
+import { moveBossAttacks, removeDieBossAttack, sendSpawnedBossAttack } from './domain/bossAttackService'
 import { BossAttackHitMessage } from './message/bossAttackHitMessage'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
 import { Player } from '@churaverse/player-plugin-server/domain/player'
-import { CHURAREN_CONSTANTS, uniqueId } from '@churaverse/churaren-core-plugin-server'
+import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
 import { IGameInfo } from '@churaverse/game-plugin-server/interface/IGameInfo'
-import { BossAttackSpawnMessage, BossAttackSpawnData } from './message/bossAttackSpawnMessage'
 import { BossPluginStore } from '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
 import { BossAttackRequestEvent } from '@churaverse/churaren-boss-plugin-server/event/bossAttackRequestEvent'
 import '@churaverse/churaren-core-plugin-server/event/churarenStartTimerEvent'
@@ -69,24 +67,11 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
     if (this.churarenGameInfo === undefined || boss === undefined) return
     // ボスのentityを生成
     const bossId = boss.bossId
-    const bossDirection = boss.direction
-    const startPos = boss.position.copy()
-
-    const bossAttack = new BossAttack(uniqueId() as string, bossId as string, startPos, bossDirection, Date.now())
-    const bossAttackSpawnData: BossAttackSpawnData = {
-      bossAttackId: bossAttack.bossAttackId,
-      startPos: startPos.toVector() as Vector & SendableObject,
-      direction: bossAttack.direction,
-      spawnTime: bossAttack.spawnTime,
-    }
-    const bossAttackSpawnMessage = new BossAttackSpawnMessage(bossAttackSpawnData)
-    this.networkPluginStore.messageSender.send(bossAttackSpawnMessage)
-    const bossAttackSpawnEvent = new EntitySpawnEvent(bossAttack)
-    this.bus.post(bossAttackSpawnEvent)
+    sendSpawnedBossAttack(this.networkPluginStore.messageSender, this.bus, boss.position, bossId)
   }
 
   private readonly update = (ev: UpdateEvent): void => {
-    moveBossAttacks(ev.dt as number, this.bossAttackPluginStore.bossAttacks, this.mapPluginStore.mapManager.currentMap)
+    moveBossAttacks(ev.dt, this.bossAttackPluginStore.bossAttacks, this.mapPluginStore.mapManager.currentMap)
     removeDieBossAttack(this.bossAttackPluginStore.bossAttacks, (bossAttackId: string, bossAttack: BossAttack) => {
       const bossAttackHitMessage = new BossAttackHitMessage({ bossAttackId })
       this.networkPluginStore.messageSender.send(bossAttackHitMessage)

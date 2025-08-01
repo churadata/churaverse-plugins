@@ -1,6 +1,5 @@
-import { DamageCause } from 'churaverse-engine-server'
 import { BossAttack } from './bossAttack'
-// import { ChurarenWeaponDamageCause } from '@churaverse/churaren-core-plugin-server/model/churarenWeaponDamageCause'
+import { ChurarenEnemyDamageCause } from '@churaverse/churaren-core-plugin-server/model/churarenEnemyDamageCause'
 
 /**
  * ボスとの当たり判定によるダメージを表すクラス
@@ -8,9 +7,9 @@ import { BossAttack } from './bossAttack'
  * @param collisionEntity 当たり判定のエンティティ
  */
 
-export class BossAttackDamageCause extends DamageCause {
+export class BossAttackDamageCause extends ChurarenEnemyDamageCause {
   public constructor(public readonly bossAttack: BossAttack) {
-    super('bossAttack')
+    super('bossAttack', bossAttack)
   }
 }
 
