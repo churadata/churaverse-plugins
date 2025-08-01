@@ -1,10 +1,9 @@
 import { BossAttack } from './bossAttack'
-import { DamageCause } from 'churaverse-engine-client'
-// import { ChurarenWeaponDamageCause } from '@churaverse/churaren-core-plugin-client/model/churarenWeaponDamageCause'
+import { ChurarenEnemyDamageCause } from '@churaverse/churaren-core-plugin-client'
 
-export class BossAttackDamageCause extends DamageCause {
+export class BossAttackDamageCause extends ChurarenEnemyDamageCause {
   public constructor(public readonly bossAttack: BossAttack) {
-    super('bossAttack')
+    super('bossAttack', bossAttack)
   }
 }
 
