@@ -11,6 +11,8 @@ import { SynchroBreakStartCountMessage } from '../message/synchroBreakStartCount
 import { SynchroBreakTurnTimerMessage } from '../message/synchroBreakTurnTimerMessage'
 import { SynchroBreakResultMessage } from '../message/synchroBreakResultMessage'
 import { UpdatePlayersCoinMessage } from '../message/updatePlayersCoinMessage'
+import { BetTimeRemainingMessage } from '../message/betTimeRemainingMessage'
+import { BET_TIMER_TIME_LIMIT } from '../synchroBreakPlugin'
 
 export class GameSequence implements IGameSequence {
   private readonly synchroBreakPluginStore!: SynchroBreakPluginStore
@@ -29,6 +31,8 @@ export class GameSequence implements IGameSequence {
   }
 
   public async processTurnSequence(): Promise<void> {
+    if (!this.isActive) return
+    await this.sendBetTimeRemaining()
     if (!this.isActive) return
     await this.startTurnCountdown()
     if (!this.isActive) return
@@ -96,6 +100,31 @@ export class GameSequence implements IGameSequence {
       const synchroBreakTurnStart = new SynchroBreakTurnStartEvent(this.turnCountNumber)
       this.eventBus.post(synchroBreakTurnStart)
     }
+  }
+
+  /**
+   * ベットタイムの残りを通知する処理
+   */
+  private async sendBetTimeRemaining(): Promise<void> {
+    let remainingTime = BET_TIMER_TIME_LIMIT
+
+    // 100ミリ秒ごとに残り時間を通知
+    while (remainingTime >= 0 && this.isActive) {
+      const numOfPlayers = this.gamePluginStore.games.get(this.gameId)?.participantIds.length ?? 0
+      const didBetPlayers = this.synchroBreakPluginStore.betCoinRepository.getBetCoinPlayerCount()
+
+      // 全プレイヤーがベットした場合は終了
+      if (numOfPlayers - didBetPlayers <= 0) {
+        return
+      }
+
+      remainingTime -= 100
+      const betTimeRemainingMessage = new BetTimeRemainingMessage({ remainingTime })
+      this.networkPluginStore.messageSender.send(betTimeRemainingMessage)
+      await this.delay(100)
+    }
+
+    await this.delay(100)
   }
 
   private get isActive(): boolean {
