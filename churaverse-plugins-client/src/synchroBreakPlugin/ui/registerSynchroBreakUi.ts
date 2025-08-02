@@ -9,6 +9,7 @@ import { BetCoinFormContainer } from './betCoinFormContainer/betCoinFormContaine
 import { NyokkiButton } from './nyokkiButton/nyokkiButton'
 import { ResultScreen } from './resultScreen/resultScreen'
 import { Scene } from 'phaser'
+import { BetTimer } from './betTimer/betTimer'
 
 /**
  * シンクロブレイクのUIを登録する
@@ -27,4 +28,5 @@ export function registerSynchroBreakUi(
   gameUiRegister.registerGameUi(gameId, 'betCoinConfirm', new BetCoinFormContainer(store))
   gameUiRegister.registerGameUi(gameId, 'nyokkiButton', new NyokkiButton(store, bus, scene))
   gameUiRegister.registerGameUi(gameId, 'resultScreen', new ResultScreen(store, bus))
+  gameUiRegister.registerGameUi(gameId, 'betTimer', new BetTimer())
 }

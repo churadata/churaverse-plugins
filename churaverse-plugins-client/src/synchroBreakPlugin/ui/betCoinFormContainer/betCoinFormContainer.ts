@@ -23,6 +23,7 @@ export class BetCoinFormContainer implements IGameUiComponent {
   public element!: HTMLElement
   public readonly visible: boolean = false
   private betCoinInputField!: HTMLInputElement
+  private isSend: boolean = false
 
   public constructor(private readonly store: Store<IMainScene>) {}
 
@@ -39,6 +40,27 @@ export class BetCoinFormContainer implements IGameUiComponent {
     this.setBetCoinFormContainer()
     const ownPlayerId = this.store.of('playerPlugin').ownPlayerId
     this.setupInputFields(ownPlayerId)
+    this.isSend = false
+  }
+
+  /**
+   * タイムアウト時に、フォームに入力されているベットコインの枚数をポストする
+   */
+  public postBetCoinOnTimeout(ownPlayerId: string): void {
+    if (this.isSend) return
+
+    const betCoins = this.inputFieldValue
+    const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
+    if (SYNCHRO_BREAK_MIN_BET_COIN <= betCoins && betCoins <= ownPlayerCoins) {
+      this.store.of('networkPlugin').messageSender.send(new SendBetCoinMessage({ playerId: ownPlayerId, betCoins }))
+    } else {
+      this.store
+        .of('networkPlugin')
+        .messageSender.send(new SendBetCoinMessage({ playerId: ownPlayerId, betCoins: SYNCHRO_BREAK_MIN_BET_COIN }))
+    }
+    this.inputFieldValue = SYNCHRO_BREAK_MIN_BET_COIN
+    this.isSend = true
+    this.close()
   }
 
   /**
@@ -54,6 +76,7 @@ export class BetCoinFormContainer implements IGameUiComponent {
       if (SYNCHRO_BREAK_MIN_BET_COIN <= betCoins && betCoins <= ownPlayerCoins) {
         this.store.of('networkPlugin').messageSender.send(new SendBetCoinMessage({ playerId: ownPlayerId, betCoins }))
         this.inputFieldValue = SYNCHRO_BREAK_MIN_BET_COIN
+        this.isSend = true
         this.close()
       } else {
         this.inputFieldValue = SYNCHRO_BREAK_MIN_BET_COIN
@@ -89,6 +112,7 @@ export class BetCoinFormContainer implements IGameUiComponent {
 
   public open(): void {
     this.element.style.display = 'flex'
+    this.isSend = false
   }
 
   public close(): void {
