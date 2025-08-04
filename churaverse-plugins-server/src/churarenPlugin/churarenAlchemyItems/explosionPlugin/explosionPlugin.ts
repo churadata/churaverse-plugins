@@ -3,13 +3,16 @@ import { ExplosionPluginStore } from './store/defExplosionPluginStore'
 import { MapPluginStore } from '@churaverse/map-plugin-server/store/defMapPluginStore'
 import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
-import { EntitySpawnEvent, IMainScene, UpdateEvent } from 'churaverse-engine-server'
+import { EntitySpawnEvent, IMainScene, LivingDamageEvent, UpdateEvent } from 'churaverse-engine-server'
 import { SocketController } from './controller/socketController'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
 import { initExplosionPluginStore } from './store/initExplosionPluginStore'
 import { moveExplosions, removeDieExplosion } from './domain/explosionService'
 import { ExplosionHitMessage } from './message/explosionHitMessage'
 import { Explosion } from './domain/explosion'
+import { Boss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
+import '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
+import { ExplosionDamageCause } from './domain/explosionDamageCause'
 
 export class ExplosionPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -74,9 +77,20 @@ export class ExplosionPlugin extends BaseGamePlugin {
     explosion.walk(this.mapPluginStore.mapManager.currentMap)
   }
 
-  // TODO: CV-706のマージ後に`Boss`との衝突後のコールバックを実装する
-  private explosionHit(explosion: Explosion, boss: any): void {}
+  private registerOnOverlapBoss(ev: RegisterOnOverlapEvent): void {
+    ev.collisionDetector.register(
+      this.explosionPluginStore.explosions,
+      this.store.of('bossPlugin').bosses,
+      this.explosionHit.bind(this)
+    )
+  }
 
-  // TODO: CV-706のマージ後に`boss`との衝突判定を有効化する
-  private registerOnOverlapBoss(ev: RegisterOnOverlapEvent): void {}
+  private explosionHit(explosion: Explosion, boss: Boss): void {
+    if (boss.isDead) return
+    explosion.isDead = true
+
+    const explosionDamageCause = new ExplosionDamageCause(explosion)
+    const livingDamageEvent = new LivingDamageEvent(boss, explosionDamageCause, explosion.power)
+    this.bus.post(livingDamageEvent)
+  }
 }

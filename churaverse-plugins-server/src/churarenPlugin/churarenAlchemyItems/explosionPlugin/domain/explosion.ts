@@ -1,13 +1,13 @@
-import { Direction, Entity, Position, Vector, WeaponEntity } from 'churaverse-engine-server'
+import { Direction, Entity, Position, Vector } from 'churaverse-engine-server'
 import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/ICollidableEntity'
 import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
 import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
+import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-server'
 
 export const EXPLOSION_WALK_LIMIT_GRIDS = 1
 export const EXPLOSION_WALK_LIMIT_MS = 600
 
-// TODO: CV-706マージ後にChurarenWeaponEntityをimplementsするように修正
-export class Explosion extends Entity implements ICollidableEntity, WeaponEntity {
+export class Explosion extends Entity implements ICollidableEntity, ChurarenWeaponEntity {
   public isCollidable = true
   public getRect(): IRectangle {
     return {
@@ -23,8 +23,7 @@ export class Explosion extends Entity implements ICollidableEntity, WeaponEntity
 
   private _isDead = false
   public readonly explosionId: string
-  // TODO: CV-706マージ後にChurarenWeaponOwnerIdを使用するように修正
-  public readonly ownerId: string // 爆発を撃ったプレイヤーのid
+  public readonly churarenWeaponOwnerId: string // 爆発を撃ったプレイヤーのid
   public readonly power = 100
   public readonly spawnTime: number
   private _velocity: Vector
@@ -40,7 +39,7 @@ export class Explosion extends Entity implements ICollidableEntity, WeaponEntity
   ) {
     super(position, direction)
     this.explosionId = explosionId
-    this.ownerId = ownerId
+    this.churarenWeaponOwnerId = ownerId
     this.spawnTime = spawnTime
 
     // walkするまでは停止
