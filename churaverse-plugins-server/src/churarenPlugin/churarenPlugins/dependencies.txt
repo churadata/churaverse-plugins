@@ -2,3 +2,4 @@
 @churaverse/churaren-item-plugin-server
 @churaverse/churaren-player-plugin-server
 @churaverse/churaren-alchemy-plugin-server
+@churaverse/churaren-boss-plugin-server

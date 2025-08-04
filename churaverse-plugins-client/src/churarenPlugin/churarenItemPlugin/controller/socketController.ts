@@ -60,11 +60,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   private readonly itemDespawn = (msg: ChurarenItemDespawnMessage): void => {
     const data = msg.data
-    const deleteItemIds: string[] = []
-    data.itemIds.forEach((itemId) => {
-      if (this.itemPluginStore.items.get(itemId) === undefined) return
-      deleteItemIds.push(itemId)
-    })
+    const deleteItemIds = data.itemIds.filter((id) => this.itemPluginStore.items.has(id))
     const itemDespawnEvent = new ChurarenItemDespawnEvent(deleteItemIds)
     this.eventBus.post(itemDespawnEvent)
   }
