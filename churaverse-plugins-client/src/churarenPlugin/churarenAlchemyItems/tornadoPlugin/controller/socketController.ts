@@ -1,5 +1,13 @@
 import { BaseSocketController } from '@churaverse/network-plugin-client/interface/baseSocketController'
-import { EntityDespawnEvent, EntitySpawnEvent, IEventBus, IMainScene, Position, Store } from 'churaverse-engine-client'
+import {
+  EntityDespawnEvent,
+  EntitySpawnEvent,
+  IEventBus,
+  IMainScene,
+  LivingDamageEvent,
+  Position,
+  Store,
+} from 'churaverse-engine-client'
 import { RegisterMessageEvent } from '@churaverse/network-plugin-client/event/registerMessageEvent'
 import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-client/event/registerMessageListenerEvent'
 import { IMessageListenerRegister } from '@churaverse/network-plugin-client/interface/IMessageListenerRegister'
@@ -8,9 +16,12 @@ import { TornadoPluginStore } from '../store/defTornadoPluginStore'
 import { TornadoSpawnMessage } from '../message/tornadoSpawnMessage'
 import { TornadoHitMessage } from '../message/tornadoHitMessage'
 import { Tornado } from '../domain/tornado'
+import { TornadoDamageCause } from '../domain/tornadoDamageCause'
+import { BossPluginStore } from '@churaverse/churaren-boss-plugin-client/store/defBossPluginStore'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private tornadoPluginStore!: TornadoPluginStore
+  private bossPluginStore!: BossPluginStore
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
 
   public constructor(eventBus: IEventBus<IMainScene>, store: Store<IMainScene>) {
@@ -40,6 +51,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public getStores(): void {
     this.tornadoPluginStore = this.store.of('churarenTornadoPlugin')
+    this.bossPluginStore = this.store.of('bossPlugin')
   }
 
   private readonly tornadoSpawn = (msg: TornadoSpawnMessage, senderId: string): void => {
@@ -59,6 +71,14 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   private readonly tornadoDamage = (msg: ChurarenDamageMessage): void => {
-    // TODO: `ChruarenBossPlugin`を実装しているブランチと依存関係がないため、`LivingDamageEvent`を`TornadoDamageCause`で発火する処理の実装。
+    const data = msg.data
+    if (data.cause !== 'tornado') return
+    const target = this.bossPluginStore.bosses.get(data.targetId)
+    const tornado = this.tornadoPluginStore.tornados.get(data.sourceId)
+    const attacker = tornado?.churarenWeaponOwnerId
+    if (target === undefined || tornado === undefined || attacker === undefined) return
+    const tornadoDamageCause = new TornadoDamageCause(tornado)
+    const livingDamageEvent = new LivingDamageEvent(target, tornadoDamageCause, data.amount)
+    this.eventBus.post(livingDamageEvent)
   }
 }

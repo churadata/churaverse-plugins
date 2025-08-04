@@ -1,9 +1,8 @@
-import { WeaponDamageCause, WeaponEntity } from 'churaverse-engine-client'
+import { ChurarenWeaponDamageCause, ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-client'
+import { WeaponDamageCause } from 'churaverse-engine-client'
 
-// TODO: CV-706のブランチのマージ後に`ChurarenWeaponDamageCause`を拡張したクラスにする
-export class TornadoDamageCause extends WeaponDamageCause {
-  // TODO: CV-706のブランチのマージ後に`ChurarenWeaponEntity`を引数に取るようにする
-  public constructor(public readonly tornado: WeaponEntity) {
+export class TornadoDamageCause extends ChurarenWeaponDamageCause {
+  public constructor(public readonly tornado: ChurarenWeaponEntity) {
     super('tornado', tornado)
   }
 }

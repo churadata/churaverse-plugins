@@ -106,7 +106,7 @@ export class TornadoPlugin extends BaseAlchemyItemPlugin {
     this.tornadoPluginStore.tornados.set(tornado.tornadoId, tornado)
     this.tornadoPluginStore.tornadoAttackRenderers.set(tornado.tornadoId, renderer)
     // 他のプレイヤーに竜巻の出現を送信する
-    if (tornado.ownerId === this.playerPluginStore.ownPlayerId) {
+    if (tornado.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) {
       this.networkStore.messageSender.send(
         new TornadoSpawnMessage({
           tornadoId: tornado.tornadoId,
@@ -126,7 +126,7 @@ export class TornadoPlugin extends BaseAlchemyItemPlugin {
   // 竜巻の出現を受信した時の処理
   private readonly spawnTornado = (ev: EntitySpawnEvent): void => {
     if (!(ev.entity instanceof Tornado)) return
-    if (ev.entity.ownerId === this.playerPluginStore.ownPlayerId) return
+    if (ev.entity.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) return
     const tornado = ev.entity
     const renderer = this.tornadoPluginStore.tornadoAttackRendererFactory.build()
     this.tornadoPluginStore.tornados.set(tornado.tornadoId, tornado)
