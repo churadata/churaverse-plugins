@@ -120,6 +120,6 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
     const multiplier = 3 // プレイヤー数に掛ける倍率
     const baseOffset = 10 // 基本オフセット値
     const maxItemNum = 40 // 最大アイテム数
-    return Math.min(this.churarenGameInfo?.participantIds.length ?? 0 * multiplier + baseOffset, maxItemNum)
+    return Math.min((this.churarenGameInfo?.participantIds.length ?? 0) * multiplier + baseOffset, maxItemNum)
   }
 }
