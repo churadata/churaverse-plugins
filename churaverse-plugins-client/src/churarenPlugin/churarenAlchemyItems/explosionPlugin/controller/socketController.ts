@@ -1,5 +1,13 @@
 import { BaseSocketController } from '@churaverse/network-plugin-client/interface/baseSocketController'
-import { EntityDespawnEvent, EntitySpawnEvent, IEventBus, IMainScene, Position, Store } from 'churaverse-engine-client'
+import {
+  EntityDespawnEvent,
+  EntitySpawnEvent,
+  IEventBus,
+  IMainScene,
+  LivingDamageEvent,
+  Position,
+  Store,
+} from 'churaverse-engine-client'
 import { ExplosionPluginStore } from '../store/defExplosionPluginStore'
 import { RegisterMessageEvent } from '@churaverse/network-plugin-client/event/registerMessageEvent'
 import { ExplosionSpawnMessage } from '../message/explosionSpawnMessage'
@@ -8,9 +16,12 @@ import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-client/
 import { IMessageListenerRegister } from '@churaverse/network-plugin-client/interface/IMessageListenerRegister'
 import { Explosion } from '../domain/explosion'
 import { ChurarenDamageMessage } from '@churaverse/churaren-player-plugin-client/message/churarenDamageMessage'
+import { ExplosionDamageCause } from '../domain/explosionDamageCause'
+import { BossPluginStore } from '@churaverse/churaren-boss-plugin-client/store/defBossPluginStore'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private explosionPluginStore!: ExplosionPluginStore
+  private bossPluginStore!: BossPluginStore
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
 
   public constructor(eventBus: IEventBus<IMainScene>, store: Store<IMainScene>) {
@@ -40,6 +51,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public getStores(): void {
     this.explosionPluginStore = this.store.of('churarenExplosionPlugin')
+    this.bossPluginStore = this.store.of('bossPlugin')
   }
 
   private readonly explosionSpawn = (msg: ExplosionSpawnMessage, senderId: string): void => {
@@ -59,6 +71,14 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   private readonly explosionDamage = (msg: ChurarenDamageMessage): void => {
-    // TODO: `ChruarenBossPlugin`を実装しているブランチと依存関係がないため、`LivingDamageEvent`を`ExplosionDamageCause`で発火する処理の実装。
+    const data = msg.data
+    if (data.cause !== 'explosion') return
+    const target = this.bossPluginStore.bosses.get(data.targetId)
+    const explosion = this.explosionPluginStore.explosions.get(data.sourceId)
+    const attacker = explosion?.churarenWeaponOwnerId
+    if (target === undefined || explosion === undefined || attacker === undefined) return
+    const explosionDamageCause = new ExplosionDamageCause(explosion)
+    const livingDamageEvent = new LivingDamageEvent(target, explosionDamageCause, data.amount)
+    this.eventBus.post(livingDamageEvent)
   }
 }
