@@ -18,22 +18,16 @@ export function checkExplode(bombs: IBombRepository): void {
 /**
  * 爆発済みの爆弾を削除する
  */
-export function removeExplodedBomb(bombs: IBombRepository): void {
-  bombs.getAllId().forEach((bombId) => {
-    if (bombs.get(bombId)?.isExplode ?? false) {
-      bombs.delete(bombId)
-    }
-  })
+export function removeExplodedBomb(bombs: IBombRepository, bombIds: string[]): void {
+  bombIds.forEach((bombId) => bombs.delete(bombId))
 }
 
 /**
  * 爆弾の爆発をfrontendに通知する
  */
-export function sendExplodedBomb(messageSender: IMessageSender<IMainScene>, bombs: IBombRepository): void {
-  bombs.getAllId().forEach((bombId) => {
-    if (bombs.get(bombId)?.isExplode ?? false) {
-      const bombExplosionMessage = new BombExplosionMessage({ bombId })
-      messageSender.send(bombExplosionMessage)
-    }
+export function sendExplodedBomb(messageSender: IMessageSender<IMainScene>, bombIds: string[]): void {
+  bombIds.forEach((bombId) => {
+    const bombExplosionMessage = new BombExplosionMessage({ bombId })
+    messageSender.send(bombExplosionMessage)
   })
 }

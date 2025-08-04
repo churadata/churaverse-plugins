@@ -46,8 +46,15 @@ export class BombPlugin extends BasePlugin<IMainScene> {
   }
 
   private update(ev: UpdateEvent): void {
-    sendExplodedBomb(this.networkPluginStore.messageSender, this.bombPluginStore.bombs)
-    removeExplodedBomb(this.bombPluginStore.bombs)
+    const explodedBombIds: string[] = this.bombPluginStore.bombs.getAllId().filter((bombId) => {
+      const bomb = this.bombPluginStore.bombs.get(bombId)
+      return bomb?.isExplode === true
+    })
+
+    if (explodedBombIds.length > 0) {
+      removeExplodedBomb(this.bombPluginStore.bombs, explodedBombIds)
+      sendExplodedBomb(this.networkPluginStore.messageSender, explodedBombIds)
+    }
   }
 
   private getStores(): void {
