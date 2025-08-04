@@ -39,7 +39,7 @@
     "@churaverse/debug-screen-plugin-client": "~0.1.0",
     "@churaverse/game-plugin-client": "file:../../gamePlugin",
     "@churaverse/network-plugin-client": "file:../../networkPlugin",
-    "@churaverse/player-plugin-client": "^0.1.2",
+    "@churaverse/player-plugin-client": "~0.1.0",
     "churaverse-engine-client": "file:../../../../../churaverse-engine/churaverse-engine-client",
     "phaser": "^3.80.1"
   }
