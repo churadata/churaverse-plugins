@@ -1,7 +1,7 @@
 import { BaseGamePlugin } from '@churaverse/game-plugin-client/domain/baseGamePlugin'
 import { ItemPluginStore } from '@churaverse/churaren-item-plugin-client/store/defItemPluginStore'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
-import { FRAME_RATE, GRID_SIZE, IMainScene, LivingDamageEvent, Position } from 'churaverse-engine-client'
+import { GRID_SIZE, IMainScene, LivingDamageEvent, Position } from 'churaverse-engine-client'
 import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { PlayerRespawnEvent } from '@churaverse/player-plugin-client/event/playerRespawnEvent'
 import { PlayerWalkEvent } from '@churaverse/player-plugin-client/event/playerWalkEvent'
@@ -194,14 +194,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     items.forEach((item: Item, index: number) => {
       if (item === undefined) return
       const renderer = this.playerItemStore.materialItemRenderers.get(item.itemId)
-      let dest: Position
-      if (index === 0) {
-        dest = player.position.copy()
-        dest.x -= player.direction.x * FRAME_RATE
-        dest.y -= player.direction.y * FRAME_RATE
-      } else {
-        dest = items[index - 1].position.copy()
-      }
+      const dest = index === 0 ? player.position.copy() : items[index - 1].position.copy()
       renderer?.chase(dest, speed, (pos: { x: number; y: number }) => {
         item.position.x = pos.x
         item.position.y = pos.y
