@@ -1,11 +1,8 @@
 import { Scene } from 'phaser'
 import { IItemRenderer } from '../domain/IItemRenderer'
-import { ItemKind } from '../domain/itemKind'
+import { ITEM_KINDS, ItemKind, materialItemImage } from '../domain/itemKind'
 import { GRID_SIZE, Position } from 'churaverse-engine-client'
-import fireOreImage from '../assets/fireOre.png'
-import waterOreImage from '../assets/waterOre.png'
-import grassOreImage from '../assets/grassOre.png'
-import herbImage from '../assets/herb.png'
+
 /**
  * アイテムのテクスチャーキー
  */
@@ -42,10 +39,9 @@ export class ItemRenderer implements IItemRenderer {
 
   // 基本アイテムのテクスチャのロード
   public static loadAssets(scene: Scene): void {
-    scene.load.image(`${ITEM_TEXTURE_KEY_PREFIX}_fireOre`, fireOreImage)
-    scene.load.image(`${ITEM_TEXTURE_KEY_PREFIX}_waterOre`, waterOreImage)
-    scene.load.image(`${ITEM_TEXTURE_KEY_PREFIX}_grassOre`, grassOreImage)
-    scene.load.image(`${ITEM_TEXTURE_KEY_PREFIX}_herb`, herbImage)
+    ITEM_KINDS.forEach((kind) => {
+      scene.load.image(`${ITEM_TEXTURE_KEY_PREFIX}_${kind}`, materialItemImage[kind])
+    })
   }
 
   public spawn(source: Position): void {
