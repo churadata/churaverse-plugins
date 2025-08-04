@@ -1,3 +1,3 @@
-export const itemKinds = ['fireOre', 'waterOre', 'grassOre', 'herb'] as const
+const ITEM_KINDS = ['fireOre', 'waterOre', 'grassOre', 'herb'] as const
 
-export type ItemKind = typeof itemKinds[number]
+export type ItemKind = (typeof ITEM_KINDS)[number]
