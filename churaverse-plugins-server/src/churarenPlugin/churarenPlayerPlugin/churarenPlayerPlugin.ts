@@ -78,25 +78,10 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     resetPlayerItemStore(this.store)
   }
 
-  private readonly changeGhostPlayer = (player: Player): void => {
-    if (player === undefined) return
-    this.churarenPlayerStore.ghostModePlayers.set(player.id, player)
-    player.isCollidable = false
-    this.deleteItems(player.id)
-    if (
-      this.churarenPlayerStore.ghostModePlayers.size ===
-      this.gamePluginStore.games.get(this.gameId)?.participantIds.length
-    ) {
-      const updateChurarenUi = new ChurarenResultEvent('gameOver')
-      this.bus.post(updateChurarenUi)
-    }
-  }
-
   private readonly skipDamage = (ev: LivingDamageEvent): void => {
     // TODO: ちゅられん特有の敵との衝突によるダメージのみ処理を行うように条件を追加
-    if (!this.isActive) return
-    const player = ev.target as Player
-    if (player === undefined) return
+    if (!isPlayer(ev.target)) return
+    const player = ev.target
     if (this.churarenPlayerStore.ghostModePlayers.has(player.id)) return
     if (this.inviciblePlayersList.includes(player.id)) {
       ev.cancel()
@@ -138,6 +123,20 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     const player = ev.target
     if (player.isDead) {
       this.changeGhostPlayer(player)
+    }
+  }
+
+  private changeGhostPlayer(player: Player): void {
+    if (player === undefined) return
+    this.churarenPlayerStore.ghostModePlayers.set(player.id, player)
+    player.isCollidable = false
+    this.deleteItems(player.id)
+    if (
+      this.churarenPlayerStore.ghostModePlayers.size ===
+      this.gamePluginStore.games.get(this.gameId)?.participantIds.length
+    ) {
+      const updateChurarenUi = new ChurarenResultEvent('gameOver')
+      this.bus.post(updateChurarenUi)
     }
   }
 
