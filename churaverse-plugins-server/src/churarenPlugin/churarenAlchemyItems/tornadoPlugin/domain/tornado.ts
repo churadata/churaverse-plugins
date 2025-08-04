@@ -1,14 +1,14 @@
-import { Direction, Entity, Position, Vector, WeaponEntity } from 'churaverse-engine-server'
+import { Direction, Entity, Position, Vector } from 'churaverse-engine-server'
 import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/ICollidableEntity'
 import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
 import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
+import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-server'
 
 export const TORNADO_WALK_LIMIT_GRIDS = 5
 export const TORNADO_WALK_LIMIT_MS = 500
 const totalSteps = 10
 
-// TODO: CV-706マージ後に`ChurarenWeaponEntity`をimplementsする
-export class Tornado extends Entity implements ICollidableEntity, WeaponEntity {
+export class Tornado extends Entity implements ICollidableEntity, ChurarenWeaponEntity {
   public isCollidable = true
   public getRect(): IRectangle {
     return {
@@ -28,8 +28,7 @@ export class Tornado extends Entity implements ICollidableEntity, WeaponEntity {
 
   private _isDead = false
   public readonly tornadoId: string
-  // TODO: CV-706マージ後にChurarenWeaponOwnerIdを使用するように修正
-  public readonly ownerId: string
+  public readonly churarenWeaponOwnerId: string
   public readonly power = 70
   public readonly spawnTime: number
   private _velocity: Vector
@@ -38,7 +37,7 @@ export class Tornado extends Entity implements ICollidableEntity, WeaponEntity {
   public constructor(tornadoId: string, ownerId: string, position: Position, direction: Direction, spawnTime: number) {
     super(position, direction)
     this.tornadoId = tornadoId
-    this.ownerId = ownerId
+    this.churarenWeaponOwnerId = ownerId
     this.spawnTime = spawnTime
 
     // walkするまでは停止
