@@ -1,7 +1,8 @@
 import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItem'
-import { Direction, GRID_SIZE, Position, WeaponEntity } from 'churaverse-engine-client'
+import { Direction, GRID_SIZE, Position } from 'churaverse-engine-client'
 import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/IAlchemyItem'
 import explosionImage from '../assets/explosion.png'
+import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-client'
 
 /**
  * 表示時の縦横のサイズ
@@ -17,15 +18,12 @@ export const EXPLOSION_ITEM: IAlchemyItem = {
 /**
  * Explosionクラスの定義
  */
-// TODO: CV-706マージ後に`ChurarenWeaponEntity`をimplementsする
-export class Explosion extends AlchemyItem implements WeaponEntity {
+export class Explosion extends AlchemyItem implements ChurarenWeaponEntity {
   public readonly power = 100
   public isDead = false
   public explosionId: string
   public spawnTime: number
-  // TODO: `ChurarenWeaponEntity`をimplementsした際に、ownerIdを`churarenWeaponOwnerId`に変更し、idは`explosionId`に統合される
-  public readonly id: string
-  public ownerId: string
+  public churarenWeaponOwnerId: string
 
   public constructor(
     explosionId: string,
@@ -35,9 +33,8 @@ export class Explosion extends AlchemyItem implements WeaponEntity {
     spawnTime: number
   ) {
     super(explosionId, EXPLOSION_ITEM.kind)
-    this.id = explosionId
     this.explosionId = explosionId
-    this.ownerId = ownerId
+    this.churarenWeaponOwnerId = ownerId
     this.position = position
     this.spawnTime = spawnTime
     this.direction = direction

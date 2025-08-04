@@ -35,6 +35,7 @@
   "license": "MIT",
   "dependencies": {
     "@churaverse/churaren-alchemy-plugin-client": "file:../../churarenAlchemyPlugin",
+    "@churaverse/churaren-boss-plugin-client": "file:../../churarenBossPlugin",
     "@churaverse/churaren-core-plugin-client": "file:../../churarenCorePlugin",
     "@churaverse/churaren-player-plugin-client": "file:../../churarenPlayerPlugin",
     "@churaverse/debug-screen-plugin-client": "~0.1.0",
