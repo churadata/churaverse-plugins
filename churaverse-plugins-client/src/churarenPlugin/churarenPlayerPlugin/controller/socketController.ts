@@ -39,14 +39,12 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.messageListenerRegister.on('invicibleTime', this.onInvicibleTime)
     this.messageListenerRegister.on('getChurarenItem', this.getItem)
     this.messageListenerRegister.on('dropChurarenItem', this.dropItem)
-    this.messageListenerRegister.on('dropChurarenItem', this.dropItem)
     this.messageListenerRegister.on('ghostMode', this.ghostMode)
   }
 
   public unregisterMessageListener(): void {
     this.messageListenerRegister.off('invicibleTime', this.onInvicibleTime)
     this.messageListenerRegister.off('getChurarenItem', this.getItem)
-    this.messageListenerRegister.off('dropChurarenItem', this.dropItem)
     this.messageListenerRegister.off('dropChurarenItem', this.dropItem)
     this.messageListenerRegister.off('ghostMode', this.ghostMode)
   }
