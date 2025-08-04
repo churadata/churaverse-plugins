@@ -26,4 +26,8 @@ export class ItemRepository {
   public clear(): void {
     this.items.clear()
   }
+
+  public has(id: string): boolean {
+    return this.items.has(id)
+  }
 }
