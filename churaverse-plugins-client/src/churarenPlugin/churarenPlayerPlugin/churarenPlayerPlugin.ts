@@ -1,7 +1,7 @@
 import { BaseGamePlugin } from '@churaverse/game-plugin-client/domain/baseGamePlugin'
 import { ItemPluginStore } from '@churaverse/churaren-item-plugin-client/store/defItemPluginStore'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
-import { GRID_SIZE, IMainScene, LivingDamageEvent } from 'churaverse-engine-client'
+import { GRID_SIZE, IMainScene, LivingDamageEvent, Position } from 'churaverse-engine-client'
 import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { PlayerRespawnEvent } from '@churaverse/player-plugin-client/event/playerRespawnEvent'
 import { PlayerWalkEvent } from '@churaverse/player-plugin-client/event/playerWalkEvent'
@@ -87,7 +87,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('dropChurarenItem', this.dropItem)
     this.bus.subscribeEvent('livingDamage', this.logPlayerDeathByBoss)
     this.bus.subscribeEvent('invicibleTime', this.onInvicibleTime)
-    this.bus.subscribeEvent('playerWalk', this.onPlayerWalk)
+    this.bus.subscribeEvent('playerWalk', this.playerItemChase)
     this.bus.subscribeEvent('playerRespawn', this.changeGhostMode, 'LOW')
     this.bus.subscribeEvent('playerNameChange', this.onChangePlayerName)
     this.bus.subscribeEvent('churarenResult', this.onChurarenResult)
@@ -99,7 +99,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.unsubscribeEvent('dropChurarenItem', this.dropItem)
     this.bus.unsubscribeEvent('livingDamage', this.logPlayerDeathByBoss)
     this.bus.unsubscribeEvent('invicibleTime', this.onInvicibleTime)
-    this.bus.unsubscribeEvent('playerWalk', this.onPlayerWalk)
+    this.bus.unsubscribeEvent('playerWalk', this.playerItemChase)
     this.bus.unsubscribeEvent('playerRespawn', this.changeGhostMode)
     this.bus.unsubscribeEvent('playerNameChange', this.onChangePlayerName)
     this.bus.unsubscribeEvent('churarenResult', this.onChurarenResult)
@@ -186,7 +186,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     }
   }
 
-  private readonly onPlayerWalk = (ev: PlayerWalkEvent): void => {
+  private readonly playerItemChase = (ev: PlayerWalkEvent): void => {
     const player = this.playerPluginStore.players.get(ev.id)
     if (player === undefined) return
     const speed = ev.speed ?? GRID_SIZE / GRID_WALK_DURATION_MS
@@ -195,16 +195,20 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     if (alchemyItem !== undefined) {
       const renderer = this.playerItemStore.alchemyItemRenderers.get(alchemyItem.itemId)
       const dest = player.position.copy()
-      this.setupChase(renderer, alchemyItem, dest, speed)
+      renderer?.chase(dest, speed, (pos: Position) => {
+        alchemyItem.position.x = pos.x
+        alchemyItem.position.y = pos.y
+      })
     } else {
-      const itemBoxes = this.playerItemStore.materialItems.getAllItem(ev.id)
-      itemBoxes.forEach((item: Item, index: number) => {
+      const items = this.playerItemStore.materialItems.getAllItem(ev.id)
+      items.forEach((item: Item, index: number) => {
         if (item === undefined) return
         const renderer = this.playerItemStore.materialItemRenderers.get(item.itemId)
-        const dest = player.position.copy()
-        dest.x -= player.direction.x * (40 + index * 40)
-        dest.y -= player.direction.y * (40 + index * 40)
-        this.setupChase(renderer, item, dest, speed)
+        const dest = index === 0 ? player.position.copy() : items[index - 1].position.copy()
+        renderer?.chase(dest, speed, (pos: { x: number; y: number }) => {
+          item.position.x = pos.x
+          item.position.y = pos.y
+        })
       })
     }
   }
@@ -232,20 +236,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   private readonly onChangePlayerName = (ev: PlayerNameChangeEvent): void => {
     if (!this.isActive) return
     this.updateGhostPlayerList()
-  }
-
-  private setupChase(
-    renderer: any,
-    item: { position: { x: number; y: number } },
-    dest: { x: number; y: number },
-    speed: number
-  ): void {
-    if (renderer !== undefined && renderer !== null && typeof renderer.chase === 'function') {
-      renderer.chase(dest, speed, (pos: { x: number; y: number }) => {
-        item.position.x = pos.x
-        item.position.y = pos.y
-      })
-    }
   }
 
   private clearPlayerItemBox(playerId?: string): void {
