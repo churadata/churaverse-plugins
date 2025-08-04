@@ -166,6 +166,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     if (boss === undefined) return
 
     if (ev.cause instanceof ChurarenWeaponDamageCause) {
+      // TODO: CV-717マージ後にChurarenDamageMessageを使用するように修正
       const weaponDamageMessage = new WeaponDamageMessage({
         targetId: boss.bossId,
         cause: ev.cause.churarenWeaponName,
