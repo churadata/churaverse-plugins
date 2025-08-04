@@ -61,21 +61,76 @@ export class BetCoinFormContainer implements IGameUiComponent {
     }
 
     const plusButton = DomManager.getElementById(BET_COIN_INCREMENT_BUTTON_ID)
-    plusButton.onclick = () => {
-      const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
-      const betCoins = this.inputFieldValue
 
-      if (betCoins >= ownPlayerCoins || betCoins >= SYNCHRO_BREAK_MAX_BET_COIN) return
-      this.inputFieldValue = betCoins + 1
+    plusButton.onclick = () => {
+      this.incrementBetCoin(ownPlayerId)
     }
+
+    this.setupLongPress(plusButton, () => {
+      this.incrementBetCoin(ownPlayerId)
+    })
 
     const minusButton = DomManager.getElementById(BET_COIN_DECREMENT_BUTTON_ID)
-    minusButton.onclick = () => {
-      const betCoins = this.inputFieldValue
 
-      if (betCoins <= SYNCHRO_BREAK_MIN_BET_COIN) return
-      this.inputFieldValue = betCoins - 1
+    minusButton.onclick = () => {
+      this.decrementBetCoin()
     }
+
+    this.setupLongPress(minusButton, () => {
+      this.decrementBetCoin()
+    })
+  }
+
+  /**
+   * ベットコインをインクリメントする
+   */
+  private incrementBetCoin(ownPlayerId: string): void {
+    const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
+    const betCoins = this.inputFieldValue
+
+    if (betCoins >= ownPlayerCoins || betCoins >= SYNCHRO_BREAK_MAX_BET_COIN) return
+    this.inputFieldValue = betCoins + 1
+  }
+
+  /**
+   * ベットコインをデクリメントする
+   */
+  private decrementBetCoin(): void {
+    const betCoins = this.inputFieldValue
+
+    if (betCoins <= SYNCHRO_BREAK_MIN_BET_COIN) return
+    this.inputFieldValue = betCoins - 1
+  }
+
+  /**
+   * ボタンの長押し機能を設定する
+   */
+  private setupLongPress(button: HTMLElement, action: () => void): void {
+    let longPressTimer: number
+    let longPressInterval: number
+
+    const startLongPress = (): void => {
+      longPressTimer = window.setTimeout(() => {
+        longPressInterval = window.setInterval(() => {
+          action()
+        }, 100)
+      }, 500)
+    }
+
+    const stopLongPress = (): void => {
+      if (longPressTimer !== 0) {
+        clearTimeout(longPressTimer)
+        longPressTimer = 0
+      }
+      if (longPressInterval !== 0) {
+        clearInterval(longPressInterval)
+        longPressInterval = 0
+      }
+    }
+
+    button.addEventListener('mousedown', startLongPress)
+    button.addEventListener('mouseup', stopLongPress)
+    button.addEventListener('mouseleave', stopLongPress)
   }
 
   private setBetCoinFormContainer(): void {
