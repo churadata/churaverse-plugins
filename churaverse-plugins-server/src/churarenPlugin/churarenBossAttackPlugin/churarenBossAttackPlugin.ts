@@ -65,15 +65,14 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
   private readonly generateBossAttack = (ev: BossAttackRequestEvent): void => {
     const boss = this.bossPluginStore.bosses.get(ev.bossId)
     if (this.churarenGameInfo === undefined || boss === undefined) return
-    // ボスのentityを生成
-    const bossId = boss.bossId
-    const position = boss.position.copy()
-    sendSpawnedBossAttack(this.networkPluginStore.messageSender, this.bus, position, bossId)
+
+    // ボスの攻撃をフロントに送信
+    sendSpawnedBossAttack(this.networkPluginStore.messageSender, this.bus, boss.position, boss.bossId)
   }
 
   private readonly update = (ev: UpdateEvent): void => {
     moveBossAttacks(ev.dt, this.bossAttackPluginStore.bossAttacks, this.mapPluginStore.mapManager.currentMap)
-    removeDieBossAttack(this.bossAttackPluginStore.bossAttacks, (bossAttackId: string, bossAttack: BossAttack) => {
+    removeDieBossAttack(this.bossAttackPluginStore.bossAttacks, (bossAttackId: string) => {
       const bossAttackHitMessage = new BossAttackHitMessage({ bossAttackId })
       this.networkPluginStore.messageSender.send(bossAttackHitMessage)
     })
@@ -87,7 +86,7 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
     this.bossPluginStore = this.store.of('bossPlugin')
   }
 
-  private readonly registerOnOverlap = (ev: RegisterOnOverlapEvent): void => {
+  private registerOnOverlap(ev: RegisterOnOverlapEvent): void {
     ev.collisionDetector.register(
       this.bossAttackPluginStore.bossAttacks,
       this.store.of('playerPlugin').players,
@@ -95,14 +94,14 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
     )
   }
 
-  private spawnBossAttack(ev: EntitySpawnEvent): void {
+  private readonly spawnBossAttack = (ev: EntitySpawnEvent): void => {
     if (!(ev.entity instanceof BossAttack)) return
     const bossAttack = ev.entity
     this.bossAttackPluginStore.bossAttacks.set(bossAttack.bossAttackId, bossAttack)
     bossAttack.attack(this.mapPluginStore.mapManager.currentMap)
   }
 
-  public bossAttackHitPlayer(bossAttack: BossAttack, player: Player): void {
+  private bossAttackHitPlayer(bossAttack: BossAttack, player: Player): void {
     // プレイヤーと衝突したボスの攻撃は消える
     bossAttack.isDead = true
     bossAttack.isCollidable = false

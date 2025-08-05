@@ -19,8 +19,16 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('bossAttackHit', BossAttackHitMessage, 'allClients')
   }
 
+  public setupMessageListenerRegister(ev: RegisterMessageListenerEvent<IMainScene>): void {
+    this.messageListenerRegister = ev.messageListenerRegister
+  }
+
   public registerMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
-    ev.messageListenerRegister.on('bossAttackSpawn', this.bossAttackSpawn.bind(this))
+    this.messageListenerRegister.on('bossAttackSpawn', this.bossAttackSpawn.bind(this))
+  }
+
+  public unregisterMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
+    this.messageListenerRegister.off('bossAttackSpawn', this.bossAttackSpawn.bind(this))
   }
 
   public bossAttackSpawn(msg: BossAttackSpawnMessage, senderId: string): void {
@@ -30,9 +38,5 @@ export class SocketController extends BaseSocketController<IMainScene> {
     bossAttack.move(Date.now() - data.spawnTime) // 遅延分移動
     const bossAttackSpawnEvent = new EntitySpawnEvent(bossAttack)
     this.eventBus.post(bossAttackSpawnEvent)
-  }
-
-  public setupMessageListenerRegister(ev: RegisterMessageListenerEvent<IMainScene>): void {
-    this.messageListenerRegister = ev.messageListenerRegister
   }
 }

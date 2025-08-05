@@ -89,7 +89,7 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
     )
   }
 
-  public spawnBossAttack = (ev: EntitySpawnEvent): void => {
+  private readonly spawnBossAttack = (ev: EntitySpawnEvent): void => {
     if (!(ev.entity instanceof BossAttack)) return
     const bossAttack = ev.entity
     this.bossAttackPluginStore.bossAttacks.set(bossAttack.bossAttackId, bossAttack)
@@ -107,7 +107,7 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
     })
   }
 
-  public dieBossAttack = (ev: EntityDespawnEvent): void => {
+  private readonly dieBossAttack = (ev: EntityDespawnEvent): void => {
     if (!(ev.entity instanceof BossAttack)) return
     const bossAttackId = ev.entity.bossAttackId
     const bossAttack = this.bossAttackPluginStore.bossAttacks.get(bossAttackId)

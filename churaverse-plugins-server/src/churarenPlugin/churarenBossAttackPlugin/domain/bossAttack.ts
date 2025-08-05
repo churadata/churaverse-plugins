@@ -30,7 +30,6 @@ export class BossAttack extends Entity implements ICollidableEntity, ChurarenWea
   private _isDead = false
   public readonly bossAttackId: string
   public churarenWeaponOwnerId: string
-  public readonly churarenEnemyOwnerId: string // ボスのId
   public readonly spawnTime: number
   private _velocity: Vector
 
@@ -46,7 +45,6 @@ export class BossAttack extends Entity implements ICollidableEntity, ChurarenWea
     this.position = position
     this.direction = direction
     this.bossAttackId = bossAttackId
-    this.churarenEnemyOwnerId = ownerId
     this.spawnTime = spawnTime
     this.churarenWeaponOwnerId = ownerId
 
