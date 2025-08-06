@@ -85,8 +85,7 @@ export class BlackHolePlugin extends BaseGamePlugin {
 
   private blackHoleHitBoss(blackHole: BlackHole, boss: Boss): void {
     if (boss.isDead) return
-    blackHole.isDead = true
-
+    blackHole.disableCollisionTemporarily()
     const blackHoleDamageCause = new BlackHoleDamageCause(blackHole)
     const livingDamageEvent = new LivingDamageEvent(boss, blackHoleDamageCause, blackHole.power)
     this.bus.post(livingDamageEvent)

@@ -72,10 +72,6 @@ export class BlackHole extends Entity implements ICollidableEntity, ChurarenWeap
     }, BLACK_HOLE_DISABLE_COLLISION_LIMIT_MS)
   }
 
-  public set isDead(value: boolean) {
-    this._isDead = value
-  }
-
   public get isDead(): boolean {
     const now = Date.now()
     if (now - this.spawnTime >= BLACK_HOLE_SPAWN_LIMIT_MS) {
