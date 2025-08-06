@@ -12,7 +12,7 @@ import { uniqueId } from '@churaverse/churaren-core-plugin-server/utils/uniqueId
  */
 export function removeDieBossAttack(
   bossAttacks: IBossAttackRepository,
-  onDelete: (bossAttackId: string, bossAttack: BossAttack) => void
+  onDelete: (bossAttackId: string) => void
 ): void {
   bossAttacks.getAllId().forEach((bossAttackId) => {
     const bossAttack = bossAttacks.get(bossAttackId)
@@ -20,7 +20,7 @@ export function removeDieBossAttack(
       bossAttacks.delete(bossAttackId)
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      onDelete(bossAttackId, bossAttack!) // null合体でundefinedでないことは確定
+      onDelete(bossAttackId) // null合体でundefinedでないことは確定
     }
   })
 }

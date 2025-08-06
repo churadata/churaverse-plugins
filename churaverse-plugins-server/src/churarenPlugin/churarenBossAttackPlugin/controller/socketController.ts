@@ -23,14 +23,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.messageListenerRegister = ev.messageListenerRegister
   }
 
-  public registerMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
-    this.messageListenerRegister.on('bossAttackSpawn', this.bossAttackSpawn.bind(this))
-  }
-
-  public unregisterMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
-    this.messageListenerRegister.off('bossAttackSpawn', this.bossAttackSpawn.bind(this))
-  }
-
   public bossAttackSpawn(msg: BossAttackSpawnMessage, senderId: string): void {
     const data = msg.data
     const pos = new Position(data.startPos.x, data.startPos.y)

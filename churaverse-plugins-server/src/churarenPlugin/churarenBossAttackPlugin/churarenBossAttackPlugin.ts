@@ -12,7 +12,6 @@ import { BossAttackHitMessage } from './message/bossAttackHitMessage'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
 import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
-import { IGameInfo } from '@churaverse/game-plugin-server/interface/IGameInfo'
 import { BossPluginStore } from '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
 import { BossAttackRequestEvent } from '@churaverse/churaren-boss-plugin-server/event/bossAttackRequestEvent'
 import '@churaverse/churaren-core-plugin-server/event/churarenStartTimerEvent'
@@ -23,19 +22,17 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
   private bossAttackPluginStore!: BossAttackPluginStore
   private mapPluginStore!: MapPluginStore
   private bossPluginStore!: BossPluginStore
-  private socketController?: SocketController
-  private churarenGameInfo?: IGameInfo
   private networkPluginStore!: NetworkPluginStore<IMainScene>
 
   public listenEvent(): void {
     super.listenEvent()
     this.bus.subscribeEvent('init', this.init.bind(this))
 
-    this.socketController = new SocketController(this.bus, this.store)
-    this.bus.subscribeEvent('registerMessage', this.socketController.registerMessage.bind(this.socketController))
+    const socketController = new SocketController(this.bus, this.store)
+    this.bus.subscribeEvent('registerMessage', socketController.registerMessage.bind(socketController))
     this.bus.subscribeEvent(
       'registerMessageListener',
-      this.socketController.setupMessageListenerRegister.bind(this.socketController)
+      socketController.setupMessageListenerRegister.bind(socketController)
     )
     this.bus.subscribeEvent('registerOnOverlap', this.registerOnOverlap.bind(this))
   }
@@ -44,30 +41,20 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
     super.subscribeGameEvent()
     this.bus.subscribeEvent('update', this.update)
     this.bus.subscribeEvent('bossAttackRequest', this.generateBossAttack)
-    this.bus.subscribeEvent('entitySpawn', this.spawnBossAttack.bind(this))
+    this.bus.subscribeEvent('entitySpawn', this.onSpawnBossAttack.bind(this))
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('update', this.update)
     this.bus.unsubscribeEvent('bossAttackRequest', this.generateBossAttack)
-    this.bus.unsubscribeEvent('entitySpawn', this.spawnBossAttack.bind(this))
+    this.bus.unsubscribeEvent('entitySpawn', this.onSpawnBossAttack.bind(this))
   }
 
-  protected handleGameStart(): void {
-    this.churarenGameInfo = this.store.of('gamePlugin').games.get(this.gameId)
-  }
+  protected handleGameStart(): void {}
 
   protected handleGameTermination(): void {
     this.bossAttackPluginStore.bossAttacks.clear()
-  }
-
-  private readonly generateBossAttack = (ev: BossAttackRequestEvent): void => {
-    const boss = this.bossPluginStore.bosses.get(ev.bossId)
-    if (this.churarenGameInfo === undefined || boss === undefined) return
-
-    // ボスの攻撃をフロントに送信
-    sendSpawnedBossAttack(this.networkPluginStore.messageSender, this.bus, boss.position, boss.bossId)
   }
 
   private readonly update = (ev: UpdateEvent): void => {
@@ -86,7 +73,16 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
     this.bossPluginStore = this.store.of('bossPlugin')
   }
 
-  private registerOnOverlap(ev: RegisterOnOverlapEvent): void {
+  private readonly generateBossAttack = (ev: BossAttackRequestEvent): void => {
+    const boss = this.bossPluginStore.bosses.get(ev.bossId)
+    const churarenGameInfo = this.store.of('gamePlugin').games.get(this.gameId)
+    if (churarenGameInfo === undefined || boss === undefined) return
+
+    // ボスの攻撃をフロントに送信
+    sendSpawnedBossAttack(this.networkPluginStore.messageSender, this.bus, boss.position, boss.bossId)
+  }
+
+  private readonly registerOnOverlap = (ev: RegisterOnOverlapEvent): void => {
     ev.collisionDetector.register(
       this.bossAttackPluginStore.bossAttacks,
       this.store.of('playerPlugin').players,
@@ -94,7 +90,7 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
     )
   }
 
-  private readonly spawnBossAttack = (ev: EntitySpawnEvent): void => {
+  private readonly onSpawnBossAttack = (ev: EntitySpawnEvent): void => {
     if (!(ev.entity instanceof BossAttack)) return
     const bossAttack = ev.entity
     this.bossAttackPluginStore.bossAttacks.set(bossAttack.bossAttackId, bossAttack)

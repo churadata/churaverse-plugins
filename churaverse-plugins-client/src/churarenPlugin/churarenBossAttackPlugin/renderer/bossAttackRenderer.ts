@@ -1,5 +1,4 @@
-import { Direction, vectorToName } from 'churaverse-engine-client'
-import { FRAME_RATE, layerSetting, Position } from 'churaverse-engine-client'
+import { Direction, vectorToName, FRAME_RATE, layerSetting, Position } from 'churaverse-engine-client'
 import { IBossAttackRenderer } from '../domain/IBossAttackRenderer'
 import { Scene } from 'phaser'
 import { CHURAREN_BOSS_ATTACK_LIMIT_MS } from '../domain/bossAttack'
@@ -34,13 +33,14 @@ const _anims = new Map<string, { key: string; frameStart: number; frameEnd: numb
  * ボスの攻撃描画クラス
  */
 export class BossAttackRenderer implements IBossAttackRenderer {
-  public scene
-  public sprite
-  public tween?: Phaser.Tweens.Tween
+  private readonly scene
+  private readonly sprite
+  private tween?: Phaser.Tweens.Tween
 
   public constructor(scene: Scene) {
     this.scene = scene
     this.sprite = scene.add.sprite(0, 0, CHURAREN_BOSS_ATTACK_TEXTURE_KEY).setDisplaySize(DISPLAY_SIZE, DISPLAY_SIZE)
+    // ユニークなアニメーションキーを生成
 
     // アニメーションの設定配列から各アニメーションを生成
     _anims.forEach((cfg) => {
@@ -64,10 +64,6 @@ export class BossAttackRenderer implements IBossAttackRenderer {
       frameWidth: 100,
       frameHeight: 100,
     })
-  }
-
-  public setSpriteId(id: string): void {
-    this.sprite.name = id
   }
 
   public attack(position: Position, dest: Position, direction: Direction, onUpdate: (pos: Position) => void): void {
