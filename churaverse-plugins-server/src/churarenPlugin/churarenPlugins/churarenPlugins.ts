@@ -6,11 +6,4 @@ import { ChurarenItemPlugin } from '@churaverse/churaren-item-plugin-server'
 import { ChurarenPlayerPlugin } from '@churaverse/churaren-player-plugin-server'
 import '@churaverse/game-plugin-server/store/defGamePluginStore'
 
-export const churarenPlugins: any[] = [
-  ChurarenCorePlugin,
-  ChurarenBossPlugin,
-  ChurarenItemPlugin,
-  ChurarenPlayerPlugin,
-  ChurarenAlchemyPlugin,
-  ...alchemyItems,
-]
+export const churarenPlugins = [ChurarenCorePlugin, ChurarenBossPlugin, ChurarenItemPlugin, ChurarenPlayerPlugin]
