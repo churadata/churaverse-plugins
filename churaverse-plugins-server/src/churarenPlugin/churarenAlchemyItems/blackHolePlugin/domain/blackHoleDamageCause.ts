@@ -1,9 +1,8 @@
-import { WeaponDamageCause, WeaponEntity } from 'churaverse-engine-server'
+import { ChurarenWeaponDamageCause, ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-server'
+import { WeaponDamageCause } from 'churaverse-engine-server'
 
-// TODO: CV-706マージ後にChurarenWeaponDamageCauseを継承するように修正
-export class BlackHoleDamageCause extends WeaponDamageCause {
-  // TODO: CV-706マージ後にChurarenWeaponEntityを引数に取るように修正
-  public constructor(public readonly blackHole: WeaponEntity) {
+export class BlackHoleDamageCause extends ChurarenWeaponDamageCause {
+  public constructor(public readonly blackHole: ChurarenWeaponEntity) {
     super('blackHole', blackHole)
   }
 }

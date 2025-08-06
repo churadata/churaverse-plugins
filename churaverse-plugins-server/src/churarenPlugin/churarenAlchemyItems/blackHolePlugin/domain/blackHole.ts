@@ -1,6 +1,7 @@
-import { Direction, Entity, Position, Vector, vectorToName, WeaponEntity } from 'churaverse-engine-server'
+import { Direction, Entity, Position, Vector, vectorToName } from 'churaverse-engine-server'
 import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/ICollidableEntity'
 import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
+import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-server'
 
 const BLACK_HOLE_DISABLE_COLLISION_LIMIT_MS = 1000
 const BLACK_HOLE_SPAWN_LIMIT_MS = 10000
@@ -11,8 +12,7 @@ const BLACK_HOLE_WALK_SPEED = BLACK_HOLE_WALK_LIMIT_GRIDS / BLACK_HOLE_WALK_LIMI
 /**
  * blackHoleクラスの定義
  */
-// TODO: CV-706マージ後に`ChurarenWeaponEntity`をimplementsする
-export class BlackHole extends Entity implements ICollidableEntity, WeaponEntity {
+export class BlackHole extends Entity implements ICollidableEntity, ChurarenWeaponEntity {
   public isCollidable = true
   public getRect(): IRectangle {
     return {
@@ -29,8 +29,7 @@ export class BlackHole extends Entity implements ICollidableEntity, WeaponEntity
   public _isDead = false
   public readonly power = 20
   public readonly blackHoleId: string
-  // TODO: CV-706マージ後にChurarenWeaponOwnerIdを使用するように修正
-  public readonly ownerId: string
+  public readonly churarenWeaponOwnerId: string
   public readonly spawnTime: number
   private readonly _velocity: Vector
   private moveDirection: Direction = Direction.right
@@ -48,7 +47,7 @@ export class BlackHole extends Entity implements ICollidableEntity, WeaponEntity
   ) {
     super(position, direction)
     this.blackHoleId = blackHoleId
-    this.ownerId = ownerId
+    this.churarenWeaponOwnerId = ownerId
     this.spawnTime = spawnTime
     this._startPosition = this.position.copy()
     if (vectorToName(this.direction) === 'left' || vectorToName(this.direction) === 'up') {
@@ -71,6 +70,10 @@ export class BlackHole extends Entity implements ICollidableEntity, WeaponEntity
     setTimeout(() => {
       this.isCollidable = true
     }, BLACK_HOLE_DISABLE_COLLISION_LIMIT_MS)
+  }
+
+  public set isDead(value: boolean) {
+    this._isDead = value
   }
 
   public get isDead(): boolean {

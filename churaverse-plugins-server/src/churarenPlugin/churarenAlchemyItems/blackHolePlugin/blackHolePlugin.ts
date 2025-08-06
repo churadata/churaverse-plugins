@@ -8,7 +8,10 @@ import { BlackHoleDespawnMessage } from './message/blackHoleDespawnMessage'
 import { BlackHolePluginStore } from './store/defBlackHolePluginStore'
 import { initBlackHolePluginStore } from './store/initBlackHolePluginStore'
 import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
-import { EntitySpawnEvent, IMainScene, UpdateEvent } from 'churaverse-engine-server'
+import { EntitySpawnEvent, IMainScene, LivingDamageEvent, UpdateEvent } from 'churaverse-engine-server'
+import { Boss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
+import '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
+import { BlackHoleDamageCause } from './domain/blackHoleDamageCause'
 
 export class BlackHolePlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -72,9 +75,20 @@ export class BlackHolePlugin extends BaseGamePlugin {
     blackHole.walk()
   }
 
-  // TODO: CV-706のマージ後に`Boss`との衝突後のコールバックを実装する
-  private blackHoleHitBoss(blackHole: BlackHole, boss: any): void {}
+  private registerOnOverlap(ev: RegisterOnOverlapEvent): void {
+    ev.collisionDetector.register(
+      this.blackHolePluginStore.blackHoles,
+      this.store.of('bossPlugin').bosses,
+      this.blackHoleHitBoss.bind(this)
+    )
+  }
 
-  // TODO: CV-706のマージ後に`boss`との衝突判定を有効化する
-  private registerOnOverlap(ev: RegisterOnOverlapEvent): void {}
+  private blackHoleHitBoss(blackHole: BlackHole, boss: Boss): void {
+    if (boss.isDead) return
+    blackHole.isDead = true
+
+    const blackHoleDamageCause = new BlackHoleDamageCause(blackHole)
+    const livingDamageEvent = new LivingDamageEvent(boss, blackHoleDamageCause, blackHole.power)
+    this.bus.post(livingDamageEvent)
+  }
 }
