@@ -1,3 +1,4 @@
-@churaverse/game-plugin-client
-@churaverse/core-ui-plugin-client
-@churaverse/network-plugin-client
+@churaverse/churaren-core-plugin-client
+@churaverse/churaren-player-plugin-client
+@churaverse/churaren-alchemy-plugin-client
+@churaverse/churaren-boss-plugin-client
