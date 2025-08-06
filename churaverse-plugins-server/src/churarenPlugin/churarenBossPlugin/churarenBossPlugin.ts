@@ -20,7 +20,6 @@ import { BossWalkMessage } from './message/bossWalkMessage'
 import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { CollisionBossDamageCause } from './domain/collisionBossDamageCause'
 import { CHURAREN_CONSTANTS, ChurarenWeaponDamageCause, uniqueId } from '@churaverse/churaren-core-plugin-server'
-import { WeaponDamageMessage } from '@churaverse/player-plugin-server/message/weaponDamageMessage'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
 import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
 import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
@@ -29,6 +28,7 @@ import { IGameInfo } from '@churaverse/game-plugin-server/interface/IGameInfo'
 import '@churaverse/churaren-core-plugin-server/event/churarenStartTimerEvent'
 import { ChurarenResultEvent } from '@churaverse/churaren-core-plugin-server/event/churarenResultEvent'
 import { BossDespawnMessage } from './message/bossDespawnMessage'
+import { ChurarenDamageMessage } from '@churaverse/churaren-player-plugin-server/message/churarenDamageMessage'
 
 const bossSpeedMultiplier = 2
 
@@ -166,11 +166,10 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     if (boss === undefined) return
 
     if (ev.cause instanceof ChurarenWeaponDamageCause) {
-      // TODO: CV-717マージ後にChurarenDamageMessageを使用するように修正
-      const weaponDamageMessage = new WeaponDamageMessage({
+      const weaponDamageMessage = new ChurarenDamageMessage({
         targetId: boss.bossId,
         cause: ev.cause.churarenWeaponName,
-        weaponId: ev.cause.churarenWeapon.id,
+        sourceId: ev.cause.churarenWeapon.id,
         amount: ev.amount,
       })
       this.networkPluginStore.messageSender.send(weaponDamageMessage)
