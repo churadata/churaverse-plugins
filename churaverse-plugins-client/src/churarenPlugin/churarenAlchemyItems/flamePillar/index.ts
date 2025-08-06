@@ -1,1 +1,0 @@
-export { FlamePillarPlugin } from './flamePillarPlugin'
