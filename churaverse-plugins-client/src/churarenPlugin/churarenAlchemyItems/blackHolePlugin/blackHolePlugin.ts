@@ -102,7 +102,7 @@ export class BlackHolePlugin extends BaseAlchemyItemPlugin {
     this.blackHolePluginStore.blackHoles.set(blackHole.blackHoleId, blackHole)
     this.blackHolePluginStore.blackHoleAttackRenderers.set(blackHole.blackHoleId, renderer)
 
-    if (blackHole.ownerId === this.playerPluginStore.ownPlayerId) {
+    if (blackHole.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) {
       const blackHoleSpawnMessage = new BlackHoleSpawnMessage({
         blackHoleId: blackHole.blackHoleId,
         startPos: blackHole.position.toVector() as Vector & Sendable,
@@ -119,7 +119,7 @@ export class BlackHolePlugin extends BaseAlchemyItemPlugin {
 
   private readonly spawnBlackHole = (ev: EntitySpawnEvent): void => {
     if (!(ev.entity instanceof BlackHole)) return
-    if (ev.entity.ownerId === this.playerPluginStore.ownPlayerId) return
+    if (ev.entity.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) return
     const blackHole = ev.entity
     const renderer = this.blackHolePluginStore.blackHoleAttackRendererFactory.build()
     this.blackHolePluginStore.blackHoles.set(blackHole.blackHoleId, blackHole)

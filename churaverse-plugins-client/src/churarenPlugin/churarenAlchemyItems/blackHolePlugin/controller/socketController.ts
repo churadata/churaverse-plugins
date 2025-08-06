@@ -1,5 +1,13 @@
 import { BaseSocketController } from '@churaverse/network-plugin-client/interface/baseSocketController'
-import { EntityDespawnEvent, EntitySpawnEvent, IEventBus, IMainScene, Position, Store } from 'churaverse-engine-client'
+import {
+  EntityDespawnEvent,
+  EntitySpawnEvent,
+  IEventBus,
+  IMainScene,
+  LivingDamageEvent,
+  Position,
+  Store,
+} from 'churaverse-engine-client'
 import { RegisterMessageEvent } from '@churaverse/network-plugin-client/event/registerMessageEvent'
 import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-client/event/registerMessageListenerEvent'
 import { IMessageListenerRegister } from '@churaverse/network-plugin-client/interface/IMessageListenerRegister'
@@ -8,9 +16,12 @@ import { BlackHole } from '../domain/blackHole'
 import { BlackHoleDespawnMessage } from '../message/blackHoleDespawnMessage'
 import { BlackHoleSpawnMessage } from '../message/blackHoleSpawnMessage'
 import { BlackHolePluginStore } from '../store/defBlackHolePluginStore'
+import { BossPluginStore } from '@churaverse/churaren-boss-plugin-client/store/defBossPluginStore'
+import { BlackHoleDamageCause } from '../domain/blackHoleDamageCause'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private blackHolePluginStore!: BlackHolePluginStore
+  private bossPluginStore!: BossPluginStore
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
 
   public constructor(eventBus: IEventBus<IMainScene>, store: Store<IMainScene>) {
@@ -40,6 +51,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public getStores(): void {
     this.blackHolePluginStore = this.store.of('churarenBlackHolePlugin')
+    this.bossPluginStore = this.store.of('bossPlugin')
   }
 
   private readonly blackHoleSpawn = (msg: BlackHoleSpawnMessage, senderId: string): void => {
@@ -59,6 +71,14 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   private readonly blackHoleDamage = (msg: ChurarenDamageMessage): void => {
-    // TODO: `ChruarenBossPlugin`を実装しているブランチと依存関係がないため、`LivingDamageEvent`を`TornadoDamageCause`で発火する処理の実装。
+    const data = msg.data
+    if (data.cause !== 'blackHole') return
+    const target = this.bossPluginStore.bosses.get(data.targetId)
+    const blackHole = this.blackHolePluginStore.blackHoles.get(data.sourceId)
+    const attacker = blackHole?.churarenWeaponOwnerId
+    if (target === undefined || blackHole === undefined || attacker === undefined) return
+    const blackHoleDamageCause = new BlackHoleDamageCause(blackHole)
+    const livingDamageEvent = new LivingDamageEvent(target, blackHoleDamageCause, data.amount)
+    this.eventBus.post(livingDamageEvent)
   }
 }
