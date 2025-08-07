@@ -1,12 +1,12 @@
 import { GameIds } from './interface/gameIds'
+import { IGameDescriptionDialog } from './interface/IGameDescriptionDialog'
 import { IGameDescriptionDialogManager } from './interface/IGameDescriptionDialogManager'
-import { IGameDescriptionWindow } from './interface/IGameDescriptionWindow'
 
 export class GameDescriptionDialogManager implements IGameDescriptionDialogManager {
-  private readonly gameDialogs = new Map<GameIds, IGameDescriptionWindow>()
+  private readonly gameDialogs = new Map<GameIds, IGameDescriptionDialog>()
   private target: GameIds | null = null
 
-  public add(name: GameIds, dialog: IGameDescriptionWindow): void {
+  public add(name: GameIds, dialog: IGameDescriptionDialog): void {
     this.gameDialogs.set(name, dialog)
   }
 

@@ -1,8 +1,8 @@
 import { domLayerSetting, DomManager, IMainScene, Store } from 'churaverse-engine-client'
 import { GamePluginStore } from '../../store/defGamePluginStore'
 import { GameIds } from '../../interface/gameIds'
-import { PopupGameDescriptionWindow } from './components/PopupGameDescriptionWindow'
-import { IGameDescriptionWindow } from '../../interface/IGameDescriptionWindow'
+import { PopupGameDescriptionDialog } from './components/PopupGameDescriptionDialog'
+import { IGameDescriptionDialog } from '../../interface/IGameDescriptionDialog'
 
 export const GAME_DESCRIPTION_CLOSE_BUTTON_ID = (gameId: GameIds): string => {
   return `game-detail-close-button-${gameId}`
@@ -12,7 +12,7 @@ export const GAME_DESCRIPTION_CONTAINER_ID = (gameId: GameIds): string => {
   return `game-detail-container-${gameId}`
 }
 
-export abstract class GameDescriptionWindow implements IGameDescriptionWindow {
+export abstract class GameDescriptionDialog implements IGameDescriptionDialog {
   private readonly container: HTMLElement
   private readonly gamePluginStore: GamePluginStore
 
@@ -22,7 +22,7 @@ export abstract class GameDescriptionWindow implements IGameDescriptionWindow {
     gameName: string
   ) {
     this.gamePluginStore = store.of('gamePlugin')
-    this.container = DomManager.addJsxDom(PopupGameDescriptionWindow({ gameId, gameName }))
+    this.container = DomManager.addJsxDom(PopupGameDescriptionDialog({ gameId, gameName }))
     domLayerSetting(this.container, 'higher')
     this.close()
     this.setupCloseButton()

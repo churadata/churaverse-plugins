@@ -1,9 +1,9 @@
 import { JSXFunc } from 'churaverse-engine-client'
-import style from './PopupGameDescriptionWindow.module.scss'
+import style from './PopupGameDescriptionDialog.module.scss'
 import { GameIds } from '../../../interface/gameIds'
-import { GAME_DESCRIPTION_CLOSE_BUTTON_ID, GAME_DESCRIPTION_CONTAINER_ID } from '../gameDescriptionWindow'
+import { GAME_DESCRIPTION_CLOSE_BUTTON_ID, GAME_DESCRIPTION_CONTAINER_ID } from '../gameDescriptionDialog'
 
-export const PopupGameDescriptionWindow: JSXFunc<any> = ({
+export const PopupGameDescriptionDialog: JSXFunc<any> = ({
   gameId,
   gameName,
 }: {
