@@ -44,7 +44,7 @@ export abstract class GameDescriptionDialog implements IGameDescriptionDialog {
   private setupCloseButton(): void {
     const closeButton = DomManager.getElementById(GAME_DESCRIPTION_CLOSE_BUTTON_ID(this.gameId))
     closeButton.addEventListener('click', () => {
-      this.gamePluginStore.gameDescriptionDialogManager.closeDescription()
+      this.gamePluginStore.gameDescriptionDialogManager.closeDialog()
     })
   }
 }

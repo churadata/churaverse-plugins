@@ -7,7 +7,7 @@ import { GameSection } from './gameSection'
 
 export class GameDialogManager {
   private readonly gameIcon: GameIcon
-  private readonly coreUiPlugin: CoreUiPluginStore
+  private readonly coreUiPluginStore: CoreUiPluginStore
   private readonly gameDialog: IGameDialog
 
   public constructor(
@@ -16,8 +16,12 @@ export class GameDialogManager {
   ) {
     this.gameDialog = new GameDialog()
     this.gameDialog.addSection(new GameSection('game', 'ゲーム一覧'))
-    this.coreUiPlugin = store.of('coreUiPlugin')
-    this.gameIcon = new GameIcon(this.coreUiPlugin.switcher, this.gameDialog, this.coreUiPlugin.topBarIconContainer)
+    this.coreUiPluginStore = store.of('coreUiPlugin')
+    this.gameIcon = new GameIcon(
+      this.coreUiPluginStore.switcher,
+      this.gameDialog,
+      this.coreUiPluginStore.topBarIconContainer
+    )
   }
 
   public init(): void {

@@ -10,13 +10,13 @@ export class GameDescriptionDialogManager implements IGameDescriptionDialogManag
     this.gameDialogs.set(name, dialog)
   }
 
-  public showDescription(gameId: GameIds): void {
+  public showDialog(gameId: GameIds): void {
     if (this.showingDialogId === gameId) {
       return
     }
 
     if (this.showingDialogId !== null) {
-      this.closeDescription()
+      this.closeDialog()
     }
 
     const showingDialogIdDialog = this.gameDialogs.get(gameId)
@@ -25,7 +25,7 @@ export class GameDescriptionDialogManager implements IGameDescriptionDialogManag
     this.showingDialogId = gameId
   }
 
-  public closeDescription(): void {
+  public closeDialog(): void {
     if (this.showingDialogId !== null) {
       const showingDialogIdDialog = this.gameDialogs.get(this.showingDialogId)
       if (showingDialogIdDialog === undefined) return
