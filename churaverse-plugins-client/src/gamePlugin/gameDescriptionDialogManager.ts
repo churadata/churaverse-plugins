@@ -4,33 +4,33 @@ import { IGameDescriptionDialogManager } from './interface/IGameDescriptionDialo
 
 export class GameDescriptionDialogManager implements IGameDescriptionDialogManager {
   private readonly gameDialogs = new Map<GameIds, IGameDescriptionDialog>()
-  private target: GameIds | null = null
+  private showingDialogId: GameIds | null = null
 
   public add(name: GameIds, dialog: IGameDescriptionDialog): void {
     this.gameDialogs.set(name, dialog)
   }
 
   public showDescription(gameId: GameIds): void {
-    if (this.target === gameId) {
+    if (this.showingDialogId === gameId) {
       return
     }
 
-    if (this.target !== null) {
+    if (this.showingDialogId !== null) {
       this.closeDescription()
     }
 
-    const targetDialog = this.gameDialogs.get(gameId)
-    if (targetDialog === undefined) return
-    targetDialog.open()
-    this.target = gameId
+    const showingDialogIdDialog = this.gameDialogs.get(gameId)
+    if (showingDialogIdDialog === undefined) return
+    showingDialogIdDialog.open()
+    this.showingDialogId = gameId
   }
 
   public closeDescription(): void {
-    if (this.target !== null) {
-      const targetDialog = this.gameDialogs.get(this.target)
-      if (targetDialog === undefined) return
-      targetDialog.close()
-      this.target = null
+    if (this.showingDialogId !== null) {
+      const showingDialogIdDialog = this.gameDialogs.get(this.showingDialogId)
+      if (showingDialogIdDialog === undefined) return
+      showingDialogIdDialog.close()
+      this.showingDialogId = null
     }
   }
 }

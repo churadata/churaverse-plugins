@@ -34,7 +34,7 @@ export class GamePlugin extends BasePlugin<IMainScene> {
     this.bus.post(new RegisterGameUiEvent(this.gameUiRegister))
   }
 
-  public closeGameDialog(): void {
+  private closeGameDialog(): void {
     this.gameDialogManager?.closeGameDialog()
   }
 }
