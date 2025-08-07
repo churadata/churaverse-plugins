@@ -1,6 +1,5 @@
-import { IMainScene, EntitySpawnEvent, UpdateEvent, LivingDamageEvent } from 'churaverse-engine-server'
+import { EntitySpawnEvent, UpdateEvent, LivingDamageEvent } from 'churaverse-engine-server'
 import { BossAttackPluginStore } from './store/defBossAttackPluginStore'
-import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { initBossAttackPluginStore } from './store/initBossAttackPluginStore'
 import { BossAttack } from './domain/bossAttack'
 import { BossAttackDamageCause } from './domain/bossAttackDamageCause'
@@ -12,17 +11,16 @@ import { BossAttackHitMessage } from './message/bossAttackHitMessage'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
 import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
-import { BossPluginStore } from '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
 import { BossAttackRequestEvent } from '@churaverse/churaren-boss-plugin-server/event/bossAttackRequestEvent'
 import '@churaverse/churaren-core-plugin-server/event/churarenStartTimerEvent'
 import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
+import '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
+import '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 
 export class ChurarenBossAttackPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
   private bossAttackPluginStore!: BossAttackPluginStore
   private mapPluginStore!: MapPluginStore
-  private bossPluginStore!: BossPluginStore
-  private networkPluginStore!: NetworkPluginStore<IMainScene>
 
   public listenEvent(): void {
     super.listenEvent()
@@ -61,7 +59,8 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
     moveBossAttacks(ev.dt, this.bossAttackPluginStore.bossAttacks, this.mapPluginStore.mapManager.currentMap)
     removeDieBossAttack(this.bossAttackPluginStore.bossAttacks, (bossAttackId: string) => {
       const bossAttackHitMessage = new BossAttackHitMessage({ bossAttackId })
-      this.networkPluginStore.messageSender.send(bossAttackHitMessage)
+      const networkPluginStore = this.store.of('networkPlugin')
+      networkPluginStore.messageSender.send(bossAttackHitMessage)
     })
   }
 
@@ -69,17 +68,17 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
     initBossAttackPluginStore(this.store)
     this.bossAttackPluginStore = this.store.of('bossAttackPlugin')
     this.mapPluginStore = this.store.of('mapPlugin')
-    this.networkPluginStore = this.store.of('networkPlugin')
-    this.bossPluginStore = this.store.of('bossPlugin')
   }
 
   private readonly generateBossAttack = (ev: BossAttackRequestEvent): void => {
-    const boss = this.bossPluginStore.bosses.get(ev.bossId)
+    const bossPluginStore = this.store.of('bossPlugin')
+    const boss = bossPluginStore.bosses.get(ev.bossId)
     const churarenGameInfo = this.store.of('gamePlugin').games.get(this.gameId)
+    const networkPluginStore = this.store.of('networkPlugin')
     if (churarenGameInfo === undefined || boss === undefined) return
 
     // ボスの攻撃をフロントに送信
-    sendSpawnedBossAttack(this.networkPluginStore.messageSender, this.bus, boss.position, boss.bossId)
+    sendSpawnedBossAttack(networkPluginStore.messageSender, this.bus, boss.position, boss.bossId)
   }
 
   private readonly registerOnOverlap = (ev: RegisterOnOverlapEvent): void => {
