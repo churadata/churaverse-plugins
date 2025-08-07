@@ -1,6 +1,6 @@
-import { GameListItemRenderer } from '../ui/gameList/gameListItemRenderer'
+import { GameSelectionListItemRenderer } from '../ui/gameList/gameSelectionListItemRenderer'
 
 export interface IGameSelectionListContainer {
   node: HTMLElement
-  addGame: (game: GameListItemRenderer) => void
+  addGame: (game: GameSelectionListItemRenderer) => void
 }

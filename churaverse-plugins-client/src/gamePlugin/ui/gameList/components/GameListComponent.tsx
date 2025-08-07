@@ -5,11 +5,11 @@ import {
   GAME_LIST_ITEM_ID,
   GAME_NAME_DIV_ID,
   GAME_START_BUTTON_ID,
-  GameListItemProps,
-} from '../gameListItemRenderer'
+  GameSelectionListItemProps,
+} from '../gameSelectionListItemRenderer'
 import { GAME_SELECTION_LIST_ID } from '../gameSelectionListContainer'
 
-export const GameListItem: JSXFunc<GameListItemProps> = (props: GameListItemProps) => {
+export const GameSelectionListItem: JSXFunc<GameSelectionListItemProps> = (props: GameSelectionListItemProps) => {
   return (
     <div id={GAME_LIST_ITEM_ID(props.gameId)} className={style.entryRow}>
       <img src={props.imagePath} alt={props.gameId} style={{ width: props.width, height: props.height }} />
@@ -31,7 +31,7 @@ export const GameListItem: JSXFunc<GameListItemProps> = (props: GameListItemProp
 export const GameSelectionList: JSXFunc = () => {
   return (
     <div id={GAME_SELECTION_LIST_ID} className={style.tableRowContainer}>
-      {/* ここにGameEntryRowが入る */}
+      {/* ここにGameListItemが入る */}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { GameIds } from './gameIds'
 
-export interface IGameListItemRenderer {
+export interface IGameSelectionListItemRenderer {
   onGameStart: (gameId: GameIds) => void
   resetStartButton: () => void
 }

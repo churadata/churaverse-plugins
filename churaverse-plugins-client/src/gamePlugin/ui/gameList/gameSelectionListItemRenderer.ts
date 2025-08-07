@@ -1,12 +1,12 @@
 import { DomManager, IMainScene, Store } from 'churaverse-engine-client'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
-import { GameListItem } from './components/GameListComponent'
 import { GameIds } from '../../interface/gameIds'
-import { IGameListItemRenderer } from '../../interface/IGameListItemRenderer'
 import { GameState } from '../../type/gameState'
 import { IGameDescriptionDialogManager } from '../../interface/IGameDescriptionDialogManager'
 import { RequestGameStartMessage } from '../../message/gameStartMessage'
 import { RequestGameAbortMessage } from '../../message/gameAbortMessage'
+import { IGameSelectionListItemRenderer } from '../../interface/IGameSelectionListItemRenderer'
+import { GameSelectionListItem } from './components/GameListComponent'
 
 const DEFAULT_ICON_SIZE = '40px'
 
@@ -26,7 +26,7 @@ export const GAME_NAME_DIV_ID = (gameId: GameIds): string => {
   return `game-name-div-${gameId}`
 }
 
-export interface GameListItemProps {
+export interface GameSelectionListItemProps {
   imagePath: string
   gameId: GameIds
   gameName: string
@@ -38,7 +38,7 @@ export interface GameListItemProps {
   order?: number
 }
 
-export abstract class GameListItemRenderer implements IGameListItemRenderer {
+export abstract class GameSelectionListItemRenderer implements IGameSelectionListItemRenderer {
   private readonly networkPlugin: NetworkPluginStore<IMainScene>
   protected readonly gameContainer: HTMLElement
   private currentButtonState: GameState
@@ -46,11 +46,11 @@ export abstract class GameListItemRenderer implements IGameListItemRenderer {
   public constructor(
     private readonly store: Store<IMainScene>,
     private readonly gameDetailManager: IGameDescriptionDialogManager,
-    private readonly props: GameListItemProps
+    private readonly props: GameSelectionListItemProps
   ) {
     this.networkPlugin = this.store.of('networkPlugin')
     this.gameContainer = DomManager.addJsxDom(
-      GameListItem({
+      GameSelectionListItem({
         imagePath: props.imagePath,
         gameId: props.gameId,
         gameName: props.gameName,
