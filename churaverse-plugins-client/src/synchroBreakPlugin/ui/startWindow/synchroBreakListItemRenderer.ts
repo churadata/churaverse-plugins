@@ -1,11 +1,11 @@
 import { IMainScene, Store } from 'churaverse-engine-client'
-import { GameListItemRenderer } from '@churaverse/game-plugin-client/ui/gameList/gameListItemRenderer'
 import { IGameDescriptionDialogManager } from '@churaverse/game-plugin-client/interface/IGameDescriptionDialogManager'
 import { IGameSelectionListContainer } from '@churaverse/game-plugin-client/interface/IGameSelectionListContainer'
+import { GameSelectionListItemRenderer } from '@churaverse/game-plugin-client/ui/gameList/gameSelectionListItemRenderer'
 
 import SYNCHRO_BREAK_ICON_PATH from '../../assets/synchroBreakIcon.png'
 
-export class SynchroBreakListItemRenderer extends GameListItemRenderer {
+export class SynchroBreakListItemRenderer extends GameSelectionListItemRenderer {
   public constructor(
     store: Store<IMainScene>,
     gameDialogManager: IGameDescriptionDialogManager,
