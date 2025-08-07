@@ -5,7 +5,7 @@ import { GameUiRegister } from '../gameUiRegister'
 import { GameUiManager } from '../gameUiManager'
 import { GameInfoRepository } from '../repository/gameInfoRepository'
 import { GameSelectionListContainer } from '../ui/gameList/gameSelectionListContainer'
-import { GameDescriptionDialogManager } from '../gameDetailDialogManager'
+import { GameDescriptionDialogManager } from '../gameDescriptionDialogManager'
 
 export function initGamePluginStore(store: Store<IMainScene>, gameUiRegister: GameUiRegister): void {
   const pluginStore: GamePluginStore = {

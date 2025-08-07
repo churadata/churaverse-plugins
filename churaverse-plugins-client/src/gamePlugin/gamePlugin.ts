@@ -24,7 +24,7 @@ export class GamePlugin extends BasePlugin<IMainScene> {
     this.gameUiRegister = new GameUiRegister()
     this.gameDialogManager = new GameDialogManager(this.store, this.bus)
     initGamePluginStore(this.store, this.gameUiRegister)
-    this.gameDialogManager.init()
+    this.gameDialogManager.init(this.store.of('gamePlugin').gameSelectionListContainer)
   }
 
   /**

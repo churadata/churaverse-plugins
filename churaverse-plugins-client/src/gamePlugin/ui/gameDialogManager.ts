@@ -4,6 +4,7 @@ import { IEventBus, IMainScene, Store } from 'churaverse-engine-client'
 import { IGameDialog } from '../interface/IGameDialog'
 import { GameDialog } from './gameDialog'
 import { GameSection } from './gameSection'
+import { IGameSelectionListContainer } from '../interface/IGameSelectionListContainer'
 
 export class GameDialogManager {
   private readonly gameIcon: GameIcon
@@ -24,9 +25,8 @@ export class GameDialogManager {
     )
   }
 
-  public init(): void {
-    const node = this.store.of('gamePlugin').gameSelectionListContainer.node
-    this.gameDialog.addContent('game', node)
+  public init(container: IGameSelectionListContainer): void {
+    this.gameDialog.addContent('game', container.node)
   }
 
   public closeGameDialog(): void {
