@@ -6,11 +6,11 @@ export class IceArrowRepository extends CollidableEntityRepository<IceArrow> imp
   private readonly iceArrows = new Map<string, IceArrow>()
 
   public set(id: string, entity: IceArrow): void {
-    this.iceArrows.set(id, entity)
+    super.set(id, entity)
   }
 
   public delete(id: string): void {
-    this.iceArrows.delete(id)
+    super.delete(id)
   }
 
   public get(id: string): IceArrow | undefined {
