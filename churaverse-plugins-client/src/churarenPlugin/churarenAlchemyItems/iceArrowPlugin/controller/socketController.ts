@@ -1,4 +1,12 @@
-import { IMainScene, IEventBus, Store, Position, EntitySpawnEvent, EntityDespawnEvent } from 'churaverse-engine-client'
+import {
+  IMainScene,
+  IEventBus,
+  Store,
+  Position,
+  EntitySpawnEvent,
+  EntityDespawnEvent,
+  LivingDamageEvent,
+} from 'churaverse-engine-client'
 import { BaseSocketController } from '@churaverse/network-plugin-client/interface/baseSocketController'
 import { RegisterMessageEvent } from '@churaverse/network-plugin-client/event/registerMessageEvent'
 import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-client/event/registerMessageListenerEvent'
@@ -8,9 +16,12 @@ import { IceArrow } from '../domain/iceArrow'
 import { IceArrowHitMessage } from '../message/iceArrowHitMessage'
 import { ChurarenDamageMessage } from '@churaverse/churaren-player-plugin-client/message/churarenDamageMessage'
 import { IMessageListenerRegister } from '@churaverse/network-plugin-client/interface/IMessageListenerRegister'
+import { BossPluginStore } from '@churaverse/churaren-boss-plugin-client/store/defBossPluginStore'
+import { IceArrowDamageCause } from '../domain/iceArrowDamageCause'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private iceArrowPluginStore!: IceArrowPluginStore
+  private bossPluginStore!: BossPluginStore
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
 
   public constructor(eventBus: IEventBus<IMainScene>, store: Store<IMainScene>) {
@@ -40,6 +51,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public getStores(): void {
     this.iceArrowPluginStore = this.store.of('churarenIceArrowPlugin')
+    this.bossPluginStore = this.store.of('bossPlugin')
   }
 
   private readonly iceArrowSpawn = (msg: IceArrowSpawnMessage, senderId: string): void => {
@@ -65,5 +77,15 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.eventBus.post(iceArrowDespawnEvent)
   }
 
-  private readonly iceArrowDamage = (msg: ChurarenDamageMessage): void => {}
+  private readonly iceArrowDamage = (msg: ChurarenDamageMessage): void => {
+    const data = msg.data
+    if (data.cause !== 'iceArrow') return
+    const target = this.bossPluginStore.bosses.get(data.targetId)
+    const iceArrow = this.iceArrowPluginStore.iceArrows.get(data.sourceId)
+    const attacker = iceArrow?.churarenWeaponOwnerId
+    if (target === undefined || iceArrow === undefined || attacker === undefined) return
+    const iceArrowDamageCause = new IceArrowDamageCause(iceArrow)
+    const livingDamageEvent = new LivingDamageEvent(target, iceArrowDamageCause, data.amount)
+    this.eventBus.post(livingDamageEvent)
+  }
 }

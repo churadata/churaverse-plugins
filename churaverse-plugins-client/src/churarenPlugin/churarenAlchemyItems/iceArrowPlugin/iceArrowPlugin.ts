@@ -118,7 +118,7 @@ export class IceArrowPlugin extends BaseAlchemyItemPlugin {
       )
       this.iceArrowPluginStore.iceArrows.set(iceArrow.iceArrowId, iceArrow)
       this.iceArrowPluginStore.iceArrowAttackRenderers.set(iceArrow.iceArrowId, renderer)
-      if (iceArrow.ownerId === this.playerPluginStore.ownPlayerId) {
+      if (iceArrow.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) {
         const iceArrowSpawnMessage = new IceArrowSpawnMessage({
           iceArrowId: iceArrow.iceArrowId,
           startPos: iceArrow.position.toVector() as Vector & Sendable,
