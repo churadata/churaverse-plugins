@@ -1,7 +1,8 @@
-import { Direction, Position, Entity, Vector, WeaponEntity } from 'churaverse-engine-server'
+import { Direction, Position, Entity, Vector } from 'churaverse-engine-server'
 import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/ICollidableEntity'
 import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
 import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
+import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-server'
 
 export const ICE_ARROW_WALK_LIMIT_GRIDS = 25
 export const ICE_ARROW_WALK_LIMIT_MS = 2400
@@ -9,7 +10,7 @@ export const ICE_ARROW_WALK_LIMIT_MS = 2400
 /**
  * IceArrowクラスの定義
  */
-export class IceArrow extends Entity implements ICollidableEntity, WeaponEntity {
+export class IceArrow extends Entity implements ICollidableEntity, ChurarenWeaponEntity {
   public isCollidable = true
   public getRect(): IRectangle {
     return {
@@ -25,7 +26,7 @@ export class IceArrow extends Entity implements ICollidableEntity, WeaponEntity 
 
   private _isDead = false
   public readonly iceArrowId: string
-  public readonly ownerId: string
+  public readonly churarenWeaponOwnerId: string
   public readonly spawnTime: number
   public readonly power = 20
   public readonly attackVector: Vector
@@ -41,7 +42,7 @@ export class IceArrow extends Entity implements ICollidableEntity, WeaponEntity 
   ) {
     super(position, direction)
     this.iceArrowId = iceArrowId
-    this.ownerId = ownerId
+    this.churarenWeaponOwnerId = ownerId
     this.spawnTime = spawnTime
     this.attackVector = attackVector
 

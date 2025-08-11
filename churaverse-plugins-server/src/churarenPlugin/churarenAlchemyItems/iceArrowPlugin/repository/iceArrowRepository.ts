@@ -7,10 +7,12 @@ export class IceArrowRepository extends CollidableEntityRepository<IceArrow> imp
 
   public set(id: string, entity: IceArrow): void {
     super.set(id, entity)
+    this.iceArrows.set(id, entity)
   }
 
   public delete(id: string): void {
     super.delete(id)
+    this.iceArrows.delete(id)
   }
 
   public get(id: string): IceArrow | undefined {

@@ -1,4 +1,4 @@
-import { IMainScene, EntitySpawnEvent, UpdateEvent } from 'churaverse-engine-server'
+import { IMainScene, EntitySpawnEvent, UpdateEvent, LivingDamageEvent } from 'churaverse-engine-server'
 import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
 import { IceArrowPluginStore } from './store/defIceArrowPluginStore'
 import { SocketController } from './controller/socketController'
@@ -10,6 +10,9 @@ import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defN
 import { IceArrowHitMessage } from './message/iceArrowHitMessage'
 import { moveIceArrows, removeDieIceArrow } from './domain/iceArrowService'
 import { IceArrow } from './domain/iceArrow'
+import { Boss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
+import '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
+import { IceArrowDamageCause } from './domain/iceArrowDamageCause'
 
 export class IceArrowPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -74,7 +77,20 @@ export class IceArrowPlugin extends BaseGamePlugin {
     iceArrow.walk(this.mapPluginStore.mapManager.currentMap)
   }
 
-  private iceArrowHit(iceArrow: IceArrow, boss: any): void {}
+  private registerOnOverlapBoss(ev: RegisterOnOverlapEvent): void {
+    ev.collisionDetector.register(
+      this.iceArrowPluginStore.iceArrows,
+      this.store.of('bossPlugin').bosses,
+      this.iceArrowHit.bind(this)
+    )
+  }
 
-  private registerOnOverlapBoss(ev: RegisterOnOverlapEvent): void {}
+  private iceArrowHit(iceArrow: IceArrow, boss: Boss): void {
+    if (boss.isDead) return
+    iceArrow.isDead = true
+
+    const iceArrowDamageCause = new IceArrowDamageCause(iceArrow)
+    const livingDamageEvent = new LivingDamageEvent(boss, iceArrowDamageCause, iceArrow.power)
+    this.bus.post(livingDamageEvent)
+  }
 }
