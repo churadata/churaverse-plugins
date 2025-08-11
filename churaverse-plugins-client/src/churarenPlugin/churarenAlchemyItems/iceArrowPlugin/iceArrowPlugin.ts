@@ -95,12 +95,12 @@ export class IceArrowPlugin extends BaseAlchemyItemPlugin {
   protected useAlchemyItem = (ev: UseAlchemyItemEvent): void => {
     if (ev.alchemyItem.kind !== 'iceArrow') return
     const gap = 65
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 8; i++) {
       const renderer = this.iceArrowPluginStore.iceArrowAttackRendererFactory.build()
       if (renderer === undefined) return
       const startPos = ev.ownPlayer.position.copy()
-      // 4方向に分散するための角度を計算 (ラジアン)
-      const angle = -(i * Math.PI) / 2 // 90度 (π/2) ごとに回転
+      // 8方向に分散するための角度を計算 (ラジアン)
+      const angle = -(i * Math.PI) / 4 // 45度 (π/4) ごとに回転
 
       // x, y成分で方向ベクトルを計算
       const attackVector = {
@@ -157,7 +157,7 @@ export class IceArrowPlugin extends BaseAlchemyItemPlugin {
 
   private walkIceArrow(iceArrow: IceArrow, renderer: IIceArrowAttackRenderer): void {
     // 斜め方向も水平・垂直方向も全て同じ移動距離にする
-    const distance = 1.0 * ICE_ARROW_WALK_LIMIT_GRIDS * GRID_SIZE
+    const distance = ICE_ARROW_WALK_LIMIT_GRIDS * GRID_SIZE
     const dest = iceArrow.position.copy()
     const moveX = iceArrow.attackVector.x * distance
     const moveY = iceArrow.attackVector.y * distance
