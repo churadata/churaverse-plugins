@@ -92,7 +92,7 @@ export class IceArrowPlugin extends BaseAlchemyItemPlugin {
     this.unsubscribeGameEvent()
   }
 
-  protected useAlchemyItem(ev: UseAlchemyItemEvent): void {
+  protected useAlchemyItem = (ev: UseAlchemyItemEvent): void => {
     if (ev.alchemyItem.kind !== 'iceArrow') return
     const gap = 65
     for (let i = 0; i < 8; i++) {
@@ -118,7 +118,7 @@ export class IceArrowPlugin extends BaseAlchemyItemPlugin {
       )
       this.iceArrowPluginStore.iceArrows.set(iceArrow.iceArrowId, iceArrow)
       this.iceArrowPluginStore.iceArrowAttackRenderers.set(iceArrow.iceArrowId, renderer)
-      if (iceArrow.ownerId === this.playerPluginStore.ownPlayerId) {
+      if (iceArrow.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) {
         const iceArrowSpawnMessage = new IceArrowSpawnMessage({
           iceArrowId: iceArrow.iceArrowId,
           startPos: iceArrow.position.toVector() as Vector & Sendable,
@@ -134,9 +134,30 @@ export class IceArrowPlugin extends BaseAlchemyItemPlugin {
     this.bus.post(clearAlchemyItemBoxEvent)
   }
 
+  private readonly spawnIceArrow = (ev: EntitySpawnEvent): void => {
+    if (!(ev.entity instanceof IceArrow)) return
+    const iceArrow = ev.entity
+    const renderer = this.iceArrowPluginStore.iceArrowAttackRendererFactory.build()
+    if (renderer === undefined) return
+    this.iceArrowPluginStore.iceArrows.set(iceArrow.iceArrowId, iceArrow)
+    this.iceArrowPluginStore.iceArrowAttackRenderers.set(iceArrow.iceArrowId, renderer)
+    this.walkIceArrow(iceArrow, renderer)
+  }
+
+  private readonly dieIceArrow = (ev: EntityDespawnEvent): void => {
+    if (!(ev.entity instanceof IceArrow)) return
+    const iceArrowId = ev.entity.iceArrowId
+    const iceArrow = this.iceArrowPluginStore.iceArrows.get(iceArrowId)
+    const iceArrowRenderer = this.iceArrowPluginStore.iceArrowAttackRenderers.get(iceArrowId)
+    iceArrow?.die()
+    iceArrowRenderer?.dead()
+    this.iceArrowPluginStore.iceArrows.delete(iceArrowId)
+    this.iceArrowPluginStore.iceArrowAttackRenderers.delete(iceArrowId)
+  }
+
   private walkIceArrow(iceArrow: IceArrow, renderer: IIceArrowAttackRenderer): void {
     // 斜め方向も水平・垂直方向も全て同じ移動距離にする
-    const distance = 1.0 * ICE_ARROW_WALK_LIMIT_GRIDS * GRID_SIZE
+    const distance = ICE_ARROW_WALK_LIMIT_GRIDS * GRID_SIZE
     const dest = iceArrow.position.copy()
     const moveX = iceArrow.attackVector.x * distance
     const moveY = iceArrow.attackVector.y * distance
@@ -147,26 +168,5 @@ export class IceArrowPlugin extends BaseAlchemyItemPlugin {
     renderer.walk(iceArrow.position, dest, iceArrow.direction, iceArrow.attackVector, (pos) => {
       iceArrow.walk(pos)
     })
-  }
-
-  private spawnIceArrow(ev: EntitySpawnEvent): void {
-    if (!(ev.entity instanceof IceArrow)) return
-    const iceArrow = ev.entity
-    const renderer = this.iceArrowPluginStore.iceArrowAttackRendererFactory.build()
-    if (renderer === undefined) return
-    this.iceArrowPluginStore.iceArrows.set(iceArrow.iceArrowId, iceArrow)
-    this.iceArrowPluginStore.iceArrowAttackRenderers.set(iceArrow.iceArrowId, renderer)
-    this.walkIceArrow(iceArrow, renderer)
-  }
-
-  private dieIceArrow(ev: EntityDespawnEvent): void {
-    if (!(ev.entity instanceof IceArrow)) return
-    const iceArrowId = ev.entity.iceArrowId
-    const iceArrow = this.iceArrowPluginStore.iceArrows.get(iceArrowId)
-    const iceArrowRenderer = this.iceArrowPluginStore.iceArrowAttackRenderers.get(iceArrowId)
-    iceArrow?.die()
-    iceArrowRenderer?.dead()
-    this.iceArrowPluginStore.iceArrows.delete(iceArrowId)
-    this.iceArrowPluginStore.iceArrowAttackRenderers.delete(iceArrowId)
   }
 }
