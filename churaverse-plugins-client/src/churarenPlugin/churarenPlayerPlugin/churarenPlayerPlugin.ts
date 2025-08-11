@@ -250,8 +250,8 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   }
 
   private updateMaterialItemBox(playerId: string): void {
-    const itemBoxes = this.playerItemStore.materialItems.getAllItem(playerId)
-    const itemImageList = itemBoxes.map((item) => materialItemImage[item.kind])
+    const items = this.playerItemStore.materialItems.getAllItem(playerId)
+    const itemImageList = items.map((item) => materialItemImage[item.kind])
     this.playerItemStore.materialItemBoxContainer.updateMaterialItemBox(itemImageList)
   }
 
