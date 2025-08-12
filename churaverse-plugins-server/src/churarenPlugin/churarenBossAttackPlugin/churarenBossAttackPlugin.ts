@@ -97,6 +97,7 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
   }
 
   private bossAttackHitPlayer(bossAttack: BossAttack, player: Player): void {
+    if (player.isDead) return
     // プレイヤーと衝突したボスの攻撃は消える
     bossAttack.isDead = true
     bossAttack.isCollidable = false
