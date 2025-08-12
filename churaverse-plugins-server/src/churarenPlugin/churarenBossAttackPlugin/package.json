@@ -1,5 +1,5 @@
 {
-  "name": "@churaverse/churaren-boss-plugin-server",
+  "name": "@churaverse/churaren-boss-attack-plugin-server",
   "version": "0.1.0",
   "description": "",
   "main": "dist/index.js",
@@ -12,6 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@churaverse/churaren-core-plugin-server": "file:../churarenCorePlugin",
+    "@churaverse/churaren-boss-plugin-server": "file:../churarenBossPlugin",
     "@churaverse/collision-detection-plugin-server": "^0.1.2",
     "@churaverse/game-plugin-server": "file:../../gamePlugin",
     "@churaverse/map-plugin-server": "file:../../mapPlugin",
