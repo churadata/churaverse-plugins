@@ -61,11 +61,6 @@ export class TrapAttackRenderer implements ITrapAttackRenderer {
     })
   }
 
-  public setInitPosition(pos: Position): void {
-    this.sprite.x = pos.x
-    this.sprite.y = pos.y
-  }
-
   public spawn(source: Position): void {
     this.sprite.active = true
     source = source.align()

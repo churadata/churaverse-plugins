@@ -86,7 +86,7 @@ export class TrapPlugin extends BaseAlchemyItemPlugin {
   }
 
   protected handleMidwayParticipant(): void {
-    this.socketController?.registerMessageListener()
+    this.unsubscribeGameEvent()
   }
 
   // 錬金アイテムを使用した時の処理
@@ -104,7 +104,7 @@ export class TrapPlugin extends BaseAlchemyItemPlugin {
     this.trapPluginStore.trapAttackRenderers.set(trap.trapId, renderer)
 
     // 他のプレイヤーに爆発の出現を送信する
-    if (trap.ownerId === this.playerPluginStore.ownPlayerId) {
+    if (trap.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) {
       this.networkStore.messageSender.send(
         new TrapSpawnMessage({
           trapId: trap.trapId,
