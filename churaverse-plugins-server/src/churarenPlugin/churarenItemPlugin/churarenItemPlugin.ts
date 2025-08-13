@@ -8,7 +8,7 @@ import { initItemPluginStore } from './store/initItemPluginStore'
 import { Item } from './domain/item'
 import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
-import { removeItems, sendGeneratedItems } from './domain/itemService'
+import { generatedItemMap, removeItems } from './domain/itemService'
 import { IGameInfo } from '@churaverse/game-plugin-server/interface/IGameInfo'
 import '@churaverse/churaren-core-plugin-server/event/churarenStartTimerEvent'
 import '@churaverse/churaren-core-plugin-server/event/churarenResultEvent'
@@ -43,14 +43,14 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
     this.bus.subscribeEvent('update', this.update)
-    this.bus.subscribeEvent('churarenStartTimer', this.generateItems)
+    this.bus.subscribeEvent('churarenStartTimer', this.sendGenerateItems)
     this.bus.subscribeEvent('churarenResult', this.removeAllItems)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('update', this.update)
-    this.bus.unsubscribeEvent('churarenStartTimer', this.generateItems)
+    this.bus.unsubscribeEvent('churarenStartTimer', this.sendGenerateItems)
     this.bus.unsubscribeEvent('churarenResult', this.removeAllItems)
   }
 
@@ -61,10 +61,9 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
   }
 
   private readonly update = (): void => {
-    removeItems(this.itemPluginStore.items, (itemIds: string[]) => {
-      const itemDespawnMessage = new ChurarenItemDespawnMessage({ itemIds })
-      this.networkPluginStore.messageSender.send(itemDespawnMessage)
-    })
+    const itemIds = removeItems(this.itemPluginStore.items)
+    const itemDespawnMessage = new ChurarenItemDespawnMessage({ itemIds })
+    this.networkPluginStore.messageSender.send(itemDespawnMessage)
   }
 
   protected handleGameStart(): void {
@@ -76,21 +75,20 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
     this.itemPluginStore.items.clear()
   }
 
-  private readonly generateItems = (): void => {
-    const generateItemsLoop = (): void => {
+  private readonly sendGenerateItems = (): void => {
+    const sendGenerateItemsLoop = (): void => {
       if (this.churarenGameInfo === undefined || !this.isActive) return
-      sendGeneratedItems(
+      const items = generatedItemMap(
         this.itemPluginStore.items,
-        this.churarenGameInfo.participantIds.length,
-        this.store.of('mapPlugin').mapManager.currentMap,
-        (items) => {
-          const itemSpawnMessage = new ChurarenItemSpawnMessage({ items })
-          this.networkPluginStore.messageSender.send(itemSpawnMessage)
-        }
+        this.itemGenerateNum,
+        this.store.of('mapPlugin').mapManager.currentMap
       )
-      this.itemGenerateIntervalId = setTimeout(generateItemsLoop, ITEM_GENERATE_INTERVAL_MS)
+      const itemSpawnMessage = new ChurarenItemSpawnMessage({ items })
+      this.networkPluginStore.messageSender.send(itemSpawnMessage)
+
+      this.itemGenerateIntervalId = setTimeout(sendGenerateItemsLoop, ITEM_GENERATE_INTERVAL_MS)
     }
-    generateItemsLoop()
+    sendGenerateItemsLoop()
   }
 
   private registerOnOverlap(ev: RegisterOnOverlapEvent): void {
@@ -121,5 +119,12 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
       clearTimeout(this.itemGenerateIntervalId)
       this.itemGenerateIntervalId = undefined
     }
+  }
+
+  private get itemGenerateNum(): number {
+    const multiplier = 3 // プレイヤー数に掛ける倍率
+    const baseOffset = 10 // 基本オフセット値
+    const maxItemNum = 40 // 最大アイテム数
+    return Math.min((this.churarenGameInfo?.participantIds.length ?? 0) * multiplier + baseOffset, maxItemNum)
   }
 }
