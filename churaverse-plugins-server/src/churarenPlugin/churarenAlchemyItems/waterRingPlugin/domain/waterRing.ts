@@ -48,26 +48,13 @@ export class WaterRing extends Entity implements ICollidableEntity, WeaponEntity
     }, WATER_RING_SPAWN_LIMIT_MS)
   }
 
-  // 当たり判定を無効化
-  public isHitValid(): boolean {
-    if (this.lastHitTime === 0) {
-      return true
-    }
-    const currentTime = Date.now()
-    return currentTime - this.lastHitTime > this.hitCooldown
-  }
-
-  public markHit(): void {
-    this.lastHitTime = Date.now()
-  }
-
   public isStop(): void {
     this.isCollidable = false
 
     // 1秒後に再び有効にする
     setTimeout(() => {
       this.isCollidable = true
-    }, 1000)
+    }, this.hitCooldown)
   }
 
   public get isDead(): boolean {

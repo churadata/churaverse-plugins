@@ -1,4 +1,4 @@
-## Churaverse Plugin: Water Ring (Server)
+## Churaverse Plugin: Water Ring Plugin (Server)
 
 ### Description
 
