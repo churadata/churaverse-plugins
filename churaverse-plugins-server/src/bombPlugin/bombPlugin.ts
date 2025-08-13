@@ -52,8 +52,8 @@ export class BombPlugin extends BasePlugin<IMainScene> {
     })
 
     if (explodedBombIds.length > 0) {
-      removeExplodedBomb(this.bombPluginStore.bombs, explodedBombIds)
       sendExplodedBomb(this.networkPluginStore.messageSender, explodedBombIds)
+      removeExplodedBomb(this.bombPluginStore.bombs, explodedBombIds)
     }
   }
 
