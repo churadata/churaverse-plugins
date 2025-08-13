@@ -24,6 +24,6 @@ export class WaterRingRepository extends CollidableEntityRepository<WaterRing> i
   }
 
   public getByOwnerId(ownerId: string): WaterRing | undefined {
-    return Array.from(this.waterRings.values()).find((waterRing) => waterRing.ownerId === ownerId)
+    return Array.from(this.waterRings.values()).find((waterRing) => waterRing.churarenWeaponOwnerId === ownerId)
   }
 }

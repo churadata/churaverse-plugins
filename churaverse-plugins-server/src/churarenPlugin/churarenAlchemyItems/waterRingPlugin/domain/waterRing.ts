@@ -1,10 +1,11 @@
-import { Position, Direction, Entity, WeaponEntity } from 'churaverse-engine-server'
+import { Position, Direction, Entity } from 'churaverse-engine-server'
 import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/ICollidableEntity'
 import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
+import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-server'
 
 const WATER_RING_SPAWN_LIMIT_MS = 5000
 
-export class WaterRing extends Entity implements ICollidableEntity, WeaponEntity {
+export class WaterRing extends Entity implements ICollidableEntity, ChurarenWeaponEntity {
   public isCollidable = true
   public getRect(): IRectangle {
     return {
@@ -20,7 +21,7 @@ export class WaterRing extends Entity implements ICollidableEntity, WeaponEntity
 
   private _isDead = false
   public readonly waterRingId: string
-  public readonly ownerId: string
+  public readonly churarenWeaponOwnerId: string
   public readonly power = 25
   public readonly spawnTime: number
   public lastHitTime: number = 0 // 最後にヒットした時間
@@ -39,7 +40,7 @@ export class WaterRing extends Entity implements ICollidableEntity, WeaponEntity
   ) {
     super(position, direction)
     this.waterRingId = waterRingId
-    this.ownerId = ownerId
+    this.churarenWeaponOwnerId = ownerId
     this.spawnTime = spawnTime
     this.lastHitTime = 0
     // 10秒後にisDeadをtrueにするタイマーを設定
