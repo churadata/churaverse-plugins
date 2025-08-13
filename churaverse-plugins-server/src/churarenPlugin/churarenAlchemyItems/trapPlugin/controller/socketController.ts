@@ -5,7 +5,7 @@ import { RegisterMessageEvent } from '@churaverse/network-plugin-server/event/re
 import { IMessageListenerRegister } from '@churaverse/network-plugin-server/interface/IMessageListenerRegister'
 import { TrapSpawnMessage } from '../message/trapSpawnMessage'
 import { Trap } from '../domain/trap'
-import { TrapDespawnMessage } from '../message/trapDespawnMessage'
+import { TrapHitMessage } from '../message/trapHitMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
@@ -16,7 +16,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
     ev.messageRegister.registerMessage('trapSpawn', TrapSpawnMessage, 'others')
-    ev.messageRegister.registerMessage('trapDespawn', TrapDespawnMessage, 'allClients')
+    ev.messageRegister.registerMessage('trapHit', TrapHitMessage, 'allClients')
   }
 
   public setupRegisterMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
