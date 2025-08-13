@@ -86,7 +86,7 @@ export class TrapPlugin extends BaseAlchemyItemPlugin {
   }
 
   protected handleMidwayParticipant(): void {
-    this.socketController?.registerMessageListener()
+    this.unsubscribeGameEvent()
   }
 
   // 錬金アイテムを使用した時の処理

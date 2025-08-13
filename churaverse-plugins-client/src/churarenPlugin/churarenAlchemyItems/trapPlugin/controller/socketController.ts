@@ -7,7 +7,7 @@ import { ChurarenDamageMessage } from '@churaverse/churaren-player-plugin-client
 import { TrapPluginStore } from '../store/defTrapPluginStore'
 import { TrapSpawnMessage } from '../message/trapSpawnMessage'
 import { Trap } from '../domain/trap'
-import { TrapDespawnMessage } from '../message/trapDespawnMessage'
+import { TrapHitMessage } from '../message/trapHitMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private trapPluginStore!: TrapPluginStore
@@ -19,7 +19,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
     ev.messageRegister.registerMessage('trapSpawn', TrapSpawnMessage, 'queue')
-    ev.messageRegister.registerMessage('trapDespawn', TrapDespawnMessage, 'queue')
+    ev.messageRegister.registerMessage('trapHit', TrapHitMessage, 'queue')
   }
 
   public setupRegisterMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
@@ -28,13 +28,13 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public registerMessageListener(): void {
     this.messageListenerRegister.on('trapSpawn', this.trapSpawn)
-    this.messageListenerRegister.on('trapDespawn', this.trapDespawn)
+    this.messageListenerRegister.on('trapHit', this.trapHit)
     this.messageListenerRegister.on('churarenDamage', this.trapDamage)
   }
 
   public unregisterMessageListener(): void {
     this.messageListenerRegister.off('trapSpawn', this.trapSpawn)
-    this.messageListenerRegister.off('trapDespawn', this.trapDespawn)
+    this.messageListenerRegister.off('trapHits', this.trapHit)
     this.messageListenerRegister.off('churarenDamage', this.trapDamage)
   }
 
@@ -50,7 +50,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.eventBus.post(trapSpawnEvent)
   }
 
-  private readonly trapDespawn = (msg: TrapDespawnMessage): void => {
+  private readonly trapHit = (msg: TrapHitMessage): void => {
     const data = msg.data
     const trap = this.trapPluginStore.traps.get(data.trapId)
     if (trap === undefined) return
