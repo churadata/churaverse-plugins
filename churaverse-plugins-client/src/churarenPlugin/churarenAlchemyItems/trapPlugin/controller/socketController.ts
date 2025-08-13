@@ -1,4 +1,12 @@
-import { IMainScene, IEventBus, Store, Position, EntityDespawnEvent, EntitySpawnEvent } from 'churaverse-engine-client'
+import {
+  IMainScene,
+  IEventBus,
+  Store,
+  Position,
+  EntityDespawnEvent,
+  EntitySpawnEvent,
+  LivingDamageEvent,
+} from 'churaverse-engine-client'
 import { RegisterMessageEvent } from '@churaverse/network-plugin-client/event/registerMessageEvent'
 import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-client/event/registerMessageListenerEvent'
 import { BaseSocketController } from '@churaverse/network-plugin-client/interface/baseSocketController'
@@ -8,9 +16,12 @@ import { TrapPluginStore } from '../store/defTrapPluginStore'
 import { TrapSpawnMessage } from '../message/trapSpawnMessage'
 import { Trap } from '../domain/trap'
 import { TrapHitMessage } from '../message/trapHitMessage'
+import { TrapDamageCause } from '../domain/trapDamageCause'
+import { BossPluginStore } from '@churaverse/churaren-boss-plugin-client/store/defBossPluginStore'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private trapPluginStore!: TrapPluginStore
+  private bossPluginStore!: BossPluginStore
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
 
   public constructor(eventBus: IEventBus<IMainScene>, store: Store<IMainScene>) {
@@ -34,12 +45,13 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public unregisterMessageListener(): void {
     this.messageListenerRegister.off('trapSpawn', this.trapSpawn)
-    this.messageListenerRegister.off('trapHits', this.trapHit)
+    this.messageListenerRegister.off('trapHit', this.trapHit)
     this.messageListenerRegister.off('churarenDamage', this.trapDamage)
   }
 
   public getStores(): void {
     this.trapPluginStore = this.store.of('churarenTrapPlugin')
+    this.bossPluginStore = this.store.of('bossPlugin')
   }
 
   private readonly trapSpawn = (msg: TrapSpawnMessage, senderId: string): void => {
@@ -58,5 +70,15 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.eventBus.post(trapDespawnEvent)
   }
 
-  private readonly trapDamage = (msg: ChurarenDamageMessage): void => {}
+  private readonly trapDamage = (msg: ChurarenDamageMessage): void => {
+    const data = msg.data
+    if (data.cause !== 'trap') return
+    const target = this.bossPluginStore.bosses.get(data.targetId)
+    const trap = this.trapPluginStore.traps.get(data.sourceId)
+    const attacker = trap?.churarenWeaponOwnerId
+    if (target === undefined || trap === undefined || attacker === undefined) return
+    const trapDamageCause = new TrapDamageCause(trap)
+    const livingDamageEvent = new LivingDamageEvent(target, trapDamageCause, data.amount)
+    this.eventBus.post(livingDamageEvent)
+  }
 }
