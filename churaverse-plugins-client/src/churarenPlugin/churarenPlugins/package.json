@@ -36,6 +36,7 @@
   "dependencies": {
     "@churaverse/churaren-alchemy-items-client": "file:../churarenAlchemyItems/alchemyItems",
     "@churaverse/churaren-alchemy-plugin-client": "file:../churarenAlchemyPlugin",
+    "@churaverse/churaren-boss-plugin-client": "file:../churarenBossPlugin",
     "@churaverse/churaren-core-plugin-client": "file:../churarenCorePlugin",
     "@churaverse/churaren-item-plugin-client": "file:../churarenItemPlugin",
     "@churaverse/churaren-player-plugin-client": "file:../churarenPlayerPlugin",

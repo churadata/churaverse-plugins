@@ -39,9 +39,7 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
       const checkReady: () => void = () => {
         if (!this.isActive) return
         const readyPlayerSize = this.store.of('churarenPlugin').readyPlayers.size
-        if (readyPlayerSize === churarenParticipants) {
-          resolve()
-        } else if (timeOutRemaining <= 0) {
+        if (readyPlayerSize === churarenParticipants || timeOutRemaining <= 0) {
           resolve()
         } else {
           setTimeout(() => {

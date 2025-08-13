@@ -1,6 +1,6 @@
 import { CoreGamePlugin } from '@churaverse/game-plugin-server/domain/coreGamePlugin'
 import { SocketController } from './controller/socketController'
-import { initChurarenPluginStore, resetChurarenPluginStore } from './store/churarenPluginStoreManager'
+import { initChurarenPluginStore } from './store/churarenPluginStoreManager'
 import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
 import { CHURAREN_CONSTANTS } from './constants/churarenConstants'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
@@ -60,19 +60,17 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   protected handleGameStart(): void {
     initChurarenPluginStore(this.gameId, this.store, this.bus)
     this.socketController?.registerMessageListener()
-    this.sequence()
-      .then(() => {})
-      .catch((err) => {
-        console.error(err)
-        this.bus.post(new GameEndEvent(this.gameId))
-      })
+    this.sequence().catch((err) => {
+      console.error(err)
+      this.bus.post(new GameEndEvent(this.gameId))
+    })
   }
 
   /**
    * 中断・終了時に実行される処理
    */
   protected handleGameTermination(): void {
-    resetChurarenPluginStore(this.store)
+    this.store.deleteStoreOf('churarenPlugin')
     this.socketController?.unregisterMessageListener()
   }
 
@@ -100,7 +98,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   }
 
   /**
-   * 結果を表示する処理 \
+   * 結果を表示する処理
    * `RESULT_DISPLAY_TIME_SECONDS`秒後にゲームを終了する
    */
   private readonly sendChurarenResult = (ev: ChurarenResultEvent): void => {

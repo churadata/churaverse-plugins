@@ -4,7 +4,6 @@ import { PhaserLoadAssets } from 'churaverse-engine-client'
 import { AlchemyItemManager } from '../alchemyItemManager'
 import { UseAlchemyItemEvent } from '../event/useAlchemyItemEvent'
 import { IAlchemyItem } from './IAlchemyItem'
-import { AlchemyItemKind } from './alchemyItemKind'
 import '@churaverse/churaren-core-plugin-client/churarenCorePlugin'
 import '../store/defAlchemyPluginStore'
 
@@ -13,7 +12,6 @@ import '../store/defAlchemyPluginStore'
  */
 export abstract class BaseAlchemyItemPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
-  protected abstract alchemyItemKind: AlchemyItemKind
   protected abstract alchemyItem: IAlchemyItem
 
   public listenEvent(): void {
@@ -32,11 +30,11 @@ export abstract class BaseAlchemyItemPlugin extends BaseGamePlugin {
   }
 
   private loadAlchemyItemAssets(ev: PhaserLoadAssets): void {
-    AlchemyItemManager.loadAssets(ev.scene, this.alchemyItemKind, this.alchemyItem.image)
+    AlchemyItemManager.loadAssets(ev.scene, this.alchemyItem.kind, this.alchemyItem.image)
   }
 
   private readonly setupAlchemyItem = (): void => {
-    this.store.of('alchemyPlugin').alchemyItemManager.set(this.alchemyItemKind, this.alchemyItem)
+    this.store.of('alchemyPlugin').alchemyItemManager.set(this.alchemyItem.kind, this.alchemyItem)
   }
 
   /**
