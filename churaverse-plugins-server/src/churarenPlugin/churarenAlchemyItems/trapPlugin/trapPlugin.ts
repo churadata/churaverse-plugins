@@ -1,12 +1,17 @@
-import { IMainScene, EntitySpawnEvent } from 'churaverse-engine-server'
+import { IMainScene, EntitySpawnEvent, LivingDamageEvent } from 'churaverse-engine-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
 import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
 import { TrapPluginStore } from './store/defTrapPluginStore'
+import { TrapHitMessage } from './message/trapHitMessage'
 import { SocketController } from './controller/socketController'
 import { initTrapPluginStore } from './store/initTrapPluginStore'
 import { Trap } from './domain/trap'
+import { removeDieTrap } from './domain/trapService'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
+import { Boss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
+import '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
+import { TrapDamageCause } from './domain/trapDamageCause'
 
 export class TrapPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -66,7 +71,23 @@ export class TrapPlugin extends BaseGamePlugin {
     })
   }
 
-  private trapHit(trap: Trap, boss: any): void {}
+  private registerOnOverlapBoss(ev: RegisterOnOverlapEvent): void {
+    ev.collisionDetector.register(
+      this.trapPluginStore.traps,
+      this.store.of('bossPlugin').bosses,
+      this.trapHit.bind(this)
+    )
+  }
 
-  private registerOnOverlapBoss(ev: RegisterOnOverlapEvent): void {}
+  private trapHit(trap: Trap, boss: Boss): void {
+    if (boss.isDead) return
+    trap.die()
+    // トラップ発動イベントの発火
+    const trapDamageCause = new TrapDamageCause(trap)
+    const livingDamageEvent = new LivingDamageEvent(boss, trapDamageCause, trap.power)
+    this.bus.post(livingDamageEvent)
+    removeDieTrap(this.trapPluginStore.traps, trap.trapId)
+    const trapHitMessage = new TrapHitMessage({ trapId: trap.trapId })
+    this.networkPluginStore.messageSender.send(trapHitMessage)
+  }
 }
