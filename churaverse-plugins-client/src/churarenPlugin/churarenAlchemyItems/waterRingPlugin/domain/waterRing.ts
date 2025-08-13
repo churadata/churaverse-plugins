@@ -1,25 +1,24 @@
-import { Position, Direction, WeaponEntity } from 'churaverse-engine-client'
+import { Position, Direction } from 'churaverse-engine-client'
 import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/IAlchemyItem'
 import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItem'
 import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind'
 import waterRingImage from '../assets/waterRing.gif'
+import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-client'
 
 export const waterRing: AlchemyItemKind = 'waterRing'
 export const WATER_RING_ITEM: IAlchemyItem = {
-  displaySize: 100,
+  kind: 'waterRing',
   image: waterRingImage,
 } as const
 
 /**
  * waterRingクラスの定義
  */
-export class WaterRing extends AlchemyItem implements WeaponEntity {
+export class WaterRing extends AlchemyItem implements ChurarenWeaponEntity {
   public readonly power = 25
   public waterRingId: string
   public churarenWeaponOwnerId: string
   public spawnTime: number
-  public readonly id: string = 'waterRing'
-  public ownerId: string
 
   public constructor(
     waterRingId: string,
@@ -31,7 +30,6 @@ export class WaterRing extends AlchemyItem implements WeaponEntity {
     super(waterRingId, 'waterRing')
     this.waterRingId = waterRingId
     this.churarenWeaponOwnerId = ownerId
-    this.ownerId = ownerId
     this.position = position
     this.spawnTime = spawnTime
     this.direction = direction
