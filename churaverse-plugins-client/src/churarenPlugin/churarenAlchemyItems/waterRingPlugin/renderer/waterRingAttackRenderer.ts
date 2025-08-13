@@ -18,6 +18,14 @@ const WATER_RING_ATTACK_ANIM_KEY = 'waterRingAttackAnimation'
  */
 const DISPLAY_SIZE = 200
 
+/**
+ * アニメーションの設定配列
+ * オブジェクトリテラルに
+ */
+const _anims: Array<{ key: string; frameStart: number; frameEnd: number }> = [
+  { key: 'water_ring_attack', frameStart: 0, frameEnd: 3 },
+]
+
 export class WaterRingAttackRenderer implements IWaterRingAttackRenderer {
   private readonly scene: Scene
   private readonly sprite: Phaser.GameObjects.Sprite
@@ -39,9 +47,12 @@ export class WaterRingAttackRenderer implements IWaterRingAttackRenderer {
       .setDisplaySize(DISPLAY_SIZE, DISPLAY_SIZE)
 
     // アニメーションを設定
-    this.scene.anims.create({
-      key: WATER_RING_ATTACK_ANIM_KEY,
-      frames: this.scene.anims.generateFrameNumbers(WATER_RING_ATTACK_TEXTURE_KEY, { start: 0, end: 3 }),
+    scene.anims.create({
+      key: _anims[0].key,
+      frames: this.scene.anims.generateFrameNumbers(WATER_RING_ATTACK_ANIM_KEY, {
+        start: _anims[0].frameStart,
+        end: _anims[0].frameEnd,
+      }),
       frameRate: 10, // フレームレートを調整
       repeat: -1, // 無限に繰り返す
     })
@@ -54,11 +65,6 @@ export class WaterRingAttackRenderer implements IWaterRingAttackRenderer {
       frameWidth: 90, // フレームの幅
       frameHeight: 90, // フレームの高さ
     })
-  }
-
-  public setInitPosition(pos: Position): void {
-    this.sprite.x = pos.x
-    this.sprite.y = pos.y
   }
 
   public spawn(source: Position): void {
