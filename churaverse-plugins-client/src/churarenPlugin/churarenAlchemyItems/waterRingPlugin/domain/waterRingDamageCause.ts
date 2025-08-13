@@ -1,7 +1,8 @@
-import { WeaponDamageCause, WeaponEntity } from 'churaverse-engine-client'
+import { ChurarenWeaponDamageCause, ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-client'
+import { WeaponDamageCause } from 'churaverse-engine-client'
 
-export class WaterRingDamageCause extends WeaponDamageCause {
-  public constructor(public readonly waterRing: WeaponEntity) {
+export class WaterRingDamageCause extends ChurarenWeaponDamageCause {
+  public constructor(public readonly waterRing: ChurarenWeaponEntity) {
     super('waterRing', waterRing)
   }
 }

@@ -1,4 +1,12 @@
-import { IMainScene, IEventBus, Store, Position, EntitySpawnEvent, EntityDespawnEvent } from 'churaverse-engine-client'
+import {
+  IMainScene,
+  IEventBus,
+  Store,
+  Position,
+  EntitySpawnEvent,
+  EntityDespawnEvent,
+  LivingDamageEvent,
+} from 'churaverse-engine-client'
 import { BaseSocketController } from '@churaverse/network-plugin-client/interface/baseSocketController'
 import { RegisterMessageEvent } from '@churaverse/network-plugin-client/event/registerMessageEvent'
 import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-client/event/registerMessageListenerEvent'
@@ -8,9 +16,12 @@ import { WaterRingSpawnMessage } from '../message/waterRingSpawnMessage'
 import { WaterRing } from '../domain/waterRing'
 import { WaterRingDespawnMessage } from '../message/waterRingDespawnMessage'
 import { ChurarenDamageMessage } from '@churaverse/churaren-player-plugin-client/message/churarenDamageMessage'
+import { WaterRingDamageCause } from '../domain/waterRingDamageCause'
+import { BossPluginStore } from '@churaverse/churaren-boss-plugin-client/store/defBossPluginStore'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private waterRingPluginStore!: WaterRingPluginStore
+  private bossPluginStore!: BossPluginStore
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
 
   public constructor(eventBus: IEventBus<IMainScene>, store: Store<IMainScene>) {
@@ -40,6 +51,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public getStores(): void {
     this.waterRingPluginStore = this.store.of('churarenWaterRingPlugin')
+    this.bossPluginStore = this.store.of('bossPlugin')
   }
 
   private readonly waterRingSpawn = (msg: WaterRingSpawnMessage, senderId: string): void => {
@@ -58,5 +70,15 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.eventBus.post(waterRingDespawnEvent)
   }
 
-  private readonly waterRingDamage = (msg: ChurarenDamageMessage): void => {}
+  private readonly waterRingDamage = (msg: ChurarenDamageMessage): void => {
+    const data = msg.data
+    if (data.cause !== 'waterRing') return
+    const target = this.store.of('bossPlugin').bosses.get(data.targetId)
+    const waterRing = this.waterRingPluginStore.waterRings.get(data.sourceId)
+    const attacker = waterRing?.churarenWeaponOwnerId
+    if (target === undefined || waterRing === undefined || attacker === undefined) return
+    const waterRingDamageCause = new WaterRingDamageCause(waterRing)
+    const livingDamageEvent = new LivingDamageEvent(target, waterRingDamageCause, data.amount)
+    this.eventBus.post(livingDamageEvent)
+  }
 }

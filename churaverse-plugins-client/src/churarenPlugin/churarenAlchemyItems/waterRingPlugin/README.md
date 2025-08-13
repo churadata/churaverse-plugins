@@ -1,4 +1,4 @@
-## Churaverse Plugin: Water Ring (Client)
+## Churaverse Plugin: Water Ring Plugin (Client)
 
 ### Description
 

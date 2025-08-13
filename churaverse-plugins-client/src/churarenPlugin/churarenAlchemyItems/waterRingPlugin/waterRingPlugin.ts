@@ -15,7 +15,7 @@ import { initWaterRingPluginStore, resetWaterRingPluginStore } from './store/ini
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { Sendable } from '@churaverse/network-plugin-client/types/sendable'
 import { WaterRingPluginStore } from './store/defWaterRingPluginStore'
-import { WaterRing, WATER_RING_ITEM, waterRing } from './domain/waterRing'
+import { WaterRing, WATER_RING_ITEM } from './domain/waterRing'
 import { WaterRingSpawnMessage } from './message/waterRingSpawnMessage'
 import { SocketController } from './controller/socketController'
 import { ClearAlchemyItemBoxEvent } from '@churaverse/churaren-alchemy-plugin-client/event/clearAlchemyItemBox'
@@ -32,7 +32,6 @@ export class WaterRingPlugin extends BaseAlchemyItemPlugin {
   private playerPluginStore!: PlayerPluginStore
   private networkStore!: NetworkPluginStore<IMainScene>
   private socketController?: SocketController
-  protected alchemyItemKind = waterRing
   protected alchemyItem = WATER_RING_ITEM
 
   public listenEvent(): void {
@@ -91,6 +90,7 @@ export class WaterRingPlugin extends BaseAlchemyItemPlugin {
   protected handleGameTermination(): void {
     resetWaterRingPluginStore(this.store)
     this.socketController?.unregisterMessageListener()
+    this.clearWaterRing()
   }
 
   protected handleMidwayParticipant(): void {
@@ -104,7 +104,7 @@ export class WaterRingPlugin extends BaseAlchemyItemPlugin {
     const startPos = ev.ownPlayer.position.copy()
 
     const renderer = this.waterRingPluginStore.waterRingAttackRendererFactory.build()
-    if (renderer == null) return
+    if (renderer === undefined) return
 
     const position = new Position(startPos.x, startPos.y)
 
@@ -133,50 +133,48 @@ export class WaterRingPlugin extends BaseAlchemyItemPlugin {
   public onPlayerWalk = (ev: PlayerWalkEvent): void => {
     const gap = 40
     const player = this.playerPluginStore.players.get(ev.id)
-    if (player == null) return
+    if (player === undefined) return
     if (this.waterRingPluginStore.waterRings.size === 0) return
     // プレイヤーのidでWaterRingを検索
     const waterRing = this.waterRingPluginStore.waterRings.getByOwnerId(player.id)
 
-    if (waterRing == null) return
+    if (waterRing === undefined) return
     const renderer = this.waterRingPluginStore.waterRingAttackRenderers.get(waterRing.waterRingId)
+    if (renderer === undefined) {
+      return
+    }
 
     const dest = player.position.copy()
     dest.x = player.position.x + player.direction.x * gap
     dest.y = player.position.y + player.direction.y * gap
     const speed = ev.speed ?? GRID_SIZE / GRID_WALK_DURATION_MS
-    if (renderer == null) {
-      return
-    }
 
     // 追従させる
-    if ('chase' in renderer) {
-      renderer?.chase(dest, speed, (pos: { x: number; y: number }) => {
-        waterRing.position.x = pos.x
-        waterRing.position.y = pos.y
-      })
-    }
+    renderer?.chase(dest, speed, (pos: { x: number; y: number }) => {
+      waterRing.position.x = pos.x
+      waterRing.position.y = pos.y
+    })
   }
 
-  public playerDie = (ev: PlayerDieEvent): void => {
+  private readonly playerDie = (ev: PlayerDieEvent): void => {
     const playerId = ev.id
-    if (playerId == null) return
+    if (playerId === undefined) return
     const waterRing = this.waterRingPluginStore.waterRings.getByOwnerId(playerId)
-    if (waterRing == null) return
+    if (waterRing === undefined) return
     const waterRingAttackRenderer = this.waterRingPluginStore.waterRingAttackRenderers.get(waterRing.waterRingId)
     waterRing?.die()
     waterRingAttackRenderer?.dead()
-    this.waterRingPluginStore.waterRings.delete(waterRing.itemId)
+    this.waterRingPluginStore.waterRings.delete(waterRing.waterRingId)
   }
 
   // 水の輪の出現を受信した時の処理
-  public spawnWaterRing = (ev: EntitySpawnEvent): void => {
+  private readonly spawnWaterRing = (ev: EntitySpawnEvent): void => {
     if (!(ev.entity instanceof WaterRing)) return
     if (ev.entity.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) return
 
     const waterRing = ev.entity
     const renderer = this.waterRingPluginStore.waterRingAttackRendererFactory.build()
-    if (renderer == null) return
+    if (renderer === undefined) return
 
     this.waterRingPluginStore.waterRings.set(waterRing.waterRingId, waterRing)
     this.waterRingPluginStore.waterRingAttackRenderers.set(waterRing.waterRingId, renderer)
