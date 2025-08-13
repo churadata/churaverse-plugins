@@ -22,8 +22,8 @@ import { ClearAlchemyItemBoxEvent } from '@churaverse/churaren-alchemy-plugin-cl
 import { UseAlchemyItemEvent } from '@churaverse/churaren-alchemy-plugin-client/event/useAlchemyItemEvent'
 import { WaterRingAttackRendererFactory } from './renderer/waterRingAttackRendererFactory'
 import { WaterRingAttackRenderer } from './renderer/waterRingAttackRenderer'
-import { PlayerWalkEvent } from '../../../playerPlugin/event/playerWalkEvent'
-import { PlayerDieEvent } from '../../../playerPlugin/event/playerDieEvent'
+import { PlayerWalkEvent } from '@churaverse/player-plugin-client/event/playerWalkEvent'
+import { PlayerDieEvent } from '@churaverse/player-plugin-client/event/playerDieEvent'
 import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-client/domain/baseAlchemyItemPlugin'
 
 export class WaterRingPlugin extends BaseAlchemyItemPlugin {
