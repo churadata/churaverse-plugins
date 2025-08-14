@@ -20,7 +20,6 @@ import { FlamePillarPluginStore } from './store/defFlamePillarPluginStore'
 import { initFlamePillarPluginStore, resetFlamePillarPluginStore } from './store/initFlamePillarPluginStore'
 import { FLAME_PILLAR_ITEM, FlamePillar } from './domain/flamePillar'
 import { FlamePillarSpawnMessage } from './message/flamePillarSpawnMessage'
-import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/IAlchemyItem'
 
 export class FlamePillarPlugin extends BaseAlchemyItemPlugin {
   private attackRendererFactory?: FlamePillarAttackRendererFactory
@@ -28,9 +27,10 @@ export class FlamePillarPlugin extends BaseAlchemyItemPlugin {
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private socketController?: SocketController
   private flamePillarPluginStore!: FlamePillarPluginStore
-  protected alchemyItem: IAlchemyItem = FLAME_PILLAR_ITEM
+  protected alchemyItem = FLAME_PILLAR_ITEM
 
   public listenEvent(): void {
+    super.listenEvent()
     this.bus.subscribeEvent('phaserSceneInit', this.phaserSceneInit.bind(this))
     this.bus.subscribeEvent('phaserLoadAssets', this.loadAssets.bind(this))
     this.bus.subscribeEvent('init', this.init.bind(this))
@@ -57,12 +57,14 @@ export class FlamePillarPlugin extends BaseAlchemyItemPlugin {
   }
 
   protected subscibeGameEvent(): void {
+    super.subscribeGameEvent()
     this.bus.subscribeEvent('useAlchemyItem', this.useAlchemyItem)
     this.bus.subscribeEvent('entitySpawn', this.spawnFlamePillar)
     this.bus.subscribeEvent('entityDespawn', this.despawnFlamePillar)
   }
 
   protected unsubscribeGameEvent(): void {
+    super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('useAlchemyItem', this.useAlchemyItem)
     this.bus.unsubscribeEvent('entitySpawn', this.spawnFlamePillar)
     this.bus.unsubscribeEvent('entityDespawn', this.despawnFlamePillar)
@@ -71,6 +73,8 @@ export class FlamePillarPlugin extends BaseAlchemyItemPlugin {
   protected handleGameStart(): void {
     initFlamePillarPluginStore(this.store, this.attackRendererFactory)
     this.flamePillarPluginStore = this.store.of('churarenFlamePillarPlugin')
+    this.socketController?.registerMessageListener()
+    this.socketController?.getStores()
   }
 
   protected handleGameTermination(): void {
