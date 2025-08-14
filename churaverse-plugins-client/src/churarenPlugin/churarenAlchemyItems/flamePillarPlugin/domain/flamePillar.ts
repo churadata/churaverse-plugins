@@ -2,7 +2,7 @@ import { Position, Direction } from 'churaverse-engine-client'
 import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/IAlchemyItem'
 import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItem'
 import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind'
-import flamePillarImage from '../assets/flamePillarAttack.png'
+import flamePillarImage from '../assets/flamePillar.gif'
 import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-client'
 
 export const flamePillar: AlchemyItemKind = 'flamePillar'
