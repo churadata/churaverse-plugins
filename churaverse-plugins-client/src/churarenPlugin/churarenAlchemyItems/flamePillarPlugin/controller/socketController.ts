@@ -16,20 +16,16 @@ export class SocketController extends BaseSocketController<IMainScene> {
     super(eventBus, store)
   }
 
-  public getStores(): void {
-    this.flamePillarPluginStore = this.store.of('churarenFlamePillarPlugin')
+  public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
+    ev.messageRegister.registerMessage('flamePillarSpawn', FlamePillarSpawnMessage, 'queue')
+    ev.messageRegister.registerMessage('flamePillarHit', FlamePillarHitMessage, 'queue')
   }
 
   public setupRegisterMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
     this.messageListenerRegister = ev.messageListenerRegister
   }
 
-  public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
-    ev.messageRegister.registerMessage('flamePillarSpawn', FlamePillarSpawnMessage, 'queue')
-    ev.messageRegister.registerMessage('flamePillarHit', FlamePillarHitMessage, 'queue')
-  }
-
-  public registerMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
+  public registerMessageListener(): void {
     this.messageListenerRegister.on('flamePillarSpawn', this.flamePillarSpawn)
     this.messageListenerRegister.on('flamePillarHit', this.flamePillarHit)
   }
@@ -37,6 +33,10 @@ export class SocketController extends BaseSocketController<IMainScene> {
   public unregisterMessageListener(): void {
     this.messageListenerRegister.off('flamePillarSpawn', this.flamePillarSpawn)
     this.messageListenerRegister.off('flamePillarHit', this.flamePillarHit)
+  }
+
+  public getStores(): void {
+    this.flamePillarPluginStore = this.store.of('churarenFlamePillarPlugin')
   }
 
   private readonly flamePillarSpawn = (msg: FlamePillarSpawnMessage, senderId: string): void => {
