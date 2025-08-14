@@ -14,6 +14,7 @@ import '@churaverse/churaren-core-plugin-server/event/churarenStartTimerEvent'
 import '@churaverse/churaren-core-plugin-server/event/churarenResultEvent'
 import { ChurarenItemDespawnMessage } from './message/churarenItemDespawnMessage'
 import { ChurarenItemSpawnMessage } from './message/churarenItemSpawnMessage'
+import { GetChurarenItemEvent } from '@churaverse/churaren-player-plugin-server/event/getChurarenItemEvent'
 
 const ITEM_GENERATE_INTERVAL_MS = 10000
 
@@ -99,7 +100,11 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
   }
 
   private getItem(item: Item, player: Player): void {
-    // TODO: ChurarenPlayerPluginのGetItemEventをpostする
+    if (this.churarenGameInfo === undefined) return
+    // プレイヤーが参加者でない場合は何もしない
+    if (!this.churarenGameInfo.participantIds.includes(player.id)) return
+    const getItemEvent = new GetChurarenItemEvent(player.id, item)
+    this.bus.post(getItemEvent)
   }
 
   private readonly removeAllItems = (): void => {
