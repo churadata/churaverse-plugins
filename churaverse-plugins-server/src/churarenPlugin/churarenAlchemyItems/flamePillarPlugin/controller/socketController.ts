@@ -5,7 +5,7 @@ import { IMessageListenerRegister } from '@churaverse/network-plugin-server/inte
 import { RegisterMessageEvent } from '@churaverse/network-plugin-server/event/registerMessageEvent'
 import { FlamePillar } from '../domain/flamePillar'
 import { FlamePillarSpawnMessage } from '../message/flamePillarSpawnMessage'
-import { FlamePillarDespawnMessage } from '../message/flamePillarDespawnMessage'
+import { FlamePillarHitMessage } from '../message/flamePillarHitMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
@@ -16,7 +16,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
     ev.messageRegister.registerMessage('flamePillarSpawn', FlamePillarSpawnMessage, 'others')
-    ev.messageRegister.registerMessage('flamePillarDespawn', FlamePillarDespawnMessage, 'allClients')
+    ev.messageRegister.registerMessage('flamePillarHit', FlamePillarHitMessage, 'allClients')
   }
 
   public setupRegisterMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
@@ -25,6 +25,10 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public registerMessageListener(): void {
     this.messageListenerRegister.on('flamePillarSpawn', this.flamePillarSpawn)
+  }
+
+  public unregisterMessageListener(): void {
+    this.messageListenerRegister.off('flamePillarSpawn', this.flamePillarSpawn)
   }
 
   private readonly flamePillarSpawn = (msg: FlamePillarSpawnMessage, senderId: string): void => {

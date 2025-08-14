@@ -6,12 +6,14 @@ import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { initFlamePillarPluginStore } from './store/initFlamePillarPluginStore'
 import { removeDieFlamePillar } from './domain/flamePillarService'
-import { FlamePillarDespawnMessage } from './message/flamePillarDespawnMessage'
 import { SocketController } from './controller/socketController'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
 import { FlamePillarDamageCause } from './domain/flamePillarDamageCause'
 import { FlamePillar } from './domain/flamePillar'
 import { Boss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
+import { FlamePillarHitMessage } from './message/flamePillarHitMessage'
+import '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
+import '@churaverse/churaren-core-plugin-server/event/churarenResultEvent'
 
 export class FlamePillarPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -21,6 +23,7 @@ export class FlamePillarPlugin extends BaseGamePlugin {
   private socketController?: SocketController
 
   public listenEvent(): void {
+    super.listenEvent()
     this.bus.subscribeEvent('init', this.init.bind(this))
 
     this.socketController = new SocketController(this.bus, this.store)
@@ -29,6 +32,7 @@ export class FlamePillarPlugin extends BaseGamePlugin {
       'registerMessageListener',
       this.socketController.setupRegisterMessageListener.bind(this.socketController)
     )
+
     this.bus.subscribeEvent('registerOnOverlap', this.registerOnOverlapBoss.bind(this))
   }
 
@@ -40,41 +44,31 @@ export class FlamePillarPlugin extends BaseGamePlugin {
   }
 
   protected subscribeGameEvent(): void {
+    super.subscribeGameEvent()
     this.bus.subscribeEvent('update', this.update)
     this.bus.subscribeEvent('entitySpawn', this.spawnFlamePillar)
+    this.bus.subscribeEvent('churarenResult', this.removeAllFlamePillar)
   }
 
   protected unsubscribeGameEvent(): void {
+    super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('update', this.update)
     this.bus.unsubscribeEvent('entitySpawn', this.spawnFlamePillar)
   }
 
-  protected handleGameStart(): void {}
+  protected handleGameStart(): void {
+    this.socketController?.registerMessageListener()
+  }
 
-  protected handleGameTermination(): void {}
+  protected handleGameTermination(): void {
+    this.socketController?.unregisterMessageListener()
+  }
 
   private readonly update = (ev: UpdateEvent): void => {
     removeDieFlamePillar(this.flamePillarPluginStore.flamePillars, (flamePillarId: string) => {
-      const flamePillarDespawnMessage = new FlamePillarDespawnMessage({ flamePillarId })
-      this.networkPluginStore.messageSender.send(flamePillarDespawnMessage)
+      const flamePillarHitMessage = new FlamePillarHitMessage({ flamePillarId })
+      this.networkPluginStore.messageSender.send(flamePillarHitMessage)
     })
-  }
-
-  private flamePillarHit(flamePillar: FlamePillar, boss: Boss): void {
-    flamePillar.isStop()
-
-    const flamePillarDamageCause = new FlamePillarDamageCause(flamePillar)
-    const livingDamageEvent = new LivingDamageEvent(boss, flamePillarDamageCause, flamePillar.power)
-    this.bus.post(livingDamageEvent)
-    this.flamePillarPluginStore.flamePillars.delete(flamePillar.id)
-  }
-
-  private registerOnOverlapBoss(ev: RegisterOnOverlapEvent): void {
-    ev.collisionDetector.register(
-      this.flamePillarPluginStore.flamePillars,
-      this.store.of('bossPlugin').bosses,
-      this.flamePillarHit.bind(this)
-    )
   }
 
   private readonly spawnFlamePillar = (ev: EntitySpawnEvent): void => {
@@ -87,8 +81,25 @@ export class FlamePillarPlugin extends BaseGamePlugin {
     const flamePillarIds = this.flamePillarPluginStore.flamePillars.getAllId()
     flamePillarIds.forEach((flamePillarId) => {
       this.flamePillarPluginStore.flamePillars.delete(flamePillarId)
-      const flamePillarDespawnMessage = new FlamePillarDespawnMessage({ flamePillarId })
-      this.networkPluginStore.messageSender.send(flamePillarDespawnMessage)
+      const flamePillarHitMessage = new FlamePillarHitMessage({ flamePillarId })
+      this.networkPluginStore.messageSender.send(flamePillarHitMessage)
     })
+  }
+
+  private registerOnOverlapBoss(ev: RegisterOnOverlapEvent): void {
+    ev.collisionDetector.register(
+      this.flamePillarPluginStore.flamePillars,
+      this.store.of('bossPlugin').bosses,
+      this.flamePillarHit.bind(this)
+    )
+  }
+
+  private flamePillarHit(flamePillar: FlamePillar, boss: Boss): void {
+    if (boss.isDead) return
+    flamePillar.die()
+
+    const flamePillarDamageCause = new FlamePillarDamageCause(flamePillar)
+    const livingDamageEvent = new LivingDamageEvent(boss, flamePillarDamageCause, flamePillar.power)
+    this.bus.post(livingDamageEvent)
   }
 }

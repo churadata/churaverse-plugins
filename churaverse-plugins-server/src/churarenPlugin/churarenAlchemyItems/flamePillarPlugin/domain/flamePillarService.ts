@@ -1,5 +1,4 @@
 import { IFlamePillarRepository } from './IFlamePillarRepository'
-import { FlamePillar } from './flamePillar'
 
 /**
  * 消滅時間に達したら削除
@@ -7,7 +6,7 @@ import { FlamePillar } from './flamePillar'
  */
 export function removeDieFlamePillar(
   flamePillars: IFlamePillarRepository,
-  onDelete: (flamePillarId: string, flamePillar: FlamePillar) => void
+  onDelete: (flamePillarId: string) => void
 ): void {
   flamePillars.getAllId().forEach((flamePillarId: string) => {
     const flamePillar = flamePillars.get(flamePillarId)
@@ -15,7 +14,7 @@ export function removeDieFlamePillar(
       flamePillars.delete(flamePillarId)
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      onDelete(flamePillarId, flamePillar!) // null合体でundefinedでないことは確定
+      onDelete(flamePillarId) // null合体でundefinedでないことは確定
     }
   })
 }
