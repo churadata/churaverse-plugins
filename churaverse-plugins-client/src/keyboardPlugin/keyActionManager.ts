@@ -59,6 +59,10 @@ export class KeyActionManager<Scene extends Scenes>
     this.keyActionReceiver.on(type, listener)
   }
 
+  public off<KeyActType extends KeyActionType<Scene> & string>(type: KeyActType, listener: IKeyActionListener): void {
+    this.keyActionReceiver.off(type, listener)
+  }
+
   public rebindKey(type: KeyActionType<Scene>, newKeyCode: KeyCode): void {
     this.keyActionObservers.get(type)?.changeKeyCode(newKeyCode)
   }
