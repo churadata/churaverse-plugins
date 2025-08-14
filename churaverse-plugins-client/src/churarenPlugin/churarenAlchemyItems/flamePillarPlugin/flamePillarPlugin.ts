@@ -56,7 +56,7 @@ export class FlamePillarPlugin extends BaseAlchemyItemPlugin {
     this.networkPluginStore = this.store.of('networkPlugin')
   }
 
-  protected subscibeGameEvent(): void {
+  protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
     this.bus.subscribeEvent('useAlchemyItem', this.useAlchemyItem)
     this.bus.subscribeEvent('entitySpawn', this.spawnFlamePillar)
@@ -87,6 +87,7 @@ export class FlamePillarPlugin extends BaseAlchemyItemPlugin {
   }
 
   protected useAlchemyItem = (ev: UseAlchemyItemEvent): void => {
+    console.log('useAlchemyItem received flamePillar', ev)
     if (ev.alchemyItem.kind !== 'flamePillar') return
 
     const gap = 65
