@@ -1,4 +1,12 @@
-import { IMainScene, IEventBus, Store, Position, EntitySpawnEvent, EntityDespawnEvent } from 'churaverse-engine-client'
+import {
+  IMainScene,
+  IEventBus,
+  Store,
+  Position,
+  EntitySpawnEvent,
+  EntityDespawnEvent,
+  LivingDamageEvent,
+} from 'churaverse-engine-client'
 import { BaseSocketController } from '@churaverse/network-plugin-client/interface/baseSocketController'
 import { RegisterMessageEvent } from '@churaverse/network-plugin-client/event/registerMessageEvent'
 import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-client/event/registerMessageListenerEvent'
@@ -7,9 +15,13 @@ import { IMessageListenerRegister } from '@churaverse/network-plugin-client/inte
 import { FlamePillarSpawnMessage } from '../message/flamePillarSpawnMessage'
 import { FlamePillar } from '../domain/flamePillar'
 import { FlamePillarHitMessage } from '../message/flamePillarHitMessage'
+import { ChurarenDamageMessage } from '@churaverse/churaren-player-plugin-client/message/churarenDamageMessage'
+import { BossPluginStore } from '@churaverse/churaren-boss-plugin-client/store/defBossPluginStore'
+import { FlamePillarDamageCause } from '../domain/flamePillarDamageCause'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private flamePillarPluginStore!: FlamePillarPluginStore
+  private bossPluginStore!: BossPluginStore
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
 
   public constructor(eventBus: IEventBus<IMainScene>, store: Store<IMainScene>) {
@@ -28,15 +40,18 @@ export class SocketController extends BaseSocketController<IMainScene> {
   public registerMessageListener(): void {
     this.messageListenerRegister.on('flamePillarSpawn', this.flamePillarSpawn)
     this.messageListenerRegister.on('flamePillarHit', this.flamePillarHit)
+    this.messageListenerRegister.on('churarenDamage', this.flamePillarDamage)
   }
 
   public unregisterMessageListener(): void {
     this.messageListenerRegister.off('flamePillarSpawn', this.flamePillarSpawn)
     this.messageListenerRegister.off('flamePillarHit', this.flamePillarHit)
+    this.messageListenerRegister.off('churarenDamage', this.flamePillarDamage)
   }
 
   public getStores(): void {
     this.flamePillarPluginStore = this.store.of('churarenFlamePillarPlugin')
+    this.bossPluginStore = this.store.of('bossPlugin')
   }
 
   private readonly flamePillarSpawn = (msg: FlamePillarSpawnMessage, senderId: string): void => {
@@ -53,5 +68,17 @@ export class SocketController extends BaseSocketController<IMainScene> {
     if (flamePillar === undefined) return
     const flamePillarDespawnEvent = new EntityDespawnEvent(flamePillar)
     this.eventBus.post(flamePillarDespawnEvent)
+  }
+
+  private readonly flamePillarDamage = (msg: ChurarenDamageMessage): void => {
+    const data = msg.data
+    if (data.cause !== 'flamePillar') return
+    const target = this.bossPluginStore.bosses.get(data.targetId)
+    const flamePillar = this.flamePillarPluginStore.flamePillars.get(data.sourceId)
+    const attacker = flamePillar?.churarenWeaponOwnerId
+    if (target === undefined || flamePillar === undefined || attacker === undefined) return
+    const flamePillarDamageCause = new FlamePillarDamageCause(flamePillar)
+    const livingDamageEvent = new LivingDamageEvent(target, flamePillarDamageCause, data.amount)
+    this.eventBus.post(livingDamageEvent)
   }
 }

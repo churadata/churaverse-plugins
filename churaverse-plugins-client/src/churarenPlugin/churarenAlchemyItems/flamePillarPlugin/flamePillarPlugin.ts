@@ -6,6 +6,7 @@ import {
   Position,
   EntitySpawnEvent,
   EntityDespawnEvent,
+  uniqueId,
 } from 'churaverse-engine-client'
 import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-client/domain/baseAlchemyItemPlugin'
 import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
@@ -105,13 +106,7 @@ export class FlamePillarPlugin extends BaseAlchemyItemPlugin {
         startPos.y + gap * ev.ownPlayer.direction.y + offsetY
       )
 
-      const flamePillar = new FlamePillar(
-        ev.alchemyItem.itemId,
-        ev.ownPlayer.id,
-        position,
-        ev.ownPlayer.direction,
-        Date.now()
-      )
+      const flamePillar = new FlamePillar(uniqueId(), ev.ownPlayer.id, position, ev.ownPlayer.direction, Date.now())
 
       this.flamePillarPluginStore.flamePillars.set(flamePillar.flamePillarId, flamePillar)
       this.flamePillarPluginStore.flamePillarAttackRenderers.set(flamePillar.flamePillarId, renderer)
