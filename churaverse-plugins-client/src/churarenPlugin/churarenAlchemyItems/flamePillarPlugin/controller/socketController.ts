@@ -6,7 +6,6 @@ import { FlamePillarPluginStore } from '../store/defFlamePillarPluginStore'
 import { IMessageListenerRegister } from '@churaverse/network-plugin-client/interface/IMessageListenerRegister'
 import { FlamePillarSpawnMessage } from '../message/flamePillarSpawnMessage'
 import { FlamePillar } from '../domain/flamePillar'
-import { FlamePillarDespawnMessage } from '../message/flamePillarDespawnMessage'
 import { FlamePillarHitMessage } from '../message/flamePillarHitMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
@@ -27,19 +26,16 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
     ev.messageRegister.registerMessage('flamePillarSpawn', FlamePillarSpawnMessage, 'queue')
-    ev.messageRegister.registerMessage('flamePillarDespawn', FlamePillarDespawnMessage, 'queue')
     ev.messageRegister.registerMessage('flamePillarHit', FlamePillarHitMessage, 'queue')
   }
 
   public registerMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
     this.messageListenerRegister.on('flamePillarSpawn', this.flamePillarSpawn)
-    this.messageListenerRegister.on('flamePillarDespawn', this.flamePillarDespawn)
     this.messageListenerRegister.on('flamePillarHit', this.flamePillarHit)
   }
 
   public unregisterMessageListener(): void {
     this.messageListenerRegister.off('flamePillarSpawn', this.flamePillarSpawn)
-    this.messageListenerRegister.off('flamePillarDespawn', this.flamePillarDespawn)
     this.messageListenerRegister.off('flamePillarHit', this.flamePillarHit)
   }
 
@@ -49,14 +45,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
     const flamePillar = new FlamePillar(data.flamePillarId, senderId, position, data.direction, data.spawnTime)
     const flamePillarSpawnEvent = new EntitySpawnEvent(flamePillar)
     this.eventBus.post(flamePillarSpawnEvent)
-  }
-
-  private readonly flamePillarDespawn = (msg: FlamePillarDespawnMessage): void => {
-    const data = msg.data
-    const flamePillar = this.flamePillarPluginStore.flamePillars.get(data.flamePillarId)
-    if (flamePillar === undefined) return
-    const flamePillarDespawnEvent = new EntityDespawnEvent(flamePillar)
-    this.eventBus.post(flamePillarDespawnEvent)
   }
 
   private readonly flamePillarHit = (msg: FlamePillarHitMessage): void => {

@@ -1,8 +1,9 @@
-import { Position, Direction, WeaponEntity } from 'churaverse-engine-client'
+import { Position, Direction } from 'churaverse-engine-client'
 import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/IAlchemyItem'
 import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItem'
 import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind'
 import flamePillarImage from '../assets/flamePillarAttack.png'
+import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-client'
 
 export const flamePillar: AlchemyItemKind = 'flamePillar'
 export const FLAME_PILLAR_ITEM: IAlchemyItem = {
@@ -13,12 +14,11 @@ export const FLAME_PILLAR_ITEM: IAlchemyItem = {
 /**
  * FlamePillarクラスの定義
  */
-export class FlamePillar extends AlchemyItem implements WeaponEntity {
+export class FlamePillar extends AlchemyItem implements ChurarenWeaponEntity {
   public readonly power = 50
   public flamePillarId: string
-  public ownerId: string
+  public churarenWeaponOwnerId: string
   public spawnTime: number
-  public readonly id
 
   public constructor(
     flamePillarId: string,
@@ -27,10 +27,11 @@ export class FlamePillar extends AlchemyItem implements WeaponEntity {
     direction: Direction,
     spawnTime: number
   ) {
-    super(flamePillarId, 'flamePillar')
+    super(flamePillarId, FLAME_PILLAR_ITEM.kind)
     this.flamePillarId = flamePillarId
-    this.ownerId = ownerId
+    this.churarenWeaponOwnerId = ownerId
     this.spawnTime = spawnTime
-    this.id = flamePillarId
+    this.position = position
+    this.direction = direction
   }
 }

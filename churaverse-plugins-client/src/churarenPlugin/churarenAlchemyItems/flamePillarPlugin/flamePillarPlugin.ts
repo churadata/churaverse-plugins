@@ -8,13 +8,14 @@ import {
   EntityDespawnEvent,
 } from 'churaverse-engine-client'
 import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-client/domain/baseAlchemyItemPlugin'
-import { PlayerPluginStore } from '../../../playerPlugin/store/defPlayerPluginStore'
+import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { Sendable } from '@churaverse/network-plugin-client/types/sendable'
 import { FlamePillarAttackRenderer } from './renderer/flamePillarAttackRenderer'
 import { FlamePillarAttackRendererFactory } from './renderer/flamePillarAttackRendererFactory'
 import { SocketController } from './controller/socketController'
 import { UseAlchemyItemEvent } from '@churaverse/churaren-alchemy-plugin-client/event/useAlchemyItemEvent'
+import { ClearAlchemyItemBoxEvent } from '@churaverse/churaren-alchemy-plugin-client/event/clearAlchemyItemBox'
 import { FlamePillarPluginStore } from './store/defFlamePillarPluginStore'
 import { initFlamePillarPluginStore, resetFlamePillarPluginStore } from './store/initFlamePillarPluginStore'
 import { FLAME_PILLAR_ITEM, FlamePillar } from './domain/flamePillar'
@@ -83,40 +84,54 @@ export class FlamePillarPlugin extends BaseAlchemyItemPlugin {
 
   protected useAlchemyItem = (ev: UseAlchemyItemEvent): void => {
     if (ev.alchemyItem.kind !== 'flamePillar') return
-    const renderer = this.flamePillarPluginStore.flamePillarAttackRendererFactory.build()
+
     const gap = 65
+    const numFlamePillars = 10
     const startPos = ev.ownPlayer.position.copy()
-    const position = new Position(
-      startPos.x + gap * ev.ownPlayer.direction.x,
-      startPos.y + gap * ev.ownPlayer.direction.y
-    )
-    const flamePillar = new FlamePillar(
-      ev.alchemyItem.itemId,
-      ev.ownPlayer.id,
-      position,
-      ev.ownPlayer.direction,
-      Date.now()
-    )
 
-    this.flamePillarPluginStore.flamePillars.set(flamePillar.flamePillarId, flamePillar)
-    this.flamePillarPluginStore.flamePillarAttackRenderers.set(flamePillar.flamePillarId, renderer)
+    for (let i = 0; i < numFlamePillars; i++) {
+      const renderer = this.flamePillarPluginStore.flamePillarAttackRendererFactory.build()
+      if (renderer == null) return
+      const offsetX = (Math.random() - 0.5) * 200 * 2
+      const offsetY = (Math.random() - 0.5) * 200 * 2
 
-    // 他のプレイヤーに炎の出現を送信する
-    if (flamePillar.ownerId === this.playerPluginStore.ownPlayerId) {
-      this.networkPluginStore.messageSender.send(
-        new FlamePillarSpawnMessage({
-          flamePillarId: flamePillar.flamePillarId,
-          startPos: flamePillar.position.toVector() as Vector & Sendable,
-          direction: flamePillar.direction,
-          spawnTime: flamePillar.spawnTime,
-        })
+      const position = new Position(
+        startPos.x + gap * ev.ownPlayer.direction.x + offsetX,
+        startPos.y + gap * ev.ownPlayer.direction.y + offsetY
       )
+
+      const flamePillar = new FlamePillar(
+        ev.alchemyItem.itemId,
+        ev.ownPlayer.id,
+        position,
+        ev.ownPlayer.direction,
+        Date.now()
+      )
+
+      this.flamePillarPluginStore.flamePillars.set(flamePillar.flamePillarId, flamePillar)
+      this.flamePillarPluginStore.flamePillarAttackRenderers.set(flamePillar.flamePillarId, renderer)
+
+      // 他のプレイヤーに爆発の出現を送信する
+      if (flamePillar.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) {
+        this.networkPluginStore.messageSender.send(
+          new FlamePillarSpawnMessage({
+            flamePillarId: flamePillar.flamePillarId,
+            startPos: flamePillar.position.toVector() as Vector & Sendable,
+            direction: flamePillar.direction,
+            spawnTime: flamePillar.spawnTime,
+          })
+        )
+      }
+      renderer.spawn(flamePillar.position)
     }
+
+    const clearAlchemyItemBoxEvent = new ClearAlchemyItemBoxEvent(ev.ownPlayer.id)
+    this.bus.post(clearAlchemyItemBoxEvent)
   }
 
   private readonly spawnFlamePillar = (ev: EntitySpawnEvent): void => {
     if (!(ev.entity instanceof FlamePillar)) return
-    if (ev.entity.ownerId === this.playerPluginStore.ownPlayerId) return
+    if (ev.entity.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) return
     const flamePillar = ev.entity
     const renderer = this.flamePillarPluginStore.flamePillarAttackRendererFactory.build()
     this.flamePillarPluginStore.flamePillars.set(flamePillar.flamePillarId, flamePillar)

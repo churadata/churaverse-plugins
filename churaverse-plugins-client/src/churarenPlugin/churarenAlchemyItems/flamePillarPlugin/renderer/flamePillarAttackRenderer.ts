@@ -1,6 +1,6 @@
 import { IFlamePillarAttackRenderer } from '../domain/IFlamePillarAttackRenderer'
 import { Scene } from 'phaser'
-import { Position } from 'churaverse-engine-client'
+import { FRAME_RATE, Position } from 'churaverse-engine-client'
 import flamePillarAttackImage from '../assets/flamePillarAttack.png'
 
 /**
@@ -13,6 +13,10 @@ const FLAME_PILLAR_ATTACK_TEXTURE_KEY = 'flamePillarAttack'
  */
 const DISPLAY_SIZE = 70
 
+const _anims: Array<{ key: string; frameStart: number; frameEnd: number }> = [
+  { key: 'flame__pillar_attack', frameStart: 0, frameEnd: 3 },
+]
+
 export class FlamePillarAttackRenderer implements IFlamePillarAttackRenderer {
   private readonly scene: Scene
   private readonly sprite: Phaser.GameObjects.Sprite
@@ -23,7 +27,15 @@ export class FlamePillarAttackRenderer implements IFlamePillarAttackRenderer {
       .sprite(-100, -100, FLAME_PILLAR_ATTACK_TEXTURE_KEY, 0)
       .setDisplaySize(DISPLAY_SIZE, DISPLAY_SIZE)
 
-    this.createAnimation() // アニメーションの作成
+    scene.anims.create({
+      key: _anims[0].key,
+      frames: this.scene.anims.generateFrameNumbers(FLAME_PILLAR_ATTACK_TEXTURE_KEY, {
+        start: _anims[0].frameStart,
+        end: _anims[0].frameEnd,
+      }),
+      frameRate: FRAME_RATE,
+      repeat: -1, // 繰り返し再生
+    })
   }
 
   // スプライトシートのロード
@@ -32,24 +44,6 @@ export class FlamePillarAttackRenderer implements IFlamePillarAttackRenderer {
       frameWidth: 90, // 各フレームの幅
       frameHeight: 90, // 各フレームの高さ
     })
-  }
-
-  // アニメーションの作成
-  private createAnimation(): void {
-    this.scene.anims.create({
-      key: 'flamePillarAnim',
-      frames: this.scene.anims.generateFrameNumbers(FLAME_PILLAR_ATTACK_TEXTURE_KEY, {
-        start: 0,
-        end: 3,
-      }),
-      frameRate: 8, // フレームレート
-      repeat: -1, // 繰り返し再生
-    })
-  }
-
-  public setInitPosition(pos: Position): void {
-    this.sprite.x = pos.x
-    this.sprite.y = pos.y
   }
 
   public spawn(source: Position): void {
@@ -61,7 +55,7 @@ export class FlamePillarAttackRenderer implements IFlamePillarAttackRenderer {
     this.sprite.setVisible(true)
 
     // アニメーションの再生
-    this.sprite.play('flamePillarAnim')
+    this.sprite.anims.play(_anims[0].key)
   }
 
   public dead(): void {
