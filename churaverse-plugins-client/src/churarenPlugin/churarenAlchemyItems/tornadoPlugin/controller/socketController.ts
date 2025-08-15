@@ -75,8 +75,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     if (data.cause !== 'tornado') return
     const target = this.bossPluginStore.bosses.get(data.targetId)
     const tornado = this.tornadoPluginStore.tornados.get(data.sourceId)
-    const attacker = tornado?.churarenWeaponOwnerId
-    if (target === undefined || tornado === undefined || attacker === undefined) return
+    if (target === undefined || tornado === undefined) return
     const tornadoDamageCause = new TornadoDamageCause(tornado)
     const livingDamageEvent = new LivingDamageEvent(target, tornadoDamageCause, data.amount)
     this.eventBus.post(livingDamageEvent)
