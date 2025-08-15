@@ -1,7 +1,7 @@
 import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItem'
 import { Direction, GRID_SIZE, Position } from 'churaverse-engine-client'
 import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/IAlchemyItem'
-import blackHoelImage from '../assets/blackHole.png'
+import blackHoelImage from '../assets/blackHole.gif'
 import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-client'
 
 export const BLACK_HOLE_MOVE_LIMIT_GRIDS = 20
