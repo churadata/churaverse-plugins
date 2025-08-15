@@ -11,6 +11,12 @@ import { SocketController } from './controller/socketController'
 
 import { NetworkPluginStore } from './store/defNetworkPluginStore'
 
+declare global {
+  interface Window {
+    debugSocket?: Socket<Scenes>
+  }
+}
+
 export class NetworkPlugin extends BasePlugin<Scenes> {
   private scene?: Scene
   private messageManager?: MessageManager<Scenes>
@@ -33,6 +39,8 @@ export class NetworkPlugin extends BasePlugin<Scenes> {
 
   private init(ev: InitEvent): void {
     const socket = Socket.build()
+    window.debugSocket = socket
+    console.log('NetworkPlugin initialized with socket:', socket)
     this.messageManager = new MessageManager(socket.socketId)
     initNetworkPluginStore(this.store, this.scene, this.messageManager, this.messageManager.socketId)
   }

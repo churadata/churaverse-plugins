@@ -57,7 +57,13 @@ export class Socket<Scene extends Scenes> {
       this.iosocket.removeAllListeners(SEND_PACKET_TO_CLIENT)
     }
 
+    console.log(`Socket: listen packet on ${SEND_PACKET_TO_CLIENT}`)
     this.iosocket.on(SEND_PACKET_TO_CLIENT, packetListener)
+    this.ioSocket.on('disconnect', () => {
+      console.warn('Socket disconnected')
+      window.alert('接続が切れました。再読み込みしてください。')
+      this.ioSocket.close()
+    })
   }
 
   public get socketId(): string {
