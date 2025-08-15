@@ -111,7 +111,7 @@ export class FlamePillarPlugin extends BaseAlchemyItemPlugin {
       this.flamePillarPluginStore.flamePillars.set(flamePillar.flamePillarId, flamePillar)
       this.flamePillarPluginStore.flamePillarAttackRenderers.set(flamePillar.flamePillarId, renderer)
 
-      // 他のプレイヤーに爆発の出現を送信する
+      // 他のプレイヤーに炎の柱の出現を送信する
       if (flamePillar.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) {
         this.networkPluginStore.messageSender.send(
           new FlamePillarSpawnMessage({
