@@ -27,7 +27,8 @@ import { UpdatePlayersCoinEvent } from './event/updatePlayersCoinEvent'
 import { NyokkiStatus } from './type/nyokkiStatus'
 import { IRankingBoard } from './interface/IRankingBoard'
 import { BetTimeRemainingEvent } from './event/betTimeRemainingEvent'
-import { BetTimer } from './ui/betTimer/betTimer'
+import { IBetCoinFormContainer } from './interface/IBetCoinFormContainer'
+import { IBetTimer } from './interface/IBetTimer'
 
 export const BET_TIMER_TIME_LIMIT = 20000
 
@@ -235,7 +236,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       this.descriptionWindow.displayTimeLimitSelectionForGuest(ev.timeLimit, ownCoins)
     }
 
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betCoinConfirm')?.open()
+    this.betCoinFormContainer.open()
   }
 
   /**
@@ -243,7 +244,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   private readonly sendBetCoinResponse = (ev: SendBetCoinResponseEvent): void => {
     if (this.isOwnPlayerMidwayParticipant) return
-    this.betTimer?.close()
+    this.betTimer.close()
 
     const coinViewerIcon = this.coinViewerIconUis.get(ev.playerId)
     coinViewerIcon?.coinViewer?.setBetCoins(ev.betCoins)
@@ -284,6 +285,16 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
           this.nyokkiActionMessage
         )
       }
+    }
+  }
+
+  private readonly updateBetTimer = (ev: BetTimeRemainingEvent): void => {
+    if (this.isOwnPlayerMidwayParticipant) return
+
+    this.betTimer.updateTimer(ev.remainingTime)
+
+    if (ev.remainingTime <= 0) {
+      this.betCoinFormContainer.postBetCoinOnTimeout(this.playerPluginStore.ownPlayerId)
     }
   }
 
@@ -362,7 +373,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const turnLeft = gameTurn - ev.turnNumber + 1
     this.displayBetTimer()
     this.descriptionWindow.displayTurnStart(turnLeft, ownCoins)
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betCoinConfirm')?.open()
+    this.betCoinFormContainer.open()
 
     this.getRankingBoard.updateTurnNumber(ev.turnNumber, gameTurn)
   }
@@ -407,7 +418,13 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     return rankingBoard
   }
 
-  private get betTimer(): BetTimer {
+  private get betCoinFormContainer(): IBetCoinFormContainer {
+    const betCoinFormContainer = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betCoinConfirm')
+    if (betCoinFormContainer === undefined) throw new SynchroBreakUiNotFoundError('betCoinFormContainer')
+    return betCoinFormContainer
+  }
+
+  private get betTimer(): IBetTimer {
     const betTimer = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betTimer')
     if (betTimer === undefined) throw new SynchroBreakUiNotFoundError('betTimer')
     return betTimer
@@ -416,18 +433,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   private displayBetTimer(): void {
     this.betTimer.open()
     this.descriptionWindow.element.appendChild(this.betTimer.element)
-  }
-
-  private readonly updateBetTimer = (ev: BetTimeRemainingEvent): void => {
-    if (this.isOwnPlayerMidwayParticipant) return
-
-    this.betTimer?.updateTimer(ev.remainingTime)
-
-    if (ev.remainingTime <= 0) {
-      this.gamePluginStore.gameUiManager
-        .getUi(this.gameId, 'betCoinConfirm')
-        ?.postBetCoinOnTimeout(this.playerPluginStore.ownPlayerId)
-    }
   }
 
   /**

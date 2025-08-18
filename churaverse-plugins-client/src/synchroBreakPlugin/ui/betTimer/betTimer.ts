@@ -1,12 +1,12 @@
 import { DomManager, makeLayerHigherTemporary, domLayerSetting } from 'churaverse-engine-client'
-import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
+import { IBetTimer } from '../../interface/IBetTimer'
 import { BetTimerComponent } from './component/BetTimerComponent'
 import { BET_TIMER_TIME_LIMIT } from '../../synchroBreakPlugin'
 
 export const BET_TIMER_CONTAINER_ID = 'betcoin-progressbar-container'
 export const BET_TIMER_ID = 'betcoin-progressbar'
 
-export class BetTimer implements IGameUiComponent {
+export class BetTimer implements IBetTimer {
   public element!: HTMLElement
   private betTimer!: HTMLElement
   public readonly visible: boolean = false

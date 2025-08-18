@@ -1,5 +1,5 @@
 import { IMainScene, Store, DomManager, makeLayerHigherTemporary, domLayerSetting } from 'churaverse-engine-client'
-import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
+import { IBetCoinFormContainer } from '../../interface/IBetCoinFormContainer'
 import { SendBetCoinMessage } from '../../message/sendBetCoinMessage'
 import { BetCoinForm } from './component/BetCoinForm'
 
@@ -19,7 +19,7 @@ export const BET_COIN_SEND_BUTTON_ID = 'bet-coin-send-button'
 export const SYNCHRO_BREAK_MIN_BET_COIN: number = 0
 export const SYNCHRO_BREAK_MAX_BET_COIN: number = 999
 
-export class BetCoinFormContainer implements IGameUiComponent {
+export class BetCoinFormContainer implements IBetCoinFormContainer {
   public element!: HTMLElement
   public readonly visible: boolean = false
   private betCoinInputField!: HTMLInputElement
