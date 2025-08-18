@@ -1,7 +1,7 @@
 import { CVEvent, IMainScene } from 'churaverse-engine-client'
 
 /**
- * ベットタイム残りの時間を通知するイベント
+ * ベットタイムの残り時間を通知するイベント
  * @param remainingTime 残りのベットタイム
  */
 export class BetTimeRemainingEvent extends CVEvent<IMainScene> {

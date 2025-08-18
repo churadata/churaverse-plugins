@@ -7,7 +7,7 @@ export interface BetTimeRemainingData extends SendableObject {
 }
 
 /**
- * ベットタイム残りのメッセージ
+ * 残りのベットタイムメッセージ
  */
 export class BetTimeRemainingMessage extends BaseMessage<IMainScene> {
   public constructor(public readonly data: BetTimeRemainingData) {
