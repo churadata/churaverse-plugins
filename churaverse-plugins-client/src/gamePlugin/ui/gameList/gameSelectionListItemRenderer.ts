@@ -123,7 +123,7 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
     startButton.disabled = true
     startButton.style.backgroundColor = 'lightgray'
     startButton.style.color = 'var(--color-button-background)'
-    this.currentButtonState = 'other'
+    this.currentButtonState = 'inActive'
   }
 
   private setupGameStartButton(): void {
