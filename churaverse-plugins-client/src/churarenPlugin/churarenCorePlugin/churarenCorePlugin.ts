@@ -15,7 +15,6 @@ import '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
   protected gameName = CHURAREN_CONSTANTS.GAME_NAME
-  private churarenDialogManager?: ChurarenDialogManager
   private socketController?: SocketController
   protected gameEntryRenderer!: IGameSelectionListItemRenderer
 
@@ -54,7 +53,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   }
 
   protected init(): void {
-    this.churarenDialogManager = new ChurarenDialogManager(this.store)
+    void new ChurarenDialogManager(this.store)
     this.gameEntryRenderer = new ChurarenListItemRenderer(
       this.store,
       this.gamePluginStore.gameDescriptionDialogManager,
