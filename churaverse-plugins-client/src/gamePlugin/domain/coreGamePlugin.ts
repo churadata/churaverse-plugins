@@ -11,12 +11,14 @@ import { GamePluginStore } from '../store/defGamePluginStore'
 import { BaseGamePlugin } from './baseGamePlugin'
 import { GamePlayerQuitEvent } from '../event/gamePlayerQuitEvent'
 import { GamePlayerQuitMessage } from '../message/gamePlayerQuitMessage'
+import { IGameListItemRenderer } from '../interface/IGameListItemRenderer'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
  */
 export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo {
   public abstract gameId: GameIds
+  protected abstract gameEntryRenderer: IGameListItemRenderer
   protected abstract gameName: string
   private _isActive: boolean = false
   private _gameOwnerId?: string
@@ -46,6 +48,8 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.subscribeEvent('init', this.getStores.bind(this))
     this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this), 'HIGH')
     this.bus.subscribeEvent('gameStart', this.gameStart.bind(this), 'HIGH')
+    this.bus.subscribeEvent('gameAbort', this.resetGameStartButton.bind(this))
+    this.bus.subscribeEvent('gameEnd', this.resetGameStartButton.bind(this))
   }
 
   protected subscribeGameEvent(): void {
@@ -80,6 +84,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
 
   protected gameStart(ev: GameStartEvent): void {
     this._isActive = this.gameId === ev.gameId
+    this.gameEntryRenderer.onGameStart(ev.gameId)
     if (!this.isActive) return
     this._gameOwnerId = ev.playerId
     this._participantIds = ev.participantIds
@@ -147,5 +152,9 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     if (idx === -1) return false
     this._participantIds.splice(idx, 1)
     return true
+  }
+
+  private resetGameStartButton(): void {
+    this.gameEntryRenderer.resetStartButton()
   }
 }
