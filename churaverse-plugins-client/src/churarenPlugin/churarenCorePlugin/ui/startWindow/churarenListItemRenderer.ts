@@ -6,7 +6,7 @@ import { CHURAREN_CONSTANTS } from '../../constants/churarenConstants'
 
 import CHURAREN_ICON_PATH from '../../assets/churarenIcon.png'
 
-export class SynchroBreakListItemRenderer extends GameSelectionListItemRenderer {
+export class ChurarenListItemRenderer extends GameSelectionListItemRenderer {
   public constructor(
     store: Store<IMainScene>,
     gameDialogManager: IGameDescriptionDialogManager,
