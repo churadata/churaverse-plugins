@@ -8,15 +8,16 @@ import { CHURAREN_UI_KEYS } from './ui/defChurarenUi'
 import { BaseGamePlugin } from '@churaverse/game-plugin-client/domain/baseGamePlugin'
 import { ChurarenResultEvent } from './event/churarenResultEvent'
 import { GamePlayerQuitEvent } from '@churaverse/game-plugin-client/event/gamePlayerQuitEvent'
-import { IGameListItemRenderer } from '@churaverse/game-plugin-client/interface/IGameListItemRenderer'
 import { ChurarenListItemRenderer } from './ui/startWindow/churarenListItemRenderer'
+import { IGameSelectionListItemRenderer } from '@churaverse/game-plugin-client/interface/IGameSelectionListItemRenderer'
+import '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
   protected gameName = CHURAREN_CONSTANTS.GAME_NAME
   private churarenDialogManager?: ChurarenDialogManager
   private socketController?: SocketController
-  protected gameEntryRenderer: IGameListItemRenderer
+  protected gameEntryRenderer!: IGameSelectionListItemRenderer
 
   public listenEvent(): void {
     super.listenEvent()
