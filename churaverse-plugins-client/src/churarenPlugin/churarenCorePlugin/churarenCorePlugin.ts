@@ -8,12 +8,14 @@ import { CHURAREN_UI_KEYS } from './ui/defChurarenUi'
 import { BaseGamePlugin } from '@churaverse/game-plugin-client/domain/baseGamePlugin'
 import { ChurarenResultEvent } from './event/churarenResultEvent'
 import { GamePlayerQuitEvent } from '@churaverse/game-plugin-client/event/gamePlayerQuitEvent'
+import { IGameListItemRenderer } from '@churaverse/game-plugin-client/interface/IGameListItemRenderer'
 
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
   protected gameName = CHURAREN_CONSTANTS.GAME_NAME
   private churarenDialogManager?: ChurarenDialogManager
   private socketController?: SocketController
+  protected gameEntryRenderer: IGameListItemRenderer
 
   public listenEvent(): void {
     super.listenEvent()
@@ -50,7 +52,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   }
 
   protected init(): void {
-    this.churarenDialogManager = new ChurarenDialogManager(this.store, this.bus, this.gameId)
+    this.churarenDialogManager = new ChurarenDialogManager(this.store)
   }
 
   protected registerGameUi(ev: RegisterGameUiEvent): void {
@@ -62,7 +64,6 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    */
   protected handleGameStart(): void {
     this.socketController?.registerMessageListener()
-    this.churarenDialogManager?.setGameAbortButtonText()
   }
 
   /**
@@ -70,14 +71,12 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    */
   protected handleGameTermination(): void {
     this.socketController?.unregisterMessageListener()
-    this.churarenDialogManager?.setGameStartButtonText()
   }
 
   /**
    * 途中参加時の処理
    */
   protected handleMidwayParticipant(): void {
-    this.churarenDialogManager?.setGameAbortButtonText()
     this.unsubscribeGameEvent()
     // `gameAbort` や `gameEnd` イベントを受け取るために `CoreGamePlugin` のイベントのみsubscribeする
     super.subscribeGameEvent()
