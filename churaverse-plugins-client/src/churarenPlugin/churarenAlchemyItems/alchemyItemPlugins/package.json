@@ -1,5 +1,5 @@
 {
-  "name": "@churaverse/churaren-alchemy-items-client",
+  "name": "@churaverse/churaren-alchemy-item-plugins-client",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
@@ -33,5 +33,7 @@
   "module": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "@churaverse/churaren-alchemy-plugin-client": "file:../../churarenAlchemyPlugin"
+  }
 }
