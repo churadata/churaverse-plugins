@@ -26,15 +26,15 @@ import { SynchroBreakTurnStartEvent } from './event/synchroBerakTurnStartEvent'
 import { UpdatePlayersCoinEvent } from './event/updatePlayersCoinEvent'
 import { NyokkiStatus } from './type/nyokkiStatus'
 import { IRankingBoard } from './interface/IRankingBoard'
-import { IGameListItemRenderer } from '@churaverse/game-plugin-client/interface/IGameListItemRenderer'
 import { SynchroBreakListItemRenderer } from './ui/startWindow/synchroBreakListItemRenderer'
+import { IGameSelectionListItemRenderer } from '@churaverse/game-plugin-client/interface/IGameSelectionListItemRenderer'
 
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
   protected readonly gameName = 'シンクロブレイク'
   private nyokkiActionMessage: string | undefined = undefined
   private ownNyokkiSatatus: NyokkiStatus = 'yet'
-  protected gameEntryRenderer!: IGameListItemRenderer
+  protected gameEntryRenderer!: IGameSelectionListItemRenderer
 
   private synchroBreakPluginStore!: SynchroBreakPluginStore
   private playerPluginStore!: PlayerPluginStore
