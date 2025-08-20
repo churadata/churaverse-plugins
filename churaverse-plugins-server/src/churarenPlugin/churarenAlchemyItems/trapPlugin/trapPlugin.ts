@@ -7,11 +7,11 @@ import { TrapHitMessage } from './message/trapHitMessage'
 import { SocketController } from './controller/socketController'
 import { initTrapPluginStore } from './store/initTrapPluginStore'
 import { Trap } from './domain/trap'
-import { removeDieTrap } from './domain/trapService'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
 import { Boss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
-import '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
 import { TrapDamageCause } from './domain/trapDamageCause'
+import '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
+import '@churaverse/churaren-core-plugin-server/event/churarenResultEvent'
 
 export class TrapPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -42,11 +42,13 @@ export class TrapPlugin extends BaseGamePlugin {
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
     this.bus.subscribeEvent('entitySpawn', this.spawnTrap)
+    this.bus.subscribeEvent('churarenResult', this.removeAllTrap)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('entitySpawn', this.spawnTrap)
+    this.bus.unsubscribeEvent('churarenResult', this.removeAllTrap)
   }
 
   protected handleGameStart(): void {
@@ -64,10 +66,12 @@ export class TrapPlugin extends BaseGamePlugin {
     this.trapPluginStore.traps.set(trap.trapId, trap)
   }
 
-  private removeAllTrap(): void {
+  private readonly removeAllTrap = (): void => {
     const trapIds = this.trapPluginStore.traps.getAllId()
     trapIds.forEach((trapId) => {
       this.trapPluginStore.traps.delete(trapId)
+      const trapHitMessage = new TrapHitMessage({ trapId })
+      this.networkPluginStore.messageSender.send(trapHitMessage)
     })
   }
 
@@ -86,7 +90,7 @@ export class TrapPlugin extends BaseGamePlugin {
     const trapDamageCause = new TrapDamageCause(trap)
     const livingDamageEvent = new LivingDamageEvent(boss, trapDamageCause, trap.power)
     this.bus.post(livingDamageEvent)
-    removeDieTrap(this.trapPluginStore.traps, trap.trapId)
+    this.trapPluginStore.traps.delete(trap.trapId)
     const trapHitMessage = new TrapHitMessage({ trapId: trap.trapId })
     this.networkPluginStore.messageSender.send(trapHitMessage)
   }

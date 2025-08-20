@@ -24,14 +24,14 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   public registerMessageListener(): void {
-    this.messageListenerRegister.on('trapSpawn', this.trapSpawn.bind(this))
+    this.messageListenerRegister.on('trapSpawn', this.trapSpawn)
   }
 
   public unregisterMessageListener(): void {
-    this.messageListenerRegister.off('trapSpawn', this.trapSpawn.bind(this))
+    this.messageListenerRegister.off('trapSpawn', this.trapSpawn)
   }
 
-  private trapSpawn(msg: TrapSpawnMessage, senderId: string): void {
+  private readonly trapSpawn = (msg: TrapSpawnMessage, senderId: string): void => {
     const data = msg.data
     const position = new Position(data.startPos.x, data.startPos.y)
     const trap = new Trap(data.trapId, senderId, position, data.direction, data.spawnTime)

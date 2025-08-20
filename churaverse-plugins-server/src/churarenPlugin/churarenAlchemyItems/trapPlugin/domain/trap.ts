@@ -7,8 +7,8 @@ export class Trap extends Entity implements ICollidableEntity, ChurarenWeaponEnt
   public isCollidable = true
   public getRect(): IRectangle {
     return {
-      width: this._width,
-      height: this._height,
+      width: this.SIDE_LENGTH,
+      height: this.SIDE_LENGTH,
       position: this.position.copy(),
     }
   }
@@ -23,8 +23,6 @@ export class Trap extends Entity implements ICollidableEntity, ChurarenWeaponEnt
   public readonly spawnTime: number
 
   private readonly SIDE_LENGTH = 70
-  private readonly _width: number = this.SIDE_LENGTH
-  private readonly _height: number = this.SIDE_LENGTH
 
   public constructor(trapId: string, ownerId: string, position: Position, direction: Direction, spawnTime: number) {
     super(position, direction)
