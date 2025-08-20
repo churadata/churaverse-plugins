@@ -11,14 +11,14 @@ import { GamePluginStore } from '../store/defGamePluginStore'
 import { BaseGamePlugin } from './baseGamePlugin'
 import { GamePlayerQuitEvent } from '../event/gamePlayerQuitEvent'
 import { GamePlayerQuitMessage } from '../message/gamePlayerQuitMessage'
-import { IGameListItemRenderer } from '../interface/IGameListItemRenderer'
+import { IGameSelectionListItemRenderer } from '../interface/IGameSelectionListItemRenderer'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
  */
 export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo {
   public abstract gameId: GameIds
-  protected abstract gameEntryRenderer: IGameListItemRenderer
+  protected abstract gameEntryRenderer: IGameSelectionListItemRenderer
   protected abstract gameName: string
   private _isActive: boolean = false
   private _gameOwnerId?: string
