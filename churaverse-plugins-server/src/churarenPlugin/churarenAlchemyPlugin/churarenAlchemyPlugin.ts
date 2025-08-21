@@ -1,6 +1,6 @@
 import { SocketController } from './controller/socketController'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
-import { spawnAlchemyPot } from './domain/alchemyService'
+import { generatedAlchemyPotMap } from './domain/alchemyService'
 import { initAlchemyPluginStore } from './store/initAlchemyPluginStore'
 import { AlchemyPluginStore } from './store/defAlchemyPluginStore'
 import { MapPluginStore } from '@churaverse/map-plugin-server/store/defMapPluginStore'
@@ -71,10 +71,9 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
 
   private readonly sendSpawnAlchemy = (): void => {
     const currentMap = this.mapPluginStore.mapManager.currentMap
-    spawnAlchemyPot(this.alchemyPluginStore.alchemyPot, currentMap, (pots) => {
-      const alchemyPotSpawnMessage = new AlchemyPotSpawnMessage({ pots })
-      this.networkPluginStore.messageSender.send(alchemyPotSpawnMessage)
-    })
+    const pots = generatedAlchemyPotMap(this.alchemyPluginStore.alchemyPot, currentMap)
+    const alchemyPotSpawnMessage = new AlchemyPotSpawnMessage({ pots })
+    this.networkPluginStore.messageSender.send(alchemyPotSpawnMessage)
   }
 
   private registerOnOverlap(ev: RegisterOnOverlapEvent): void {

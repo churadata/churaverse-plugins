@@ -9,11 +9,7 @@ import { Position, Vector } from 'churaverse-engine-server'
 /**
  *  alchemyPotsの生成をfrontendに通知する
  */
-export function spawnAlchemyPot(
-  alchemyPot: IAlchemyPotRepository,
-  worldMap: WorldMap,
-  sendSpawnPot: (potMap: AlchemyPotMap) => void
-): void {
+export function generatedAlchemyPotMap(alchemyPot: IAlchemyPotRepository, worldMap: WorldMap): AlchemyPotMap {
   const potsMap: AlchemyPotMap = {}
   const alchemyPotPosition = calculatePositions(worldMap.width, worldMap.height)
 
@@ -22,7 +18,7 @@ export function spawnAlchemyPot(
     potsMap[pot.id] = alchemyPotInfoToSendableObject(pot)
     alchemyPot.set(pot.id, pot)
   }
-  sendSpawnPot(potsMap)
+  return potsMap
 }
 
 function alchemyPotInfoToSendableObject(pot: AlchemyPot): AlchemyPotInfo {
