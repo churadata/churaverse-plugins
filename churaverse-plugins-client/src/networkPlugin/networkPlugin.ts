@@ -11,12 +11,6 @@ import { SocketController } from './controller/socketController'
 
 import { NetworkPluginStore } from './store/defNetworkPluginStore'
 
-declare global {
-  interface Window {
-    debugSocket?: Socket<Scenes>
-  }
-}
-
 export class NetworkPlugin extends BasePlugin<Scenes> {
   private scene?: Scene
   private messageManager?: MessageManager<Scenes>

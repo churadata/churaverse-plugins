@@ -7,12 +7,6 @@ interface AccessTokenResponse {
   token: string
 }
 
-declare global {
-  interface Window {
-    liveKitRoom?: Room
-  }
-}
-
 export class WebRtc {
   public readonly room: Room
 
@@ -43,7 +37,7 @@ export class WebRtc {
 
       console.log(`connected to room. roomName: ${this.room.name}`)
     } catch (e) {
-      console.error(`Failed to connect to room.`, e)
+      console.error(`Failed to connect to room.`,e)
       window.alert('chromeでの利用を推奨します')
     }
   }
