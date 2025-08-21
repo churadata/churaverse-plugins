@@ -41,8 +41,6 @@ export class WebRtc {
       const token = await this.getAccessToken(ownPlayerId)
       await this.room.connect(`${import.meta.env.VITE_LIVEKIT_URL ?? 'ws://localhost:8080/livekit'}`, token)
 
-      window.liveKitRoom = this.room
-
       console.log(`connected to room. roomName: ${this.room.name}`)
     } catch (e) {
       console.error(`Failed to connect to room.`, e)

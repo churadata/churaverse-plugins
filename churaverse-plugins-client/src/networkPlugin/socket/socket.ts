@@ -34,7 +34,13 @@ export class Socket<Scene extends Scenes> {
     })
 
     ioSocket.on('disconnect', (reason) => {
+      if (reason === 'io server disconnect') {
+        console.warn('Socket disconnected by server')
+        return
+      }
+
       location.reload()
+      window.alert('接続が切断されました。')
     })
 
     Socket.instance = new Socket(ioSocket)
