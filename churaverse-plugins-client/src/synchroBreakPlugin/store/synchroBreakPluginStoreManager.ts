@@ -12,6 +12,7 @@ export function initSynchroBreakPluginStore(store: Store<IMainScene>): void {
     synchroBreakIcons: new Map<string, PlayerNyokkiStatusIcon>(),
     playersCoinRepository: new PlayersCoinRepository(),
     nyokkiLogTextCreator: new NyokkiLogTextCreator(store),
+    exitConfirmMessage: 'シンクロブレイクを終わる？',
     timeLimit: undefined,
     gameTurn: undefined,
   }

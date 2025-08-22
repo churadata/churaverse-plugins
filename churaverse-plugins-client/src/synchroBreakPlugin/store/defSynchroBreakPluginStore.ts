@@ -6,6 +6,7 @@ export interface SynchroBreakPluginStore {
   readonly synchroBreakIcons: Map<string, PlayerNyokkiStatusIcon>
   readonly playersCoinRepository: IPlayersCoinRepository
   readonly nyokkiLogTextCreator: INyokkiLogTextCreator
+  exitConfirmMessage?: string
   timeLimit: number | undefined
   gameTurn: number | undefined
 }

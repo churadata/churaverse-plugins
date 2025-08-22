@@ -3,7 +3,7 @@ import { IGameLogRenderer } from '../interface/IGameLogRenderer'
 import { IGameInfoRepository } from '../interface/IGameInfoRepository'
 import { IGameSelectionListContainer } from '../interface/IGameSelectionListContainer'
 import { IGameDescriptionDialogManager } from '../interface/IGameDescriptionDialogManager'
-
+import { IGameExitAlertConfirmManager } from '../interface/IGameExitAlertConfirmManager'
 declare module 'churaverse-engine-client' {
   export interface StoreInMain {
     gamePlugin: GamePluginStore
@@ -16,6 +16,7 @@ export interface GamePluginStore {
   readonly gameLogRenderer: IGameLogRenderer
   readonly gameSelectionListContainer: IGameSelectionListContainer
   readonly gameDescriptionDialogManager: IGameDescriptionDialogManager
+  readonly gameExitAlertConfirmManager: IGameExitAlertConfirmManager
 }
 
 export interface GameInfoStore {

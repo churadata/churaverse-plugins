@@ -5,7 +5,6 @@ import { RegisterGameUiEvent } from '@churaverse/game-plugin-client/event/regist
 import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { PlayerRendererNotFoundError } from '@churaverse/player-plugin-client/errors/playerRendererNotFoundError'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
-import { SynchroBreakDialogManager } from './ui/startWindow/synchroBreakDialogManager'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
 import { SynchroBreakPluginError } from './errors/synchroBreakPluginError'
 import { SynchroBreakUiNotFoundError } from './errors/synchroBreakUiNotFoundError'
@@ -38,7 +37,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
 
   private synchroBreakPluginStore!: SynchroBreakPluginStore
   private playerPluginStore!: PlayerPluginStore
-  private synchroBreakDialogManager!: SynchroBreakDialogManager
   private scene!: Scene
   private coinViewerIconUis = new Map<string, CoinViewerIcon>()
   private socketController!: SocketController
@@ -97,16 +95,21 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   }
 
   private init(): void {
-    this.synchroBreakDialogManager = new SynchroBreakDialogManager(this.store)
+    initSynchroBreakPluginStore(this.store)
     this.coinViewerIconUis = new Map<string, CoinViewerIcon>()
     this.gameInfoStore = this.store.of('gameInfo')
     this.gamePluginStore = this.store.of('gamePlugin')
     this.playerPluginStore = this.store.of('playerPlugin')
+    this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
+    // this.synchroBreakDialogManager = new SynchroBreakDialogManager(this.store)
     this.gameEntryRenderer = new SynchroBreakListItemRenderer(
       this.store,
       this.gamePluginStore.gameDescriptionDialogManager,
       this.gamePluginStore.gameSelectionListContainer
     )
+
+    // 退出アラートを SynchroBreak 用に登録（新しい Confirm Manager 経由）
+    // this.gamePluginStore.gameExitAlertConfirmManager.add(this.gameId, new ExitAlert())
   }
 
   /**
@@ -152,6 +155,10 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   protected handleGameTermination(): void {
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
+    //  退出アラートを表示（manager 経由）
+    const message = this.synchroBreakPluginStore.exitConfirmMessage
+    const ok = this.gamePluginStore.gameExitAlertConfirmManager.showAlert(this.gameId, message)
+    if (!ok) return
 
     if (!this.isOwnPlayerMidwayParticipant) {
       resetSynchroBreakPluginStore(this.store)
