@@ -9,7 +9,7 @@ import {
 } from 'churaverse-engine-server'
 import { SocketController } from './controller/socketController'
 import { Bomb } from './domain/bomb'
-import { checkExplode, removeExplodedBomb, sendExplodedBomb } from './domain/bombService'
+import { checkExplode } from './domain/bombService'
 import { BombPluginStore } from './store/defBombPluginStore'
 import { initBombPluginStore } from './store/initBombPluginStore'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
@@ -17,6 +17,7 @@ import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { BombDamageCause } from './domain/bombDamageCause'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { PlayerPluginStore } from '@churaverse/player-plugin-server/store/defPlayerPluginStore'
+import { BombExplosionMessage } from './message/bombExplosionMessage'
 
 export class BombPlugin extends BasePlugin<IMainScene> {
   private bombPluginStore!: BombPluginStore
@@ -46,15 +47,16 @@ export class BombPlugin extends BasePlugin<IMainScene> {
   }
 
   private update(ev: UpdateEvent): void {
-    const explodedBombIds: string[] = this.bombPluginStore.bombs.getAllId().filter((bombId) => {
-      const bomb = this.bombPluginStore.bombs.get(bombId)
-      return bomb?.isExplode === true
-    })
-
-    if (explodedBombIds.length > 0) {
-      sendExplodedBomb(this.networkPluginStore.messageSender, explodedBombIds)
-      removeExplodedBomb(this.bombPluginStore.bombs, explodedBombIds)
-    }
+    this.bombPluginStore.bombs
+      .getAllId()
+      .filter((bombId) => {
+        return this.bombPluginStore.bombs.get(bombId)?.isExplode === true
+      })
+      .forEach((bombId) => {
+        const bombExplosionMessage = new BombExplosionMessage({ bombId })
+        this.networkPluginStore.messageSender.send(bombExplosionMessage)
+        this.bombPluginStore.bombs.delete(bombId)
+      })
   }
 
   private getStores(): void {
