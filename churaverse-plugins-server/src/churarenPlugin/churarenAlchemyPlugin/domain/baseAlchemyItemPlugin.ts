@@ -2,6 +2,7 @@ import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
 import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
 import '@churaverse/churaren-core-plugin-server/event/churarenStartCountdownEvent'
 import { IAlchemyItem } from '../interface/IAlchemyItem'
+import '../store/defAlchemyPluginStore'
 
 /**
  * 錬金アイテムのプラグインのベースクラス
