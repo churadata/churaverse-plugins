@@ -106,26 +106,20 @@ export class BetCoinFormContainer implements IGameUiComponent {
    * ボタンの長押し機能を設定する
    */
   private setupLongPress(button: HTMLElement, action: () => void): void {
-    let longPressTimer: number
-    let longPressInterval: number
+    let longPressTimerId: number
+    let longPressIntervalId: number
 
     const startLongPress = (): void => {
-      longPressTimer = window.setTimeout(() => {
-        longPressInterval = window.setInterval(() => {
+      longPressTimerId = window.setTimeout(() => {
+        longPressIntervalId = window.setInterval(() => {
           action()
         }, 100)
       }, 500)
     }
 
     const stopLongPress = (): void => {
-      if (longPressTimer !== 0) {
-        clearTimeout(longPressTimer)
-        longPressTimer = 0
-      }
-      if (longPressInterval !== 0) {
-        clearInterval(longPressInterval)
-        longPressInterval = 0
-      }
+      clearTimeout(longPressTimerId)
+      clearInterval(longPressIntervalId)
     }
 
     button.addEventListener('mousedown', startLongPress)
