@@ -24,7 +24,7 @@ const DISPLAY_SIZE = 200
  * オブジェクトリテラルに
  */
 const _anims: Array<{ key: string; frameStart: number; frameEnd: number }> = [
-  { key: 'explosionAttack', frameStart: 6, frameEnd: 11 },
+  { key: 'explosion_attack', frameStart: 6, frameEnd: 11 },
 ]
 
 /**

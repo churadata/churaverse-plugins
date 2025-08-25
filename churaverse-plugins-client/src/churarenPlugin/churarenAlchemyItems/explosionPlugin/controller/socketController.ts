@@ -75,8 +75,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     if (data.cause !== 'explosion') return
     const target = this.bossPluginStore.bosses.get(data.targetId)
     const explosion = this.explosionPluginStore.explosions.get(data.sourceId)
-    const attacker = explosion?.churarenWeaponOwnerId
-    if (target === undefined || explosion === undefined || attacker === undefined) return
+    if (target === undefined || explosion === undefined) return
     const explosionDamageCause = new ExplosionDamageCause(explosion)
     const livingDamageEvent = new LivingDamageEvent(target, explosionDamageCause, data.amount)
     this.eventBus.post(livingDamageEvent)
