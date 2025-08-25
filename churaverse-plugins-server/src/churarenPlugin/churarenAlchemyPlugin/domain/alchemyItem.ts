@@ -3,13 +3,11 @@ import { AlchemyItemKind } from './alchemyItemKind'
 
 export class AlchemyItem extends Entity {
   public itemId: string
-  public spawnTime: number
   public kind: AlchemyItemKind
 
-  public constructor(itemId: string, position: Position, spawnTime: number, kind: AlchemyItemKind) {
-    super(position, Direction.down)
+  public constructor(itemId: string, kind: AlchemyItemKind) {
+    super(new Position(0, 0), Direction.down)
     this.itemId = itemId
-    this.spawnTime = spawnTime
     this.kind = kind
   }
 }
