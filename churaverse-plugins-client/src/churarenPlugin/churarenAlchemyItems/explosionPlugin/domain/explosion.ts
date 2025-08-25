@@ -56,3 +56,9 @@ export class Explosion extends AlchemyItem implements ChurarenWeaponEntity {
     this.isDead = true
   }
 }
+
+declare module '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind' {
+  export interface AlchemyItemKindMap {
+    explosion: Explosion
+  }
+}
