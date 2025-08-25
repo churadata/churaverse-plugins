@@ -13,13 +13,15 @@ import { Explosion } from './domain/explosion'
 import { Boss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
 import '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
 import { ExplosionDamageCause } from './domain/explosionDamageCause'
+import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-server/domain/baseAlchemyItemPlugin'
 
-export class ExplosionPlugin extends BaseGamePlugin {
+export class ExplosionPlugin extends BaseAlchemyItemPlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
   private explosionPluginStore!: ExplosionPluginStore
   private mapPluginStore!: MapPluginStore
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private socketController?: SocketController
+  
 
   public listenEvent(): void {
     super.listenEvent()

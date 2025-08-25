@@ -1,13 +1,22 @@
-import { Direction, Entity, Position, Vector } from 'churaverse-engine-server'
+import { Direction, Position, Vector } from 'churaverse-engine-server'
 import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/ICollidableEntity'
 import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
 import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
 import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-server'
+import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-server/interface/IAlchemyItem'
+import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItem'
 
 export const EXPLOSION_WALK_LIMIT_GRIDS = 1
 export const EXPLOSION_WALK_LIMIT_MS = 600
+export const EXPLOSION_ITEM: IAlchemyItem = {
+  kind: 'explosion',
+  recipe: {
+    pattern: 'two_same_one_diff',
+    materialKind: 'fireOre',
+  },
+}
 
-export class Explosion extends Entity implements ICollidableEntity, ChurarenWeaponEntity {
+export class Explosion extends AlchemyItem implements ICollidableEntity, ChurarenWeaponEntity {
   public isCollidable = true
   public getRect(): IRectangle {
     return {
@@ -37,10 +46,12 @@ export class Explosion extends Entity implements ICollidableEntity, ChurarenWeap
     direction: Direction,
     spawnTime: number
   ) {
-    super(position, direction)
+    super(explosionId, EXPLOSION_ITEM.kind)
     this.explosionId = explosionId
     this.churarenWeaponOwnerId = ownerId
     this.spawnTime = spawnTime
+    this.position = position
+    this.direction = direction
 
     // walkするまでは停止
     this._velocity = { x: 0, y: 0 }
@@ -78,5 +89,11 @@ export class Explosion extends Entity implements ICollidableEntity, ChurarenWeap
   public move(dt: number): void {
     this.position.x += this._velocity.x * dt
     this.position.y += this._velocity.y * dt
+  }
+}
+
+declare module '@churaverse/churaren-alchemy-item-plugins-server/domain/alchemyItemKind' {
+  export interface AlchemyItemKindMap {
+    explosion: Explosion
   }
 }
