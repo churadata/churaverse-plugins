@@ -1,6 +1,7 @@
 import { ItemKind } from '@churaverse/churaren-item-plugin-server/domain/itemKind'
-import { AlchemyItemKind, AlchemyItemRecipe } from '../domain/alchemyItemKind'
+import { AlchemyItemKind } from '../domain/alchemyItemKind'
 import { IAlchemyItemRecipeRepository } from '../interface/IAlchemyItemRecipeRepository'
+import { AlchemyItemRecipe } from '../interface/IAlchemyItem'
 
 export class AlchemyItemRecipeRepository implements IAlchemyItemRecipeRepository {
   private readonly recipes = new Map<AlchemyItemRecipe, AlchemyItemKind>()
@@ -15,35 +16,29 @@ export class AlchemyItemRecipeRepository implements IAlchemyItemRecipeRepository
 
   public getByMaterialItems(materialItems: ItemKind[]): AlchemyItemKind {
     const countKinds = this.countAlchemyItemKinds(materialItems)
-    const itemCount = Object.keys(countKinds).length
+    const itemCount = countKinds.size
 
     if (itemCount === 1) {
       return this.get({ pattern: 'all_same', materialKind: materialItems[0] })
     } else if (itemCount === 2) {
-      const [kind1, kind2] = materialItems
-      if (countKinds[kind1] === 2 || countKinds[kind2] === 2) {
-        return this.get({ pattern: 'two_same_one_diff', materialKind: kind1 === kind2 ? kind1 : kind1 })
-      }
+      const sortedKinds = [...countKinds.entries()].sort((a, b) => b[1] - a[1])
+      return this.get({ pattern: 'two_same_one_diff', materialKind: sortedKinds[0][0] as ItemKind })
     } else if (itemCount === 3) {
-      return this.get({ pattern: 'all_diff', materialKind: 'fireOre' })
+      return 'blackHole'
     }
 
-    return 'blackHole' // Default case if no recipe matches
+    return 'blackHole'
   }
 
   public clear(): void {
     this.recipes.clear()
   }
 
-  private countAlchemyItemKinds(items: ItemKind[]): Record<AlchemyItemKind, number> {
-    const kindCount: Record<AlchemyItemKind, number> = {}
+  private countAlchemyItemKinds(items: ItemKind[]): Map<AlchemyItemKind, number> {
+    const kindCount = new Map<AlchemyItemKind, number>()
 
     items.forEach((item) => {
-      if (item in kindCount) {
-        kindCount[item] += 1
-      } else {
-        kindCount[item] = 1
-      }
+      kindCount.set(item, (kindCount.get(item) ?? 0) + 1)
     })
 
     return kindCount
