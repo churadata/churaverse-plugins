@@ -1,7 +1,6 @@
 import { CoreGamePlugin } from '@churaverse/game-plugin-client/domain/coreGamePlugin'
 import { CHURAREN_CONSTANTS } from './constants/churarenConstants'
 import { SocketController } from './controller/socketController'
-import { ChurarenDialogManager } from './ui/startWindow/churarenDialogManager'
 import { RegisterGameUiEvent } from '@churaverse/game-plugin-client/event/registerGameUiEvent'
 import { registerChurarenUi } from './ui/registerChurarenUi'
 import { CHURAREN_UI_KEYS } from './ui/defChurarenUi'
@@ -11,6 +10,7 @@ import { GamePlayerQuitEvent } from '@churaverse/game-plugin-client/event/gamePl
 import { ChurarenListItemRenderer } from './ui/startWindow/churarenListItemRenderer'
 import { IGameSelectionListItemRenderer } from '@churaverse/game-plugin-client/interface/IGameSelectionListItemRenderer'
 import '@churaverse/player-plugin-client/store/defPlayerPluginStore'
+import { setupChurarenDialog } from './ui/startWindow/setupChurarenDialog'
 
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -53,7 +53,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   }
 
   protected init(): void {
-    void new ChurarenDialogManager(this.store)
+    setupChurarenDialog(this.store)
     this.gameEntryRenderer = new ChurarenListItemRenderer(
       this.store,
       this.gamePluginStore.gameDescriptionDialogManager,
