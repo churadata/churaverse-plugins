@@ -1,4 +1,3 @@
-import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
 import { ExplosionPluginStore } from './store/defExplosionPluginStore'
 import { MapPluginStore } from '@churaverse/map-plugin-server/store/defMapPluginStore'
 import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
@@ -9,7 +8,7 @@ import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-s
 import { initExplosionPluginStore } from './store/initExplosionPluginStore'
 import { moveExplosions, removeDieExplosion } from './domain/explosionService'
 import { ExplosionHitMessage } from './message/explosionHitMessage'
-import { Explosion } from './domain/explosion'
+import { Explosion, EXPLOSION_ITEM } from './domain/explosion'
 import { Boss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
 import '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
 import { ExplosionDamageCause } from './domain/explosionDamageCause'
@@ -21,7 +20,7 @@ export class ExplosionPlugin extends BaseAlchemyItemPlugin {
   private mapPluginStore!: MapPluginStore
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private socketController?: SocketController
-  
+  protected alchemyItem = EXPLOSION_ITEM
 
   public listenEvent(): void {
     super.listenEvent()

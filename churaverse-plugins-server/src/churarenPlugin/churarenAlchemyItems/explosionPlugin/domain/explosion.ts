@@ -92,7 +92,7 @@ export class Explosion extends AlchemyItem implements ICollidableEntity, Churare
   }
 }
 
-declare module '@churaverse/churaren-alchemy-item-plugins-server/domain/alchemyItemKind' {
+declare module '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItemKind' {
   export interface AlchemyItemKindMap {
     explosion: Explosion
   }
