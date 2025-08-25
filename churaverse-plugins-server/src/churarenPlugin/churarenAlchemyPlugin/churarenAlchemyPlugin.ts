@@ -1,14 +1,14 @@
 import { SocketController } from './controller/socketController'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
-import { judgeAlchemy, spawnAlchemyPot } from './domain/alchemyService'
+import { generatedAlchemyPotMap } from './domain/alchemyService'
 import { initAlchemyPluginStore } from './store/initAlchemyPluginStore'
 import { AlchemyPluginStore } from './store/defAlchemyPluginStore'
 import { MapPluginStore } from '@churaverse/map-plugin-server/store/defMapPluginStore'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
 import { AlchemizeData, AlchemizeMessage } from './message/alchemizeMessage'
 import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
-import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
-import { IMainScene } from 'churaverse-engine-server'
+import { CHURAREN_CONSTANTS, uniqueId } from '@churaverse/churaren-core-plugin-server'
+import { IMainScene, Position } from 'churaverse-engine-server'
 import { AlchemyPot } from './domain/alchemyPot'
 import { AlchemyPotSpawnMessage } from './message/alchemyPotSpawnMessage'
 import { Player } from '@churaverse/player-plugin-server/domain/player'
@@ -16,6 +16,7 @@ import { MAX_ITEMS } from '@churaverse/churaren-player-plugin-server/churarenPla
 import { PlayerItemsStore } from '@churaverse/churaren-player-plugin-server/store/defPlayerItemsStore'
 import '@churaverse/churaren-core-plugin-server/event/churarenStartTimerEvent'
 import { ClearAlchemyItemBoxEvent } from './event/clearAlchemyItemBoxEvent'
+import { AlchemyItem } from './domain/alchemyItem'
 
 export class ChurarenAlchemyPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -70,10 +71,9 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
 
   private readonly sendSpawnAlchemy = (): void => {
     const currentMap = this.mapPluginStore.mapManager.currentMap
-    spawnAlchemyPot(this.alchemyPluginStore.alchemyPot, currentMap, (pots) => {
-      const alchemyPotSpawnMessage = new AlchemyPotSpawnMessage({ pots })
-      this.networkPluginStore.messageSender.send(alchemyPotSpawnMessage)
-    })
+    const pots = generatedAlchemyPotMap(this.alchemyPluginStore.alchemyPot, currentMap)
+    const alchemyPotSpawnMessage = new AlchemyPotSpawnMessage({ pots })
+    this.networkPluginStore.messageSender.send(alchemyPotSpawnMessage)
   }
 
   private registerOnOverlap(ev: RegisterOnOverlapEvent): void {
@@ -84,17 +84,17 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
     )
   }
 
-  private alchemize(alchemy: AlchemyPot, player: Player): void {
+  private alchemize(_: AlchemyPot, player: Player): void {
     const game = this.gamePluginStore.games.get(this.gameId)
     if (game === undefined || !game.participantIds.includes(player.id)) return
-    const itemBoxes = this.playerItemStore.materialItems
-    const items = itemBoxes.getAllItem(player.id)
-    if (items.length !== MAX_ITEMS) {
-      return
-    }
-    const { alchemizedItem, deletedItemIds } = judgeAlchemy(items, player, itemBoxes)
+    const items = this.playerItemStore.materialItems.getAllItem(player.id)
+    if (items.length !== MAX_ITEMS) return
 
-    if (alchemizedItem === null || alchemizedItem === undefined) return
+    const alchemizedItemKind = this.alchemyPluginStore.alchemyItemRecipe.getByMaterialItems(
+      items.map((item) => item.kind)
+    )
+    const deletedItemIds: string[] = items.map((item) => item.id)
+    const alchemizedItem = new AlchemyItem(uniqueId(), new Position(0, 0), Date.now(), alchemizedItemKind)
 
     const alchemizeData: AlchemizeData = {
       playerId: player.id,

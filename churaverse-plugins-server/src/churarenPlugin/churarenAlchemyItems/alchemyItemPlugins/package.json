@@ -1,5 +1,5 @@
 {
-  "name": "@churaverse/churaren-alchemy-items-server",
+  "name": "@churaverse/churaren-alchemy-item-plugins-server",
   "version": "0.1.0",
   "description": "",
   "main": "dist/index.js",
@@ -10,5 +10,7 @@
     "link:cvPackages": "sh npm_link_cvPackages.sh"
   },
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "@churaverse/churaren-alchemy-plugin-server": "file:../../churarenAlchemyPlugin"
+  }
 }
