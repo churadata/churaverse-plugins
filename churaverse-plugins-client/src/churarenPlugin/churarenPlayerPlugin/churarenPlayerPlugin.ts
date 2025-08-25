@@ -219,17 +219,16 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   }
 
   private readonly logPlayerDeathByBoss = (ev: LivingDamageEvent): void => {
-    if (ev.cause instanceof ChurarenEnemyDamageCause) {
-      if (isPlayer(ev.target) && ev.target.isDead) {
-        const deathLog: DeathLog = {
-          victim: ev.target,
-          killer: ev.cause.entityName,
-          cause: ev.cause.entityName,
-          diedTime: new Date(),
-        }
-        this.playerPluginStore.deathLogRenderer.add(deathLog)
-        this.playerPluginStore.deathLogRepository.addDeathLog(deathLog)
+    if (!(ev.cause instanceof ChurarenEnemyDamageCause)) return
+    if (isPlayer(ev.target) && ev.target.isDead) {
+      const deathLog: DeathLog = {
+        victim: ev.target,
+        killer: ev.cause.entityName,
+        cause: ev.cause.entityName,
+        diedTime: new Date(),
       }
+      this.playerPluginStore.deathLogRenderer.add(deathLog)
+      this.playerPluginStore.deathLogRepository.addDeathLog(deathLog)
     }
   }
 
