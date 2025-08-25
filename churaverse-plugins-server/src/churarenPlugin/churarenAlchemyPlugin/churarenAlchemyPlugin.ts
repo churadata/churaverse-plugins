@@ -8,7 +8,7 @@ import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-s
 import { AlchemizeData, AlchemizeMessage } from './message/alchemizeMessage'
 import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
 import { CHURAREN_CONSTANTS, uniqueId } from '@churaverse/churaren-core-plugin-server'
-import { IMainScene, Position } from 'churaverse-engine-server'
+import { IMainScene } from 'churaverse-engine-server'
 import { AlchemyPot } from './domain/alchemyPot'
 import { AlchemyPotSpawnMessage } from './message/alchemyPotSpawnMessage'
 import { Player } from '@churaverse/player-plugin-server/domain/player'
@@ -94,7 +94,7 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
       items.map((item) => item.kind)
     )
     const deletedItemIds: string[] = items.map((item) => item.id)
-    const alchemizedItem = new AlchemyItem(uniqueId(), new Position(0, 0), Date.now(), alchemizedItemKind)
+    const alchemizedItem = new AlchemyItem(uniqueId(), alchemizedItemKind)
 
     const alchemizeData: AlchemizeData = {
       playerId: player.id,
