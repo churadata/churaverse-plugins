@@ -114,6 +114,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.churarenPlayerStore = this.store.of('churarenPlayerStore')
     this.ghostModeIndicatorUi = new GhostModeIndicatorUi(this.store)
     this.playerItemStore.materialItemBoxContainer.initialize()
+    this.playerItemStore.alchemyItemBoxContainer.initialize()
     this.churarenPlayerStore.ghostPlayerListUi.initialize()
     this.ghostModeIndicatorUi.ghostModeIcon.deactivate()
     this.socketController?.registerMessageListener()
@@ -127,6 +128,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.resetKeyAction()
     this.socketController?.unregisterMessageListener()
     this.playerItemStore.materialItemBoxContainer.remove()
+    this.playerItemStore.alchemyItemBoxContainer.remove()
     this.churarenPlayerStore.ghostPlayerListUi.remove()
     this.clearPlayerItemBox()
     this.showAllGhostPlayers()
@@ -172,9 +174,9 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   private readonly getItem = (ev: GetChurarenItemEvent): void => {
     const item = this.itemPluginStore.items.get(ev.itemId)
     const renderer = this.itemPluginStore.itemRenderers.get(ev.itemId)
+    const alchemyItem = this.playerItemStore.alchemyItem.get(ev.playerId)
 
-    // TODO: 錬金アイテムを持っている場合も考慮する
-    if (item === undefined || renderer === undefined) return
+    if (item === undefined || renderer === undefined || alchemyItem !== undefined) return
 
     this.playerItemStore.materialItems.set(ev.playerId, item)
     this.playerItemStore.materialItemRenderers.set(ev.itemId, renderer)
@@ -190,17 +192,26 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     if (player === undefined) return
     const speed = ev.speed ?? GRID_SIZE / GRID_WALK_DURATION_MS
 
-    // TODO: 錬金アイテムを持っている場合の処理を追加
-    const items = this.playerItemStore.materialItems.getAllItem(ev.id)
-    items.forEach((item: Item, index: number) => {
-      if (item === undefined) return
-      const renderer = this.playerItemStore.materialItemRenderers.get(item.itemId)
-      const dest = index === 0 ? player.position.copy() : items[index - 1].position.copy()
-      renderer?.chase(dest, speed, (pos: { x: number; y: number }) => {
-        item.position.x = pos.x
-        item.position.y = pos.y
+    const alchemyItem = this.playerItemStore.alchemyItem.get(ev.id)
+    if (alchemyItem !== undefined) {
+      const renderer = this.playerItemStore.alchemyItemRenderers.get(alchemyItem.itemId)
+      const dest = player.position.copy()
+      renderer?.chase(dest, speed, (pos: Position) => {
+        alchemyItem.position.x = pos.x
+        alchemyItem.position.y = pos.y
       })
-    })
+    } else {
+      const items = this.playerItemStore.materialItems.getAllItem(ev.id)
+      items.forEach((item: Item, index: number) => {
+        if (item === undefined) return
+        const renderer = this.playerItemStore.materialItemRenderers.get(item.itemId)
+        const dest = index === 0 ? player.position.copy() : items[index - 1].position.copy()
+        renderer?.chase(dest, speed, (pos: { x: number; y: number }) => {
+          item.position.x = pos.x
+          item.position.y = pos.y
+        })
+      })
+    }
   }
 
   private readonly dropItem = (ev: DropChurarenItemEvent): void => {
@@ -242,8 +253,11 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
       this.playerItemStore.materialItemRenderers.forEach((renderer) => {
         renderer.destroy()
       })
+      this.playerItemStore.alchemyItemRenderers.forEach((renderer) => {
+        renderer.destroy()
+      })
       this.playerItemStore.materialItems.clearAll()
-      // TODO: 錬金アイテムの削除処理を追加
+      this.playerItemStore.alchemyItem.clear()
     } else {
       const materialItems = [...this.playerItemStore.materialItems.getAllItem(playerId)]
       materialItems.forEach((item) => {
@@ -255,7 +269,14 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
         }
       })
 
-      // TODO: 錬金アイテムの削除処理を追加
+      const alchemyItem = this.playerItemStore.alchemyItem.get(playerId)
+      if (alchemyItem === undefined) return
+      const alchemyRenderer = this.playerItemStore.alchemyItemRenderers.get(alchemyItem.itemId)
+      if (alchemyRenderer !== undefined) {
+        alchemyRenderer.destroy()
+        this.playerItemStore.alchemyItemRenderers.delete(alchemyItem.itemId)
+        this.playerItemStore.alchemyItem.delete(playerId)
+      }
     }
   }
 
@@ -286,6 +307,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
 
   private hideItemBox(): void {
     this.playerItemStore.materialItemBoxContainer.hide()
-    // TODO: 錬金アイテムのコンテナも非表示にする
+    this.playerItemStore.alchemyItemBoxContainer.hide()
   }
 }
