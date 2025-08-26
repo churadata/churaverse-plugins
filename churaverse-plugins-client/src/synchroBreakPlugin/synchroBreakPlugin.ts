@@ -132,7 +132,12 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   protected handleGameStart(): void {
     // アラート文言をセット
-    this.coreUiPluginStore.exitConfirmMessage = 'シンクロブレイクから退出しますか？(handlegamestart)'
+    if (this.gameOwnerId === this.playerPluginStore.ownPlayerId) {
+      this.coreUiPluginStore.exitConfirmMessage =
+        'あなたはゲームオーナーです。退出されるとゲームが即終了します(gamestart)'
+    } else {
+      this.coreUiPluginStore.exitConfirmMessage = 'ミーティングから退出しますか？（gamestart）'
+    }
 
     initSynchroBreakPluginStore(this.store)
     this.socketController.registerMessageListener()
@@ -156,7 +161,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * シンクロブレイク特有の中断・終了時に実行される処理
    */
   protected handleGameTermination(): void {
-    this.coreUiPluginStore.exitConfirmMessage = 'ミーティングから退出しますか？（handlegametermination）'
+    this.coreUiPluginStore.exitConfirmMessage = 'ミーティングから退出しますか？（gameend）'
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
 
