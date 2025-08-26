@@ -78,6 +78,19 @@ export class ResultScreen implements ISynchroBreakResultScreen {
     this.element.appendChild(exitButton)
     exitButton.addEventListener('click', () => {
       const playerId = this.store.of('playerPlugin').ownPlayerId
+      
+      // 退出前に確認ダイアログを表示
+      const gamePluginStore = this.store.of('gamePlugin')
+      const synchroBreakStore = this.store.of('synchroBreakPlugin')
+      const message = synchroBreakStore.exitConfirmMessage
+      
+      const ok = gamePluginStore.gameExitAlertConfirmManager.showAlert(this.gameId, message)
+      if (!ok) {
+        // ユーザーがキャンセルした場合は何もしない
+        return
+      }
+      
+      // ユーザーがOKした場合のみ退出処理を実行
       this.eventBus.post(new GamePlayerQuitEvent(this.gameId, playerId))
       this.remove()
     })

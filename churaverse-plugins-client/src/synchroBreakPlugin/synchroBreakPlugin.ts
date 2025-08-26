@@ -27,6 +27,7 @@ import { NyokkiStatus } from './type/nyokkiStatus'
 import { IRankingBoard } from './interface/IRankingBoard'
 import { IGameSelectionListItemRenderer } from '@churaverse/game-plugin-client/interface/IGameSelectionListItemRenderer'
 import { SynchroBreakListItemRenderer } from './ui/startWindow/synchroBreakListItemRenderer'
+import { ExitAlert } from '@churaverse/game-plugin-client/ui/exit/gameExitAlertManager'
 
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
@@ -109,7 +110,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     )
 
     // 退出アラートを SynchroBreak 用に登録（新しい Confirm Manager 経由）
-    // this.gamePluginStore.gameExitAlertConfirmManager.add(this.gameId, new ExitAlert())
+    this.gamePluginStore.gameExitAlertConfirmManager.add(this.gameId, new ExitAlert())
   }
 
   /**
@@ -155,10 +156,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   protected handleGameTermination(): void {
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
-    //  退出アラートを表示（manager 経由）
-    const message = this.synchroBreakPluginStore.exitConfirmMessage
-    const ok = this.gamePluginStore.gameExitAlertConfirmManager.showAlert(this.gameId, message)
-    if (!ok) return
 
     if (!this.isOwnPlayerMidwayParticipant) {
       resetSynchroBreakPluginStore(this.store)
