@@ -84,7 +84,7 @@ export class CoreUiPlugin extends BasePlugin<IMainScene> {
       this.coreUiPluginStore.topBarIconContainer
     )
 
-    void new ExitButton(this.bus)
+    void new ExitButton(this.bus, this.store)
 
     this.keyboardPluginStore.keySettingWindow.addKeyAction('focusNext', 'カメラフォーカス対象の切り替え', 50)
   }

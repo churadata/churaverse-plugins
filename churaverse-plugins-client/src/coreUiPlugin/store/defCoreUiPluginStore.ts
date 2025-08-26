@@ -11,6 +11,7 @@ declare module 'churaverse-engine-client' {
   }
 }
 export interface CoreUiPluginStore {
+  exitConfirmMessage: string
   readonly topBarIconContainer: ITopBarIconContainer
   readonly settingDialog: ISettingDialog
   readonly adminSettingDialog: IAdminSettingDialog

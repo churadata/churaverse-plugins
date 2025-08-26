@@ -27,7 +27,7 @@ import { NyokkiStatus } from './type/nyokkiStatus'
 import { IRankingBoard } from './interface/IRankingBoard'
 import { IGameSelectionListItemRenderer } from '@churaverse/game-plugin-client/interface/IGameSelectionListItemRenderer'
 import { SynchroBreakListItemRenderer } from './ui/startWindow/synchroBreakListItemRenderer'
-import { ExitAlert } from '@churaverse/game-plugin-client/ui/exit/gameExitAlertManager'
+import { CoreUiPluginStore } from '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
 
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
@@ -38,6 +38,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
 
   private synchroBreakPluginStore!: SynchroBreakPluginStore
   private playerPluginStore!: PlayerPluginStore
+  private coreUiPluginStore!: CoreUiPluginStore
   private scene!: Scene
   private coinViewerIconUis = new Map<string, CoinViewerIcon>()
   private socketController!: SocketController
@@ -101,6 +102,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.gameInfoStore = this.store.of('gameInfo')
     this.gamePluginStore = this.store.of('gamePlugin')
     this.playerPluginStore = this.store.of('playerPlugin')
+    this.coreUiPluginStore = this.store.of('coreUiPlugin')
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
     // this.synchroBreakDialogManager = new SynchroBreakDialogManager(this.store)
     this.gameEntryRenderer = new SynchroBreakListItemRenderer(
@@ -108,9 +110,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       this.gamePluginStore.gameDescriptionDialogManager,
       this.gamePluginStore.gameSelectionListContainer
     )
-
-    // 退出アラートを SynchroBreak 用に登録（新しい Confirm Manager 経由）
-    this.gamePluginStore.gameExitAlertConfirmManager.add(this.gameId, new ExitAlert())
   }
 
   /**
@@ -132,6 +131,9 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * シンクロブレイク特有の開始時に実行される処理
    */
   protected handleGameStart(): void {
+    // アラート文言をセット
+    this.coreUiPluginStore.exitConfirmMessage = 'シンクロブレイクから退出しますか？(handlegamestart)'
+
     initSynchroBreakPluginStore(this.store)
     this.socketController.registerMessageListener()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
@@ -154,6 +156,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * シンクロブレイク特有の中断・終了時に実行される処理
    */
   protected handleGameTermination(): void {
+    this.coreUiPluginStore.exitConfirmMessage = 'ミーティングから退出しますか？（handlegametermination）'
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
 

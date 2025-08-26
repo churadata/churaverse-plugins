@@ -11,9 +11,11 @@ export function initCoreUiPlugin(
   eventBus: IEventBus<Scenes>,
   store: Store<IMainScene>,
   scene: Phaser.Scene,
-  focusTargetRepository: IFocusTargetRepository
+  focusTargetRepository: IFocusTargetRepository,
+  exitConfirmMessage?: string
 ): void {
   const pluginStore: CoreUiPluginStore = {
+    exitConfirmMessage: exitConfirmMessage ?? 'ミーティングから退出しますか？',
     topBarIconContainer: new TopBarIconContainer(),
     settingDialog: new SettingDialog(),
     adminSettingDialog: new AdminSettingDialog(),
