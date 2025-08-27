@@ -3,6 +3,8 @@ import { DescriptionWindowComponent } from './component/DescriptionWindowCompone
 import '@churaverse/game-plugin-client/gameUiManager'
 import { IDescriptionWindow } from '../../interface/IDescriptionWindow'
 
+export const DESCRIPTION_TEXT_ID = 'description-text'
+
 export class DescriptionWindow implements IDescriptionWindow {
   public element!: HTMLElement
   public visible: boolean = false
@@ -164,6 +166,8 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param text 更新する文章
    */
   private setDescriptionText(text: string): void {
-    this.element.innerHTML = text
+    const descriptionText = this.element.querySelector(`#${DESCRIPTION_TEXT_ID}`)
+    if (descriptionText === null) return
+    descriptionText.innerHTML = text
   }
 }
