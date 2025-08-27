@@ -25,6 +25,7 @@ import { KeyCode } from './types/keyCode'
 import { ActivateUiEvent } from '@churaverse/core-ui-plugin-client/event/activateUiEvent'
 import { DeactivateUiEvent } from '@churaverse/core-ui-plugin-client/event/deactivateUiEvent'
 import { WillSceneTransitionEvent } from '@churaverse/transition-plugin-client/event/willSceneTransitionEvent'
+import { toPhaserKeyCode } from './service/keyCodeUtil'
 
 export class KeyboardPlugin extends BasePlugin<Scenes> {
   private scene?: Scene
@@ -59,6 +60,27 @@ export class KeyboardPlugin extends BasePlugin<Scenes> {
     const keyFactory = new KeyFactory(keyStateGetter)
     this.keyActionManager = new KeyActionManager(keyFactory, savedKeyBindInfo)
     initKeyboardPluginStore(this.store, this.scene, this.keyActionManager, keyStateGetter)
+    this.setupKeyboardEventListeners()
+  }
+
+  private setupKeyboardEventListeners(): void {
+    window.addEventListener('keyup', this.handleKeyUp)
+    window.addEventListener('keydown', this.handleKeyDown)
+  }
+
+  private readonly handleKeyUp = (e: KeyboardEvent): void => {
+    if (this.keyActionManager === undefined) throw new KeyActionManagerUndefinedError()
+    if (e.key === 'Meta') {
+      this.keyActionManager.logicalReleaseAllKeys()
+    }
+  }
+
+  private readonly handleKeyDown = (event: KeyboardEvent): void => {
+    if (this.keyActionManager === undefined) throw new KeyActionManagerUndefinedError()
+    const keyCode = toPhaserKeyCode(event.key)
+    if (keyCode !== undefined) {
+      this.keyActionManager.physicalKeyDown(keyCode)
+    }
   }
 
   private start(): void {
