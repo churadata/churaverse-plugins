@@ -1,4 +1,4 @@
 export interface IGameExitAlertConfirm {
-  show: (message?: string) => boolean
-  close: () => void
+  showAlert: () => boolean
+  setMessage: (message: string) => void
 }
