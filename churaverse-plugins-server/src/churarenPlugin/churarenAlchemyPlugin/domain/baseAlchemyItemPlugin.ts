@@ -6,6 +6,7 @@ import '../store/defAlchemyPluginStore'
 
 /**
  * 錬金アイテムのプラグインのベースクラス
+ * @property {IAlchemyItem} alchemyItem 錬金アイテムの情報
  */
 export abstract class BaseAlchemyItemPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID

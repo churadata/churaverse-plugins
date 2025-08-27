@@ -4,14 +4,17 @@ import { IAlchemyItemRecipeRepository } from '../interface/IAlchemyItemRecipeRep
 import { AlchemyItemRecipe } from '../interface/IAlchemyItem'
 
 export class AlchemyItemRecipeRepository implements IAlchemyItemRecipeRepository {
-  private readonly recipes = new Map<AlchemyItemRecipe, AlchemyItemKind>()
+  private readonly recipes = new Map<AlchemyItemRecipe, AlchemyItemKind[]>()
 
   public set(recipe: AlchemyItemRecipe, kind: AlchemyItemKind): void {
-    this.recipes.set(recipe, kind)
+    const kinds = this.recipes.get(recipe) ?? []
+    kinds.push(kind)
+    this.recipes.set(recipe, kinds)
   }
 
   public get(alchemyItemRecipe: AlchemyItemRecipe): AlchemyItemKind {
-    return this.recipes.get(alchemyItemRecipe) ?? 'blackHole'
+    const kinds = this.recipes.get(alchemyItemRecipe) ?? []
+    return kinds[Math.floor(Math.random() * kinds.length)] ?? 'blackHole'
   }
 
   public getByMaterialItems(materialItems: ItemKind[]): AlchemyItemKind {

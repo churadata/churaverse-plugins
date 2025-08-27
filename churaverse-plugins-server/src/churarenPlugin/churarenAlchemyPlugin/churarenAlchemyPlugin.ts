@@ -1,6 +1,6 @@
 import { SocketController } from './controller/socketController'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
-import { generatedAlchemyPotMap } from './domain/alchemyService'
+import { generatedAlchemyPotMap } from './domain/alchemyPotService'
 import { initAlchemyPluginStore } from './store/initAlchemyPluginStore'
 import { AlchemyPluginStore } from './store/defAlchemyPluginStore'
 import { MapPluginStore } from '@churaverse/map-plugin-server/store/defMapPluginStore'
