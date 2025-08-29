@@ -36,6 +36,4 @@ export interface IPlayerRenderer extends IFocusableRenderer {
   setParentContainer: (container: GameObjects.Container) => void
   addToPlayerContainer: (child: Phaser.GameObjects.GameObject) => void
   addToPlayerFrontContainer: (child: Phaser.GameObjects.GameObject) => void
-  setSpriteAlpha: (alpha: number) => void
-  blinkPlayer: (blinkTime: number) => void
 }

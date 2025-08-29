@@ -19,6 +19,7 @@ import { BossWalkEvent } from './event/bossWalkEvent'
 import '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
 import '@churaverse/churaren-core-plugin-client/churarenCorePlugin'
 import { CHURAREN_CONSTANTS, ChurarenWeaponDamageCause } from '@churaverse/churaren-core-plugin-client'
+import { BossDamageCauseLogRepository } from './ui/damageCauseLog/bossDamageLogRepository'
 import { BossDamageCauseLog } from './ui/damageCauseLog/bossDamageCauseLog'
 
 export class ChurarenBossPlugin extends BaseGamePlugin {
@@ -27,6 +28,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   private bossPluginStore!: BossPluginStore
   private playerPluginStore!: PlayerPluginStore
   private socketController?: SocketController
+  private readonly damageCauseLog: BossDamageCauseLogRepository = new BossDamageCauseLogRepository()
 
   public listenEvent(): void {
     super.listenEvent()
@@ -68,10 +70,6 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
 
   private init(): void {
     this.playerPluginStore = this.store.of('playerPlugin')
-    this.playerPluginStore.deathLogRenderer.addDeathLogMessageBuilder(
-      'collisionBoss',
-      (deathLog) => `${deathLog.victim.name} がボスに潰された！ ${deathLog.victim.name} は死んでしまった！`
-    )
   }
 
   public handleGameStart(): void {
@@ -90,7 +88,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     this.unsubscribeGameEvent()
   }
 
-  private readonly spawnBoss = (ev: EntitySpawnEvent): void => {
+  public spawnBoss = (ev: EntitySpawnEvent): void => {
     if (!(ev.entity instanceof Boss)) return
     const boss = ev.entity
     const renderer = this.bossPluginStore.bossRendererFactory.build(boss.position, boss.hp)
@@ -99,7 +97,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     renderer.spawn(boss.position)
   }
 
-  private readonly despawnBoss = (ev: EntityDespawnEvent): void => {
+  public despawnBoss = (ev: EntityDespawnEvent): void => {
     if (!(ev.entity instanceof Boss)) return
     const bossId = ev.entity.bossId
 
@@ -114,7 +112,30 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     this.bossPluginStore.bossRenderers.delete(bossId)
   }
 
-  private readonly moveBoss = (ev: BossWalkEvent): void => {
+  public onLivingDamage = (ev: LivingDamageEvent): void => {
+    if (!(ev.target instanceof Boss)) return
+    const boss = this.bossPluginStore.bosses.get(ev.target.bossId)
+    if (boss === undefined) return
+    boss.damage(ev.amount)
+    this.bossPluginStore.bossRenderers.get(ev.target.bossId)?.damage(ev.amount, boss.hp)
+    if (ev.cause instanceof ChurarenWeaponDamageCause) {
+      const attacker = this.playerPluginStore.players.get(ev.cause.churarenWeapon.churarenWeaponOwnerId)
+      if (attacker === undefined) return
+      this.addDamageCauseLog(attacker, ev.cause.name, ev.amount)
+    }
+  }
+
+  private addDamageCauseLog(attacker: Player, cause: DamageCauseType, damage: number): void {
+    const damageCauseLog: BossDamageCauseLog = {
+      attacker,
+      cause,
+      damage,
+    }
+    this.bossPluginStore.damageCauseLogRenderer.add(damageCauseLog)
+    this.damageCauseLog.addDamageCauseLog(damageCauseLog)
+  }
+
+  public moveBoss = (ev: BossWalkEvent): void => {
     const boss = this.bossPluginStore.bosses.get(ev.id)
     if (boss === undefined) return
     const speed = ev.speed
@@ -140,28 +161,5 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
       boss.walk(dest, direction)
     }
     ev.cancel()
-  }
-
-  private readonly onLivingDamage = (ev: LivingDamageEvent): void => {
-    if (!(ev.target instanceof Boss)) return
-    const boss = this.bossPluginStore.bosses.get(ev.target.bossId)
-    if (boss === undefined) return
-    boss.damage(ev.amount)
-    this.bossPluginStore.bossRenderers.get(ev.target.bossId)?.damage(ev.amount, boss.hp)
-    if (ev.cause instanceof ChurarenWeaponDamageCause) {
-      const attacker = this.playerPluginStore.players.get(ev.cause.churarenWeapon.churarenWeaponOwnerId)
-      if (attacker === undefined) return
-      this.addDamageCauseLog(attacker, ev.cause.name, ev.amount)
-    }
-  }
-
-  private addDamageCauseLog(attacker: Player, cause: DamageCauseType, damage: number): void {
-    const damageCauseLog: BossDamageCauseLog = {
-      attacker,
-      cause,
-      damage,
-    }
-    this.bossPluginStore.damageCauseLogRenderer.add(damageCauseLog)
-    this.bossPluginStore.damageCauseLogRepository.addDamageCauseLog(damageCauseLog)
   }
 }

@@ -19,3 +19,10 @@ export function initChurarenPluginStore(
 
   store.setInit('churarenPlugin', churarenPluginStore)
 }
+
+/**
+ * churarenPluginStoreをリセットする関数
+ */
+export function resetChurarenPluginStore(store: Store<IMainScene>): void {
+  store.deleteStoreOf('churarenPlugin')
+}

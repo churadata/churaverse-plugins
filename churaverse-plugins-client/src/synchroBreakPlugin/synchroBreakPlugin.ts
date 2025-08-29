@@ -26,15 +26,12 @@ import { SynchroBreakTurnStartEvent } from './event/synchroBerakTurnStartEvent'
 import { UpdatePlayersCoinEvent } from './event/updatePlayersCoinEvent'
 import { NyokkiStatus } from './type/nyokkiStatus'
 import { IRankingBoard } from './interface/IRankingBoard'
-import { SynchroBreakListItemRenderer } from './ui/startWindow/synchroBreakListItemRenderer'
-import { IGameSelectionListItemRenderer } from '@churaverse/game-plugin-client/interface/IGameSelectionListItemRenderer'
 
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
   protected readonly gameName = 'シンクロブレイク'
   private nyokkiActionMessage: string | undefined = undefined
   private ownNyokkiSatatus: NyokkiStatus = 'yet'
-  protected gameEntryRenderer!: IGameSelectionListItemRenderer
 
   private synchroBreakPluginStore!: SynchroBreakPluginStore
   private playerPluginStore!: PlayerPluginStore
@@ -97,16 +94,11 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   }
 
   private init(): void {
-    this.synchroBreakDialogManager = new SynchroBreakDialogManager(this.store)
+    this.synchroBreakDialogManager = new SynchroBreakDialogManager(this.store, this.bus)
     this.coinViewerIconUis = new Map<string, CoinViewerIcon>()
     this.gameInfoStore = this.store.of('gameInfo')
     this.gamePluginStore = this.store.of('gamePlugin')
     this.playerPluginStore = this.store.of('playerPlugin')
-    this.gameEntryRenderer = new SynchroBreakListItemRenderer(
-      this.store,
-      this.gamePluginStore.gameDescriptionDialogManager,
-      this.gamePluginStore.gameSelectionListContainer
-    )
   }
 
   /**
@@ -130,6 +122,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   protected handleGameStart(): void {
     initSynchroBreakPluginStore(this.store)
     this.socketController.registerMessageListener()
+    this.synchroBreakDialogManager.setGameAbortButtonText()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
     this.initSynchroBreakPlayerIcons()
     this.nyokkiActionMessage = undefined
@@ -152,6 +145,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   protected handleGameTermination(): void {
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
+    this.synchroBreakDialogManager.setGameStartButtonText()
 
     if (!this.isOwnPlayerMidwayParticipant) {
       resetSynchroBreakPluginStore(this.store)
@@ -164,6 +158,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   protected handleMidwayParticipant(): void {
     this.socketController.registerMessageListener()
+    this.synchroBreakDialogManager.setGameAbortButtonText()
   }
 
   /**
