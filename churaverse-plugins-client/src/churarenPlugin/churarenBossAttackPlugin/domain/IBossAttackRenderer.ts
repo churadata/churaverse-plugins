@@ -8,6 +8,6 @@ export interface IBossAttackRenderer {
    * walk Phaserのtweenによりアニメーションするため,座標の同期をonUpdateでさせる
    * @param onUpdate updateごとに座標の通知
    */
-  attack: (position: Position, dest: Position, direction: Direction, onUpdate: (pos: Position) => void) => void
+  move: (position: Position, dest: Position, direction: Direction, onUpdate: (pos: Position) => void) => void
   dead: () => void
 }

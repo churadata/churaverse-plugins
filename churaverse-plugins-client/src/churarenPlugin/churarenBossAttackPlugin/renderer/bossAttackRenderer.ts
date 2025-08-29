@@ -66,7 +66,7 @@ export class BossAttackRenderer implements IBossAttackRenderer {
     })
   }
 
-  public attack(position: Position, dest: Position, direction: Direction, onUpdate: (pos: Position) => void): void {
+  public move(position: Position, dest: Position, direction: Direction, onUpdate: (pos: Position) => void): void {
     this.sprite.active = true
     const src = position.copy()
     this.tween = this.scene.add.tween({

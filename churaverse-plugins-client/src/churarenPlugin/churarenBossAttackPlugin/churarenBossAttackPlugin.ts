@@ -102,8 +102,8 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
     const dest = bossAttack.position.copy()
     dest.x = bossAttack.direction.x * CHURAREN_BOSS_ATTACK_LIMIT_GRIDS * GRID_SIZE + bossAttack.position.x
     dest.y = bossAttack.direction.y * CHURAREN_BOSS_ATTACK_LIMIT_GRIDS * GRID_SIZE + bossAttack.position.y
-    renderer.attack(bossAttack.position, dest, bossAttack.direction, (pos) => {
-      bossAttack.attack(pos)
+    renderer.move(bossAttack.position, dest, bossAttack.direction, (pos) => {
+      bossAttack.move(pos)
     })
   }
 

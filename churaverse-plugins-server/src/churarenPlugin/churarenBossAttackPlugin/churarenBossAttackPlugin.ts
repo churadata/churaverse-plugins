@@ -71,17 +71,14 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
   }
 
   private readonly generateBossAttack = (ev: BossAttackRequestEvent): void => {
-    const bossPluginStore = this.store.of('bossPlugin')
-    const boss = bossPluginStore.bosses.get(ev.bossId)
+    const boss = this.store.of('bossPlugin').bosses.get(ev.bossId)
     const churarenGameInfo = this.store.of('gamePlugin').games.get(this.gameId)
-    const networkPluginStore = this.store.of('networkPlugin')
     if (churarenGameInfo === undefined || boss === undefined) return
-
     // ボスの攻撃をフロントに送信
-    sendSpawnedBossAttack(networkPluginStore.messageSender, this.bus, boss.position, boss.bossId)
+    sendSpawnedBossAttack(this.store.of('networkPlugin').messageSender, this.bus, boss.position, boss.bossId)
   }
 
-  private readonly registerOnOverlap = (ev: RegisterOnOverlapEvent): void => {
+  private registerOnOverlap(ev: RegisterOnOverlapEvent): void {
     ev.collisionDetector.register(
       this.bossAttackPluginStore.bossAttacks,
       this.store.of('playerPlugin').players,
