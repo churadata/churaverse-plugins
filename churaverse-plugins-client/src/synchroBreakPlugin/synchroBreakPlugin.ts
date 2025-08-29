@@ -129,7 +129,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   protected handleGameStart(): void {
     // ゲーム専用の中断文言セット
-    this.gamePluginStore.gameExitAlertConfirm.setMessage('シンクロブレイクを中断しますか？')
+    this.gamePluginStore.gameAbortAlertConfirm.setMessage('シンクロブレイクを中断しますか？')
     // 退出アラート文言をセット
     if (this.gameOwnerId === this.playerPluginStore.ownPlayerId) {
       this.coreUiPluginStore.exitButton.setMessage(

@@ -3,7 +3,7 @@ import { GameInfoStore, GamePluginStore } from './defGamePluginStore'
 import { GameLogRenderer } from '../ui/logRenderer/gameLogRenderer'
 import { GameUiRegister } from '../gameUiRegister'
 import { GameUiManager } from '../gameUiManager'
-import { GameExitAlertConfirm } from '../ui/exit/gameExitAlerConfirm'
+import { GameAbortAlertConfirm } from '../ui/exit/gameAbortAlerConfirm'
 import { GameInfoRepository } from '../repository/gameInfoRepository'
 import { GameSelectionListContainer } from '../ui/gameList/gameSelectionListContainer'
 import { GameDescriptionDialogManager } from '../gameDescriptionDialogManager'
@@ -14,7 +14,7 @@ export function initGamePluginStore(store: Store<IMainScene>, gameUiRegister: Ga
     gameLogRenderer: new GameLogRenderer(store),
     gameSelectionListContainer: new GameSelectionListContainer(),
     gameDescriptionDialogManager: new GameDescriptionDialogManager(),
-    gameExitAlertConfirm: new GameExitAlertConfirm(),
+    gameAbortAlertConfirm: new GameAbortAlertConfirm(),
   }
   const gameInfoStore: GameInfoStore = { games: new GameInfoRepository() }
 

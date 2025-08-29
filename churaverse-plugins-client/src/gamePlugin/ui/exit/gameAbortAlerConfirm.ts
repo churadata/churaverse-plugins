@@ -1,11 +1,9 @@
-import { IGameExitAlertConfirm } from '../../interface/IGameExitAlertConfirm'
+import { IGameAbortAlertConfirm } from '../../interface/IGameAbortAlertConfirm'
 
-export class GameExitAlertConfirm implements IGameExitAlertConfirm {
+export class GameAbortAlertConfirm implements IGameAbortAlertConfirm {
   private message: string = 'このゲームを中止して退出しますか？'
 
   public showAlert(): boolean {
-    // フォールバック: window.confirm を直接使用
-    // eslint-disable-next-line no-alert
     const shouldExit = window.confirm(this.message)
     return shouldExit
   }
