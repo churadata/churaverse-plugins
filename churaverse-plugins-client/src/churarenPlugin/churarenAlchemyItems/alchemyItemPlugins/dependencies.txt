@@ -1,0 +1,2 @@
+@churaverse/churaren-alchemy-plugin-client
+@churaverse/churaren-explosion-plugin-client
