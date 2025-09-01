@@ -28,9 +28,9 @@ export class ReceiveQueue<Scene extends Scenes> implements IReceiveQueue<Scene> 
   public popPacket(): Packet<Scene> {
     let poppedPacket: Packet<Scene> = []
     void this.lock.acquire(RECEIVE_QUEUE_ASYNC_LOCK_KEY, () => {
-      // 文字列化してdeep copyするこの方法ではシリアライズ可能なオブジェクトのみコピー可能
+      // この方法ではシリアライズ可能なオブジェクトのみコピー可能
       // socket.ioで通信できるのもシリアライズ可能なオブジェクトのみなのでこの方法でdeep copyしている
-      poppedPacket = JSON.parse(JSON.stringify(this.packets)) as Packet<Scene>
+      poppedPacket = structuredClone(this.packets)
       this.packets.length = 0
     })
 
