@@ -32,7 +32,7 @@ export class BossAttack extends Entity implements ChurarenWeaponEntity {
    * 移動
    * @param position 宛先
    */
-  public move(position: Position): void {
+  public attack(position: Position): void {
     this.position.x = position.x
     this.position.y = position.y
   }
