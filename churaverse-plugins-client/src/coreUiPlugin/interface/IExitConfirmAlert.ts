@@ -1,3 +1,5 @@
 export interface IExitConfirmAlert {
-  setMessage: (message?: string) => void
+  setGameOwnerExitMessage: (gameName?: string) => void
+  setGameExitMessage: (gameName?: string) => void
+  resetGameExitMessage: () => void
 }

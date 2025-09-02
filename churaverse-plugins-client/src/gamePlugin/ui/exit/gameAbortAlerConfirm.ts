@@ -8,7 +8,7 @@ export class GameAbortAlertConfirm implements IGameAbortAlertConfirm {
     return shouldExit
   }
 
-  public setMessage(message: string): void {
-    this.message = message
+  public setGameAbortMessage(gameName: string): void {
+    this.message = gameName + 'を中止して退出しますか？'
   }
 }
