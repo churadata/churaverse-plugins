@@ -1,0 +1,1 @@
+export { ChurarenPlayerPlugin } from './churarenPlayerPlugin'
