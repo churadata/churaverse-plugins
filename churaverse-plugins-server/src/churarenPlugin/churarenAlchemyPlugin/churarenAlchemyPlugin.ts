@@ -67,20 +67,20 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
   }
 
   protected handleGameTermination(): void {
-    this.alchemyPluginStore.alchemyPot.clear()
+    this.alchemyPluginStore.alchemyPots.clear()
     this.socketController?.unregisterMessageListener()
   }
 
   private readonly sendSpawnAlchemyPot = (): void => {
     const currentMap = this.mapPluginStore.mapManager.currentMap
-    const pots = generatedAlchemyPot(this.alchemyPluginStore.alchemyPot, currentMap)
+    const pots = generatedAlchemyPot(this.alchemyPluginStore.alchemyPots, currentMap)
     const alchemyPotSpawnMessage = new AlchemyPotSpawnMessage({ pots: alchemyPotInfoToSendableObject(pots) })
     this.networkPluginStore.messageSender.send(alchemyPotSpawnMessage)
   }
 
   private registerOnOverlap(ev: RegisterOnOverlapEvent): void {
     ev.collisionDetector.register(
-      this.alchemyPluginStore.alchemyPot,
+      this.alchemyPluginStore.alchemyPots,
       this.store.of('playerPlugin').players,
       this.alchemize.bind(this)
     )

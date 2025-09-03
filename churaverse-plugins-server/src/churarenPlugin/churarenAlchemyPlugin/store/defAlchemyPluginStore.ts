@@ -9,7 +9,7 @@ declare module 'churaverse-engine-server' {
 }
 
 export interface AlchemyPluginStore {
-  readonly alchemyPot: IAlchemyPotRepository
+  readonly alchemyPots: IAlchemyPotRepository
   readonly alchemyItemRegister: IAlchemyItemRegister
   readonly alchemyItemManager: IAlchemyItemManger
 }
