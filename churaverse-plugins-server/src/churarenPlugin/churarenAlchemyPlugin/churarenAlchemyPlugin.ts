@@ -1,6 +1,6 @@
 import { SocketController } from './controller/socketController'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
-import { generatedAlchemyPotMap } from './domain/alchemyPotService'
+import { alchemyPotInfoToSendableObject, generatedAlchemyPot } from './domain/alchemyPotService'
 import { initAlchemyPluginStore } from './store/initAlchemyPluginStore'
 import { AlchemyPluginStore } from './store/defAlchemyPluginStore'
 import { MapPluginStore } from '@churaverse/map-plugin-server/store/defMapPluginStore'
@@ -50,13 +50,13 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
 
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
-    this.bus.subscribeEvent('churarenStartTimer', this.sendSpawnAlchemy)
+    this.bus.subscribeEvent('churarenStartTimer', this.sendSpawnAlchemyPot)
     this.bus.subscribeEvent('clearAlchemyItemBox', this.clearAlchemyItem)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
-    this.bus.unsubscribeEvent('churarenStartTimer', this.sendSpawnAlchemy)
+    this.bus.unsubscribeEvent('churarenStartTimer', this.sendSpawnAlchemyPot)
     this.bus.unsubscribeEvent('clearAlchemyItemBox', this.clearAlchemyItem)
   }
 
@@ -71,10 +71,10 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
     this.socketController?.unregisterMessageListener()
   }
 
-  private readonly sendSpawnAlchemy = (): void => {
+  private readonly sendSpawnAlchemyPot = (): void => {
     const currentMap = this.mapPluginStore.mapManager.currentMap
-    const pots = generatedAlchemyPotMap(this.alchemyPluginStore.alchemyPot, currentMap)
-    const alchemyPotSpawnMessage = new AlchemyPotSpawnMessage({ pots })
+    const pots = generatedAlchemyPot(this.alchemyPluginStore.alchemyPot, currentMap)
+    const alchemyPotSpawnMessage = new AlchemyPotSpawnMessage({ pots: alchemyPotInfoToSendableObject(pots) })
     this.networkPluginStore.messageSender.send(alchemyPotSpawnMessage)
   }
 
