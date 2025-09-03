@@ -1,0 +1,33 @@
+.container {
+  position: absolute;
+  top: 100px;
+  left: 50px;
+  width: 20%;
+  min-height: 100px;
+  max-height: 40%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  padding: 12px;
+  font-family: 'Arial', sans-serif;
+}
+
+.nameContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ghostPlayerNameBlock {
+  font-size: 18px;
+  padding: 8px 12px;
+  background-color: rgba(220, 220, 220, 0.7);
+  border-radius: 6px;
+  color: #333;
+  text-align: center;
+  word-break: break-word;
+}
