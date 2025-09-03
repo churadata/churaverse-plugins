@@ -1,10 +1,4 @@
 import { ItemKind } from '@churaverse/churaren-item-plugin-server/domain/itemKind'
-import { AlchemyItemKind } from '../domain/alchemyItemKind'
-
-export interface IAlchemyItem {
-  readonly kind: AlchemyItemKind
-  readonly recipe: AlchemyItemRecipe
-}
 
 /**
  * 錬金アイテムを生成するための素材アイテムの組み合わせ

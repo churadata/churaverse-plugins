@@ -1,5 +1,6 @@
 import { IAlchemyPotRepository } from '../domain/IAlchemyPotRepository'
-import { IAlchemyItemRecipeRepository } from '../interface/IAlchemyItemRecipeRepository'
+import { IAlchemyItemManger } from '../interface/IAlchemyItemManger'
+import { IAlchemyItemRegister } from '../interface/IAlchemyItemRegister'
 
 declare module 'churaverse-engine-server' {
   export interface StoreInMain {
@@ -9,5 +10,6 @@ declare module 'churaverse-engine-server' {
 
 export interface AlchemyPluginStore {
   readonly alchemyPot: IAlchemyPotRepository
-  readonly alchemyItemRecipe: IAlchemyItemRecipeRepository
+  readonly alchemyItemRegister: IAlchemyItemRegister
+  readonly alchemyItemManager: IAlchemyItemManger
 }

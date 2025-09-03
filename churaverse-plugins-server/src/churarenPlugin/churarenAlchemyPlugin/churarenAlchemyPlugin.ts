@@ -17,6 +17,7 @@ import { PlayerItemsStore } from '@churaverse/churaren-player-plugin-server/stor
 import '@churaverse/churaren-core-plugin-server/event/churarenStartTimerEvent'
 import { ClearAlchemyItemBoxEvent } from './event/clearAlchemyItemBoxEvent'
 import { AlchemyItem } from './domain/alchemyItem'
+import { AlchemyItemRegisterEvent } from './event/alchemyItemRegisterEvent'
 
 export class ChurarenAlchemyPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -62,6 +63,7 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
   protected handleGameStart(): void {
     this.playerItemStore = this.store.of('playerItemStore')
     this.socketController?.registerMessageListener()
+    this.bus.post(new AlchemyItemRegisterEvent(this.alchemyPluginStore.alchemyItemRegister))
   }
 
   protected handleGameTermination(): void {
@@ -90,7 +92,7 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
     const items = this.playerItemStore.materialItems.getAllItem(player.id)
     if (items.length !== MAX_ITEMS) return
 
-    const alchemizedItemKind = this.alchemyPluginStore.alchemyItemRecipe.getByMaterialItems(
+    const alchemizedItemKind = this.alchemyPluginStore.alchemyItemManager.getByMaterialItems(
       items.map((item) => item.kind)
     )
     const deletedItemIds: string[] = items.map((item) => item.id)
