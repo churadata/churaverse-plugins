@@ -2,7 +2,7 @@ import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/a
 import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind'
 import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/IAlchemyItem'
 import { Direction, Position } from 'churaverse-engine-client'
-import tornadoImage from '../assets/tornado.png'
+import tornadoImage from '../assets/tornado.gif'
 import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-client'
 
 export const TORNADO_WALK_LIMIT_GRIDS = 5
