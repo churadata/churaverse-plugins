@@ -95,31 +95,25 @@ export class BlackHolePlugin extends BaseAlchemyItemPlugin {
 
   protected useAlchemyItem = (ev: UseAlchemyItemEvent): void => {
     if (ev.alchemyItem.kind !== 'blackHole') return
+    if (ev.ownPlayer.id !== this.playerPluginStore.ownPlayerId) return
     const startPos = ev.ownPlayer.position.copy()
-    const renderer = this.blackHolePluginStore.blackHoleAttackRendererFactory.build()
     const pos = new Position(startPos.x, startPos.y)
     const blackHole = new BlackHole(ev.alchemyItem.itemId, ev.ownPlayer.id, pos, ev.ownPlayer.direction, Date.now()) // blackHoleは右向きに動き始める
-    this.blackHolePluginStore.blackHoles.set(blackHole.blackHoleId, blackHole)
-    this.blackHolePluginStore.blackHoleAttackRenderers.set(blackHole.blackHoleId, renderer)
 
-    if (blackHole.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) {
-      const blackHoleSpawnMessage = new BlackHoleSpawnMessage({
-        blackHoleId: blackHole.blackHoleId,
-        startPos: blackHole.position.toVector() as Vector & Sendable,
-        direction: blackHole.direction,
-        spawnTime: blackHole.spawnTime,
-      })
-      this.networkStore.messageSender.send(blackHoleSpawnMessage)
-    }
+    const blackHoleSpawnMessage = new BlackHoleSpawnMessage({
+      blackHoleId: blackHole.blackHoleId,
+      startPos: blackHole.position.toVector() as Vector & Sendable,
+      direction: blackHole.direction,
+      spawnTime: blackHole.spawnTime,
+    })
+    this.networkStore.messageSender.send(blackHoleSpawnMessage)
 
     const clearAlchemyItemBoxEvent = new ClearAlchemyItemBoxEvent(ev.ownPlayer.id)
     this.bus.post(clearAlchemyItemBoxEvent)
-    this.moveBlackHole(blackHole, renderer)
   }
 
   private readonly spawnBlackHole = (ev: EntitySpawnEvent): void => {
     if (!(ev.entity instanceof BlackHole)) return
-    if (ev.entity.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) return
     const blackHole = ev.entity
     const renderer = this.blackHolePluginStore.blackHoleAttackRendererFactory.build()
     this.blackHolePluginStore.blackHoles.set(blackHole.blackHoleId, blackHole)
