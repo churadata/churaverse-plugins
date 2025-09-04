@@ -11,6 +11,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@churaverse/churaren-alchemy-plugin-server": "file:../../churarenAlchemyPlugin"
+    "@churaverse/game-plugin-server": "file:../../../gamePlugin"
   }
 }

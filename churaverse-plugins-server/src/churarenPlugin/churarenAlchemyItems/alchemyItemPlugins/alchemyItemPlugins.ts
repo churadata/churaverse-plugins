@@ -1,3 +1,3 @@
-import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-server/domain/baseAlchemyItemPlugin'
+import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
 
-export const alchemyItemPlugins: Array<typeof BaseAlchemyItemPlugin> = []
+export const alchemyItemPlugins: Array<typeof BaseGamePlugin> = []
