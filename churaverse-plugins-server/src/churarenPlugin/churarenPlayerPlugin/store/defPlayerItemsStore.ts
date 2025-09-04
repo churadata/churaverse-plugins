@@ -1,3 +1,4 @@
+import { IPlayerAlchemyItemRepository } from '../interface/IPlayerAlchemyItemRepository'
 import { IPlayerMaterialItemRepository } from '../interface/IPlayerMaterialItemRepository'
 
 declare module 'churaverse-engine-server' {
@@ -8,5 +9,5 @@ declare module 'churaverse-engine-server' {
 
 export interface PlayerItemsStore {
   materialItems: IPlayerMaterialItemRepository
-  // TODO: 錬金アイテムのリポジトリを追加
+  alchemyItem: IPlayerAlchemyItemRepository
 }
