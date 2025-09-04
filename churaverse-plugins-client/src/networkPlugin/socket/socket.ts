@@ -72,8 +72,7 @@ export class Socket<Scene extends Scenes> {
 
   public socketEventToBusEvent(bus: IEventBus<Scenes>): void {
     this.iosocket.on('disconnect', () => {
-      console.log('Socket disconnected:', this.socketId)
-      bus.post(new NetworkDisconnectEvent(this.socketId))
+      bus.post(new NetworkDisconnectEvent())
     })
   }
 }

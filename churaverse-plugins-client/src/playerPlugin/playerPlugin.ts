@@ -71,6 +71,7 @@ import { DeathLogRepository } from './ui/deathLog/deathLogRepository'
 import { JoinLeaveLogRenderer } from './ui/joinLeaveLogRenderer/joinLeaveLogRenderer'
 import { setupPlayerUi } from './ui/setupPlayerUi'
 import { Sendable } from '@churaverse/network-plugin-client/types/sendable'
+import '@churaverse/network-plugin-client/event/networkDisconnectEvent'
 
 export class PlayerPlugin extends BasePlugin<IMainScene> {
   private rendererFactory?: PlayerRendererFactory
@@ -125,6 +126,8 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     this.bus.subscribeEvent('playerDie', this.onDiePlayer.bind(this))
     this.bus.subscribeEvent('playerRespawn', this.onRespawnPlayer.bind(this))
     this.bus.subscribeEvent('dumpDebugData', this.dumpDebugData.bind(this))
+
+    this.bus.subscribeEvent('networkDisconnect', this.onNetworkDisconnect.bind(this))
   }
 
   private phaserSceneInit(ev: PhaserSceneInit): void {
@@ -524,5 +527,9 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     ev.dataDumper.dump('playerPosition', `Position: ${positionStr} ${gridStr}`)
     ev.dataDumper.dump('playerDirection', vectorToName(ownPlayer.direction))
     ev.dataDumper.dump('playerRole', ownPlayer.role)
+  }
+
+  private onNetworkDisconnect(): void {
+    this.transitionPluginStore.transitionManager.transitionTo('TitleScene')
   }
 }

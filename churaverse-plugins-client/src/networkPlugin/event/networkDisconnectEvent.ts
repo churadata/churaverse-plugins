@@ -1,7 +1,7 @@
 import { CVEvent, IMainScene } from 'churaverse-engine-client'
 
 export class NetworkDisconnectEvent extends CVEvent<IMainScene> {
-  public constructor(public readonly sessionId: string) {
+  public constructor() {
     super('networkDisconnect', true)
   }
 }
