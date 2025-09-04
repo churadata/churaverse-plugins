@@ -1,6 +1,7 @@
 import { io, Socket as ioSocket } from 'socket.io-client'
 import { Packet } from './packet'
-import { Scenes } from 'churaverse-engine-client'
+import { IEventBus, Scenes } from 'churaverse-engine-client'
+import { NetworkDisconnectEvent } from '../event/networkDisconnectEvent'
 
 const SEND_PACKET_TO_SERVER = 'sendPacketToServer'
 const SEND_PACKET_TO_CLIENT = 'sendPacketToClient'
@@ -31,16 +32,6 @@ export class Socket<Scene extends Scenes> {
     const ioSocket = io(url.host, {
       // 最後が/で終わるときはpathを置き換え
       path: url.pathname.replace(/\/$/, '') + '/socket.io/',
-    })
-
-    ioSocket.on('disconnect', (reason) => {
-      if (reason === 'io server disconnect') {
-        console.warn('Socket disconnected by server')
-        return
-      }
-
-      location.reload()
-      window.alert('接続が切断されました。')
     })
 
     Socket.instance = new Socket(ioSocket)
@@ -77,5 +68,12 @@ export class Socket<Scene extends Scenes> {
   public get ioSocket(): ioSocket {
     // TODO: 旧Socketクラスが置き換わり次第, 関数削除
     return this.iosocket
+  }
+
+  public socketEventToBusEvent(bus: IEventBus<Scenes>): void {
+    this.iosocket.on('disconnect', () => {
+      console.log('Socket disconnected:', this.socketId)
+      bus.post(new NetworkDisconnectEvent(this.socketId))
+    })
   }
 }
