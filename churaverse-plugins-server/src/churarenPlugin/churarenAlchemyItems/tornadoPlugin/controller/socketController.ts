@@ -15,7 +15,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
-    ev.messageRegister.registerMessage('tornadoSpawn', TornadoSpawnMessage, 'others')
+    ev.messageRegister.registerMessage('tornadoSpawn', TornadoSpawnMessage, 'allClients')
     ev.messageRegister.registerMessage('tornadoHit', TornadoHitMessage, 'allClients')
   }
 
