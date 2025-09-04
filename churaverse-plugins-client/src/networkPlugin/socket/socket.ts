@@ -1,6 +1,7 @@
 import { io, Socket as ioSocket } from 'socket.io-client'
 import { Packet } from './packet'
-import { Scenes } from 'churaverse-engine-client'
+import { IEventBus, Scenes } from 'churaverse-engine-client'
+import { NetworkDisconnectEvent } from '../event/networkDisconnectEvent'
 
 const SEND_PACKET_TO_SERVER = 'sendPacketToServer'
 const SEND_PACKET_TO_CLIENT = 'sendPacketToClient'
@@ -67,5 +68,11 @@ export class Socket<Scene extends Scenes> {
   public get ioSocket(): ioSocket {
     // TODO: 旧Socketクラスが置き換わり次第, 関数削除
     return this.iosocket
+  }
+
+  public socketEventToBusEvent(bus: IEventBus<Scenes>): void {
+    this.iosocket.on('disconnect', () => {
+      bus.post(new NetworkDisconnectEvent())
+    })
   }
 }
