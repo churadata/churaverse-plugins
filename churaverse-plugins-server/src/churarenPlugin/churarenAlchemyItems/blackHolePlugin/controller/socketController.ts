@@ -15,7 +15,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
-    ev.messageRegister.registerMessage('blackHoleSpawn', BlackHoleSpawnMessage, 'others')
+    ev.messageRegister.registerMessage('blackHoleSpawn', BlackHoleSpawnMessage, 'allClients')
     ev.messageRegister.registerMessage('blackHoleDespawn', BlackHoleDespawnMessage, 'allClients')
   }
 
