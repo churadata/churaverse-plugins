@@ -15,7 +15,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
-    ev.messageRegister.registerMessage('flamePillarSpawn', FlamePillarSpawnMessage, 'others')
+    ev.messageRegister.registerMessage('flamePillarSpawn', FlamePillarSpawnMessage, 'allClients')
     ev.messageRegister.registerMessage('flamePillarHit', FlamePillarHitMessage, 'allClients')
   }
 
