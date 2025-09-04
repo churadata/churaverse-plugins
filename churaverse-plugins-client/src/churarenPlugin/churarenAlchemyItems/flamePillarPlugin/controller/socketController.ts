@@ -75,8 +75,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     if (data.cause !== 'flamePillar') return
     const target = this.bossPluginStore.bosses.get(data.targetId)
     const flamePillar = this.flamePillarPluginStore.flamePillars.get(data.sourceId)
-    const attacker = flamePillar?.churarenWeaponOwnerId
-    if (target === undefined || flamePillar === undefined || attacker === undefined) return
+    if (target === undefined || flamePillar === undefined) return
     const flamePillarDamageCause = new FlamePillarDamageCause(flamePillar)
     const livingDamageEvent = new LivingDamageEvent(target, flamePillarDamageCause, data.amount)
     this.eventBus.post(livingDamageEvent)
