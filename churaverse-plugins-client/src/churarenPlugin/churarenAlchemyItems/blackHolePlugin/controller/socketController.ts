@@ -75,8 +75,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     if (data.cause !== 'blackHole') return
     const target = this.bossPluginStore.bosses.get(data.targetId)
     const blackHole = this.blackHolePluginStore.blackHoles.get(data.sourceId)
-    const attacker = blackHole?.churarenWeaponOwnerId
-    if (target === undefined || blackHole === undefined || attacker === undefined) return
+    if (target === undefined || blackHole === undefined) return
     const blackHoleDamageCause = new BlackHoleDamageCause(blackHole)
     const livingDamageEvent = new LivingDamageEvent(target, blackHoleDamageCause, data.amount)
     this.eventBus.post(livingDamageEvent)
