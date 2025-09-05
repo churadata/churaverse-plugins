@@ -57,9 +57,9 @@ export function sendSpawnedBossAttack(
   startPos: Position,
   bossId: string
 ): void {
-  const gap = 100
   if (startPos === undefined) return
   // 四方向に攻撃を生成
+  const gap = 100
   Object.values(Direction).forEach((direction) => {
     const position = new Position(startPos.x + gap * direction.x, startPos.y + gap * direction.y)
     const bossAttack = new BossAttack(uniqueId(), bossId, position, direction, Date.now())
