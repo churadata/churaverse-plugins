@@ -14,6 +14,15 @@ export class KeyActionReceiver<Scene extends Scenes> {
     this.listenersMap.get(type)?.push(listener)
   }
 
+  public off<KeyActType extends KeyActionType<Scene> & string>(type: KeyActType, listener: IKeyActionListener): void {
+    const listeners = this.listenersMap.get(type)
+    if (listeners === undefined) return
+    const index = listeners.indexOf(listener)
+    if (index !== -1) {
+      listeners.splice(index, 1)
+    }
+  }
+
   /**
    * on()で追加したlistenerを返す
    */

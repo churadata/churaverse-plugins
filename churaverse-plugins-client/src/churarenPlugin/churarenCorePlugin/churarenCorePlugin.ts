@@ -8,6 +8,8 @@ import { CHURAREN_UI_KEYS } from './ui/defChurarenUi'
 import { BaseGamePlugin } from '@churaverse/game-plugin-client/domain/baseGamePlugin'
 import { ChurarenResultEvent } from './event/churarenResultEvent'
 import { GamePlayerQuitEvent } from '@churaverse/game-plugin-client/event/gamePlayerQuitEvent'
+import { isWeaponEntity } from './util/isWeaponEntity'
+import { EntitySpawnEvent } from 'churaverse-engine-client'
 
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -37,6 +39,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
     this.bus.subscribeEvent('churarenStartCountdown', this.startCountdown)
     this.bus.subscribeEvent('churarenStartTimer', this.startTimer)
     this.bus.subscribeEvent('churarenResult', this.resultChurarenUi)
+    this.bus.subscribeEvent('entitySpawn', this.cancelChruaverseAction)
   }
 
   /**
@@ -47,6 +50,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
     this.bus.unsubscribeEvent('churarenStartCountdown', this.startCountdown)
     this.bus.unsubscribeEvent('churarenStartTimer', this.startTimer)
     this.bus.unsubscribeEvent('churarenResult', this.resultChurarenUi)
+    this.bus.unsubscribeEvent('entitySpawn', this.cancelChruaverseAction)
   }
 
   protected init(): void {
@@ -79,7 +83,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   protected handleMidwayParticipant(): void {
     this.churarenDialogManager?.setGameAbortButtonText()
     this.unsubscribeGameEvent()
-    // `gameAbort` や `gameEnd` イベントを受け取るために再度イベントを登録
+    // `gameAbort` や `gameEnd` イベントを受け取るために `CoreGamePlugin` のイベントのみsubscribeする
     super.subscribeGameEvent()
   }
 
@@ -109,6 +113,16 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
       this.bus.post(new GamePlayerQuitEvent(this.gameId, this.store.of('playerPlugin').ownPlayerId))
       resultWindow.remove()
     })
+  }
+
+  /**
+   * ちゅられん参加者はちゅらバースの攻撃を撃てない
+   */
+  private readonly cancelChruaverseAction = (ev: EntitySpawnEvent): void => {
+    if (!isWeaponEntity(ev.entity)) return
+    if (this.participantIds.includes(ev.entity.ownerId)) {
+      ev.cancel()
+    }
   }
 }
 
