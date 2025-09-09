@@ -6,7 +6,7 @@ import { IExitConfirmAlert } from '../interface/IExitConfirmAlert'
 export class ExitButton implements IExitConfirmAlert {
   public constructor(
     public eventBus: IEventBus<IMainScene>,
-    public gameName: string = 'このゲーム'
+    public exitMessage: string = 'このミーティングから退出しますか？'
   ) {
     // 退出ボタンの位置･見た目設定
     const img = document.createElement('img')
@@ -28,23 +28,18 @@ export class ExitButton implements IExitConfirmAlert {
 
   /** buttonが押されたときの動作 */
   private onClick(): void {
-    const isPlayerKicked = window.confirm(this.gameName)
+    const isPlayerKicked = window.confirm(this.exitMessage)
     if (isPlayerKicked) {
       const ownPlayerExitEvent = new OwnPlayerExitEvent()
       this.eventBus.post(ownPlayerExitEvent)
     }
   }
 
-  public setGameOwnerExitMessage(gameName?: string): void {
-    this.gameName =
-      'あなたはゲームオーナーです。あなたが退出すると' + (gameName ?? this.gameName) + 'が直ちに終了します'
-  }
-
-  public setGameExitMessage(gameName?: string): void {
-    this.gameName = (gameName ?? this.gameName) + 'から退出しますか？'
+  public setGameOwnerExitMessage(exitMessage?: string): void {
+    this.exitMessage = exitMessage ?? 'あなたはゲームオーナーです。あなたが退出するとこのゲームが直ちに終了します'
   }
 
   public resetGameExitMessage(): void {
-    this.gameName = 'このミーティングから退出しますか？'
+    this.exitMessage = 'このミーティングから退出しますか？'
   }
 }

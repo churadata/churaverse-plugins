@@ -2,7 +2,6 @@ import { PhaserLoadAssets, PhaserSceneInit } from 'churaverse-engine-client'
 import { Scene } from 'phaser'
 import { CoreGamePlugin } from '@churaverse/game-plugin-client/domain/coreGamePlugin'
 import { RegisterGameUiEvent } from '@churaverse/game-plugin-client/event/registerGameUiEvent'
-import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { PlayerRendererNotFoundError } from '@churaverse/player-plugin-client/errors/playerRendererNotFoundError'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { SynchroBreakDialogManager } from './ui/startWindow/synchroBreakDialogManager'
@@ -28,7 +27,6 @@ import { NyokkiStatus } from './type/nyokkiStatus'
 import { IRankingBoard } from './interface/IRankingBoard'
 import { IGameSelectionListItemRenderer } from '@churaverse/game-plugin-client/interface/IGameSelectionListItemRenderer'
 import { SynchroBreakListItemRenderer } from './ui/startWindow/synchroBreakListItemRenderer'
-import { CoreUiPluginStore } from '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
 
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
@@ -38,8 +36,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   protected gameEntryRenderer!: IGameSelectionListItemRenderer
   private synchroBreakDialogManager!: SynchroBreakDialogManager
   private synchroBreakPluginStore!: SynchroBreakPluginStore
-  private playerPluginStore!: PlayerPluginStore
-  private coreUiPluginStore!: CoreUiPluginStore
   private scene!: Scene
   private coinViewerIconUis = new Map<string, CoinViewerIcon>()
   private socketController!: SocketController
@@ -103,7 +99,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.gameInfoStore = this.store.of('gameInfo')
     this.gamePluginStore = this.store.of('gamePlugin')
     this.playerPluginStore = this.store.of('playerPlugin')
-    this.coreUiPluginStore = this.store.of('coreUiPlugin')
     this.gameEntryRenderer = new SynchroBreakListItemRenderer(
       this.store,
       this.gamePluginStore.gameDescriptionDialogManager,
@@ -130,15 +125,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * シンクロブレイク特有の開始時に実行される処理
    */
   protected handleGameStart(): void {
-    // ゲーム専用の中断文言セット
-    this.gamePluginStore.gameAbortAlertConfirm.setGameAbortMessage(this.gameName)
-    // 退出アラート文言をセット
-    if (this.gameOwnerId === this.playerPluginStore.ownPlayerId) {
-      this.coreUiPluginStore.exitButton.setGameOwnerExitMessage(this.gameName)
-    } else {
-      this.coreUiPluginStore.exitButton.setGameExitMessage(this.gameName)
-    }
-
     initSynchroBreakPluginStore(this.store)
     this.socketController.registerMessageListener()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
@@ -161,7 +147,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * シンクロブレイク特有の中断・終了時に実行される処理
    */
   protected handleGameTermination(): void {
-    this.coreUiPluginStore.exitButton.resetGameExitMessage()
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
 
