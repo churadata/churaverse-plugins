@@ -33,6 +33,7 @@ export class TornadoPlugin extends BaseAlchemyItemPlugin {
   protected alchemyItem = TORNADO_ITEM
 
   public listenEvent(): void {
+    // event登録
     super.listenEvent()
     this.bus.subscribeEvent('phaserSceneInit', this.phaserSceneInit.bind(this))
     this.bus.subscribeEvent('phaserLoadAssets', this.loadAssets.bind(this))
@@ -93,7 +94,7 @@ export class TornadoPlugin extends BaseAlchemyItemPlugin {
   // 竜巻アイテムを使った時の処理
   protected useAlchemyItem = (ev: UseAlchemyItemEvent): void => {
     if (ev.alchemyItem.kind !== 'tornado') return
-    if (this.playerPluginStore.ownPlayerId !== ev.ownPlayer.id) return
+    const renderer = this.tornadoPluginStore.tornadoAttackRendererFactory.build()
     const gap = 65
     const startPos = ev.ownPlayer.position.copy()
     const position = new Position(
@@ -101,23 +102,31 @@ export class TornadoPlugin extends BaseAlchemyItemPlugin {
       startPos.y + gap * ev.ownPlayer.direction.y
     )
     const tornado = new Tornado(ev.alchemyItem.itemId, ev.ownPlayer.id, position, ev.ownPlayer.direction, Date.now())
-
-    this.networkStore.messageSender.send(
-      new TornadoSpawnMessage({
-        tornadoId: tornado.tornadoId,
-        startPos: tornado.position.toVector() as Vector & Sendable,
-        direction: tornado.direction,
-        spawnTime: tornado.spawnTime,
-      })
-    )
+    if (renderer == null) return
+    this.tornadoPluginStore.tornados.set(tornado.tornadoId, tornado)
+    this.tornadoPluginStore.tornadoAttackRenderers.set(tornado.tornadoId, renderer)
+    // 他のプレイヤーに竜巻の出現を送信する
+    if (tornado.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) {
+      this.networkStore.messageSender.send(
+        new TornadoSpawnMessage({
+          tornadoId: tornado.tornadoId,
+          startPos: tornado.position.toVector() as Vector & Sendable,
+          direction: tornado.direction,
+          spawnTime: tornado.spawnTime,
+        })
+      )
+    }
 
     const clearAlchemyItemBoxEvent = new ClearAlchemyItemBoxEvent(ev.ownPlayer.id)
     this.bus.post(clearAlchemyItemBoxEvent)
+
+    this.walkTornado(tornado, renderer)
   }
 
   // 竜巻の出現を受信した時の処理
   private readonly spawnTornado = (ev: EntitySpawnEvent): void => {
     if (!(ev.entity instanceof Tornado)) return
+    if (ev.entity.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) return
     const tornado = ev.entity
     const renderer = this.tornadoPluginStore.tornadoAttackRendererFactory.build()
     this.tornadoPluginStore.tornados.set(tornado.tornadoId, tornado)
