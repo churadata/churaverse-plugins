@@ -1,4 +1,4 @@
-import { AlchemyItemGenerateType } from './interface/IAlchemyItem'
+import { AlchemyItemGenerateType } from './interface/IAlchemyItemRecipe'
 import { ItemKind } from './domain/itemKind'
 import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItemKind'
 

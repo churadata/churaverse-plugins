@@ -1,4 +1,4 @@
-import { AlchemyItemRecipe } from './IAlchemyItem'
+import { AlchemyItemRecipe } from './IAlchemyItemRecipe'
 import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItemKind'
 
 export interface IAlchemyItemRegister {

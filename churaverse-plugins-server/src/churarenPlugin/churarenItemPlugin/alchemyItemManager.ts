@@ -1,6 +1,6 @@
 import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItemKind'
 import { ItemKind } from './domain/itemKind'
-import { AlchemyItemGenerateType, AlchemyItemRecipe } from './interface/IAlchemyItem'
+import { AlchemyItemGenerateType, AlchemyItemRecipe } from './interface/IAlchemyItemRecipe'
 import { IAlchemyItemManger } from './interface/IAlchemyItemManger'
 import { IAlchemyItemRegister } from './interface/IAlchemyItemRegister'
 import { AlchemyItemRegistry } from './alchemyItemRegistry'
