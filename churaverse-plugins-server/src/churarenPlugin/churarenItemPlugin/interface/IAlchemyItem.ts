@@ -1,4 +1,4 @@
-import { ItemKind } from '@churaverse/churaren-item-plugin-server/domain/itemKind'
+import { ItemKind } from '../domain/itemKind'
 
 /**
  * 錬金アイテムを生成するための素材アイテムの組み合わせ

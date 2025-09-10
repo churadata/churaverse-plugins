@@ -1,32 +1,34 @@
-import { ITEM_KINDS, ItemKind } from '@churaverse/churaren-item-plugin-server/domain/itemKind'
-import { IAlchemyItemManger } from './interface/IAlchemyItemManger'
+import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItemKind'
+import { ItemKind } from './domain/itemKind'
 import { AlchemyItemGenerateType, AlchemyItemRecipe } from './interface/IAlchemyItem'
-import { AlchemyItem } from './domain/alchemyItem'
+import { IAlchemyItemManger } from './interface/IAlchemyItemManger'
 import { IAlchemyItemRegister } from './interface/IAlchemyItemRegister'
-import { AlchemyItemKind } from './domain/alchemyItemKind'
+import { AlchemyItemRegistry } from './alchemyItemRegistry'
 
 export class AlchemyItemManager implements IAlchemyItemRegister, IAlchemyItemManger {
-  private readonly recipes = new Map<ItemKind, Map<AlchemyItemGenerateType, AlchemyItem>>()
+  private readonly alchemyItemRegistry: AlchemyItemRegistry
 
   public constructor() {
-    ITEM_KINDS.forEach((kind) => {
-      this.recipes.set(kind, new Map())
-    })
+    this.alchemyItemRegistry = new AlchemyItemRegistry()
   }
 
-  public register(recipe: AlchemyItemRecipe, kind: AlchemyItem): void {
-    const pattern = recipe.pattern as AlchemyItemGenerateType
-    const existAlchemyItem = this.recipes.get(recipe.materialKind)?.get(pattern)
-    if (existAlchemyItem === undefined) {
-      this.recipes.set(recipe.materialKind, new Map([[pattern, kind]]))
+  public register(recipe: AlchemyItemRecipe, kind: AlchemyItemKind): void {
+    switch (recipe.pattern) {
+      case 'two_same_one_diff':
+        this.alchemyItemRegistry.register(recipe.materialKind, kind, undefined)
+        break
+      case 'all_same':
+        this.alchemyItemRegistry.register(recipe.materialKind, undefined, kind)
+        break
     }
   }
 
   public get(alchemyItemRecipe: AlchemyItemRecipe): AlchemyItemKind {
-    const alchemyItem = this.recipes
-      .get(alchemyItemRecipe.materialKind)
-      ?.get(alchemyItemRecipe.pattern as AlchemyItemGenerateType)
-    return alchemyItem?.kind ?? ('blackHole' as AlchemyItemKind)
+    const alchemyItem = this.alchemyItemRegistry.get(
+      alchemyItemRecipe.materialKind,
+      alchemyItemRecipe.pattern as AlchemyItemGenerateType
+    )
+    return alchemyItem ?? ('blackHole' as AlchemyItemKind)
   }
 
   public getByMaterialItems(materialItems: ItemKind[]): AlchemyItemKind {
@@ -43,10 +45,6 @@ export class AlchemyItemManager implements IAlchemyItemRegister, IAlchemyItemMan
     }
 
     return 'blackHole' as AlchemyItemKind
-  }
-
-  public clear(): void {
-    this.recipes.clear()
   }
 
   private countAlchemyItemKinds(items: ItemKind[]): Map<ItemKind, number> {
