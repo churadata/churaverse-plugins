@@ -33,7 +33,6 @@ export class TornadoPlugin extends BaseAlchemyItemPlugin {
   protected alchemyItem = TORNADO_ITEM
 
   public listenEvent(): void {
-    // event登録
     super.listenEvent()
     this.bus.subscribeEvent('phaserSceneInit', this.phaserSceneInit.bind(this))
     this.bus.subscribeEvent('phaserLoadAssets', this.loadAssets.bind(this))
