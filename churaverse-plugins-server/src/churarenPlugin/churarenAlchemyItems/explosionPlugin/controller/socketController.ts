@@ -15,7 +15,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
-    ev.messageRegister.registerMessage('explosionSpawn', ExplosionSpawnMessage, 'allClients')
+    ev.messageRegister.registerMessage('explosionSpawn', ExplosionSpawnMessage, 'others')
     ev.messageRegister.registerMessage('explosionHit', ExplosionHitMessage, 'allClients')
   }
 
