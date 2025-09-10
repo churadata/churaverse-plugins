@@ -92,7 +92,6 @@ export class ExplosionPlugin extends BaseAlchemyItemPlugin {
   // 爆発アイテムを使った時の処理
   protected useAlchemyItem = (ev: UseAlchemyItemEvent): void => {
     if (ev.alchemyItem.kind !== 'explosion') return
-    if (ev.ownPlayer.id !== this.playerPluginStore.ownPlayerId) return
     const gap = 65
     const startPos = ev.ownPlayer.position.copy()
     const position = new Position(
@@ -107,14 +106,17 @@ export class ExplosionPlugin extends BaseAlchemyItemPlugin {
       Date.now()
     )
 
-    this.networkStore.messageSender.send(
-      new ExplosionSpawnMessage({
-        explosionId: explosion.explosionId,
-        startPos: explosion.position.toVector() as Vector & Sendable,
-        direction: explosion.direction,
-        spawnTime: explosion.spawnTime,
-      })
-    )
+    // 他のプレイヤーに爆発の出現を送信する
+    if (explosion.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) {
+      this.networkStore.messageSender.send(
+        new ExplosionSpawnMessage({
+          explosionId: explosion.explosionId,
+          startPos: explosion.position.toVector() as Vector & Sendable,
+          direction: explosion.direction,
+          spawnTime: explosion.spawnTime,
+        })
+      )
+    }
 
     const clearAlchemyItemBoxEvent = new ClearAlchemyItemBoxEvent(ev.ownPlayer.id)
     this.bus.post(clearAlchemyItemBoxEvent)
