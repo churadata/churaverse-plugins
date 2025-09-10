@@ -38,9 +38,9 @@
     "@churaverse/debug-screen-plugin-client": "~0.1.0",
     "@churaverse/player-plugin-client": "~0.1.0",
     "@churaverse/popup-screen-list-plugin-client": "~0.1.0",
-    "@churaverse/web-rtc-plugin-client": "~0.1.0",
-    "@livekit/track-processors": "^0.3.1",
+    "@churaverse/web-rtc-plugin-client": "../webRtcPlugin",
+    "@livekit/track-processors": "^0.5.8",
     "churaverse-engine-client": "~0.1.0",
-    "livekit-client": "^1.13.4"
+    "livekit-client": "^2.15.6"
   }
 }

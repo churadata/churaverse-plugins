@@ -11,7 +11,7 @@ import {
   VideoCaptureOptions,
   createLocalVideoTrack,
 } from 'livekit-client'
-import { IMainScene, Store } from 'churaverse-engine-client'
+import { IEventBus, IMainScene, Store } from 'churaverse-engine-client'
 import { TriggerVideoSendingEvent } from './event/event'
 import {
   IWebCameraIdDebugDetailScreen,
@@ -19,14 +19,16 @@ import {
 } from './debugScreen/IDebugScreen/IWebCameraInfoDebugScreen'
 import '@churaverse/popup-screen-list-plugin-client'
 import { EffectManager } from './effectManager'
+import { EnableVideoChatButtonEvent } from './event/enableVideoChatButtonEvent'
 
 export class CameraVideoSender implements IVideoSender {
-  private localVideoTrack: LocalVideoTrack | undefined = undefined
+  private localVideoTrack: LocalTrack | undefined = undefined
 
   public constructor(
     private readonly room: Room,
 
     private readonly store: Store<IMainScene>,
+    private readonly bus: IEventBus<IMainScene>,
     private readonly effectManager: EffectManager,
     private readonly webCameraIdDebugDetailScreen: IWebCameraIdDebugDetailScreen,
     private readonly webCameraMyStatusDebugDetailScreen: IWebCameraMyStatusDebugDetailScreen
@@ -44,10 +46,9 @@ export class CameraVideoSender implements IVideoSender {
     void Promise.resolve().then(async () => {
       if (this.localVideoTrack != null) {
         await this.localVideoTrack?.stopProcessor()
-        const track = this.room.localParticipant.getTrack(Track.Source.Camera)
-        if (track?.videoTrack != null) {
-          // 切り替わる前のtrackが送出されるのは困るため、一度unpublishする
-          await this.room.localParticipant.unpublishTrack(track?.videoTrack as LocalTrack)
+        const track = this.room.localParticipant.getTrackPublication(Track.Source.Camera)?.track
+        if (track != null) {
+          await this.stopStream()
           await this.startStream()
         }
       }
@@ -66,7 +67,6 @@ export class CameraVideoSender implements IVideoSender {
     if (publication.kind !== 'video') return
     if (publication.source !== Track.Source.Camera) return
     this.store.of('popUpScreenList').removeScreen(participant.identity)
-    this.localVideoTrack = undefined
   }
 
   public handleVideoSendTrigger(ev: TriggerVideoSendingEvent): void {
@@ -95,26 +95,28 @@ export class CameraVideoSender implements IVideoSender {
    */
   public async startStream(): Promise<boolean> {
     const videoCaptureOptions: VideoCaptureOptions = {
-      // 将来的に解像度は変更できるようにしたい
       resolution: VideoPresets.h360,
-      deviceId: this.room.getActiveDevice('videoinput'),
+      deviceId: { exact: this.room.getActiveDevice('videoinput') },
     }
 
-    const videoTrack = await createLocalVideoTrack(videoCaptureOptions)
-    const effect = this.effectManager.getEffectMode()
-    this.localVideoTrack = videoTrack
-    await this.setEffect(effect)
-    await this.room.localParticipant.publishTrack(videoTrack)
+    await this.room.localParticipant.setCameraEnabled(true, videoCaptureOptions)
 
+    await this.setEffect(this.effectManager.getEffectMode())
+
+    const track = this.room.localParticipant.getTrackPublication(Track.Source.Camera)?.track
+    if (track == null) return false
+    this.localVideoTrack = track
+    this.bus.post(new EnableVideoChatButtonEvent())
     return this.room.localParticipant.isCameraEnabled
   }
 
   public async stopStream(): Promise<boolean> {
-    await this.room.localParticipant.setCameraEnabled(false)
     if (this.localVideoTrack != null) {
       await this.localVideoTrack.stopProcessor()
-      await this.room.localParticipant.unpublishTrack(this.localVideoTrack)
+      await this.room.localParticipant.setCameraEnabled(false)
+      this.localVideoTrack = undefined
     }
+    this.bus.post(new EnableVideoChatButtonEvent())
     // 終了失敗=isCameraEnabledがtrueの時なので, isCameraEnabledの否定を返す
     return !this.room.localParticipant.isCameraEnabled
   }

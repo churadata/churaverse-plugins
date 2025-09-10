@@ -2,6 +2,7 @@ import { ILocalCameraManager } from '../interface/ILocalDeviceManager/ILocalCame
 import { ILocalMicrophoneManager } from '../interface/ILocalDeviceManager/ILocalMicrophoneManager'
 import { ILocalSpeakerManager } from '../interface/ILocalDeviceManager/ILocalSpeakerManager'
 import { WebRtc } from '../webRtc'
+import 'churaverse-engine-client'
 
 declare module 'churaverse-engine-client' {
   export interface StoreInMain {
