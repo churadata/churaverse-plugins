@@ -68,15 +68,17 @@ export class KeyboardPlugin extends BasePlugin<Scenes> {
     window.addEventListener('keydown', this.handleKeyDown)
   }
 
-  private readonly handleKeyUp = (e: KeyboardEvent): void => {
+  private readonly handleKeyUp = (event: KeyboardEvent): void => {
     if (this.keyActionManager === undefined) throw new KeyActionManagerUndefinedError()
-    if (e.key === 'Meta') {
+    if (event.key === 'Meta') {
       this.keyActionManager.logicalReleaseAllKeys()
     }
   }
 
   private readonly handleKeyDown = (event: KeyboardEvent): void => {
     if (this.keyActionManager === undefined) throw new KeyActionManagerUndefinedError()
+    if (event.key === 'Meta') event.preventDefault()
+
     const keyCode = toPhaserKeyCode(event.key)
     if (keyCode !== undefined) {
       this.keyActionManager.physicalKeyDown(keyCode)
