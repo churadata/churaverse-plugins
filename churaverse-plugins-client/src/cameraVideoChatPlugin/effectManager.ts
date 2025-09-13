@@ -4,7 +4,7 @@ import { BackgroundBlur, ProcessorWrapper, BackgroundOptions, VirtualBackground 
 
 export class EffectManager {
   private currentEffectMode: CameraEffectId = 'dummy'
-  private readonly effectMap: Map<CameraEffectId, ProcessorWrapper<BackgroundOptions> | undefined> = new Map()
+  private readonly effectMap = new Map<CameraEffectId, ProcessorWrapper<BackgroundOptions> | undefined>()
   private readonly blurRadius = 10
 
   public constructor(private readonly effectSettingStore: CameraEffectSettingStore) {

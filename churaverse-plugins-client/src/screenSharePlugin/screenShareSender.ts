@@ -27,7 +27,7 @@ export class ScreenShareSender implements IScreenShareSender {
   private onStartStream(publication: LocalTrackPublication, participant: LocalParticipant): void {
     if (publication.source !== Track.Source.ScreenShare) return
     const track = participant.getTrackPublication(Track.Source.ScreenShare)?.track
-    if (track == null || track.mediaStreamTrack == null) return
+    if (track?.mediaStreamTrack === undefined) return
 
     const mediaStream = new MediaStream()
     mediaStream.addTrack(track.mediaStreamTrack)
@@ -74,7 +74,7 @@ export class ScreenShareSender implements IScreenShareSender {
    * 既に他プレイヤーが画面共有している場合true
    */
   private alreadyOthersScreenShared(): boolean {
-    const participants = Array.from(this.room.remoteParticipants.values())
+    const participants = Array.from(this.room.remoteParticipants.values() as Iterable<LocalParticipant>)
 
     return participants.some((participant) => {
       return participant.isScreenShareEnabled

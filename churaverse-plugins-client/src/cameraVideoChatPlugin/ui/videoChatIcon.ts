@@ -33,7 +33,7 @@ export class VideoChatIcon extends TopBarIconRenderer {
     super.deactivate()
   }
 
-  public enableButton() {
+  public enableButton(): void {
     this.isLocked = false
     this.setButtonDisabled(false)
   }
@@ -53,7 +53,7 @@ export class VideoChatIcon extends TopBarIconRenderer {
     }
   }
 
-  private setButtonDisabled(disabled: boolean) {
+  private setButtonDisabled(disabled: boolean): void {
     super.node.style.cursor = disabled ? 'not-allowed' : 'default'
   }
 }
