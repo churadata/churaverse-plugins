@@ -1,1 +1,0 @@
-@churaverse/churaren-healing-potion-plugin-client

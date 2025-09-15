@@ -1,4 +1,4 @@
-## Churaverse Plugin: Churaren Alchemy Items (Client)
+## Churaverse Plugin: Churaren Alchemy Item Plugins (Client)
 
 ### Description
 
