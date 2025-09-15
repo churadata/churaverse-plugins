@@ -13,8 +13,6 @@ import { GetChurarenItemEvent } from '../event/getChurarenItemEvent'
 import { DropChurarenItemMessage } from '../message/dropChurarenItemMessage'
 import { DropChurarenItemEvent } from '../event/dropChurarenItemEvent'
 import { ChurarenDamageMessage } from '../message/churarenDamageMessage'
-import { PlayerHealMessage } from '../message/playerHealMessage'
-import { PlayerHealEvent } from '../event/playerHealEvent'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private playerPluginStore!: PlayerPluginStore
@@ -30,7 +28,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('dropChurarenItem', DropChurarenItemMessage, 'queue')
     ev.messageRegister.registerMessage('ghostMode', GhostModeMessage, 'queue')
     ev.messageRegister.registerMessage('churarenDamage', ChurarenDamageMessage, 'queue')
-    ev.messageRegister.registerMessage('playerHeal', PlayerHealMessage, 'queue')
   }
 
   public setupMessageListenerRegister(ev: RegisterMessageListenerEvent<IMainScene>): void {
@@ -43,7 +40,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.messageListenerRegister.on('getChurarenItem', this.getItem)
     this.messageListenerRegister.on('dropChurarenItem', this.dropItem)
     this.messageListenerRegister.on('ghostMode', this.ghostMode)
-    this.messageListenerRegister.on('playerHeal', this.playerHeal)
   }
 
   public unregisterMessageListener(): void {
@@ -51,7 +47,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.messageListenerRegister.off('getChurarenItem', this.getItem)
     this.messageListenerRegister.off('dropChurarenItem', this.dropItem)
     this.messageListenerRegister.off('ghostMode', this.ghostMode)
-    this.messageListenerRegister.off('playerHeal', this.playerHeal)
   }
 
   private readonly onInvicibleTime = (msg: InvicibleTimeMessage): void => {
@@ -78,13 +73,5 @@ export class SocketController extends BaseSocketController<IMainScene> {
     if (player === undefined) return
     const ghostModeEvent = new GhostModeEvent(player.id)
     this.eventBus.post(ghostModeEvent)
-  }
-
-  private readonly playerHeal = (msg: PlayerHealMessage): void => {
-    const data = msg.data
-    const player = this.playerPluginStore.players.get(data.playerId)
-    if (player === undefined) return
-    const playerHealEvent = new PlayerHealEvent(player.id, data.healAmount)
-    this.eventBus.post(playerHealEvent)
   }
 }
