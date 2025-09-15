@@ -167,9 +167,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
       if (revivalPlayer === undefined) return
       this.churarenPlayerStore.ghostModePlayers.delete(revivalPlayerId)
       revivalPlayer.isCollidable = true
-      const revivalItemMessage = new PlayerRevivalMessage({
-        playerId: revivalPlayer.id,
-      })
+      const revivalItemMessage = new PlayerRevivalMessage({ playerId: revivalPlayer.id })
       this.networkPluginStore.messageSender.send(revivalItemMessage)
     }
   }
