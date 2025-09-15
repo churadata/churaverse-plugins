@@ -1,3 +1,4 @@
+import { AlchemyItemManager } from '../alchemyItemManager'
 import { IItemRepository } from '../domain/IItemRepository'
 
 declare module 'churaverse-engine-server' {
@@ -8,4 +9,5 @@ declare module 'churaverse-engine-server' {
 
 export interface ItemPluginStore {
   readonly items: IItemRepository
+  readonly alchemyItemManager: AlchemyItemManager
 }

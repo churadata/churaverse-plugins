@@ -2,7 +2,6 @@ import { JSXFunc } from 'churaverse-engine-client'
 import style from './RuleExplanationWindowComponent.module.scss'
 import ruleDescription from '../../../assets/rule_description.png'
 export const POPUP_GAME_START_WINDOW_BUTTON_ID = 'gameStartForm-open-button'
-export const GAME_START_BUTTON = 'game-start-button'
 
 export interface FrameInfo {
   name: string
@@ -77,9 +76,6 @@ export const RuleExplanationWindowComponent: JSXFunc = () => {
           ※ニョッキに失敗した場合は倍率が0となり、ベットコインは戻りません。
         </li>
       </ol>
-      <button className={style.popupButton} type="button" id={GAME_START_BUTTON}>
-        シンクロブレイク開始
-      </button>
     </div>
   )
 }

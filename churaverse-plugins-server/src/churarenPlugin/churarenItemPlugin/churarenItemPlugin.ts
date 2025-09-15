@@ -15,6 +15,7 @@ import '@churaverse/churaren-core-plugin-server/event/churarenResultEvent'
 import { ChurarenItemDespawnMessage } from './message/churarenItemDespawnMessage'
 import { ChurarenItemSpawnMessage } from './message/churarenItemSpawnMessage'
 import { GetChurarenItemEvent } from '@churaverse/churaren-player-plugin-server/event/getChurarenItemEvent'
+import { AlchemyItemRegisterEvent } from './event/alchemyItemRegisterEvent'
 
 const ITEM_GENERATE_INTERVAL_MS = 10000
 
@@ -68,6 +69,7 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
 
   protected handleGameStart(): void {
     this.churarenGameInfo = this.store.of('gamePlugin').games.get(this.gameId)
+    this.bus.post(new AlchemyItemRegisterEvent(this.itemPluginStore.alchemyItemManager))
   }
 
   protected handleGameTermination(): void {
@@ -125,6 +127,6 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
     const multiplier = 3 // プレイヤー数に掛ける倍率
     const baseOffset = 10 // 基本オフセット値
     const maxItemNum = 40 // 最大アイテム数
-    return Math.min(this.churarenGameInfo?.participantIds.length ?? 0 * multiplier + baseOffset, maxItemNum)
+    return Math.min((this.churarenGameInfo?.participantIds.length ?? 0) * multiplier + baseOffset, maxItemNum)
   }
 }

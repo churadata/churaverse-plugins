@@ -20,7 +20,6 @@ import { BossWalkMessage } from './message/bossWalkMessage'
 import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { CollisionBossDamageCause } from './domain/collisionBossDamageCause'
 import { CHURAREN_CONSTANTS, ChurarenWeaponDamageCause, uniqueId } from '@churaverse/churaren-core-plugin-server'
-import { WeaponDamageMessage } from '@churaverse/player-plugin-server/message/weaponDamageMessage'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
 import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
 import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
@@ -29,6 +28,7 @@ import { IGameInfo } from '@churaverse/game-plugin-server/interface/IGameInfo'
 import '@churaverse/churaren-core-plugin-server/event/churarenStartTimerEvent'
 import { ChurarenResultEvent } from '@churaverse/churaren-core-plugin-server/event/churarenResultEvent'
 import { BossDespawnMessage } from './message/bossDespawnMessage'
+import { ChurarenDamageMessage } from '@churaverse/churaren-player-plugin-server/message/churarenDamageMessage'
 
 const bossSpeedMultiplier = 2
 
@@ -51,7 +51,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
       this.socketController.setupMessageListenerRegister.bind(this.socketController)
     )
 
-    this.bus.subscribeEvent('registerOnOverlap', this.registerOnOverlap)
+    this.bus.subscribeEvent('registerOnOverlap', this.registerOnOverlap.bind(this))
   }
 
   protected subscribeGameEvent(): void {
@@ -160,25 +160,16 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     }
   }
 
-  private onCollisionPlayer(boss: Boss, player: Player): void {
-    if (player.isDead) return
-    if (!boss.isCollidable) return
-    if (this.churarenGameInfo === undefined || !this.churarenGameInfo.participantIds.includes(player.id)) return
-    const collisionBossDamageCause = new CollisionBossDamageCause(boss)
-    const livingDamageEvent = new LivingDamageEvent(player, collisionBossDamageCause, boss.power)
-    this.bus.post(livingDamageEvent)
-  }
-
   private readonly onLivingDamage = (ev: LivingDamageEvent): void => {
     if (!(ev.target instanceof Boss)) return
     const boss = this.bossPluginStore.bosses.get(ev.target.bossId)
     if (boss === undefined) return
 
     if (ev.cause instanceof ChurarenWeaponDamageCause) {
-      const weaponDamageMessage = new WeaponDamageMessage({
+      const weaponDamageMessage = new ChurarenDamageMessage({
         targetId: boss.bossId,
         cause: ev.cause.churarenWeaponName,
-        weaponId: ev.cause.churarenWeapon.id,
+        sourceId: ev.cause.churarenWeapon.id,
         amount: ev.amount,
       })
       this.networkPluginStore.messageSender.send(weaponDamageMessage)
@@ -205,12 +196,21 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     })
   }
 
-  private readonly registerOnOverlap = (ev: RegisterOnOverlapEvent): void => {
+  private registerOnOverlap(ev: RegisterOnOverlapEvent): void {
     ev.collisionDetector.register(
       this.bossPluginStore.bosses,
       this.store.of('playerPlugin').players,
       this.onCollisionPlayer.bind(this)
     )
+  }
+
+  private onCollisionPlayer(boss: Boss, player: Player): void {
+    if (player.isDead) return
+    if (!boss.isCollidable) return
+    if (this.churarenGameInfo === undefined || !this.churarenGameInfo.participantIds.includes(player.id)) return
+    const collisionBossDamageCause = new CollisionBossDamageCause(boss)
+    const livingDamageEvent = new LivingDamageEvent(player, collisionBossDamageCause, boss.power)
+    this.bus.post(livingDamageEvent)
   }
 
   private isBossWalkInMap(dest: Position, currentMap: WorldMap): boolean {

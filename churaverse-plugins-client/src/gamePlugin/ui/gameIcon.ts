@@ -1,16 +1,16 @@
-import { ITopBarIconContainer } from '@churaverse/core-ui-plugin-client/interface/ITopBarIconContainer'
 import { TopBarIconRenderer } from '@churaverse/core-ui-plugin-client/topBarIcon'
 import { IDialogSwitcher } from '@churaverse/core-ui-plugin-client/interface/IDialogSwitcher'
-import { ISynchroBreakDialog } from '../../interface/ISynchroBreakDialog'
+import { IGameDialog } from '../interface/IGameDialog'
+import { ITopBarIconContainer } from '@churaverse/core-ui-plugin-client/interface/ITopBarIconContainer'
 
-import START_BUTTON_ICON_PATH from '../../assets/synchroBreakIcon.png'
+import GAME_ICON_PATH from '../assets/gameIcon.png'
 
-export class SynchroBreakIcon extends TopBarIconRenderer {
+export class GameIcon extends TopBarIconRenderer {
   public constructor(
     private readonly switcher: IDialogSwitcher,
-    dialog: ISynchroBreakDialog,
+    dialog: IGameDialog,
     iconContainer: ITopBarIconContainer,
-    iconPath: string = START_BUTTON_ICON_PATH
+    iconPath: string = GAME_ICON_PATH
   ) {
     super({
       activeIconImgPath: iconPath,
@@ -19,25 +19,27 @@ export class SynchroBreakIcon extends TopBarIconRenderer {
         this.onClick(isActive)
       },
       isActive: false,
-      order: 300,
+      order: 500,
     })
 
     iconContainer.addIcon(this)
-    switcher.add('synchroBreak', dialog, () => {
+    switcher.add('game', dialog, () => {
       super.deactivate()
     })
   }
 
-  /**
-   * buttonが押されたときの動作
-   */
   public onClick(isActive: boolean): void {
     if (isActive) {
       this.switcher.close()
     } else {
-      this.switcher.open('synchroBreak', () => {
+      this.switcher.open('game', () => {
         super.activate()
       })
     }
+  }
+
+  public close(): void {
+    this.switcher.close()
+    super.deactivate()
   }
 }
