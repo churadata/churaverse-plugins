@@ -25,7 +25,6 @@ import { initPlayerItemStore, resetPlayerItemStore } from './store/initPlayerIte
 import { DropChurarenItemEvent } from './event/dropChurarenItemEvent'
 import { DropChurarenItemData, DropChurarenItemMessage } from './message/dropChurarenItemMessage'
 import { GamePluginStore } from '@churaverse/game-plugin-client/store/defGamePluginStore'
-import { PlayerHealEvent } from './event/playerHealEvent'
 
 export class ChurarenPlayerPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -92,7 +91,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('playerRespawn', this.changeGhostMode, 'LOW')
     this.bus.subscribeEvent('playerNameChange', this.onChangePlayerName)
     this.bus.subscribeEvent('churarenResult', this.onChurarenResult)
-    this.bus.subscribeEvent('playerHeal', this.onPlayerHeal)
   }
 
   protected unsubscribeGameEvent(): void {
@@ -105,7 +103,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.unsubscribeEvent('playerRespawn', this.changeGhostMode)
     this.bus.unsubscribeEvent('playerNameChange', this.onChangePlayerName)
     this.bus.unsubscribeEvent('churarenResult', this.onChurarenResult)
-    this.bus.unsubscribeEvent('playerHeal', this.onPlayerHeal)
   }
 
   protected handleGameStart(): void {
@@ -239,14 +236,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   private readonly onChangePlayerName = (ev: PlayerNameChangeEvent): void => {
     if (!this.isActive) return
     this.updateGhostPlayerList()
-  }
-
-  private readonly onPlayerHeal = (ev: PlayerHealEvent): void => {
-    const player = this.playerPluginStore.players.get(ev.id)
-    const renderer = this.playerPluginStore.playerRenderers.get(ev.id)
-    if (player === undefined || renderer === undefined) return
-    player.heal(ev.healAmount)
-    renderer.heal(ev.healAmount, player.hp)
   }
 
   private clearPlayerItemBox(playerId?: string): void {

@@ -17,6 +17,7 @@ import {
   DamageCauseType,
   vectorToName,
   Vector,
+  LivingHealEvent,
 } from 'churaverse-engine-client'
 import { PlayerSetupInfoWriter } from './interface/playerSetupInfoWriter'
 import { CookieStore } from '@churaverse/data-persistence-plugin-client/cookieStore'
@@ -122,6 +123,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     this.bus.subscribeEvent('playerNameChange', this.onChangePlayerName.bind(this))
     this.bus.subscribeEvent('playerColorChange', this.onChangePlayerColor.bind(this))
     this.bus.subscribeEvent('livingDamage', this.onLivingDamage.bind(this))
+    this.bus.subscribeEvent('livingHeal', this.onLivingHeal.bind(this))
     this.bus.subscribeEvent('dumpDebugData', this.dumpDebugData.bind(this))
   }
 
@@ -391,6 +393,14 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     if (ev.target.id === this.playerPluginStore.ownPlayerId) {
       this.updateDebugScreenPlayerHp()
     }
+  }
+
+  private onLivingHeal(ev: LivingHealEvent): void {
+    if (!(ev.target instanceof Player)) return
+    const player = this.playerPluginStore.players.get(ev.target.id)
+    if (player === undefined) return
+    player.heal(ev.amount)
+    this.playerPluginStore.playerRenderers.get(ev.target.id)?.heal(ev.amount, player.hp)
   }
 
   private onDiePlayer(ev: PlayerDieEvent): void {
