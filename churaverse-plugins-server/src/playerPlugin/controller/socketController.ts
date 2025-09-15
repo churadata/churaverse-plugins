@@ -24,6 +24,7 @@ import { WeaponDamageMessage } from '../message/weaponDamageMessage'
 import { PlayerDieMessage } from '../message/playerDieMessage'
 import { PlayerRespawnMessage } from '../message/playerRespawnMessage'
 import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
+import { PlayerHealMessage } from '../message/playerHealMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private networkPluginStore!: NetworkPluginStore<IMainScene>
@@ -46,6 +47,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('playerColorChange', PlayerColorChangeMessage, 'others')
 
     ev.messageRegister.registerMessage('weaponDamage', WeaponDamageMessage, 'allClients')
+    ev.messageRegister.registerMessage('playerHeal', PlayerHealMessage, 'allClients')
     ev.messageRegister.registerMessage('playerDie', PlayerDieMessage, 'allClients')
     ev.messageRegister.registerMessage('playerRespawn', PlayerRespawnMessage, 'allClients')
   }
