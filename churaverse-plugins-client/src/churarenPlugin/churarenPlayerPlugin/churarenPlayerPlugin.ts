@@ -1,7 +1,7 @@
 import { BaseGamePlugin } from '@churaverse/game-plugin-client/domain/baseGamePlugin'
 import { ItemPluginStore } from '@churaverse/churaren-item-plugin-client/store/defItemPluginStore'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
-import { GRID_SIZE, IMainScene, LivingDamageEvent, LivingHealEvent, Position } from 'churaverse-engine-client'
+import { GRID_SIZE, IMainScene, LivingDamageEvent, Position } from 'churaverse-engine-client'
 import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { PlayerRespawnEvent } from '@churaverse/player-plugin-client/event/playerRespawnEvent'
 import { PlayerWalkEvent } from '@churaverse/player-plugin-client/event/playerWalkEvent'
@@ -14,7 +14,7 @@ import { DeathLogRepository } from '@churaverse/player-plugin-client/ui/deathLog
 import { SocketController } from './controller/socketController'
 import { KeyboardController } from './controller/keyboardController'
 import { initChurarenPlayersStore, resetChurarenPlayersStore } from './store/initChurarenPlayersStore'
-import { GRID_WALK_DURATION_MS, isPlayer } from '@churaverse/player-plugin-client/domain/player'
+import { GRID_WALK_DURATION_MS } from '@churaverse/player-plugin-client/domain/player'
 import { InvicibleTimeEvent } from './event/invicibleTimeEvent'
 import { Item } from '@churaverse/churaren-item-plugin-client/domain/item'
 import { materialItemImage } from '@churaverse/churaren-item-plugin-client/domain/itemKind'
@@ -91,7 +91,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('playerRespawn', this.changeGhostMode, 'LOW')
     this.bus.subscribeEvent('playerNameChange', this.onChangePlayerName)
     this.bus.subscribeEvent('churarenResult', this.onChurarenResult)
-    this.bus.subscribeEvent('livingHeal', this.onPlayerHeal)
   }
 
   protected unsubscribeGameEvent(): void {
@@ -104,7 +103,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.unsubscribeEvent('playerRespawn', this.changeGhostMode)
     this.bus.unsubscribeEvent('playerNameChange', this.onChangePlayerName)
     this.bus.unsubscribeEvent('churarenResult', this.onChurarenResult)
-    this.bus.unsubscribeEvent('livingHeal', this.onPlayerHeal)
   }
 
   protected handleGameStart(): void {
@@ -238,16 +236,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   private readonly onChangePlayerName = (ev: PlayerNameChangeEvent): void => {
     if (!this.isActive) return
     this.updateGhostPlayerList()
-  }
-
-  private readonly onPlayerHeal = (ev: LivingHealEvent): void => {
-    if (!isPlayer(ev.target)) return
-    const playerId = ev.target.id
-    const player = this.playerPluginStore.players.get(playerId)
-    const renderer = this.playerPluginStore.playerRenderers.get(playerId)
-    if (player === undefined || renderer === undefined) return
-    player.heal(ev.amount)
-    renderer.heal(ev.amount, player.hp)
   }
 
   private clearPlayerItemBox(playerId?: string): void {
