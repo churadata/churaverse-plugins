@@ -16,7 +16,7 @@ export class HealingPotionPlugin extends BaseGamePlugin {
     )
   }
 
-  // 回復は`ChruarenPlayerPlugin`で行っている
+  // 回復は`PlayerPlugin`で行っている
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
   }
