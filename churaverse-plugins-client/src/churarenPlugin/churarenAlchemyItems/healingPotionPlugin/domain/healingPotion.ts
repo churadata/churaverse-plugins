@@ -51,3 +51,9 @@ export class HealingPotion extends AlchemyItem {
     this.isDead = true
   }
 }
+
+declare module '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind' {
+  export interface AlchemyItemKindMap {
+    healingPotion: HealingPotion
+  }
+}
