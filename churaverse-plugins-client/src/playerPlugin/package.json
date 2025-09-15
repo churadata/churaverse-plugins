@@ -39,7 +39,7 @@
     "@churaverse/debug-screen-plugin-client": "~0.1.0",
     "@churaverse/keyboard-plugin-client": "~0.1.0",
     "@churaverse/map-plugin-client": "~0.1.0",
-    "@churaverse/network-plugin-client": "file:../networkPlugin",
+    "@churaverse/network-plugin-client": "~0.1.2",
     "@churaverse/title-plugin-client": "~0.1.0",
     "@churaverse/transition-plugin-client": "~0.1.0",
     "@churaverse/voice-chat-plugin-client": "~0.1.0",
