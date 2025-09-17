@@ -1,6 +1,7 @@
 import { io, Socket as ioSocket } from 'socket.io-client'
 import { Packet } from './packet'
 import { IEventBus, Scenes } from 'churaverse-engine-client'
+import { NetworkConnectEvent } from '../event/networkConnectEvent'
 import { NetworkDisconnectEvent } from '../event/networkDisconnectEvent'
 
 const SEND_PACKET_TO_SERVER = 'sendPacketToServer'
@@ -65,14 +66,22 @@ export class Socket<Scene extends Scenes> {
     return this.iosocket.id ?? ''
   }
 
+  public get connected(): boolean {
+    return this.iosocket.connected
+  }
+
   public get ioSocket(): ioSocket {
     // TODO: 旧Socketクラスが置き換わり次第, 関数削除
     return this.iosocket
   }
 
-  public socketEventToBusEvent(bus: IEventBus<Scenes>): void {
+  public socketEventToBusEvent(eventBus: IEventBus<Scenes>): void {
+    this.iosocket.on('connect', () => {
+      eventBus.post(new NetworkConnectEvent())
+    })
+
     this.iosocket.on('disconnect', () => {
-      bus.post(new NetworkDisconnectEvent())
+      eventBus.post(new NetworkDisconnectEvent())
     })
   }
 }
