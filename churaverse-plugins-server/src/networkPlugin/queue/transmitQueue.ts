@@ -144,9 +144,10 @@ export class TransmitQueue<Scene extends Scenes> implements ITransmitQueue<Scene
    * 排他制御は行わないので外部からは使用しない
    */
   private popPacketAtWithoutLock(playerId: string): Packet<Scene> {
-    // 文字列化してdeep copyするこの方法ではシリアライズ可能なオブジェクトのみコピー可能
+    // この方法ではシリアライズ可能なオブジェクトのみコピー可能
     // socket.ioで通信できるのもシリアライズ可能なオブジェクトのみなのでこの方法でdeep copyしている
-    const poppedPacket = JSON.parse(JSON.stringify(this.packets.get(playerId))) as Packet<Scene>
+    const packet = this.packets.get(playerId)
+    const poppedPacket = packet !== undefined ? structuredClone(packet) : []
     // 中身を空に
     this.packets.set(playerId, [])
     return poppedPacket
