@@ -2,7 +2,7 @@ import { CVEvent, IMainScene } from 'churaverse-engine-server'
 import { IAlchemyItemRegister } from '../interface/IAlchemyItemRegister'
 
 export class AlchemyItemRegisterEvent extends CVEvent<IMainScene> {
-  public constructor(public readonly register: IAlchemyItemRegister) {
+  public constructor(public readonly alchemyItemRegister: IAlchemyItemRegister) {
     super('alchemyItemRegister', true)
   }
 }
