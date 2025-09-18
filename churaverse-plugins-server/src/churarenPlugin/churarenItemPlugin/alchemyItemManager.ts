@@ -3,23 +3,51 @@ import { ItemKind } from './domain/itemKind'
 import { AlchemyItemRecipe } from './interface/IAlchemyItemRecipe'
 import { IAlchemyItemManger } from './interface/IAlchemyItemManger'
 import { IAlchemyItemRegister } from './interface/IAlchemyItemRegister'
-import { AlchemyItemRegistry } from './alchemyItemRegistry'
+import { AlchemyItemRecipeRecord, AlchemyItemRegistry } from './alchemyItemRegistry'
 
 export class AlchemyItemManager implements IAlchemyItemRegister, IAlchemyItemManger {
   private readonly alchemyItemRegistry: AlchemyItemRegistry
+  private readonly pendingRecipes: Map<ItemKind, Partial<AlchemyItemRecipeRecord>>
 
   public constructor() {
     this.alchemyItemRegistry = new AlchemyItemRegistry()
+    this.pendingRecipes = new Map()
   }
 
   public register(recipe: AlchemyItemRecipe, kind: AlchemyItemKind): void {
-    switch (recipe.pattern) {
-      case 'two_same_one_diff':
-        this.alchemyItemRegistry.register(recipe.materialKind, kind, undefined)
-        break
-      case 'all_same':
-        this.alchemyItemRegistry.register(recipe.materialKind, undefined, kind)
-        break
+    const pendingRecipe = this.pendingRecipes.get(recipe.materialKind) ?? {}
+
+    if (recipe.pattern === 'all_same') {
+      if (pendingRecipe.allSame != null) {
+        throw new Error(`[AlchemyItemManager] 'all_same' for ${recipe.materialKind} is already registered.`)
+      }
+      pendingRecipe.allSame = kind
+    } else {
+      if (pendingRecipe.twoSameOneDiff != null) {
+        throw new Error(`[AlchemyItemManager] 'two_same_one_diff' for ${recipe.materialKind} is already registered.`)
+      }
+      pendingRecipe.twoSameOneDiff = kind
+    }
+
+    this.pendingRecipes.set(recipe.materialKind, pendingRecipe)
+
+    this.tryFinalizeRecipe(recipe.materialKind)
+  }
+
+  /**
+   * 未完成レシピが完成していれば、Registryに登録する
+   */
+  private tryFinalizeRecipe(materialKind: ItemKind): void {
+    const pendingRecipe = this.pendingRecipes.get(materialKind)
+
+    if (pendingRecipe?.allSame != null && pendingRecipe?.twoSameOneDiff != null) {
+      const recipeRecord: AlchemyItemRecipeRecord = {
+        allSame: pendingRecipe.allSame,
+        twoSameOneDiff: pendingRecipe.twoSameOneDiff,
+      }
+
+      this.alchemyItemRegistry.register(materialKind, recipeRecord)
+      this.pendingRecipes.delete(materialKind)
     }
   }
 

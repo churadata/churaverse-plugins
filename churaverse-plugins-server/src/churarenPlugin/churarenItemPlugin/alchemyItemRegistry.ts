@@ -2,40 +2,29 @@ import { AlchemyItemRecipe } from './interface/IAlchemyItemRecipe'
 import { ItemKind } from './domain/itemKind'
 import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItemKind'
 
+export interface AlchemyItemRecipeRecord {
+  allSame: AlchemyItemKind
+  twoSameOneDiff: AlchemyItemKind
+}
+
 export class AlchemyItemRegistry {
-  private readonly twoSameOneDiffRecipes = new Map<ItemKind, AlchemyItemKind>()
-  private readonly allSameRecipes = new Map<ItemKind, AlchemyItemKind>()
+  private readonly alchemyItemRecipes = new Map<string, AlchemyItemRecipeRecord>()
 
-  public register(materialItem: ItemKind, twoSameOneDiff?: AlchemyItemKind, allSame?: AlchemyItemKind): void {
-    if (twoSameOneDiff != null) {
-      if (this.twoSameOneDiffRecipes.has(materialItem)) {
-        throw new Error(
-          `Recipe for two_same_one_diff with material ${materialItem} is already registered.` +
-            ` Cannot register new item ${twoSameOneDiff}.`
-        )
-      }
-      this.twoSameOneDiffRecipes.set(materialItem, twoSameOneDiff)
+  public register(materialItem: ItemKind, recipeRecord: AlchemyItemRecipeRecord): void {
+    if (this.alchemyItemRecipes.has(materialItem)) {
+      throw new Error(`Already registered material item: ${materialItem}`)
     }
-
-    if (allSame != null) {
-      if (this.allSameRecipes.has(materialItem)) {
-        throw new Error(
-          `Recipe for all_same with material ${materialItem} is already registered.` +
-            ` Cannot register new item ${allSame}.`
-        )
-      }
-      this.allSameRecipes.set(materialItem, allSame)
-    }
+    this.alchemyItemRecipes.set(materialItem, recipeRecord)
   }
 
   public get(recipe: AlchemyItemRecipe): AlchemyItemKind | undefined {
+    const record = this.alchemyItemRecipes.get(recipe.materialKind)
+
     switch (recipe.pattern) {
       case 'all_same':
-        return this.allSameRecipes.get(recipe.materialKind)
+        return record?.allSame
       case 'two_same_one_diff':
-        return this.twoSameOneDiffRecipes.get(recipe.materialKind)
-      default:
-        return undefined
+        return record?.twoSameOneDiff
     }
   }
 }
