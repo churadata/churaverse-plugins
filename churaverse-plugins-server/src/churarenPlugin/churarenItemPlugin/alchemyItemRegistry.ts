@@ -1,4 +1,4 @@
-import { AlchemyItemGenerateType } from './interface/IAlchemyItemRecipe'
+import { AlchemyItemRecipe } from './interface/IAlchemyItemRecipe'
 import { ItemKind } from './domain/itemKind'
 import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItemKind'
 
@@ -28,12 +28,12 @@ export class AlchemyItemRegistry {
     }
   }
 
-  public get(materialItem: ItemKind, pattern: AlchemyItemGenerateType): AlchemyItemKind | undefined {
-    switch (pattern) {
+  public get(recipe: AlchemyItemRecipe): AlchemyItemKind | undefined {
+    switch (recipe.pattern) {
       case 'all_same':
-        return this.allSameRecipes.get(materialItem)
+        return this.allSameRecipes.get(recipe.materialKind)
       case 'two_same_one_diff':
-        return this.twoSameOneDiffRecipes.get(materialItem)
+        return this.twoSameOneDiffRecipes.get(recipe.materialKind)
       default:
         return undefined
     }

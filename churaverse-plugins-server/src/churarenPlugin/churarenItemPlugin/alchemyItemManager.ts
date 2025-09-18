@@ -1,6 +1,6 @@
 import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItemKind'
 import { ItemKind } from './domain/itemKind'
-import { AlchemyItemGenerateType, AlchemyItemRecipe } from './interface/IAlchemyItemRecipe'
+import { AlchemyItemRecipe } from './interface/IAlchemyItemRecipe'
 import { IAlchemyItemManger } from './interface/IAlchemyItemManger'
 import { IAlchemyItemRegister } from './interface/IAlchemyItemRegister'
 import { AlchemyItemRegistry } from './alchemyItemRegistry'
@@ -24,11 +24,8 @@ export class AlchemyItemManager implements IAlchemyItemRegister, IAlchemyItemMan
   }
 
   public get(alchemyItemRecipe: AlchemyItemRecipe): AlchemyItemKind {
-    const alchemyItem = this.alchemyItemRegistry.get(
-      alchemyItemRecipe.materialKind,
-      alchemyItemRecipe.pattern as AlchemyItemGenerateType
-    )
-    return alchemyItem ?? ('blackHole' as AlchemyItemKind)
+    const alchemyItem = this.alchemyItemRegistry.get(alchemyItemRecipe)
+    return alchemyItem ?? 'blackHole'
   }
 
   public getByMaterialItems(materialItems: ItemKind[]): AlchemyItemKind {
@@ -41,10 +38,10 @@ export class AlchemyItemManager implements IAlchemyItemRegister, IAlchemyItemMan
       const sortedKinds = [...countKinds.entries()].sort((a, b) => b[1] - a[1])
       return this.get({ pattern: 'two_same_one_diff', materialKind: sortedKinds[0][0] as ItemKind })
     } else if (itemCount === 3) {
-      return 'blackHole' as AlchemyItemKind
+      return 'blackHole'
     }
 
-    return 'blackHole' as AlchemyItemKind
+    return 'blackHole'
   }
 
   private countAlchemyItemKinds(items: ItemKind[]): Map<ItemKind, number> {

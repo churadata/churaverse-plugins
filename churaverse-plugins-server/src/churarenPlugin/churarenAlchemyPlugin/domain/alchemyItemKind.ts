@@ -1,4 +1,4 @@
-import { Direction, Entity, KnownKeyOf, Position } from 'churaverse-engine-server'
+import { Direction, Entity, Position } from 'churaverse-engine-server'
 import { AlchemyItem } from './alchemyItem'
 
 // eslint-disable-next-line @typescript-eslint/consistent-indexed-object-style
@@ -6,7 +6,7 @@ export interface AlchemyItemKindMap {
   [key: string]: AlchemyItem
 }
 
-export type AlchemyItemKind = KnownKeyOf<AlchemyItemKindMap>
+export type AlchemyItemKind = keyof AlchemyItemKindMap & string
 
 export abstract class BaseAlchemyItem extends Entity {
   public constructor(
