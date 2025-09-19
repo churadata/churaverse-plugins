@@ -35,11 +35,7 @@ export class ExitButton implements IExitConfirmAlert {
     }
   }
 
-  public setGameOwnerExitMessage(exitMessage?: string): void {
-    this.exitMessage = exitMessage ?? 'あなたはゲームオーナーです。あなたが退出するとこのゲームが直ちに終了します'
-  }
-
-  public resetGameExitMessage(): void {
-    this.exitMessage = 'このミーティングから退出しますか？'
+  public setMessage(message: string): void {
+    this.exitMessage = message
   }
 }

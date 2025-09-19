@@ -98,7 +98,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.gameInfoStore.games.set(this.gameId, this)
     this.gamePluginStore.gameAbortAlertConfirm.setGameAbortMessage(this.gameName)
     if (this._gameOwnerId === this.store.of('playerPlugin').ownPlayerId) {
-      this.coreUiPluginStore.exitButton.setGameOwnerExitMessage(
+      this.coreUiPluginStore.exitButton.setMessage(
         'あなたはゲームオーナーです。あなたが退出すると' + this.gameName + 'が終了します'
       )
     }
@@ -122,7 +122,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._participantIds = []
     this.gameInfoStore.games.delete(this.gameId)
 
-    this.coreUiPluginStore.exitButton.resetGameExitMessage()
+    this.coreUiPluginStore.exitButton.setMessage('このミーティングから退出しますか？')
 
     if (this.isOwnPlayerMidwayParticipant) {
       this._isOwnPlayerMidwayParticipant = false
