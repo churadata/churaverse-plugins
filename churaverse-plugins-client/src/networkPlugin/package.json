@@ -34,8 +34,8 @@
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "dependencies": {
-    "churaverse-engine-client": "file:../../../../churaverse-engine/churaverse-engine-client",
     "phaser": "^3.80.1",
-    "socket.io-client": "^4.7.4"
+    "socket.io-client": "^4.7.4",
+    "churaverse-engine-client": "~0.1.1"
   }
 }
