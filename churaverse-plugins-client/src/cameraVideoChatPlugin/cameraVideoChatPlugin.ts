@@ -35,7 +35,7 @@ export class CameraVideoChatPlugin extends BasePlugin<IMainScene> {
     this.bus.subscribeEvent('init', this.init.bind(this))
     this.bus.subscribeEvent('triggerVideoSending', this.triggerVideoSending.bind(this))
     this.bus.subscribeEvent('dumpDebugData', this.dumpDebugData.bind(this))
-    this.bus.subscribeEvent('enableVideoChatButton', this.enableVideoChatButton.bind(this))
+    this.bus.subscribeEvent('videoChatStatusChanged', this.enableVideoChatButton.bind(this))
   }
 
   private triggerVideoSending(ev: TriggerVideoSendingEvent): void {
