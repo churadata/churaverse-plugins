@@ -24,7 +24,16 @@ export class MapManager implements IMapManager {
    * マップのJSONデータを読み込んで返す
    */
   public static async loadMapJSON(fileName: string): Promise<TiledMapOrthogonal> {
-    return (await import('./data/' + fileName)) as TiledMapOrthogonal
+    // 動的importの代わりに、ファイル名に基づいた静的importを使用
+    // webpackでバンドルできないため…
+    switch(fileName) {
+      case 'Map.json':
+        return require('./data/Map.json');
+      case 'Map2.json':
+        return require('./data/Map2.json');
+      default:
+        throw new Error(`Map file ${fileName} not found`);
+    }
   }
 
   /**
