@@ -1,11 +1,11 @@
 import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItemKind'
 import { ItemKind } from './domain/itemKind'
 import { AlchemyItemRecipe } from './interface/IAlchemyItemRecipe'
-import { IAlchemyItemManger } from './interface/IAlchemyItemManger'
 import { IAlchemyItemRegister } from './interface/IAlchemyItemRegister'
 import { AlchemyItemRecipeRecord, AlchemyItemRegistry } from './alchemyItemRegistry'
+import { IAlchemyItemManager } from './interface/IAlchemyItemManager'
 
-export class AlchemyItemManager implements IAlchemyItemRegister, IAlchemyItemManger {
+export class AlchemyItemManager implements IAlchemyItemRegister, IAlchemyItemManager {
   private readonly alchemyItemRegistry: AlchemyItemRegistry
   private readonly pendingRecipes: Map<ItemKind, Partial<AlchemyItemRecipeRecord>>
 

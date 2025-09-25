@@ -5,9 +5,11 @@ import '@churaverse/map-plugin-server/store/defMapPluginStore'
 import { AlchemyItemManager } from '../alchemyItemManager'
 
 export function initItemPluginStore(store: Store<IMainScene>): void {
+  const alchemyItemManager = new AlchemyItemManager()
   const itemPluginStore: ItemPluginStore = {
     items: new ItemRepository(store.of('mapPlugin').mapManager.currentMap),
-    alchemyItemManager: new AlchemyItemManager(),
+    alchemyItemManager,
+    alchemyItemRegister: alchemyItemManager,
   }
 
   store.setInit('churarenItemPlugin', itemPluginStore)
