@@ -17,7 +17,7 @@ import {
 } from './debugScreen/IDebugScreen/IWebCameraInfoDebugScreen'
 import '@churaverse/popup-screen-list-plugin-client'
 import { EffectManager } from './effectManager'
-import { EnableVideoChatButtonEvent } from './event/enableVideoChatButtonEvent'
+import { VideoChatStatusChangedEvent } from './event/videoChatStatusChangedEvent'
 
 export class CameraVideoSender implements IVideoSender {
   private localVideoTrack: LocalTrack | undefined = undefined
@@ -104,7 +104,7 @@ export class CameraVideoSender implements IVideoSender {
     const track = this.room.localParticipant.getTrackPublication(Track.Source.Camera)?.track
     if (track == null) return false
     this.localVideoTrack = track
-    this.bus.post(new EnableVideoChatButtonEvent())
+    this.bus.post(new VideoChatStatusChangedEvent())
     return this.room.localParticipant.isCameraEnabled
   }
 
@@ -114,7 +114,7 @@ export class CameraVideoSender implements IVideoSender {
       await this.room.localParticipant.setCameraEnabled(false)
       this.localVideoTrack = undefined
     }
-    this.bus.post(new EnableVideoChatButtonEvent())
+    this.bus.post(new VideoChatStatusChangedEvent())
     // 終了失敗=isCameraEnabledがtrueの時なので, isCameraEnabledの否定を返す
     return !this.room.localParticipant.isCameraEnabled
   }
