@@ -19,7 +19,9 @@ export class DeviceSelector<DeviceType extends Device> {
     settingDialog.addContent('peripheralSetting', content)
 
     this.selectTag = DomManager.getElementById<HTMLSelectElement>(selectTagId)
-    this.selectTag.addEventListener('change', () => this.onSelect())
+    this.selectTag.addEventListener('change', () => {
+      this.onSelect()
+    })
   }
 
   /**
