@@ -26,7 +26,7 @@ export class MapManager implements IMapManager {
   public static async loadMapJSON(fileName: string): Promise<TiledMapOrthogonal> {
     // 動的importの代わりに、ファイル名に基づいた静的importを使用
     // webpackでバンドルできないため…
-    switch(fileName) {
+    switch(fileName) { 
       case 'Map.json':
         return require('./data/Map.json');
       case 'Map2.json':
