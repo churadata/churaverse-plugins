@@ -76,4 +76,19 @@ export class KeyActionManager<Scene extends Scenes>
       observer.update(dt, this.keyActionReceiver)
     })
   }
+
+  public logicalReleaseAllKeys(): void {
+    this.keyActionObservers.forEach((observer) => {
+      observer.getKey().logicalRelease()
+    })
+  }
+
+  public physicalKeyDown(keyCode: KeyCode): void {
+    for (const observer of this.keyActionObservers.values()) {
+      if (observer.getKey().keyCode === keyCode) {
+        observer.getKey().onPhysicalKeyDown()
+        break
+      }
+    }
+  }
 }
