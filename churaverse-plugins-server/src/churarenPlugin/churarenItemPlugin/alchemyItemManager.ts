@@ -51,7 +51,7 @@ export class AlchemyItemManager implements IAlchemyItemRegister, IAlchemyItemMan
     }
   }
 
-  public get(alchemyItemRecipe: AlchemyItemRecipe): AlchemyItemKind {
+  private get(alchemyItemRecipe: AlchemyItemRecipe): AlchemyItemKind {
     const alchemyItem = this.alchemyItemRegistry.get(alchemyItemRecipe)
     return alchemyItem ?? 'blackHole'
   }
