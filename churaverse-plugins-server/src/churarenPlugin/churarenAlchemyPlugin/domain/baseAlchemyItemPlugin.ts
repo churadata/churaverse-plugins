@@ -12,17 +12,12 @@ export abstract class BaseAlchemyItemPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
   protected abstract alchemyItem: IAlchemyItem
 
-  protected subscribeGameEvent(): void {
-    super.subscribeGameEvent()
+  public listenEvent(): void {
+    super.listenEvent()
     this.bus.subscribeEvent('alchemyItemRegister', this.onAlchemyItemRegister.bind(this))
   }
 
-  protected unsubscribeGameEvent(): void {
-    super.unsubscribeGameEvent()
-    this.bus.unsubscribeEvent('alchemyItemRegister', this.onAlchemyItemRegister.bind(this))
-  }
-
-  private readonly onAlchemyItemRegister = (ev: AlchemyItemRegisterEvent): void => {
+  private onAlchemyItemRegister(ev: AlchemyItemRegisterEvent): void {
     ev.alchemyItemRegister.register(this.alchemyItem.recipe, this.alchemyItem.kind)
   }
 }
