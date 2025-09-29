@@ -26,6 +26,7 @@ import { DropChurarenItemEvent } from './event/dropChurarenItemEvent'
 import { DropChurarenItemData, DropChurarenItemMessage } from './message/dropChurarenItemMessage'
 import { GamePluginStore } from '@churaverse/game-plugin-client/store/defGamePluginStore'
 import { DeathLog } from '@churaverse/player-plugin-client/ui/deathLog/deathLog'
+import { Position } from 'churaverse-engine-client'
 
 export class ChurarenPlayerPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
