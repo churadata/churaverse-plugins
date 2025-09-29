@@ -5,4 +5,4 @@ export interface AlchemyItemKindMap {
   [key: string]: AlchemyItem
 }
 
-export type AlchemyItemKind = keyof AlchemyItemKindMap
+export type AlchemyItemKind = keyof AlchemyItemKindMap & string

@@ -1,6 +1,6 @@
 import { SocketController } from './controller/socketController'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
-import { generatedAlchemyPotMap } from './domain/alchemyService'
+import { alchemyPotInfoToSendableObject, generatedAlchemyPot } from './domain/alchemyPotService'
 import { initAlchemyPluginStore } from './store/initAlchemyPluginStore'
 import { AlchemyPluginStore } from './store/defAlchemyPluginStore'
 import { MapPluginStore } from '@churaverse/map-plugin-server/store/defMapPluginStore'
@@ -17,6 +17,7 @@ import { PlayerItemsStore } from '@churaverse/churaren-player-plugin-server/stor
 import '@churaverse/churaren-core-plugin-server/event/churarenStartTimerEvent'
 import { ClearAlchemyItemBoxEvent } from './event/clearAlchemyItemBoxEvent'
 import { AlchemyItem } from './domain/alchemyItem'
+import { ItemPluginStore } from '@churaverse/churaren-item-plugin-server/store/defItemPluginStore'
 
 export class ChurarenAlchemyPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -24,6 +25,7 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
   private alchemyPluginStore!: AlchemyPluginStore
   private mapPluginStore!: MapPluginStore
   private playerItemStore!: PlayerItemsStore
+  private itemPluginStore!: ItemPluginStore
   private socketController?: SocketController
 
   public listenEvent(): void {
@@ -49,36 +51,37 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
 
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
-    this.bus.subscribeEvent('churarenStartTimer', this.sendSpawnAlchemy)
+    this.bus.subscribeEvent('churarenStartTimer', this.sendSpawnAlchemyPot)
     this.bus.subscribeEvent('clearAlchemyItemBox', this.clearAlchemyItem)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
-    this.bus.unsubscribeEvent('churarenStartTimer', this.sendSpawnAlchemy)
+    this.bus.unsubscribeEvent('churarenStartTimer', this.sendSpawnAlchemyPot)
     this.bus.unsubscribeEvent('clearAlchemyItemBox', this.clearAlchemyItem)
   }
 
   protected handleGameStart(): void {
     this.playerItemStore = this.store.of('playerItemStore')
+    this.itemPluginStore = this.store.of('churarenItemPlugin')
     this.socketController?.registerMessageListener()
   }
 
   protected handleGameTermination(): void {
-    this.alchemyPluginStore.alchemyPot.clear()
+    this.alchemyPluginStore.alchemyPots.clear()
     this.socketController?.unregisterMessageListener()
   }
 
-  private readonly sendSpawnAlchemy = (): void => {
+  private readonly sendSpawnAlchemyPot = (): void => {
     const currentMap = this.mapPluginStore.mapManager.currentMap
-    const pots = generatedAlchemyPotMap(this.alchemyPluginStore.alchemyPot, currentMap)
-    const alchemyPotSpawnMessage = new AlchemyPotSpawnMessage({ pots })
+    const pots = generatedAlchemyPot(this.alchemyPluginStore.alchemyPots, currentMap)
+    const alchemyPotSpawnMessage = new AlchemyPotSpawnMessage({ pots: alchemyPotInfoToSendableObject(pots) })
     this.networkPluginStore.messageSender.send(alchemyPotSpawnMessage)
   }
 
   private registerOnOverlap(ev: RegisterOnOverlapEvent): void {
     ev.collisionDetector.register(
-      this.alchemyPluginStore.alchemyPot,
+      this.alchemyPluginStore.alchemyPots,
       this.store.of('playerPlugin').players,
       this.alchemize.bind(this)
     )
@@ -90,7 +93,7 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
     const items = this.playerItemStore.materialItems.getAllItem(player.id)
     if (items.length !== MAX_ITEMS) return
 
-    const alchemizedItemKind = this.alchemyPluginStore.alchemyItemRecipe.getByMaterialItems(
+    const alchemizedItemKind = this.itemPluginStore.alchemyItemManager.getByMaterialItems(
       items.map((item) => item.kind)
     )
     const deletedItemIds: string[] = items.map((item) => item.id)
