@@ -44,15 +44,17 @@ export class BossAttackRenderer implements IBossAttackRenderer {
 
     // アニメーションの設定配列から各アニメーションを生成
     _anims.forEach((cfg) => {
-      scene.anims.create({
-        key: cfg.key,
-        frames: scene.anims.generateFrameNames(CHURAREN_BOSS_ATTACK_ANIM_KEY, {
-          start: cfg.frameStart,
-          end: cfg.frameEnd,
-        }),
-        frameRate: FRAME_RATE,
-        repeat: -1,
-      })
+      if (!scene.anims.exists(cfg.key)) {
+        scene.anims.create({
+          key: cfg.key,
+          frames: scene.anims.generateFrameNames(CHURAREN_BOSS_ATTACK_ANIM_KEY, {
+            start: cfg.frameStart,
+            end: cfg.frameEnd,
+          }),
+          frameRate: FRAME_RATE,
+          repeat: -1,
+        })
+      }
     })
 
     // ボスの攻撃を描画するレイヤーを設定
