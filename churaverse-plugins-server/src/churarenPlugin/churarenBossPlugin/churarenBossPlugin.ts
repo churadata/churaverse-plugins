@@ -120,7 +120,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     const boss = ev.entity
     this.bossPluginStore.bosses.set(boss.bossId, boss)
 
-    let actionCycleCounter = 0
+    let walkCount = 0
 
     const bossWalkLoop = (): void => {
       if (
@@ -131,10 +131,10 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
         return
 
       // 攻撃周期ごとに攻撃イベントを発火
-      if (actionCycleCounter % BOSS_ATTACK_CYCLE === 0) {
+      if (walkCount % BOSS_ATTACK_CYCLE === 0) {
         this.bus.post(new BossAttackRequestEvent(boss.bossId, boss.position.copy()))
       }
-      actionCycleCounter++
+      walkCount++
       this.updateBossPosition(boss.bossId)
       setTimeout(bossWalkLoop, CHURAREN_BOSS_WALK_DURATION_MS)
     }

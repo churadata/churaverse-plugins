@@ -16,7 +16,7 @@ export function removeDieBossAttack(
 ): void {
   bossAttacks.getAllId().forEach((bossAttackId) => {
     const bossAttack = bossAttacks.get(bossAttackId)
-    if ((bossAttack?.isDead ?? false) === true) {
+    if (bossAttack?.isDead ?? false) {
       bossAttacks.delete(bossAttackId)
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -32,7 +32,7 @@ export function removeDieBossAttack(
 export function moveBossAttacks(dt: number, bossAttacks: IBossAttackRepository, worldMap: WorldMap): void {
   bossAttacks.getAllId().forEach((bossAttackId) => {
     const bossAttack = bossAttacks.get(bossAttackId)
-    if (bossAttack !== undefined && bossAttack.isDead !== true) {
+    if (bossAttack !== undefined && bossAttack.isDead) {
       bossAttack.move(dt)
       if (
         bossAttack.position.x < 0 ||
