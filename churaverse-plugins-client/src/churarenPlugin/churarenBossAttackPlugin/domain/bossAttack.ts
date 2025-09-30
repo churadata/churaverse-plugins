@@ -1,5 +1,4 @@
 import { GRID_SIZE, Entity, Position, Direction } from 'churaverse-engine-client'
-import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-client/model/churarenWeaponEntity'
 
 export const CHURAREN_BOSS_ATTACK_LIMIT_GRIDS = 25
 export const CHURAREN_BOSS_ATTACK_LIMIT_MS = 5000
@@ -8,7 +7,7 @@ export const CHURAREN_BOSS_ATTACK_SPEED = (CHURAREN_BOSS_ATTACK_LIMIT_GRIDS * GR
 /**
  * ChurarenBossAttackクラス
  */
-export class BossAttack extends Entity implements ChurarenWeaponEntity {
+export class BossAttack extends Entity {
   public readonly power = 30
   public isDead = false
   public bossAttackId: string

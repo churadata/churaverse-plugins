@@ -79,7 +79,7 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
   }
 
   public handleMidwayParticipant(): void {
-    this.subscribeGameEvent()
+    this.unsubscribeGameEvent()
   }
 
   private start(ev: StartEvent): void {

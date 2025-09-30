@@ -14,7 +14,7 @@ import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPla
 import { BossAttackPluginStore } from '../store/defBossAttackPluginStore'
 import { BossAttackSpawnMessage } from '../message/bossAttackSpawnMessage'
 import { BossAttackHitMessage } from '../message/bossAttackHitMessage'
-import { WeaponDamageMessage } from '@churaverse/player-plugin-client/message/weaponDamageMessage'
+import { ChurarenDamageMessage } from '@churaverse/churaren-player-plugin-client/message/churarenDamageMessage'
 import { BossAttack } from '../domain/bossAttack'
 import { BossAttackDamageCause } from '../domain/bossAttackDamageCause'
 import { IMessageListenerRegister } from '@churaverse/network-plugin-client/interface/IMessageListenerRegister'
@@ -45,11 +45,13 @@ export class SocketController extends BaseSocketController<IMainScene> {
   public registerMessageListener(): void {
     this.messageListenerRegister.on('bossAttackSpawn', this.bossAttackSpawn)
     this.messageListenerRegister.on('bossAttackHit', this.bossAttackHit)
+    this.messageListenerRegister.on('churarenDamage', this.bossAttackDamage)
   }
 
   public unregisterMessageListener(): void {
     this.messageListenerRegister.off('bossAttackSpawn', this.bossAttackSpawn)
     this.messageListenerRegister.off('bossAttackHit', this.bossAttackHit)
+    this.messageListenerRegister.off('churarenDamage', this.bossAttackDamage)
   }
 
   private readonly bossAttackSpawn = (msg: BossAttackSpawnMessage, senderId: string): void => {
@@ -69,11 +71,11 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   // TODO: CV-717のマージ後にChurarenDamageMessageを受け取るよう修正
-  private readonly bossAttackDamage = (msg: WeaponDamageMessage): void => {
+  private readonly bossAttackDamage = (msg: ChurarenDamageMessage): void => {
     const data = msg.data
     if (data.cause !== 'bossAttack') return
     const target = this.playerPluginStore.players.get(data.targetId)
-    const bossAttack = this.bossAttackPluginStore.bossAttacks.get(data.weaponId)
+    const bossAttack = this.bossAttackPluginStore.bossAttacks.get(data.sourceId)
     const attacker = bossAttack?.churarenWeaponOwnerId
     if (target === undefined || bossAttack === undefined || attacker === undefined) return
     const bossAttackDamageCause = new BossAttackDamageCause(bossAttack)

@@ -13,7 +13,8 @@
   "dependencies": {
     "@churaverse/churaren-core-plugin-server": "file:../churarenCorePlugin",
     "@churaverse/churaren-boss-plugin-server": "file:../churarenBossPlugin",
-    "@churaverse/collision-detection-plugin-server": "^0.1.2",
+    "@churaverse/churaren-player-plugin-server": "file:../churarenPlayerPlugin",
+    "@churaverse/collision-detection-plugin-server": "file:../../collisionDetectionPlugin",
     "@churaverse/game-plugin-server": "file:../../gamePlugin",
     "@churaverse/map-plugin-server": "file:../../mapPlugin",
     "@churaverse/network-plugin-server": "file:../../networkPlugin",

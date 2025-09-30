@@ -35,12 +35,13 @@
   "license": "MIT",
   "dependencies": {
     "@churaverse/churaren-core-plugin-client": "file:../churarenCorePlugin",
+    "@churaverse/churaren-player-plugin-client": "file:../churarenPlayerPlugin",
     "@churaverse/game-plugin-client": "file:../../gamePlugin",
     "@churaverse/network-plugin-client": "file:../../networkPlugin",
-    "@churaverse/player-plugin-client": "~0.1.0",
+    "@churaverse/player-plugin-client": "file:../../playerPlugin",
     "@churaverse/core-ui-plugin-client": "~0.1.0",
     "@churaverse/map-plugin-client": "~0.1.0",
-    "churaverse-engine-client": "file:../../../../../churaverse-engine/churaverse-engine-client",
+    "churaverse-engine-client": "~0.1.1",
     "phaser": "^3.80.1"
   }
 }

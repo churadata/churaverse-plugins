@@ -12,6 +12,7 @@ import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-s
 import { Player } from '@churaverse/player-plugin-server/domain/player'
 import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
 import { BossAttackRequestEvent } from '@churaverse/churaren-boss-plugin-server/event/bossAttackRequestEvent'
+import { IGameInfo } from '@churaverse/game-plugin-server/interface/IGameInfo'
 import '@churaverse/churaren-core-plugin-server/event/churarenStartTimerEvent'
 import '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 import '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
@@ -19,18 +20,20 @@ import '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 
 export class ChurarenBossAttackPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
+  private churarenGameInfo?: IGameInfo
   private bossAttackPluginStore!: BossAttackPluginStore
   private mapPluginStore!: MapPluginStore
+  private socketController?: SocketController
 
   public listenEvent(): void {
     super.listenEvent()
     this.bus.subscribeEvent('init', this.init.bind(this))
 
-    const socketController = new SocketController(this.bus, this.store)
-    this.bus.subscribeEvent('registerMessage', socketController.registerMessage.bind(socketController))
+    this.socketController = new SocketController(this.bus, this.store)
+    this.bus.subscribeEvent('registerMessage', this.socketController.registerMessage.bind(this.socketController))
     this.bus.subscribeEvent(
       'registerMessageListener',
-      socketController.setupMessageListenerRegister.bind(socketController)
+      this.socketController.setupMessageListenerRegister.bind(this.socketController)
     )
     this.bus.subscribeEvent('registerOnOverlap', this.registerOnOverlap.bind(this))
   }
@@ -39,17 +42,19 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
     super.subscribeGameEvent()
     this.bus.subscribeEvent('update', this.update)
     this.bus.subscribeEvent('bossAttackRequest', this.generateBossAttack)
-    this.bus.subscribeEvent('entitySpawn', this.onSpawnBossAttack.bind(this))
+    this.bus.subscribeEvent('entitySpawn', this.onSpawnBossAttack)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
     this.bus.unsubscribeEvent('update', this.update)
     this.bus.unsubscribeEvent('bossAttackRequest', this.generateBossAttack)
-    this.bus.unsubscribeEvent('entitySpawn', this.onSpawnBossAttack.bind(this))
+    this.bus.unsubscribeEvent('entitySpawn', this.onSpawnBossAttack)
   }
 
-  protected handleGameStart(): void {}
+  protected handleGameStart(): void {
+    this.churarenGameInfo = this.store.of('gamePlugin').games.get(this.gameId)
+  }
 
   protected handleGameTermination(): void {
     this.bossAttackPluginStore.bossAttacks.clear()
@@ -92,18 +97,19 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
     if (!(ev.entity instanceof BossAttack)) return
     const bossAttack = ev.entity
     this.bossAttackPluginStore.bossAttacks.set(bossAttack.bossAttackId, bossAttack)
-    bossAttack.attack(this.mapPluginStore.mapManager.currentMap)
+    bossAttack.ignition(this.mapPluginStore.mapManager.currentMap)
   }
 
   private bossAttackHitPlayer(bossAttack: BossAttack, player: Player): void {
     if (player.isDead) return
-    // プレイヤーと衝突したボスの攻撃は消える
-    bossAttack.isDead = true
-    bossAttack.isCollidable = false
-
+    if (!bossAttack.isCollidable) return
+    if (this.churarenGameInfo === undefined || !this.churarenGameInfo.participantIds.includes(player.id)) return
     // ボスの攻撃衝突イベントの発火
     const bossAttackDamageCause = new BossAttackDamageCause(bossAttack)
     const livingDamageEvent = new LivingDamageEvent(player, bossAttackDamageCause, bossAttack.power)
     this.bus.post(livingDamageEvent)
+    // プレイヤーと衝突したボスの攻撃は消える
+    bossAttack.isDead = true
+    bossAttack.isCollidable = false
   }
 }

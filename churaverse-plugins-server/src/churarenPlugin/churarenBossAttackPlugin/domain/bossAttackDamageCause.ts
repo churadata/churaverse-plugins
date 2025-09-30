@@ -1,5 +1,5 @@
 import { BossAttack } from './bossAttack'
-import { ChurarenEnemyDamageCause } from '@churaverse/churaren-core-plugin-server/model/churarenEnemyDamageCause'
+import { ChurarenEnemyDamageCause } from '@churaverse/churaren-core-plugin-server'
 
 /**
  * ボスの攻撃との当たり判定によるダメージを表すクラス

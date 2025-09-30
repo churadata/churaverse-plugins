@@ -17,6 +17,7 @@ import { isPlayer, Player } from '@churaverse/player-plugin-server/domain/player
 import { ChurarenResultEvent } from '@churaverse/churaren-core-plugin-server/event/churarenResultEvent'
 import { ChurarenDamageMessage } from './message/churarenDamageMessage'
 import { isBoss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
+import { isBossAttack } from '@churaverse/churaren-boss-attack-plugin-server/domain/bossAttack'
 
 export const MAX_ITEMS = 3
 
@@ -53,6 +54,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('getChurarenItem', this.getItem)
     this.bus.subscribeEvent('dropChurarenItem', this.dropItem)
     this.bus.subscribeEvent('livingDamage', this.onChurarenDamageFromBoss)
+    this.bus.subscribeEvent('livingDamage', this.onChurarenDamageFromBossAttack)
     this.bus.subscribeEvent('livingDamage', this.skipDamage, 'HIGH')
   }
 
@@ -61,6 +63,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.unsubscribeEvent('getChurarenItem', this.getItem)
     this.bus.unsubscribeEvent('dropChurarenItem', this.dropItem)
     this.bus.unsubscribeEvent('livingDamage', this.onChurarenDamageFromBoss)
+    this.bus.unsubscribeEvent('livingDamage', this.onChurarenDamageFromBossAttack)
     this.bus.unsubscribeEvent('livingDamage', this.skipDamage)
   }
 
@@ -121,6 +124,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
 
   private readonly onChurarenDamageFromBoss = (ev: LivingDamageEvent): void => {
     if (!(ev.cause instanceof ChurarenEnemyDamageCause)) return
+    if (ev.cause.name !== 'collisionBoss') return
     if (isPlayer(ev.target) && isBoss(ev.cause.entity)) {
       const player = ev.target
       const damageCause = new ChurarenDamageMessage({
@@ -131,6 +135,26 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
       })
       this.networkPluginStore.messageSender.send(damageCause)
 
+      // 即時に死亡していればそのままゴースト化
+      if (player.isDead) {
+        this.changeGhostPlayer(player)
+      }
+    }
+  }
+
+  private readonly onChurarenDamageFromBossAttack = (ev: LivingDamageEvent): void => {
+    if (!(ev.cause instanceof ChurarenEnemyDamageCause)) return
+    if (ev.cause.name !== 'bossAttack') return
+    if (isPlayer(ev.target) && isBossAttack(ev.cause.entity)) {
+      const player = ev.target
+      const damageCause = new ChurarenDamageMessage({
+        targetId: player.id,
+        cause: ev.cause.name,
+        sourceId: ev.cause.entity.id,
+        amount: ev.amount,
+      })
+      this.networkPluginStore.messageSender.send(damageCause)
+      // 即時に死亡していればそのままゴースト化
       if (player.isDead) {
         this.changeGhostPlayer(player)
       }

@@ -2,7 +2,6 @@ import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server
 import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
 import { Position, Direction, Vector, Entity } from 'churaverse-engine-server'
 import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
-import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-server'
 
 export const CHURAREN_BOSS_ATTACK_LIMIT_GRIDS = 25
 export const CHURAREN_BOSS_ATTACK_LIMIT_MS = 5000
@@ -11,7 +10,7 @@ const CHURAREN_BOSS_ATTACK_SIZE = 100
 /**
  * ChurarenBossAttackクラス
  */
-export class BossAttack extends Entity implements ICollidableEntity, ChurarenWeaponEntity {
+export class BossAttack extends Entity implements ICollidableEntity {
   public isCollidable = true
   public getRect(): IRectangle {
     return {
@@ -52,7 +51,7 @@ export class BossAttack extends Entity implements ICollidableEntity, ChurarenWea
     this._velocity = { x: 0, y: 0 }
   }
 
-  public attack(worldMap: WorldMap): void {
+  public ignition(worldMap: WorldMap): void {
     const moveDistance = CHURAREN_BOSS_ATTACK_LIMIT_GRIDS * worldMap.gridSize
     const speed = moveDistance / CHURAREN_BOSS_ATTACK_LIMIT_MS
     this._velocity = {
@@ -82,4 +81,11 @@ export class BossAttack extends Entity implements ICollidableEntity, ChurarenWea
     this.position.x += this._velocity.x * dt
     this.position.y += this._velocity.y * dt
   }
+}
+
+export function isBossAttack(entity: Entity): entity is BossAttack {
+  if (!(entity instanceof Entity)) return false
+  const bossKeys = Object.keys(entity) as Array<keyof BossAttack>
+  const requiredKeys: Array<keyof BossAttack> = ['bossAttackId', 'spawnTime', 'power', 'isCollidable']
+  return requiredKeys.every((key) => bossKeys.includes(key))
 }
