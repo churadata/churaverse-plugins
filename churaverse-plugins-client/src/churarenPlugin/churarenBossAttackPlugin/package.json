@@ -1,5 +1,5 @@
 {
-  "name": "@churaverse/churaren-plugins-client",
+  "name": "@churaverse/churaren-boss-attack-plugin-client",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
@@ -34,13 +34,14 @@
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "dependencies": {
-    "@churaverse/churaren-alchemy-item-plugins-client": "file:../churarenAlchemyItems/alchemyItemPlugins",
-    "@churaverse/churaren-alchemy-plugin-client": "file:../churarenAlchemyPlugin",
-    "@churaverse/churaren-boss-attack-plugin-client": "file:../churarenBossAttackPlugin",
-    "@churaverse/churaren-boss-plugin-client": "file:../churarenBossPlugin",
     "@churaverse/churaren-core-plugin-client": "file:../churarenCorePlugin",
-    "@churaverse/churaren-item-plugin-client": "file:../churarenItemPlugin",
     "@churaverse/churaren-player-plugin-client": "file:../churarenPlayerPlugin",
-    "@churaverse/game-plugin-client": "file:../../gamePlugin"
+    "@churaverse/game-plugin-client": "file:../../gamePlugin",
+    "@churaverse/network-plugin-client": "file:../../networkPlugin",
+    "@churaverse/player-plugin-client": "file:../../playerPlugin",
+    "@churaverse/core-ui-plugin-client": "~0.1.0",
+    "@churaverse/map-plugin-client": "~0.1.0",
+    "churaverse-engine-client": "~0.1.1",
+    "phaser": "^3.80.1"
   }
 }
