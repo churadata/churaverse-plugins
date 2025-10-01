@@ -97,6 +97,10 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
       items.map((item) => item.kind)
     )
     const deletedItemIds: string[] = items.map((item) => item.id)
+    deletedItemIds.forEach((itemId) => {
+      this.playerItemStore.materialItems.delete(player.id, itemId)
+    })
+
     const alchemizedItem = new AlchemyItem(uniqueId(), alchemizedItemKind)
 
     const alchemizeData: AlchemizeData = {

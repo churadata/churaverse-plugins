@@ -1,4 +1,4 @@
-import { alchemyItemPlugins } from '../churarenAlchemyItems/alchemyItemPlugins'
+import { alchemyItemPlugins } from '@churaverse/churaren-alchemy-item-plugins-server'
 import { ChurarenAlchemyPlugin } from '@churaverse/churaren-alchemy-plugin-server'
 import { ChurarenBossPlugin } from '@churaverse/churaren-boss-plugin-server'
 import { ChurarenCorePlugin } from '@churaverse/churaren-core-plugin-server'
