@@ -1,7 +1,7 @@
 import { BaseGamePlugin } from '@churaverse/game-plugin-client/domain/baseGamePlugin'
 import { ItemPluginStore } from '@churaverse/churaren-item-plugin-client/store/defItemPluginStore'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
-import { GRID_SIZE, IMainScene, LivingDamageEvent } from 'churaverse-engine-client'
+import { GRID_SIZE, IMainScene, LivingDamageEvent, Position } from 'churaverse-engine-client'
 import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { PlayerRespawnEvent } from '@churaverse/player-plugin-client/event/playerRespawnEvent'
 import { PlayerWalkEvent } from '@churaverse/player-plugin-client/event/playerWalkEvent'
@@ -26,7 +26,6 @@ import { DropChurarenItemEvent } from './event/dropChurarenItemEvent'
 import { DropChurarenItemData, DropChurarenItemMessage } from './message/dropChurarenItemMessage'
 import { GamePluginStore } from '@churaverse/game-plugin-client/store/defGamePluginStore'
 import { DeathLog } from '@churaverse/player-plugin-client/ui/deathLog/deathLog'
-import { Position } from 'churaverse-engine-client'
 
 export class ChurarenPlayerPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
