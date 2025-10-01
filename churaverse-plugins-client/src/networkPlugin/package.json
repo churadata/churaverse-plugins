@@ -36,6 +36,6 @@
   "dependencies": {
     "phaser": "^3.80.1",
     "socket.io-client": "^4.7.4",
-    "churaverse-engine-client": "~0.1.1"
+    "churaverse-engine-client": "~0.1.2"
   }
 }
