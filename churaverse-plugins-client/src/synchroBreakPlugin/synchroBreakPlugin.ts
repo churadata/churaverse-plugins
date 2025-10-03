@@ -31,6 +31,12 @@ import { SynchroBreakListItemRenderer } from './ui/startWindow/synchroBreakListI
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
   protected readonly gameName = 'シンクロブレイク'
+  protected readonly ownerExitMessage =
+    /**
+     * シンクロブレイクはオーナーが退出するとゲームが終了する仕様のため
+     */
+    'あなたはゲームオーナーです。あなたが退出すると' + this.gameName + 'が終了します'
+
   private nyokkiActionMessage: string | undefined = undefined
   private ownNyokkiSatatus: NyokkiStatus = 'yet'
   protected gameEntryRenderer!: IGameSelectionListItemRenderer

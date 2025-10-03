@@ -154,8 +154,7 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
 
   protected sendGameAbortMessage(): void {
     // 中止前に確認ダイアログを表示
-    const gamePluginStore = this.store.of('gamePlugin')
-    const shouldExit = gamePluginStore.gameAbortAlertConfirm.showAlert()
+    const shouldExit = this.store.of('gamePlugin').gameAbortAlertConfirm.showAlert()
     if (shouldExit) {
       // ユーザーがOKした場合のみ中止メッセージを送信
       const gameAbortMessage = new RequestGameAbortMessage({

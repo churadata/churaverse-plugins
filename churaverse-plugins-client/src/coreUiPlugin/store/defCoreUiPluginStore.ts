@@ -4,7 +4,7 @@ import { IDialogSwitcher } from '../interface/IDialogSwitcher'
 import { IFocusTargetRepository } from '../interface/IFocusTargetRepository'
 import { ISettingDialog } from '../interface/ISettingDialog'
 import { ITopBarIconContainer } from '../interface/ITopBarIconContainer'
-import { ExitButton } from '../exit/exitButton'
+import { IExitConfirmAlert } from '../interface/IExitConfirmAlert'
 
 declare module 'churaverse-engine-client' {
   export interface StoreInMain {
@@ -12,7 +12,7 @@ declare module 'churaverse-engine-client' {
   }
 }
 export interface CoreUiPluginStore {
-  exitButton: ExitButton
+  readonly exitButton: IExitConfirmAlert
   readonly topBarIconContainer: ITopBarIconContainer
   readonly settingDialog: ISettingDialog
   readonly adminSettingDialog: IAdminSettingDialog

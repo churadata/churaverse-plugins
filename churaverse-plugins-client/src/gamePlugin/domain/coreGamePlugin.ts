@@ -22,6 +22,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   public abstract gameId: GameIds
   protected abstract gameEntryRenderer: IGameSelectionListItemRenderer
   protected abstract gameName: string
+  protected abstract ownerExitMessage: string
   private _isActive: boolean = false
   private _gameOwnerId?: string
   private _participantIds: string[] = []
@@ -98,9 +99,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.gameInfoStore.games.set(this.gameId, this)
     this.gamePluginStore.gameAbortAlertConfirm.setGameAbortMessage(this.gameName)
     if (this._gameOwnerId === this.store.of('playerPlugin').ownPlayerId) {
-      this.coreUiPluginStore.exitButton.setMessage(
-        'あなたはゲームオーナーです。あなたが退出すると' + this.gameName + 'が終了します'
-      )
+      this.coreUiPluginStore.exitButton.setMessage(`${this.ownerExitMessage}`)
     }
   }
 
