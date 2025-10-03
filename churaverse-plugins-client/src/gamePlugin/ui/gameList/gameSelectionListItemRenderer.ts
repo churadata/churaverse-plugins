@@ -44,7 +44,7 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
   private currentButtonState: GameState
 
   public constructor(
-    private readonly store: Store<IMainScene>,
+    protected readonly store: Store<IMainScene>,
     private readonly gameDetailManager: IGameDescriptionDialogManager,
     private readonly props: GameSelectionListItemProps
   ) {
@@ -152,11 +152,16 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
     this.networkPlugin.messageSender.send(gameStartMessage)
   }
 
-  private sendGameAbortMessage(): void {
-    const gameAbortMessage = new RequestGameAbortMessage({
-      gameId: this.props.gameId,
-      playerId: this.store.of('playerPlugin').ownPlayerId,
-    })
-    this.networkPlugin.messageSender.send(gameAbortMessage)
+  protected sendGameAbortMessage(): void {
+    // 中止前に確認ダイアログを表示
+    const shouldExit = this.store.of('gamePlugin').gameAbortAlertConfirm.showAlert()
+    if (shouldExit) {
+      // ユーザーがOKした場合のみ中止メッセージを送信
+      const gameAbortMessage = new RequestGameAbortMessage({
+        gameId: this.props.gameId,
+        playerId: this.store.of('playerPlugin').ownPlayerId,
+      })
+      this.networkPlugin.messageSender.send(gameAbortMessage)
+    }
   }
 }

@@ -11,21 +11,26 @@ import { GamePluginStore } from '../store/defGamePluginStore'
 import { BaseGamePlugin } from './baseGamePlugin'
 import { GamePlayerQuitEvent } from '../event/gamePlayerQuitEvent'
 import { GamePlayerQuitMessage } from '../message/gamePlayerQuitMessage'
-import { IGameListItemRenderer } from '../interface/IGameListItemRenderer'
+import { IGameSelectionListItemRenderer } from '../interface/IGameSelectionListItemRenderer'
+import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
+import { CoreUiPluginStore } from '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
  */
 export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo {
   public abstract gameId: GameIds
-  protected abstract gameEntryRenderer: IGameListItemRenderer
+  protected abstract gameEntryRenderer: IGameSelectionListItemRenderer
   protected abstract gameName: string
+  protected abstract ownerExitMessage: string
   private _isActive: boolean = false
   private _gameOwnerId?: string
   private _participantIds: string[] = []
   private _isOwnPlayerMidwayParticipant: boolean = false
   protected gamePluginStore!: GamePluginStore
   private networkPluginStore!: NetworkPluginStore<IMainScene>
+  protected playerPluginStore!: PlayerPluginStore
+  protected coreUiPluginStore!: CoreUiPluginStore
 
   public get isActive(): boolean {
     return this._isActive
@@ -72,6 +77,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     super.getStores()
     this.gamePluginStore = this.store.of('gamePlugin')
     this.networkPluginStore = this.store.of('networkPlugin')
+    this.coreUiPluginStore = this.store.of('coreUiPlugin')
   }
 
   private priorGameData(ev: PriorGameDataEvent): void {
@@ -91,6 +97,10 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.gamePluginStore.gameUiManager.initializeAllUis(this.gameId)
     this.gamePluginStore.gameLogRenderer.gameStartLog(this.gameName, this.gameOwnerId ?? '')
     this.gameInfoStore.games.set(this.gameId, this)
+    this.gamePluginStore.gameAbortAlertConfirm.setGameAbortMessage(this.gameName)
+    if (this._gameOwnerId === this.store.of('playerPlugin').ownPlayerId) {
+      this.coreUiPluginStore.exitButton.setMessage(`${this.ownerExitMessage}`)
+    }
   }
 
   private readonly gameAbort = (ev: GameAbortEvent): void => {
@@ -110,6 +120,8 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._gameOwnerId = undefined
     this._participantIds = []
     this.gameInfoStore.games.delete(this.gameId)
+
+    this.coreUiPluginStore.exitButton.setMessage('このミーティングから退出しますか？')
 
     if (this.isOwnPlayerMidwayParticipant) {
       this._isOwnPlayerMidwayParticipant = false
