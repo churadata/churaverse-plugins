@@ -68,6 +68,10 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
 
   private init(): void {
     this.playerPluginStore = this.store.of('playerPlugin')
+    this.playerPluginStore.deathLogRenderer.addDeathLogMessageBuilder(
+      'collisionBoss',
+      (deathLog) => `${deathLog.victim.name} がボスに潰された！ ${deathLog.victim.name} は死んでしまった！`
+    )
   }
 
   public handleGameStart(): void {
@@ -110,16 +114,6 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
     this.bossPluginStore.bossRenderers.delete(bossId)
   }
 
-  private addDamageCauseLog(attacker: Player, cause: DamageCauseType, damage: number): void {
-    const damageCauseLog: BossDamageCauseLog = {
-      attacker,
-      cause,
-      damage,
-    }
-    this.bossPluginStore.damageCauseLogRenderer.add(damageCauseLog)
-    this.bossPluginStore.damageCauseLogRepository.addDamageCauseLog(damageCauseLog)
-  }
-
   private readonly moveBoss = (ev: BossWalkEvent): void => {
     const boss = this.bossPluginStore.bosses.get(ev.id)
     if (boss === undefined) return
@@ -159,5 +153,15 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
       if (attacker === undefined) return
       this.addDamageCauseLog(attacker, ev.cause.name, ev.amount)
     }
+  }
+
+  private addDamageCauseLog(attacker: Player, cause: DamageCauseType, damage: number): void {
+    const damageCauseLog: BossDamageCauseLog = {
+      attacker,
+      cause,
+      damage,
+    }
+    this.bossPluginStore.damageCauseLogRenderer.add(damageCauseLog)
+    this.bossPluginStore.damageCauseLogRepository.addDamageCauseLog(damageCauseLog)
   }
 }

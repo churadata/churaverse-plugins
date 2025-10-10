@@ -1,10 +1,12 @@
 import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
 import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
-import '@churaverse/churaren-core-plugin-server/event/churarenStartCountdownEvent'
-import { IAlchemyItem } from '../interface/IAlchemyItem'
+import { AlchemyItemRegisterEvent } from '@churaverse/churaren-item-plugin-server/event/alchemyItemRegisterEvent'
+import { IAlchemyItem } from './IAlchemyItem'
 
 /**
- * 錬金アイテムのプラグインのベースクラス
+ * 錬金アイテムプラグインのベースクラス
+ * 各錬金アイテムプラグインはこのクラスを継承し、`alchemyItem` プロパティを実装する必要がある。
+ * @property {IAlchemyItem} alchemyItem - 錬金アイテムの情報を持つオブジェクト
  */
 export abstract class BaseAlchemyItemPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -12,15 +14,15 @@ export abstract class BaseAlchemyItemPlugin extends BaseGamePlugin {
 
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
-    this.bus.subscribeEvent('churarenStartCountdown', this.setupAlchemyItem)
+    this.bus.subscribeEvent('alchemyItemRegister', this.onAlchemyItemRegister.bind(this))
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
-    this.bus.unsubscribeEvent('churarenStartCountdown', this.setupAlchemyItem)
+    this.bus.unsubscribeEvent('alchemyItemRegister', this.onAlchemyItemRegister.bind(this))
   }
 
-  private readonly setupAlchemyItem = (): void => {
-    this.store.of('alchemyPlugin').alchemyItemRecipe.set(this.alchemyItem.recipe, this.alchemyItem.kind)
+  private readonly onAlchemyItemRegister = (ev: AlchemyItemRegisterEvent): void => {
+    ev.alchemyItemRegister.register(this.alchemyItem.recipe, this.alchemyItem.kind)
   }
 }

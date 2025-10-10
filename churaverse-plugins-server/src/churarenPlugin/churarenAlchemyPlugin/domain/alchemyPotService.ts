@@ -1,4 +1,4 @@
-import { AlchemyPotMap, AlchemyPotInfo } from '../message/alchemyPotSpawnMessage'
+import { AlchemyPotMap } from '../message/alchemyPotSpawnMessage'
 import { AlchemyPot } from './alchemyPot'
 import { uniqueId } from '@churaverse/churaren-core-plugin-server'
 import { IAlchemyPotRepository } from './IAlchemyPotRepository'
@@ -7,25 +7,35 @@ import { SendableObject } from '@churaverse/network-plugin-server/types/sendable
 import { Position, Vector } from 'churaverse-engine-server'
 
 /**
- *  alchemyPotsの生成をfrontendに通知する
+ * @function calculateAlchemyPotPositions で計算した位置にalchemyPotsの生成を行う
+ * @param alchemyPot - 生成された錬金釜を登録するためのリポジトリ
+ * @param worldMap - 錬金釜を配置するワールドマップのデータ（幅と高さを使用）
+ * @returns 生成された錬金釜の配列
  */
-export function generatedAlchemyPotMap(alchemyPot: IAlchemyPotRepository, worldMap: WorldMap): AlchemyPotMap {
-  const potsMap: AlchemyPotMap = {}
+export function generatedAlchemyPot(alchemyPot: IAlchemyPotRepository, worldMap: WorldMap): AlchemyPot[] {
+  const pots = []
   const alchemyPotPosition = calculatePositions(worldMap.width, worldMap.height)
 
   for (const pos of alchemyPotPosition) {
     const pot = new AlchemyPot(uniqueId(), new Position(pos.x, pos.y))
-    potsMap[pot.id] = alchemyPotInfoToSendableObject(pot)
     alchemyPot.set(pot.id, pot)
+    pots.push(pot)
   }
-  return potsMap
+  return pots
 }
 
-function alchemyPotInfoToSendableObject(pot: AlchemyPot): AlchemyPotInfo {
-  const info: AlchemyPotInfo = {
-    potId: pot.id,
-    spawnPos: pot.position.toVector() as Vector & SendableObject,
-  }
+/**
+ * 受け取ったAlchemyPotの配列をSendableObjectに変換する
+ * @param pots 錬金釜の配列
+ */
+export function alchemyPotInfoToSendableObject(pots: AlchemyPot[]): AlchemyPotMap {
+  const info: AlchemyPotMap = {}
+  pots.forEach((pot) => {
+    info[pot.id] = {
+      potId: pot.id,
+      spawnPos: pot.position.toVector() as Vector & SendableObject,
+    }
+  })
   return info
 }
 
