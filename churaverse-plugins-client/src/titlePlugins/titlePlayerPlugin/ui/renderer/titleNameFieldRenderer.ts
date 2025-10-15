@@ -32,11 +32,8 @@ export class TitleNameFieldRenderer implements ITitleNameFieldRenderer {
   public validate(): boolean {
     const name = this.getName()?.trim()
     // 名前の文字列が空白文字のみまたは空文字のみでないかを判定
-    if (name === '') {
-      return false
-    }
     //名前の長さが15文字以下かを判定（全角・半角問わず）
-    if (name.length > 15) {
+    if (name.length === 0 || name.length > 15) {
       return false
     }
     return true
