@@ -1,10 +1,10 @@
 import { JSXFunc } from 'churaverse-engine-client'
 import style from './RuleExplanationWindowComponent.module.scss'
-import headerImage from '../assets/multi.png'
-import itemImage from '../assets/item_with_player.png'
-import alchemyImage from '../assets/items_with_alchemy.png'
-import bossImage from '../assets/attack_to_boss.png'
-import ghostImage from '../assets/ghost_player.png'
+import headerImage from '../../../assets/ruleDescriptionImages/header.png'
+import itemImage from '../../../assets/ruleDescriptionImages/item_with_player.png'
+import alchemyImage from '../../../assets/ruleDescriptionImages/items_with_alchemy.png'
+import bossImage from '../../../assets/ruleDescriptionImages/attack_to_boss.png'
+import ghostImage from '../../../assets/ruleDescriptionImages/ghost_player.png'
 
 export const POPUP_GAME_START_WINDOW_BUTTON_ID = 'churaren-game-start-form-open-button'
 export const GAME_START_BUTTON = 'churaren-game-start-button'
@@ -79,6 +79,3 @@ export const RuleExplanationWindowComponent: JSXFunc = () => {
     </div>
   )
 }
-
-export const CHURAREN_DESCRIPTION =
-  'ちゅられんは、みんなで協力し、制限時間内に強大なモンスターに立ち向かう協力型バトルゲーム！ フィールドでアイテムを集め、錬金窯で攻撃を錬金し、チームでボスを撃破しよう！'
