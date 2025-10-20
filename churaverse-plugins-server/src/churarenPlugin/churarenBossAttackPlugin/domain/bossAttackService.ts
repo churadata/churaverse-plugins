@@ -32,7 +32,7 @@ export function removeDieBossAttack(
 export function moveBossAttacks(dt: number, bossAttacks: IBossAttackRepository, worldMap: WorldMap): void {
   bossAttacks.getAllId().forEach((bossAttackId) => {
     const bossAttack = bossAttacks.get(bossAttackId)
-    if (bossAttack !== undefined && bossAttack.isDead) {
+    if (bossAttack !== undefined && !bossAttack.isDead) {
       bossAttack.move(dt)
       if (
         bossAttack.position.x < 0 ||

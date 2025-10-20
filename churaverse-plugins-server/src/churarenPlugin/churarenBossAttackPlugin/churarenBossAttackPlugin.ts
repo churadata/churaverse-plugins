@@ -104,11 +104,10 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
     if (player.isDead) return
     if (!bossAttack.isCollidable) return
     if (this.churarenGameInfo === undefined || !this.churarenGameInfo.participantIds.includes(player.id)) return
-    // ボスの攻撃衝突イベントの発火
+    // ボス攻撃とプレイヤー衝突イベントの発火
     const bossAttackDamageCause = new BossAttackDamageCause(bossAttack)
     const livingDamageEvent = new LivingDamageEvent(player, bossAttackDamageCause, bossAttack.power)
     this.bus.post(livingDamageEvent)
-    // プレイヤーと衝突したボスの攻撃は消える
     bossAttack.isDead = true
     bossAttack.isCollidable = false
   }
