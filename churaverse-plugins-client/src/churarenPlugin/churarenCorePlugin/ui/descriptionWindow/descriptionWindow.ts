@@ -1,14 +1,11 @@
 import { DomManager, IMainScene, Store, domLayerSetting } from 'churaverse-engine-client'
-import { DescriptionWindowComponent } from './component/DescriptionWindowComponent'
+import { DescriptionWindowComponent, CHURAREN_DESCRIPTION } from './component/DescriptionWindowComponent'
 import '@churaverse/game-plugin-client/gameUiManager'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { ChurarenPlayerReadyMessage } from '../../message/churarenPlayerReadyMessage'
 import { IDescriptionWindow } from '../../interface/IChurarenUiComponent'
 
 export const CHURAREN_GAME_START_BUTTON_ID = 'churaren-send-ready-button'
-
-const CHURAREN_DESCRIPTION =
-  'ちゅられんは、みんなで協力し、制限時間内に強大なモンスターに立ち向かう協力型バトルゲーム！ フィールドでアイテムを集め、錬金窯で攻撃を錬金し、チームでボスを撃破しよう！'
 
 export class DescriptionWindow implements IDescriptionWindow {
   public element!: HTMLElement
