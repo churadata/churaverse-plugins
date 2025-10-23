@@ -13,6 +13,8 @@ import { GamePlayerQuitEvent } from '../event/gamePlayerQuitEvent'
 import { GamePlayerQuitMessage } from '../message/gamePlayerQuitMessage'
 import { IGameSelectionListItemRenderer } from '../interface/IGameSelectionListItemRenderer'
 import { GameHostEvent } from '../event/gameHostEvent'
+import { ParticipationResponseEvent } from '../event/participationResponseEvent'
+import { ParticipationResponseMessage } from '../message/participationResponseMessage'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -25,6 +27,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private _gameOwnerId?: string
   private _participantIds: string[] = []
   private _isOwnPlayerMidwayParticipant: boolean = false
+  private _isJoinGame: boolean = false
   protected gamePluginStore!: GamePluginStore
   private networkPluginStore!: NetworkPluginStore<IMainScene>
 
@@ -44,11 +47,16 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     return this._isOwnPlayerMidwayParticipant
   }
 
+  public get isJoinGame(): boolean {
+    return this._isJoinGame
+  }
+
   public listenEvent(): void {
     super.listenEvent()
     this.bus.subscribeEvent('init', this.getStores.bind(this))
     this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this), 'HIGH')
     this.bus.subscribeEvent('gameHost', this.gameHost.bind(this))
+    this.bus.subscribeEvent('participationResponse', this.participationResponse.bind(this))
     this.bus.subscribeEvent('gameStart', this.gameStart.bind(this), 'HIGH')
     this.bus.subscribeEvent('gameAbort', this.resetGameStartButton.bind(this))
     this.bus.subscribeEvent('gameEnd', this.resetGameStartButton.bind(this))
@@ -90,6 +98,17 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     if (!this.isActive) return
     this._gameOwnerId = ev.ownerId
     this.gameInfoStore.games.set(this.gameId, this)
+  }
+
+  private participationResponse(ev: ParticipationResponseEvent): void {
+    if (ev.gameId !== this.gameId) return
+    this._isJoinGame = ev.isJoin
+
+    const participationResponseMessage = new ParticipationResponseMessage({
+      gameId: this.gameId,
+      isJoin: this.isJoinGame,
+    })
+    this.networkPluginStore.messageSender.send(participationResponseMessage)
   }
 
   protected gameStart(ev: GameStartEvent): void {
