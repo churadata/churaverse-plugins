@@ -159,7 +159,7 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
   private setupGameDetailButton(): void {
     const detailButton = DomManager.getElementById<HTMLButtonElement>(GAME_DETAIL_BUTTON_ID(this.props.gameId))
     detailButton.addEventListener('click', () => {
-      this.gameDetailManager.showDialog(this.props.gameId)
+      this.gameDetailManager.showDialog(this.props.gameId, 'showCloseButton')
     })
   }
 
