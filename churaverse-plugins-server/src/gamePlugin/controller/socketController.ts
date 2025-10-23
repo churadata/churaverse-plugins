@@ -14,6 +14,7 @@ import { PriorGameDataMessage } from '../message/priorGameDataMessage'
 import { GamePlayerQuitMessage } from '../message/gamePlayerQuitMessage'
 import { GamePlayerQuitEvent } from '../event/gamePlayerQuitEvent'
 import { RequestGameHostMessage, ResponseGameHostMessage } from '../message/gameHostMessage'
+import { GameHostEvent } from '../event/gameHostEvent'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
@@ -31,6 +32,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public registerMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
     ev.messageListenerRegister.on('requestPriorData', this.sendPriorGameData.bind(this))
+    ev.messageListenerRegister.on('requestGameHost', this.gameHost.bind(this))
     ev.messageListenerRegister.on('requestGameStart', this.gameStart.bind(this))
     ev.messageListenerRegister.on('requestGameEnd', this.gameEnd.bind(this))
     ev.messageListenerRegister.on('requestGameAbort', this.gameAbort.bind(this))
@@ -43,6 +45,10 @@ export class SocketController extends BaseSocketController<IMainScene> {
    */
   private sendPriorGameData(msg: PriorDataRequestMessage, senderId: string): void {
     this.eventBus.post(new PriorGameDataEvent(senderId))
+  }
+
+  private gameHost(msg: RequestGameHostMessage): void {
+    this.eventBus.post(new GameHostEvent(msg.data.gameId, msg.data.ownerId))
   }
 
   private gameStart(msg: RequestGameStartMessage): void {
