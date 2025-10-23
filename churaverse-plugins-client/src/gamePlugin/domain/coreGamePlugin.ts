@@ -12,6 +12,7 @@ import { BaseGamePlugin } from './baseGamePlugin'
 import { GamePlayerQuitEvent } from '../event/gamePlayerQuitEvent'
 import { GamePlayerQuitMessage } from '../message/gamePlayerQuitMessage'
 import { IGameSelectionListItemRenderer } from '../interface/IGameSelectionListItemRenderer'
+import { GameHostEvent } from '../event/gameHostEvent'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -47,6 +48,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     super.listenEvent()
     this.bus.subscribeEvent('init', this.getStores.bind(this))
     this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this), 'HIGH')
+    this.bus.subscribeEvent('gameHost', this.gameHost.bind(this))
     this.bus.subscribeEvent('gameStart', this.gameStart.bind(this), 'HIGH')
     this.bus.subscribeEvent('gameAbort', this.resetGameStartButton.bind(this))
     this.bus.subscribeEvent('gameEnd', this.resetGameStartButton.bind(this))
@@ -79,6 +81,13 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     if (!this.isActive) return
     this.gamePluginStore.gameLogRenderer.gameLog(`${this.gameName}が開始されています。`, 400)
     this._isOwnPlayerMidwayParticipant = true
+    this.gameInfoStore.games.set(this.gameId, this)
+  }
+
+  private gameHost(ev: GameHostEvent): void {
+    this._isActive = this.gameId === ev.gameId
+    if (!this.isActive) return
+    this._gameOwnerId = ev.ownerId
     this.gameInfoStore.games.set(this.gameId, this)
   }
 

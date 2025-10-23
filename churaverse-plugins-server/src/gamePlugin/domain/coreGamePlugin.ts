@@ -14,6 +14,8 @@ import { ResponseGameStartMessage } from '../message/gameStartMessage'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
 import { BaseGamePlugin } from './baseGamePlugin'
 import { GamePlayerQuitEvent } from '../event/gamePlayerQuitEvent'
+import { GameHostEvent } from '../event/gameHostEvent'
+import { ResponseGameHostMessage } from '../message/gameHostMessage'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -40,6 +42,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     super.listenEvent()
     this.bus.subscribeEvent('gameStart', this.gameStart.bind(this), 'HIGH')
     this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this))
+    this.bus.subscribeEvent('gameHost', this.gameHost.bind(this))
   }
 
   protected subscribeGameEvent(): void {
@@ -63,6 +66,19 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.store
       .of('networkPlugin')
       .messageSender.send(new PriorGameDataMessage({ runningGameId: this.gameId }), ev.senderId)
+  }
+
+  private gameHost(ev: GameHostEvent): void {
+    this._isActive = this.gameId === ev.gameId
+    if (!this.isActive) return
+    this._gameOwnerId = ev.ownerId
+    const timeoutSec = 30
+    const responseGameHostMessage = new ResponseGameHostMessage({
+      gameId: this.gameId,
+      ownerId: this.gameOwnerId ?? '',
+      timeoutSec,
+    })
+    this.store.of('networkPlugin').messageSender.send(responseGameHostMessage)
   }
 
   private gameStart(ev: GameStartEvent): void {
