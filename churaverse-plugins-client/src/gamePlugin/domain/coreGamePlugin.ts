@@ -86,6 +86,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
 
   private gameHost(ev: GameHostEvent): void {
     this._isActive = this.gameId === ev.gameId
+    this.gameEntryRenderer.onGameHost(ev.gameId)
     if (!this.isActive) return
     this._gameOwnerId = ev.ownerId
     this.gameInfoStore.games.set(this.gameId, this)

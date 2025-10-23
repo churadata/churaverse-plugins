@@ -81,6 +81,16 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
     this.gameContainer.style.order = value.toString()
   }
 
+  public onGameHost(gameId: GameIds): void {
+    if (this.props.gameId !== gameId) {
+      this.gameStartButtonGrayOut()
+      return
+    }
+
+    this.setGameHostText()
+    this.setGameStatusText()
+  }
+
   public onGameStart(gameId: GameIds): void {
     if (this.props.gameId === gameId) {
       this.setGameAbortText()
@@ -104,6 +114,15 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
     this.currentButtonState = 'start'
   }
 
+  private setGameHostText(): void {
+    const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
+    startButton.textContent = `開始待ち`
+    startButton.disabled = true
+    startButton.style.backgroundColor = 'lightgray'
+    startButton.style.color = 'var(--color-button-background)'
+    this.currentButtonState = 'host'
+  }
+
   private setGameAbortText(): void {
     const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
     startButton.textContent = '中止'
@@ -123,7 +142,7 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
     startButton.disabled = true
     startButton.style.backgroundColor = 'lightgray'
     startButton.style.color = 'var(--color-button-background)'
-    this.currentButtonState = 'inActive'
+    this.currentButtonState = 'inactive'
   }
 
   private setupGameStartButton(): void {
