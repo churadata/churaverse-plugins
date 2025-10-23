@@ -3,10 +3,10 @@ import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defN
 import { GameIds } from '../../interface/gameIds'
 import { GameState } from '../../type/gameState'
 import { IGameDescriptionDialogManager } from '../../interface/IGameDescriptionDialogManager'
-import { RequestGameStartMessage } from '../../message/gameStartMessage'
 import { RequestGameAbortMessage } from '../../message/gameAbortMessage'
 import { IGameSelectionListItemRenderer } from '../../interface/IGameSelectionListItemRenderer'
 import { GameSelectionListItem } from './components/GameListComponent'
+import { RequestGameHostMessage } from '../../message/gameHostMessage'
 
 const DEFAULT_ICON_SIZE = '40px'
 
@@ -130,7 +130,7 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
     const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
     startButton.addEventListener('click', () => {
       if (this.currentButtonState === 'start') {
-        this.sendGameStartMessage()
+        this.sendGameHostMessage()
       } else if (this.currentButtonState === 'abort') {
         this.sendGameAbortMessage()
       }
@@ -144,12 +144,12 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
     })
   }
 
-  private sendGameStartMessage(): void {
-    const gameStartMessage = new RequestGameStartMessage({
+  private sendGameHostMessage(): void {
+    const gameHostMessage = new RequestGameHostMessage({
       gameId: this.props.gameId,
-      playerId: this.store.of('playerPlugin').ownPlayerId,
+      ownerId: this.store.of('playerPlugin').ownPlayerId,
     })
-    this.networkPlugin.messageSender.send(gameStartMessage)
+    this.networkPlugin.messageSender.send(gameHostMessage)
   }
 
   private sendGameAbortMessage(): void {
