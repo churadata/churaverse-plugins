@@ -11,6 +11,7 @@ import { GameAbortEvent } from '../event/gameAbortEvent'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
 import { PriorGameDataEvent } from '../event/priorGameDataEvent'
 import { GamePlayerQuitMessage } from '../message/gamePlayerQuitMessage'
+import { RequestGameHostMessage, ResponseGameHostMessage } from '../message/gameHostMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   public constructor(eventBus: IEventBus<IMainScene>, store: Store<IMainScene>) {
@@ -19,6 +20,8 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
     ev.messageRegister.registerMessage('priorGameData', PriorGameDataMessage, 'dest=onlySelf')
+    ev.messageRegister.registerMessage('requestGameHost', RequestGameHostMessage, 'lastOnly')
+    ev.messageRegister.registerMessage('responseGameHost', ResponseGameHostMessage, 'dest=onlySelf')
     ev.messageRegister.registerMessage('requestGameStart', RequestGameStartMessage, 'lastOnly')
     ev.messageRegister.registerMessage('responseGameStart', ResponseGameStartMessage, 'dest=onlySelf')
     ev.messageRegister.registerMessage('requestGameEnd', RequestGameEndMessage, 'lastOnly')
