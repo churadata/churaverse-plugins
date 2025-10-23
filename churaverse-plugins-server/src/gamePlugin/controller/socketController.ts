@@ -15,12 +15,14 @@ import { GamePlayerQuitMessage } from '../message/gamePlayerQuitMessage'
 import { GamePlayerQuitEvent } from '../event/gamePlayerQuitEvent'
 import { RequestGameHostMessage, ResponseGameHostMessage } from '../message/gameHostMessage'
 import { GameHostEvent } from '../event/gameHostEvent'
+import { ParticipationResponseMessage } from '../message/participationResponseMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
     ev.messageRegister.registerMessage('priorGameData', PriorGameDataMessage, 'onlySelf')
     ev.messageRegister.registerMessage('requestGameHost', RequestGameHostMessage, 'onlyServer')
     ev.messageRegister.registerMessage('responseGameHost', ResponseGameHostMessage, 'allClients')
+    ev.messageRegister.registerMessage('participationResponse', ParticipationResponseMessage, 'onlyServer')
     ev.messageRegister.registerMessage('requestGameStart', RequestGameStartMessage, 'onlySelf')
     ev.messageRegister.registerMessage('responseGameStart', ResponseGameStartMessage, 'allClients')
     ev.messageRegister.registerMessage('requestGameEnd', RequestGameEndMessage, 'onlySelf')
