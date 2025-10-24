@@ -114,7 +114,7 @@ export class RankingBoard implements IRankingBoard {
    */
   public changePlayersCoin(playerId: string, coins: number): void {
     // playerIdが存在しない場合に落ちるのを防止
-    const playerCoins = document.getElementById(PLAYER_COINS_ID(playerId))
+    const playerCoins = DomManager.getElementById(PLAYER_COINS_ID(playerId))
     if (playerCoins === null) return
     playerCoins.textContent = `${coins}コイン`
   }
@@ -124,7 +124,7 @@ export class RankingBoard implements IRankingBoard {
    */
   public changeNyokkiStatus(playrId: string, status: NyokkiStatus): void {
     // playerIdが存在しない場合に落ちるのを防止
-    const playerNyokkiStatus = document.getElementById(NYOKKI_STATUS_ID(playrId))
+    const playerNyokkiStatus = DomManager.getElementById(NYOKKI_STATUS_ID(playrId))
     if (playerNyokkiStatus === null) return
 
     playerNyokkiStatus.textContent = status
