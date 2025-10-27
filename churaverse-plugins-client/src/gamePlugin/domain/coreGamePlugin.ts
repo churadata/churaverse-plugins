@@ -16,6 +16,8 @@ import { GameHostEvent } from '../event/gameHostEvent'
 import { ParticipationResponseEvent } from '../event/participationResponseEvent'
 import { ParticipationResponseMessage } from '../message/participationResponseMessage'
 import { GameState } from '../type/gameState'
+import { GamePolicy } from '../interface/gamePolicy'
+import { GameMidwayJoinEvent } from '../event/gameMidwayJoinEvent'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -24,6 +26,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   public abstract gameId: GameIds
   protected abstract gameEntryRenderer: IGameSelectionListItemRenderer
   protected abstract gameName: string
+  public abstract gamePolicy: GamePolicy
   private _isActive: boolean = false
   private _gameOwnerId?: string
   private _participantIds: string[] = []
@@ -61,6 +64,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.subscribeEvent('gameStart', this.gameStart.bind(this), 'HIGH')
     this.bus.subscribeEvent('gameAbort', this.gameAbort.bind(this))
     this.bus.subscribeEvent('gameEnd', this.gameEnd.bind(this))
+    this.bus.subscribeEvent('gameMidwayJoin', this.gameMidwayJoin.bind(this))
   }
 
   protected subscribeGameEvent(): void {
@@ -185,6 +189,16 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
    * @param playerId ゲームから離脱したプレイヤーのID
    */
   protected abstract handlePlayerQuitGame(playerId: string): void
+
+  private gameMidwayJoin(ev: GameMidwayJoinEvent): void {
+    if (!this.isActive) return
+    this.gamePluginStore.gameLogRenderer.gameMidwayJoinLog(this.gameName, ev.joinPlayerId)
+    if (!ev.participantIds.includes(this.store.of('playerPlugin').ownPlayerId)) return
+    this._participantIds = ev.participantIds
+    if (ev.joinPlayerId === this.store.of('playerPlugin').ownPlayerId) {
+      this.gameEntryRenderer.onGameStart(this.gameId, true)
+    }
+  }
 
   /**
    * 退出したプレイヤーがゲーム参加者の場合、参加者リストから削除しtrueを返す

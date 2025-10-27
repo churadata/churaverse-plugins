@@ -1,11 +1,11 @@
 import { BasePlugin, IMainScene } from 'churaverse-engine-client'
 import { GameStartEvent } from '../event/gameStartEvent'
 import { GameIds } from '../interface/gameIds'
-import { PriorGameDataEvent } from '../event/priorGameDataEvent'
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { GameInfoStore } from '../store/defGamePluginStore'
 import { ParticipationResponseEvent } from '../event/participationResponseEvent'
+import { GameMidwayJoinEvent } from '../event/gameMidwayJoinEvent'
 
 /**
  * 全てのゲームプラグインの基本となる抽象クラス
@@ -17,7 +17,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.getStores.bind(this))
     this.bus.subscribeEvent('participationResponse', this.onParticipationResponse.bind(this))
-    // this.bus.subscribeEvent('priorGameData', this.getPriorGameData.bind(this))
+    this.bus.subscribeEvent('gameMidwayJoin', this.onGameMidwayJoin.bind(this))
   }
 
   private getStores(): void {
@@ -46,13 +46,6 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     return this.gameInfoStore.games.get(this.gameId)?.isActive ?? false
   }
 
-  private getPriorGameData(ev: PriorGameDataEvent): void {
-    if (!this.isActive) return
-    // 途中参加者はonGameStartではなく、getPriorGameDataでsubscribeGameEventする
-    this.subscribeGameEvent()
-    this.handleMidwayParticipant()
-  }
-
   private onParticipationResponse(ev: ParticipationResponseEvent): void {
     if (!this.isActive || !ev.isJoin) return
     this.subscribeGameEvent()
@@ -69,21 +62,28 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     this.handleGameTermination()
   }
 
+  private onGameMidwayJoin(ev: GameMidwayJoinEvent): void {
+    if (!this.isActive) return
+    if (this.store.of('playerPlugin').ownPlayerId !== ev.joinPlayerId) return
+    this.subscribeGameEvent()
+    this.handleMidwayParticipant()
+  }
+
   /**
    * ゲーム特有の開始時の処理を実装するための抽象メソッド
-   * 各ゲームプラグインでオーバーライドし、具体的な処理を定義する
+   * - ゲームに参加している全プレイヤーに対して共通で実行される
    */
   protected abstract handleGameStart(): void
 
   /**
    * ゲームの終了・中断時の処理を実装するための抽象メソッド。
-   * 各ゲームプラグインでオーバーライドし、具体的な処理を定義する。
+   * - ゲームに参加している全プレイヤーに対して共通で実行される
    */
   protected abstract handleGameTermination(): void
 
   /**
    * ゲーム特有の途中参加時の処理を実装するための抽象メソッド
-   * 各ゲームプラグインでオーバーライドし、具体的な処理を定義する
+   * - 途中参加したプレイヤーにのみ実行される
    */
   protected abstract handleMidwayParticipant(): void
 }
