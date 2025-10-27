@@ -1,5 +1,4 @@
 import { IMainScene, Store } from 'churaverse-engine-client'
-import { IGameDescriptionDialogManager } from '@churaverse/game-plugin-client/interface/IGameDescriptionDialogManager'
 import { IGameSelectionListContainer } from '@churaverse/game-plugin-client/interface/IGameSelectionListContainer'
 import { GameSelectionListItemRenderer } from '@churaverse/game-plugin-client/ui/gameList/gameSelectionListItemRenderer'
 
@@ -8,11 +7,10 @@ import SYNCHRO_BREAK_ICON_PATH from '../../assets/synchroBreakIcon.png'
 export class SynchroBreakListItemRenderer extends GameSelectionListItemRenderer {
   public constructor(
     store: Store<IMainScene>,
-    gameDialogManager: IGameDescriptionDialogManager,
     gameListContainer: IGameSelectionListContainer,
     imagePath: string = SYNCHRO_BREAK_ICON_PATH
   ) {
-    super(store, gameDialogManager, {
+    super(store, {
       imagePath,
       gameId: 'synchroBreak',
       gameName: 'シンクロブレイク',

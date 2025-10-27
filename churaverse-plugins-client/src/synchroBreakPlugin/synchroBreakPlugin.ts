@@ -5,7 +5,7 @@ import { RegisterGameUiEvent } from '@churaverse/game-plugin-client/event/regist
 import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { PlayerRendererNotFoundError } from '@churaverse/player-plugin-client/errors/playerRendererNotFoundError'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
-import { SynchroBreakDialogManager } from './ui/startWindow/synchroBreakDialogManager'
+import { setupSynchroBreakDialogManager } from './ui/startWindow/setupSynchroBreakDialogManager'
 import { initSynchroBreakPluginStore, resetSynchroBreakPluginStore } from './store/synchroBreakPluginStoreManager'
 import { SynchroBreakPluginError } from './errors/synchroBreakPluginError'
 import { SynchroBreakUiNotFoundError } from './errors/synchroBreakUiNotFoundError'
@@ -38,7 +38,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
 
   private synchroBreakPluginStore!: SynchroBreakPluginStore
   private playerPluginStore!: PlayerPluginStore
-  private synchroBreakDialogManager!: SynchroBreakDialogManager
   private scene!: Scene
   private coinViewerIconUis = new Map<string, CoinViewerIcon>()
   private socketController!: SocketController
@@ -97,14 +96,13 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   }
 
   private init(): void {
-    this.synchroBreakDialogManager = new SynchroBreakDialogManager(this.bus, this.store)
+    setupSynchroBreakDialogManager(this.bus, this.store)
     this.coinViewerIconUis = new Map<string, CoinViewerIcon>()
     this.gameInfoStore = this.store.of('gameInfo')
     this.gamePluginStore = this.store.of('gamePlugin')
     this.playerPluginStore = this.store.of('playerPlugin')
     this.gameEntryRenderer = new SynchroBreakListItemRenderer(
       this.store,
-      this.gamePluginStore.gameDescriptionDialogManager,
       this.gamePluginStore.gameSelectionListContainer
     )
   }
