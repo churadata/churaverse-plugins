@@ -2,7 +2,6 @@ import { DomManager, IMainScene, Store } from 'churaverse-engine-client'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { GameIds } from '../../interface/gameIds'
 import { GameState } from '../../type/gameState'
-import { IGameDescriptionDialogManager } from '../../interface/IGameDescriptionDialogManager'
 import { RequestGameAbortMessage } from '../../message/gameAbortMessage'
 import { IGameSelectionListItemRenderer } from '../../interface/IGameSelectionListItemRenderer'
 import { GameSelectionListItem } from './components/GameListComponent'
@@ -45,7 +44,6 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
 
   public constructor(
     private readonly store: Store<IMainScene>,
-    private readonly gameDetailManager: IGameDescriptionDialogManager,
     private readonly props: GameSelectionListItemProps
   ) {
     this.networkPlugin = this.store.of('networkPlugin')
@@ -91,12 +89,17 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
     this.setGameStatusText()
   }
 
-  public onGameStart(gameId: GameIds): void {
-    if (this.props.gameId === gameId) {
-      this.setGameAbortText()
-      this.setGameStatusText()
-    } else {
+  public onGameStart(gameId: GameIds, isJoin: boolean): void {
+    if (this.props.gameId !== gameId) {
       this.gameStartButtonGrayOut()
+      return
+    }
+
+    this.setGameStatusText()
+    if (isJoin) {
+      this.setGameAbortText()
+    } else {
+      this.setPlayingGameText()
     }
   }
 
@@ -125,6 +128,7 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
 
   private setGameAbortText(): void {
     const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
+    startButton.disabled = false
     startButton.textContent = '中止'
     startButton.style.color = 'red'
     startButton.style.backgroundColor = 'white'
@@ -145,6 +149,15 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
     this.currentButtonState = 'inactive'
   }
 
+  private setPlayingGameText(): void {
+    const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
+    this.currentButtonState = 'playing'
+    startButton.textContent = `プレイ中`
+    startButton.disabled = true
+    startButton.style.backgroundColor = 'lightgray'
+    startButton.style.color = 'var(--color-button-background)'
+  }
+
   private setupGameStartButton(): void {
     const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
     startButton.addEventListener('click', () => {
@@ -159,7 +172,7 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
   private setupGameDetailButton(): void {
     const detailButton = DomManager.getElementById<HTMLButtonElement>(GAME_DETAIL_BUTTON_ID(this.props.gameId))
     detailButton.addEventListener('click', () => {
-      this.gameDetailManager.showDialog(this.props.gameId, 'showCloseButton')
+      this.store.of('gamePlugin').gameDescriptionDialogManager.showDialog(this.props.gameId, 'showCloseButton')
     })
   }
 
