@@ -1,5 +1,6 @@
 import { GameState } from '../type/gameState'
 import { GameIds } from './gameIds'
+import { GamePolicy } from './gamePolicy'
 
 /**
  * ゲームのメタ情報
@@ -10,4 +11,5 @@ export interface IGameInfo {
   readonly gameOwnerId: string | undefined
   readonly participantIds: string[]
   readonly gameState: GameState
+  readonly gamePolicy: GamePolicy
 }
