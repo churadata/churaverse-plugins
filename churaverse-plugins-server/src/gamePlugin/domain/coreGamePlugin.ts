@@ -100,6 +100,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     if (!this.isActive) return
     this._gameState = 'host'
     this._gameOwnerId = ev.ownerId
+    this.gamePluginStore.games.set(this.gameId, this)
     const timeoutSec = 30
     const responseGameHostMessage = new ResponseGameHostMessage({
       gameId: this.gameId,
@@ -131,8 +132,6 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
       participantIds: this.participantIds,
     })
     this.store.of('networkPlugin').messageSender.send(gameStartMessage)
-
-    this.gamePluginStore.games.set(this.gameId, this)
   }
 
   private readonly gameAbort = (ev: GameAbortEvent): void => {
