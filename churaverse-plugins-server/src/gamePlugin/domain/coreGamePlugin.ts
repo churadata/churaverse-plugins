@@ -116,7 +116,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
 
   private gameStart(ev: GameStartEvent): void {
     if (!this.isActive) return
-
+    this._gameState = 'start'
     const gameStartMessage = new GameStartMessage({
       gameId: ev.gameId,
       ownerId: ev.playerId,
@@ -144,6 +144,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private terminateGame(): void {
     this._isActive = false
     this._gameOwnerId = undefined
+    this._gameState = 'inactive'
     this.gameParticipationManager.clear()
     this.gamePluginStore.games.delete(this.gameId)
   }

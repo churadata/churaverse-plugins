@@ -15,6 +15,7 @@ import { IGameSelectionListItemRenderer } from '../interface/IGameSelectionListI
 import { GameHostEvent } from '../event/gameHostEvent'
 import { ParticipationResponseEvent } from '../event/participationResponseEvent'
 import { ParticipationResponseMessage } from '../message/participationResponseMessage'
+import { GameState } from '../type/gameState'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -28,6 +29,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private _participantIds: string[] = []
   private _isOwnPlayerMidwayParticipant: boolean = false
   private _isJoinGame: boolean = false
+  private _gameState: GameState = 'inactive'
   protected gamePluginStore!: GamePluginStore
   private networkPluginStore!: NetworkPluginStore<IMainScene>
 
@@ -96,6 +98,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._isActive = this.gameId === ev.gameId
     this.gameEntryRenderer.onGameHost(ev.gameId)
     if (!this.isActive) return
+    this._gameState = 'host'
     this._gameOwnerId = ev.ownerId
     this.gameInfoStore.games.set(this.gameId, this)
     if (ev.ownerId === this.store.of('playerPlugin').ownPlayerId) {
@@ -120,6 +123,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   protected gameStart(ev: GameStartEvent): void {
     this.gameEntryRenderer.onGameStart(ev.gameId, this.isJoinGame)
     if (!this.isActive) return
+    this._gameState = 'start'
     this._gameOwnerId = ev.playerId
     this._participantIds = ev.participantIds
     this.gamePluginStore.gameDescriptionDialogManager.closeDialog()
@@ -145,6 +149,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._gameOwnerId = undefined
     this._participantIds = []
     this.gameInfoStore.games.delete(this.gameId)
+    this._gameState = 'inactive'
 
     if (this.isOwnPlayerMidwayParticipant) {
       this._isOwnPlayerMidwayParticipant = false

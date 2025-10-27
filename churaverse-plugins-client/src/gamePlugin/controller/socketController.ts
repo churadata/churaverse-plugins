@@ -46,7 +46,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
    * イベントを発火し、それぞれのゲームプラグインで処理を行う
    */
   private priorGameData(msg: PriorGameDataMessage): void {
-    this.eventBus.post(new PriorGameDataEvent(msg.data.runningGameId))
+    this.eventBus.post(new PriorGameDataEvent(msg.data.runningGameId, msg.data.gameState))
   }
 
   private gameHost(msg: ResponseGameHostMessage): void {

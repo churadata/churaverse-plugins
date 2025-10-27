@@ -2,9 +2,11 @@ import { IMainScene } from 'churaverse-engine-client'
 import { BaseMessage } from '@churaverse/network-plugin-client/message/baseMessage'
 import { SendableObject } from '@churaverse/network-plugin-client/types/sendable'
 import { GameIds } from '../interface/gameIds'
+import { GameState } from '../type/gameState'
 
 export interface PriorGameData extends SendableObject {
   runningGameId: GameIds
+  gameState: GameState
 }
 
 /**
