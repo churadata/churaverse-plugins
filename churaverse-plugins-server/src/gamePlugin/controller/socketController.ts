@@ -16,6 +16,8 @@ import { RequestGameHostMessage, ResponseGameHostMessage } from '../message/game
 import { GameHostEvent } from '../event/gameHostEvent'
 import { ParticipationResponseMessage } from '../message/participationResponseMessage'
 import { ParticipationResponseEvent } from '../event/participationResponseEvent'
+import { RequestGameMidwayJoinMessage, ResponseGameMidwayJoinMessage } from '../message/gameMidwayJoinMessage'
+import { GameMidwayJoinEvent } from '../event/gameMidwayJoinEvent'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
@@ -29,6 +31,8 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('requestGameAbort', RequestGameAbortMessage, 'onlySelf')
     ev.messageRegister.registerMessage('responseGameAbort', ResponseGameAbortMessage, 'allClients')
     ev.messageRegister.registerMessage('gamePlayerQuit', GamePlayerQuitMessage, 'onlySelf')
+    ev.messageRegister.registerMessage('requestGameMidwayJoin', RequestGameMidwayJoinMessage, 'onlyServer')
+    ev.messageRegister.registerMessage('responseGameMidwayJoin', ResponseGameMidwayJoinMessage, 'onlySelf')
   }
 
   public registerMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
@@ -38,6 +42,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageListenerRegister.on('requestGameEnd', this.gameEnd.bind(this))
     ev.messageListenerRegister.on('requestGameAbort', this.gameAbort.bind(this))
     ev.messageListenerRegister.on('gamePlayerQuit', this.gamePlayerQuit.bind(this))
+    ev.messageListenerRegister.on('requestGameMidwayJoin', this.gameMidwayJoin.bind(this))
   }
 
   /**
@@ -66,5 +71,9 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   private gamePlayerQuit(msg: GamePlayerQuitMessage): void {
     this.eventBus.post(new GamePlayerQuitEvent(msg.data.gameId, msg.data.playerId))
+  }
+
+  private gameMidwayJoin(msg: RequestGameMidwayJoinMessage, senderId: string): void {
+    this.eventBus.post(new GameMidwayJoinEvent(msg.data.gameId, senderId))
   }
 }
