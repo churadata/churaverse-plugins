@@ -17,7 +17,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.getStores.bind(this))
     this.bus.subscribeEvent('participationResponse', this.onParticipationResponse.bind(this))
-    this.bus.subscribeEvent('priorGameData', this.getPriorGameData.bind(this))
+    // this.bus.subscribeEvent('priorGameData', this.getPriorGameData.bind(this))
   }
 
   private getStores(): void {

@@ -27,7 +27,6 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private _isActive: boolean = false
   private _gameOwnerId?: string
   private _participantIds: string[] = []
-  private _isOwnPlayerMidwayParticipant: boolean = false
   private _isJoinGame: boolean = false
   private _gameState: GameState = 'inactive'
   protected gamePluginStore!: GamePluginStore
@@ -45,12 +44,12 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     return this._participantIds
   }
 
-  public get isOwnPlayerMidwayParticipant(): boolean {
-    return this._isOwnPlayerMidwayParticipant
-  }
-
   public get isJoinGame(): boolean {
     return this._isJoinGame
+  }
+
+  public get gameState(): GameState {
+    return this._gameState
   }
 
   public listenEvent(): void {
@@ -60,22 +59,18 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.subscribeEvent('gameHost', this.gameHost.bind(this))
     this.bus.subscribeEvent('participationResponse', this.participationResponse.bind(this))
     this.bus.subscribeEvent('gameStart', this.gameStart.bind(this), 'HIGH')
-    this.bus.subscribeEvent('gameAbort', this.resetGameStartButton.bind(this))
-    this.bus.subscribeEvent('gameEnd', this.resetGameStartButton.bind(this))
+    this.bus.subscribeEvent('gameAbort', this.gameAbort.bind(this))
+    this.bus.subscribeEvent('gameEnd', this.gameEnd.bind(this))
   }
 
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
-    this.bus.subscribeEvent('gameAbort', this.gameAbort)
-    this.bus.subscribeEvent('gameEnd', this.gameEnd)
     this.bus.subscribeEvent('entityDespawn', this.onPlayerLeave)
     this.bus.subscribeEvent('gamePlayerQuit', this.onPlayerQuitGame)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
-    this.bus.unsubscribeEvent('gameAbort', this.gameAbort)
-    this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
     this.bus.unsubscribeEvent('entityDespawn', this.onPlayerLeave)
     this.bus.unsubscribeEvent('gamePlayerQuit', this.onPlayerQuitGame)
   }
@@ -91,7 +86,6 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     if (!this.isActive) return
     this._gameState = ev.gameState
     this.gamePluginStore.gameLogRenderer.gameLog(`${this.gameName}が開始されています。`, 400)
-    this._isOwnPlayerMidwayParticipant = true
     this.gameInfoStore.games.set(this.gameId, this)
   }
 
@@ -102,6 +96,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._gameState = 'host'
     this._gameOwnerId = ev.ownerId
     this.gameInfoStore.games.set(this.gameId, this)
+    this.gamePluginStore.countdownTimer.start(ev.timeoutSec)
     if (ev.ownerId === this.store.of('playerPlugin').ownPlayerId) {
       this.gamePluginStore.gameDescriptionDialogManager.showDialog(this.gameId, 'showCloseButton')
       this.bus.post(new ParticipationResponseEvent(this.gameId, true))
@@ -113,6 +108,12 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private participationResponse(ev: ParticipationResponseEvent): void {
     if (ev.gameId !== this.gameId) return
     this._isJoinGame = ev.isJoin
+
+    if (!this.isJoinGame) {
+      this.gamePluginStore.countdownTimer.close()
+    } else {
+      this.gamePluginStore.gameUiManager.initializeAllUis(this.gameId)
+    }
 
     const participationResponseMessage = new ParticipationResponseMessage({
       gameId: this.gameId,
@@ -127,19 +128,20 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._gameState = 'start'
     this._gameOwnerId = ev.playerId
     this._participantIds = ev.participantIds
+    this.gamePluginStore.countdownTimer.close()
     this.gamePluginStore.gameDescriptionDialogManager.closeDialog()
-    this.gamePluginStore.gameUiManager.initializeAllUis(this.gameId)
     this.gamePluginStore.gameLogRenderer.gameStartLog(this.gameName, this.gameOwnerId ?? '')
-    this.gameInfoStore.games.set(this.gameId, this)
   }
 
-  private readonly gameAbort = (ev: GameAbortEvent): void => {
+  private gameAbort(ev: GameAbortEvent): void {
+    this.gameEntryRenderer.resetStartButton()
     if (ev.gameId !== this.gameId) return
     this.gamePluginStore.gameLogRenderer.gameAbortLog(this.gameName, ev.playerId)
     this.terminateGame()
   }
 
-  private readonly gameEnd = (ev: GameEndEvent): void => {
+  private gameEnd(ev: GameEndEvent): void {
+    this.gameEntryRenderer.resetStartButton()
     if (ev.gameId !== this.gameId) return
     this.gamePluginStore.gameLogRenderer.gameEndLog(this.gameName)
     this.terminateGame()
@@ -152,10 +154,9 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.gameInfoStore.games.delete(this.gameId)
     this._gameState = 'inactive'
 
-    if (this.isOwnPlayerMidwayParticipant) {
-      this._isOwnPlayerMidwayParticipant = false
-    } else {
+    if (this.isJoinGame) {
       this.gamePluginStore.gameUiManager.removeAllUis(this.gameId)
+      this._isJoinGame = false
     }
   }
 
@@ -193,9 +194,5 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     if (idx === -1) return false
     this._participantIds.splice(idx, 1)
     return true
-  }
-
-  private resetGameStartButton(): void {
-    this.gameEntryRenderer.resetStartButton()
   }
 }

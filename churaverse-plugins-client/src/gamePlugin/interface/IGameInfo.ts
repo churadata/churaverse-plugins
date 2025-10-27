@@ -1,3 +1,4 @@
+import { GameState } from '../type/gameState'
 import { GameIds } from './gameIds'
 
 /**
@@ -9,5 +10,5 @@ export interface IGameInfo {
   readonly isJoinGame: boolean
   readonly gameOwnerId: string | undefined
   readonly participantIds: string[]
-  readonly isOwnPlayerMidwayParticipant: boolean
+  readonly gameState: GameState
 }
