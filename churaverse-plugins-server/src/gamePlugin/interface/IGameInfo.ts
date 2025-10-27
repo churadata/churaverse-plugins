@@ -1,3 +1,4 @@
+import { GameState } from '../type/gameState'
 import { GameIds } from './gameIds'
 
 /**
@@ -8,4 +9,5 @@ export interface IGameInfo {
   readonly isActive: boolean
   readonly gameOwnerId: string | undefined
   readonly participantIds: string[]
+  readonly gameState: GameState
 }

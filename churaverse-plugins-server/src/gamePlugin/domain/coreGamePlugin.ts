@@ -19,6 +19,7 @@ import { ResponseGameHostMessage } from '../message/gameHostMessage'
 import { GameParticipationManager } from '../gameParticipationManager'
 import { IGameParticipationManager } from '../interface/IGameParticipatioinManager'
 import { ParticipationResponseEvent } from '../event/participationResponseEvent'
+import { GameState } from '../type/gameState'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -27,6 +28,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   public abstract gameId: GameIds
   private _isActive: boolean = false
   private _gameOwnerId?: string
+  private _gameState: GameState = 'inactive'
   private gameParticipationManager!: IGameParticipationManager
   private participationTimeoutId?: NodeJS.Timeout
 
@@ -40,6 +42,10 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
 
   public get participantIds(): string[] {
     return this.gameParticipationManager.getJoinPlayers()
+  }
+
+  public get gameState(): GameState {
+    return this._gameState
   }
 
   public listenEvent(): void {
@@ -75,12 +81,16 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     if (!this.isActive) return
     this.store
       .of('networkPlugin')
-      .messageSender.send(new PriorGameDataMessage({ runningGameId: this.gameId }), ev.senderId)
+      .messageSender.send(
+        new PriorGameDataMessage({ runningGameId: this.gameId, gameState: this.gameState }),
+        ev.senderId
+      )
   }
 
   private gameHost(ev: GameHostEvent): void {
     this._isActive = this.gameId === ev.gameId
     if (!this.isActive) return
+    this._gameState = 'host'
     this._gameOwnerId = ev.ownerId
     const timeoutSec = 30
     const responseGameHostMessage = new ResponseGameHostMessage({
