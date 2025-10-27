@@ -56,7 +56,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.subscribeEvent('init', this.getStores.bind(this))
     this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this), 'HIGH')
     this.bus.subscribeEvent('gameHost', this.gameHost.bind(this))
-    this.bus.subscribeEvent('onParticipationResponse', this.onParticipationResponse.bind(this))
+    this.bus.subscribeEvent('participationResponse', this.onParticipationResponse.bind(this))
     this.bus.subscribeEvent('gameStart', this.gameStart.bind(this), 'HIGH')
     this.bus.subscribeEvent('gameAbort', this.resetGameStartButton.bind(this))
     this.bus.subscribeEvent('gameEnd', this.resetGameStartButton.bind(this))
@@ -98,6 +98,12 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     if (!this.isActive) return
     this._gameOwnerId = ev.ownerId
     this.gameInfoStore.games.set(this.gameId, this)
+    if (ev.ownerId === this.store.of('playerPlugin').ownPlayerId) {
+      this.gamePluginStore.gameDescriptionDialogManager.showDialog(this.gameId, 'showCloseButton')
+      this.bus.post(new ParticipationResponseEvent(this.gameId, true))
+    } else {
+      this.gamePluginStore.gameDescriptionDialogManager.showDialog(this.gameId, 'showParticipationButtons')
+    }
   }
 
   private onParticipationResponse(ev: ParticipationResponseEvent): void {
