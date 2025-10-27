@@ -97,7 +97,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   }
 
   private init(): void {
-    this.synchroBreakDialogManager = new SynchroBreakDialogManager(this.store)
+    this.synchroBreakDialogManager = new SynchroBreakDialogManager(this.bus, this.store)
     this.coinViewerIconUis = new Map<string, CoinViewerIcon>()
     this.gameInfoStore = this.store.of('gameInfo')
     this.gamePluginStore = this.store.of('gamePlugin')
