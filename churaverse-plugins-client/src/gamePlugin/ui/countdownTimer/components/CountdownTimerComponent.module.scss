@@ -1,0 +1,19 @@
+.countdownContainer {
+  background-color: var(--c-primary-deep);
+  top: 20%;
+  left: 5%;
+  width: 150px;
+  height: 100px;
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  display: none;
+}
+
+.countdownTimer {
+  font-size: 40px;
+  color: white;
+  text-align: center;
+  font-weight: bold;
+}
