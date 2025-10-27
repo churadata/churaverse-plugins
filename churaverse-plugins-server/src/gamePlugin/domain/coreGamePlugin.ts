@@ -85,12 +85,14 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
 
   private priorGameData(ev: PriorGameDataEvent): void {
     if (!this.isActive) return
-    this.store
-      .of('networkPlugin')
-      .messageSender.send(
-        new PriorGameDataMessage({ runningGameId: this.gameId, gameState: this.gameState }),
-        ev.senderId
-      )
+    this.store.of('networkPlugin').messageSender.send(
+      new PriorGameDataMessage({
+        runningGameId: this.gameId,
+        ownerId: this.gameOwnerId ?? '',
+        gameState: this.gameState,
+      }),
+      ev.senderId
+    )
   }
 
   private gameHost(ev: GameHostEvent): void {

@@ -9,6 +9,7 @@ import { GameState } from '../type/gameState'
 export class PriorGameDataEvent extends CVEvent<IMainScene> {
   public constructor(
     public readonly runningGameId: GameIds,
+    public readonly ownerId: string,
     public readonly gameState: GameState
   ) {
     super('priorGameData', true)

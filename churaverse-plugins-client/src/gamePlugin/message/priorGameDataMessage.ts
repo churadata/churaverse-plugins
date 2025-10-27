@@ -6,6 +6,7 @@ import { GameState } from '../type/gameState'
 
 export interface PriorGameData extends SendableObject {
   runningGameId: GameIds
+  ownerId: string
   gameState: GameState
 }
 

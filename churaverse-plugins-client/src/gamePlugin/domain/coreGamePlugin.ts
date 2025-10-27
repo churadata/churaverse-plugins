@@ -89,6 +89,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.gameEntryRenderer.onPriorGameData(ev.runningGameId, ev.gameState)
     if (!this.isActive) return
     this._gameState = ev.gameState
+    this._gameOwnerId = ev.ownerId
     this.gamePluginStore.gameLogRenderer.gameLog(`${this.gameName}が開始されています。`, 400)
     this.gameInfoStore.games.set(this.gameId, this)
   }
