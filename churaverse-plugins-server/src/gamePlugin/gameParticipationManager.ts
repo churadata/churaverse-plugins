@@ -33,14 +33,8 @@ export class GameParticipationManager implements IGameParticipationManager {
     return game.joinedPlayers.delete(playerId)
   }
 
-  public isPlayerJoined(playerId: string): boolean {
-    const game = this.gameParticipation.get(this.gameId)
-    return game?.joinedPlayers.has(playerId) ?? false
-  }
-
   public isAllPlayersResponded(): boolean {
     const game = this.gameParticipation.get(this.gameId)
-    console.log(game?.allPlayers, game?.respondedPlayers)
     return game?.allPlayers.size === game?.respondedPlayers.size
   }
 
