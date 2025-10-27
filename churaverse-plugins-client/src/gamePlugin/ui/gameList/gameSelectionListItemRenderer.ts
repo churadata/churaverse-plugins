@@ -118,7 +118,7 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
   }
 
   public resetStartButton(): void {
-    if (this.currentButtonState === 'abort') {
+    if (this.currentButtonState === 'abort' || this.currentButtonState === 'playing') {
       const gameNameElement = DomManager.getElementById(GAME_NAME_DIV_ID(this.props.gameId))
       gameNameElement.textContent = `${this.props.gameName}`
     }
