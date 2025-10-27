@@ -17,11 +17,10 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.getStores.bind(this))
     this.bus.subscribeEvent('participationResponse', this.onParticipationResponse.bind(this))
-    this.bus.subscribeEvent('gameStart', this.onGameStart.bind(this))
     this.bus.subscribeEvent('priorGameData', this.getPriorGameData.bind(this))
   }
 
-  public getStores(): void {
+  private getStores(): void {
     this.gameInfoStore = this.store.of('gameInfo')
   }
 
@@ -29,6 +28,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
    * ゲーム開始時に共通して登録されるイベントリスナー
    */
   protected subscribeGameEvent(): void {
+    this.bus.subscribeEvent('gameStart', this.onGameStart)
     this.bus.subscribeEvent('gameAbort', this.onGameTerminate)
     this.bus.subscribeEvent('gameEnd', this.onGameTerminate)
   }
@@ -37,6 +37,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
    * ゲーム中断・終了時に共通して削除されるイベントリスナー
    */
   protected unsubscribeGameEvent(): void {
+    this.bus.unsubscribeEvent('gameStart', this.onGameStart)
     this.bus.unsubscribeEvent('gameAbort', this.onGameTerminate)
     this.bus.unsubscribeEvent('gameEnd', this.onGameTerminate)
   }
@@ -57,7 +58,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     this.subscribeGameEvent()
   }
 
-  private onGameStart(ev: GameStartEvent): void {
+  private readonly onGameStart = (ev: GameStartEvent): void => {
     if (!this.isActive) return
     this.handleGameStart()
   }
