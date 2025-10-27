@@ -10,7 +10,7 @@ import { GameIds } from '../interface/gameIds'
 import { IGameInfo } from '../interface/IGameInfo'
 import { ResponseGameAbortMessage } from '../message/gameAbortMessage'
 import { ResponseGameEndMessage } from '../message/gameEndMessage'
-import { ResponseGameStartMessage } from '../message/gameStartMessage'
+import { GameStartMessage } from '../message/gameStartMessage'
 import { PriorGameDataMessage } from '../message/priorGameDataMessage'
 import { BaseGamePlugin } from './baseGamePlugin'
 import { GamePlayerQuitEvent } from '../event/gamePlayerQuitEvent'
@@ -105,13 +105,11 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   }
 
   private gameStart(ev: GameStartEvent): void {
-    this._isActive = this.gameId === ev.gameId
     if (!this.isActive) return
-    this._gameOwnerId = ev.playerId
 
-    const gameStartMessage = new ResponseGameStartMessage({
-      gameId: this.gameId,
-      playerId: ev.playerId,
+    const gameStartMessage = new GameStartMessage({
+      gameId: ev.gameId,
+      ownerId: ev.playerId,
       participantIds: this.participantIds,
     })
     this.store.of('networkPlugin').messageSender.send(gameStartMessage)

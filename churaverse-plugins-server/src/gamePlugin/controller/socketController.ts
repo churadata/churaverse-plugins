@@ -3,8 +3,7 @@ import { BaseSocketController } from '@churaverse/network-plugin-server/interfac
 import { RegisterMessageEvent } from '@churaverse/network-plugin-server/event/registerMessageEvent'
 import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-server/event/registerMessageListenerEvent'
 import { PriorDataRequestMessage } from '@churaverse/network-plugin-server/message/priorDataMessage'
-import { RequestGameStartMessage, ResponseGameStartMessage } from '../message/gameStartMessage'
-import { GameStartEvent } from '../event/gameStartEvent'
+import { GameStartMessage } from '../message/gameStartMessage'
 import { RequestGameEndMessage, ResponseGameEndMessage } from '../message/gameEndMessage'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { RequestGameAbortMessage, ResponseGameAbortMessage } from '../message/gameAbortMessage'
@@ -24,8 +23,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('requestGameHost', RequestGameHostMessage, 'onlyServer')
     ev.messageRegister.registerMessage('responseGameHost', ResponseGameHostMessage, 'allClients')
     ev.messageRegister.registerMessage('participationResponse', ParticipationResponseMessage, 'onlyServer')
-    ev.messageRegister.registerMessage('requestGameStart', RequestGameStartMessage, 'onlySelf')
-    ev.messageRegister.registerMessage('responseGameStart', ResponseGameStartMessage, 'allClients')
+    ev.messageRegister.registerMessage('gameStart', GameStartMessage, 'allClients')
     ev.messageRegister.registerMessage('requestGameEnd', RequestGameEndMessage, 'onlySelf')
     ev.messageRegister.registerMessage('responseGameEnd', ResponseGameEndMessage, 'allClients')
     ev.messageRegister.registerMessage('requestGameAbort', RequestGameAbortMessage, 'onlySelf')
@@ -37,7 +35,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageListenerRegister.on('requestPriorData', this.sendPriorGameData.bind(this))
     ev.messageListenerRegister.on('requestGameHost', this.gameHost.bind(this))
     ev.messageListenerRegister.on('participationResponse', this.participationResponse.bind(this))
-    ev.messageListenerRegister.on('requestGameStart', this.gameStart.bind(this))
     ev.messageListenerRegister.on('requestGameEnd', this.gameEnd.bind(this))
     ev.messageListenerRegister.on('requestGameAbort', this.gameAbort.bind(this))
     ev.messageListenerRegister.on('gamePlayerQuit', this.gamePlayerQuit.bind(this))
@@ -57,10 +54,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   private participationResponse(msg: ParticipationResponseMessage, senderId: string): void {
     this.eventBus.post(new ParticipationResponseEvent(msg.data.gameId, senderId, msg.data.isJoin))
-  }
-
-  private gameStart(msg: RequestGameStartMessage): void {
-    this.eventBus.post(new GameStartEvent(msg.data.gameId, msg.data.playerId))
   }
 
   private gameAbort(msg: RequestGameAbortMessage): void {
