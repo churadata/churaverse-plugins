@@ -5,6 +5,7 @@ import { PriorGameDataEvent } from '../event/priorGameDataEvent'
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { GameInfoStore } from '../store/defGamePluginStore'
+import { ParticipationResponseEvent } from '../event/participationResponseEvent'
 
 /**
  * 全てのゲームプラグインの基本となる抽象クラス
@@ -15,6 +16,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
 
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.getStores.bind(this))
+    this.bus.subscribeEvent('participationResponse', this.onParticipationResponse.bind(this))
     this.bus.subscribeEvent('gameStart', this.onGameStart.bind(this))
     this.bus.subscribeEvent('priorGameData', this.getPriorGameData.bind(this))
   }
@@ -48,6 +50,11 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     // 途中参加者はonGameStartではなく、getPriorGameDataでsubscribeGameEventする
     this.subscribeGameEvent()
     this.handleMidwayParticipant()
+  }
+
+  private onParticipationResponse(ev: ParticipationResponseEvent): void {
+    if (!this.isActive || !ev.isJoin) return
+    this.subscribeGameEvent()
   }
 
   private onGameStart(ev: GameStartEvent): void {
