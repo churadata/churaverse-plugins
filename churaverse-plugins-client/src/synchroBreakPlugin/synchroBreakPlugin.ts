@@ -150,11 +150,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   protected handleGameTermination(): void {
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
-
-    if (!this.isOwnPlayerMidwayParticipant) {
-      resetSynchroBreakPluginStore(this.store)
-      this.removeSynchroBreakIcons()
-    }
+    this.removeSynchroBreakIcons()
   }
 
   /**
@@ -201,8 +197,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * ターンが設定された時の処理
    */
   private readonly synchroBreakTurnSelect = (ev: SynchroBreakTurnSelectEvent): void => {
-    if (this.isOwnPlayerMidwayParticipant) return
-
     this.getRankingBoard.updateTurnNumber(1, ev.allTurn)
 
     this.synchroBreakPluginStore.gameTurn = ev.allTurn
@@ -219,7 +213,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * タイムリミットが設定された際の処理
    */
   private readonly timeLimitConfirm = (ev: TimeLimitConfirmEvent): void => {
-    if (this.isOwnPlayerMidwayParticipant) return
     this.synchroBreakPluginStore.timeLimit = Number(ev.timeLimit)
 
     const ownPlayerId = this.playerPluginStore.ownPlayerId
@@ -238,8 +231,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * ベットコインが設定された際の処理
    */
   private readonly sendBetCoinResponse = (ev: SendBetCoinResponseEvent): void => {
-    if (this.isOwnPlayerMidwayParticipant) return
-
     const coinViewerIcon = this.coinViewerIconUis.get(ev.playerId)
     coinViewerIcon?.coinViewer?.setBetCoins(ev.betCoins)
 
@@ -255,7 +246,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * ゲーム開始までのカウントダウンを表示する
    */
   private readonly gameStartCount = (ev: SynchroBreakStartCountEvent): void => {
-    if (this.isOwnPlayerMidwayParticipant) return
     this.descriptionWindow.displayGameStartCountdown(ev.remainingSeconds)
   }
 
@@ -263,7 +253,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * ターン中の残り時間を表示する
    */
   private readonly turnTimer = (ev: SynchroBreakTurnTimerEvent): void => {
-    if (this.isOwnPlayerMidwayParticipant) return
     const ownPlayerId = this.playerPluginStore.ownPlayerId
     const ownPlayerName = this.playerPluginStore.players.get(ownPlayerId)?.name
     if (ev.remainingSeconds === this.synchroBreakPluginStore.timeLimit) {
@@ -286,7 +275,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * ニョッキアクションの実行結果を受け取った際の処理
    */
   private readonly nyokkiActionResponse = (ev: NyokkiActionResponseEvent): void => {
-    if (this.isOwnPlayerMidwayParticipant) return
     const nyokkiCollectionPlayerIds = ev.sameTimePlayersId
     const isSuccess = ev.isSuccess
 
@@ -319,7 +307,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * ターンが終了した際の処理
    */
   private readonly synchroBreakTurnEnd = (ev: SynchroBreakTurnEndEvent): void => {
-    if (this.isOwnPlayerMidwayParticipant) return
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.close()
     this.nyokkiActionMessage = undefined
     this.ownNyokkiSatatus = 'yet'
@@ -345,7 +332,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * ターンが開始した際の処理
    */
   private readonly synchroBreakTurnStart = (ev: SynchroBreakTurnStartEvent): void => {
-    if (this.isOwnPlayerMidwayParticipant) return
     this.resetPlayerNyokkiIcon()
     this.removeBetCoinUi()
     const ownPlayerId = this.playerPluginStore.ownPlayerId
@@ -365,7 +351,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * プレイヤーのコイン所持数が更新された際の処理
    */
   private readonly updatePlayersCoin = (ev: UpdatePlayersCoinEvent): void => {
-    if (this.isOwnPlayerMidwayParticipant) return
     for (const playerCoin of ev.playersCoin) {
       this.synchroBreakPluginStore.playersCoinRepository.set(playerCoin.playerId, playerCoin.coins)
     }
@@ -376,7 +361,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * ゲーム終了後の結果ウィンドウ表示処理
    */
   private readonly showSynchroBreakResult = (): void => {
-    if (this.isOwnPlayerMidwayParticipant) return
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')?.remove()
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.remove()
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')?.displayResultMessage()
