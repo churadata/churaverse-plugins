@@ -16,6 +16,8 @@ import { BaseGamePlugin } from './baseGamePlugin'
 import { GamePlayerQuitEvent } from '../event/gamePlayerQuitEvent'
 import { GameHostEvent } from '../event/gameHostEvent'
 import { ResponseGameHostMessage } from '../message/gameHostMessage'
+import { GameParticipationManager } from '../gameParticipationManager'
+import { IGameParticipationManager } from '../interface/IGameParticipatioinManager'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -25,6 +27,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private _isActive: boolean = false
   private _gameOwnerId?: string
   private _participantIds: string[] = []
+  private gameParticipationManager!: IGameParticipationManager
 
   public get isActive(): boolean {
     return this._isActive
@@ -40,6 +43,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
 
   public listenEvent(): void {
     super.listenEvent()
+    this.bus.subscribeEvent('init', this.handleInit.bind(this))
     this.bus.subscribeEvent('gameStart', this.gameStart.bind(this), 'HIGH')
     this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this))
     this.bus.subscribeEvent('gameHost', this.gameHost.bind(this))
@@ -59,6 +63,10 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
     this.bus.unsubscribeEvent('entityDespawn', this.onPlayerLeave)
     this.bus.unsubscribeEvent('gamePlayerQuit', this.onPlayerQuitGame)
+  }
+
+  private handleInit(): void {
+    this.gameParticipationManager = new GameParticipationManager(this.gameId)
   }
 
   private priorGameData(ev: PriorGameDataEvent): void {
