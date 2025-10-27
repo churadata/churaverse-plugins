@@ -43,4 +43,11 @@ export interface IGameParticipationManager {
    * @returns 全てのプレイヤーを回答済みにする
    */
   timeoutResponse: () => void
+
+  /**
+   * 途中参加するプレイヤーを参加者リストに追加する
+   * @param playerId 途中参加するプレイヤーのID
+   * @returns
+   */
+  midwayJoinPlayer: (playerId: string) => void
 }

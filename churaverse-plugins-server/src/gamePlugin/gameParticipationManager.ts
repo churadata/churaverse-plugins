@@ -55,4 +55,12 @@ export class GameParticipationManager implements IGameParticipationManager {
       game.respondedPlayers.add(playerId)
     })
   }
+
+  public midwayJoinPlayer(playerId: string): void {
+    const game = this.gameParticipation.get(this.gameId)
+    if (game === undefined) return
+    game.allPlayers.add(playerId)
+    game.joinedPlayers.add(playerId)
+    game.respondedPlayers.add(playerId)
+  }
 }

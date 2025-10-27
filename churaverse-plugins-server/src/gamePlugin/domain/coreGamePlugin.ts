@@ -20,12 +20,16 @@ import { GameParticipationManager } from '../gameParticipationManager'
 import { IGameParticipationManager } from '../interface/IGameParticipatioinManager'
 import { ParticipationResponseEvent } from '../event/participationResponseEvent'
 import { GameState } from '../type/gameState'
+import { GamePolicy } from '../interface/gamePolicy'
+import { GameMidwayJoinEvent } from '../event/gameMidwayJoinEvent'
+import { ResponseGameMidwayJoinMessage } from '../message/gameMidwayJoinMessage'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
  */
 export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo {
   public abstract gameId: GameIds
+  public abstract gamePolicy: GamePolicy
   private _isActive: boolean = false
   private _gameOwnerId?: string
   private _gameState: GameState = 'inactive'
@@ -63,6 +67,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.subscribeEvent('gameEnd', this.gameEnd)
     this.bus.subscribeEvent('entityDespawn', this.onPlayerLeave)
     this.bus.subscribeEvent('gamePlayerQuit', this.onPlayerQuitGame)
+    this.bus.subscribeEvent('gameMidwayJoin', this.onPlayerMidwayJoin)
   }
 
   protected unsubscribeGameEvent(): void {
@@ -71,6 +76,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.unsubscribeEvent('gameEnd', this.gameEnd)
     this.bus.unsubscribeEvent('entityDespawn', this.onPlayerLeave)
     this.bus.unsubscribeEvent('gamePlayerQuit', this.onPlayerQuitGame)
+    this.bus.unsubscribeEvent('gameMidwayJoin', this.onPlayerMidwayJoin)
   }
 
   private handleInit(): void {
@@ -175,6 +181,18 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
    * @param playerId ゲームから離脱したプレイヤーのID
    */
   protected abstract handlePlayerQuitGame(playerId: string): void
+
+  private readonly onPlayerMidwayJoin = (ev: GameMidwayJoinEvent): void => {
+    if (!this.isActive) return
+    if (!this.gamePolicy.allowLateJoin) throw new Error('このゲームは途中参加を許可していません')
+    this.gameParticipationManager.midwayJoinPlayer(ev.playerId)
+    const responseGameMidwayJoinMessage = new ResponseGameMidwayJoinMessage({
+      gameId: this.gameId,
+      joinPlayerId: ev.playerId,
+      participantIds: this.participantIds,
+    })
+    this.store.of('networkPlugin').messageSender.send(responseGameMidwayJoinMessage)
+  }
 
   private closeParticipationRequest(): void {
     if (!this.isActive || this.participationTimeoutId === undefined) return
