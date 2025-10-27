@@ -28,10 +28,15 @@ import { NyokkiStatus } from './type/nyokkiStatus'
 import { IRankingBoard } from './interface/IRankingBoard'
 import { SynchroBreakListItemRenderer } from './ui/startWindow/synchroBreakListItemRenderer'
 import { IGameSelectionListItemRenderer } from '@churaverse/game-plugin-client/interface/IGameSelectionListItemRenderer'
+import { GamePolicy } from '@churaverse/game-plugin-client/interface/gamePolicy'
 
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
   protected readonly gameName = 'シンクロブレイク'
+  public readonly gamePolicy: GamePolicy = {
+    allowLateJoin: false,
+  }
+
   private nyokkiActionMessage: string | undefined = undefined
   private ownNyokkiSatatus: NyokkiStatus = 'yet'
   protected gameEntryRenderer!: IGameSelectionListItemRenderer
@@ -103,6 +108,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.playerPluginStore = this.store.of('playerPlugin')
     this.gameEntryRenderer = new SynchroBreakListItemRenderer(
       this.store,
+      this.gamePolicy,
       this.gamePluginStore.gameSelectionListContainer
     )
   }
