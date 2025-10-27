@@ -118,10 +118,11 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   }
 
   protected gameStart(ev: GameStartEvent): void {
-    this.gameEntryRenderer.onGameStart(ev.gameId)
+    this.gameEntryRenderer.onGameStart(ev.gameId, this.isJoinGame)
     if (!this.isActive) return
     this._gameOwnerId = ev.playerId
     this._participantIds = ev.participantIds
+    this.gamePluginStore.gameDescriptionDialogManager.closeDialog()
     this.gamePluginStore.gameUiManager.initializeAllUis(this.gameId)
     this.gamePluginStore.gameLogRenderer.gameStartLog(this.gameName, this.gameOwnerId ?? '')
     this.gameInfoStore.games.set(this.gameId, this)
