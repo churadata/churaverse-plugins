@@ -79,6 +79,20 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
     this.gameContainer.style.order = value.toString()
   }
 
+  public onPriorGameData(gameId: GameIds, gameState: GameState): void {
+    if (this.props.gameId !== gameId) {
+      this.gameStartButtonGrayOut()
+      return
+    }
+
+    this.setGameStatusText()
+    if (gameState === 'host') {
+      this.setGameHostText()
+    } else if (gameState === 'start') {
+      this.setPlayingGameText()
+    }
+  }
+
   public onGameHost(gameId: GameIds): void {
     if (this.props.gameId !== gameId) {
       this.gameStartButtonGrayOut()
