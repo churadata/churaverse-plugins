@@ -16,6 +16,7 @@ import { GamePlayerQuitEvent } from '../event/gamePlayerQuitEvent'
 import { RequestGameHostMessage, ResponseGameHostMessage } from '../message/gameHostMessage'
 import { GameHostEvent } from '../event/gameHostEvent'
 import { ParticipationResponseMessage } from '../message/participationResponseMessage'
+import { ParticipationResponseEvent } from '../event/participationResponseEvent'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
@@ -35,6 +36,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
   public registerMessageListener(ev: RegisterMessageListenerEvent<IMainScene>): void {
     ev.messageListenerRegister.on('requestPriorData', this.sendPriorGameData.bind(this))
     ev.messageListenerRegister.on('requestGameHost', this.gameHost.bind(this))
+    ev.messageListenerRegister.on('participationResponse', this.participationResponse.bind(this))
     ev.messageListenerRegister.on('requestGameStart', this.gameStart.bind(this))
     ev.messageListenerRegister.on('requestGameEnd', this.gameEnd.bind(this))
     ev.messageListenerRegister.on('requestGameAbort', this.gameAbort.bind(this))
@@ -51,6 +53,10 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   private gameHost(msg: RequestGameHostMessage): void {
     this.eventBus.post(new GameHostEvent(msg.data.gameId, msg.data.ownerId))
+  }
+
+  private participationResponse(msg: ParticipationResponseMessage, senderId: string): void {
+    this.eventBus.post(new ParticipationResponseEvent(msg.data.gameId, senderId, msg.data.isJoin))
   }
 
   private gameStart(msg: RequestGameStartMessage): void {
