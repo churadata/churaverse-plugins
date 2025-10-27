@@ -3,8 +3,9 @@ import '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
 import '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { Player } from '@churaverse/player-plugin-client/domain/player'
 import { PlayerNotExistsInPlayerRepositoryError } from '@churaverse/player-plugin-client/errors/playerNotExistsInPlayerRepositoryError'
+import { IGameLogRenderer } from '../../interface/IGameLogRenderer'
 
-export class GameLogRenderer {
+export class GameLogRenderer implements IGameLogRenderer {
   public constructor(private readonly store: Store<IMainScene>) {}
 
   /**
@@ -42,6 +43,15 @@ export class GameLogRenderer {
    */
   public gameLog(message: string, x: number): void {
     this.store.of('coreUiPlugin').fadeOutLogRenderer.add(message, x)
+  }
+
+  /**
+   * ゲームに途中参加したプレイヤーのログを表示
+   * @param gameName
+   */
+  public gameMidwayJoinLog(gameName: string, joinPlayerId: string): void {
+    const playerName = this.getPlayerName(joinPlayerId)
+    this.store.of('coreUiPlugin').fadeOutLogRenderer.add(`${playerName}さんが、${gameName}に途中参加しました`)
   }
 
   /**
