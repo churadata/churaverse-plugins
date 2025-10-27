@@ -18,6 +18,7 @@ import { GameHostEvent } from '../event/gameHostEvent'
 import { ResponseGameHostMessage } from '../message/gameHostMessage'
 import { GameParticipationManager } from '../gameParticipationManager'
 import { IGameParticipationManager } from '../interface/IGameParticipatioinManager'
+import { ParticipationResponseEvent } from '../event/participationResponseEvent'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -28,6 +29,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private _gameOwnerId?: string
   private _participantIds: string[] = []
   private gameParticipationManager!: IGameParticipationManager
+  private participationTimeoutId?: NodeJS.Timeout
 
   public get isActive(): boolean {
     return this._isActive
@@ -47,6 +49,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.subscribeEvent('gameStart', this.gameStart.bind(this), 'HIGH')
     this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this))
     this.bus.subscribeEvent('gameHost', this.gameHost.bind(this))
+    this.bus.subscribeEvent('participationResponse', this.onParticipationResponse.bind(this))
   }
 
   protected subscribeGameEvent(): void {
@@ -87,6 +90,19 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
       timeoutSec,
     })
     this.store.of('networkPlugin').messageSender.send(responseGameHostMessage)
+
+    this.gameParticipationManager.init(this.store.of('playerPlugin').players.getAllId())
+    this.participationTimeoutId = setTimeout(() => {
+      this.closeParticipationRequest()
+    }, timeoutSec * 1000)
+  }
+
+  private onParticipationResponse(ev: ParticipationResponseEvent): void {
+    if (!this.isActive) return
+    this.gameParticipationManager.set(ev.playerId, ev.isJoin)
+    if (this.gameParticipationManager.isAllPlayersResponded()) {
+      this.closeParticipationRequest()
+    }
   }
 
   private gameStart(ev: GameStartEvent): void {
@@ -161,5 +177,14 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     if (idx === -1) return false
     this._participantIds.splice(idx, 1)
     return true
+  }
+
+  private closeParticipationRequest(): void {
+    if (!this.isActive || this.participationTimeoutId === undefined) return
+    clearTimeout(this.participationTimeoutId)
+    this.participationTimeoutId = undefined
+    this.gameParticipationManager.timeoutResponse()
+    const gameStartEvent = new GameStartEvent(this.gameId, this.gameOwnerId ?? '')
+    this.bus.post(gameStartEvent)
   }
 }
