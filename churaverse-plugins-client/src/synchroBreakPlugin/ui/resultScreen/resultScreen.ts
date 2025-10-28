@@ -67,18 +67,17 @@ export class ResultScreen implements ISynchroBreakResultScreen {
       previousCoins = player.coins
     })
 
-    this.createExitButton()
+    this.createResultExitButton()
   }
 
   /**
    * 結果画面を閉じるボタンを作成する
    */
-  private createExitButton(): void {
-    const exitButton = DomManager.jsxToDom(ResultExitButton())
-    this.element.appendChild(exitButton)
-    exitButton.addEventListener('click', () => {
+  private createResultExitButton(): void {
+    const resultExitButton = DomManager.jsxToDom(ResultExitButton())
+    this.element.appendChild(resultExitButton)
+    resultExitButton.addEventListener('click', () => {
       const playerId = this.store.of('playerPlugin').ownPlayerId
-      // ユーザーがOKした場合のみ退出処理を実行
       this.eventBus.post(new GamePlayerQuitEvent(this.gameId, playerId))
       this.remove()
     })
