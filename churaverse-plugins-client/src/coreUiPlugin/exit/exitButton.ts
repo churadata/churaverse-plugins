@@ -1,9 +1,9 @@
 import exitIconImage from '../assets/exit.png'
 import { OwnPlayerExitEvent } from '../event/ownPlayerExitEvent'
 import { IMainScene, IEventBus, domLayerSetting, DomManager } from 'churaverse-engine-client'
-import { IExitConfirmAlert } from '../interface/IExitConfirmAlert'
+import { IExitButton } from '../interface/IExitButton'
 
-export class ExitButton implements IExitConfirmAlert {
+export class ExitButton implements IExitButton {
   public constructor(
     public eventBus: IEventBus<IMainScene>,
     public exitMessage: string = 'このミーティングから退出しますか？'
@@ -35,7 +35,7 @@ export class ExitButton implements IExitConfirmAlert {
     }
   }
 
-  public setMessage(message: string): void {
+  public setExitMessage(message: string): void {
     this.exitMessage = message
   }
 }
