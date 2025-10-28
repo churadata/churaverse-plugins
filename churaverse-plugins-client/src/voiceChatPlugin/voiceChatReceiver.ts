@@ -26,7 +26,7 @@ export class VoiceChatReceiver {
   private onJoin(track: RemoteTrack, publication: RemoteTrackPublication, participant: RemoteParticipant): void {
     if (track.source !== Track.Source.Microphone) return
 
-    const remoteTrackPublication = participant.getTrack(Track.Source.Microphone)
+    const remoteTrackPublication = participant.getTrackPublication(Track.Source.Microphone)
     if (remoteTrackPublication?.audioTrack == null || remoteTrackPublication.track == null) {
       return
     }
@@ -49,7 +49,7 @@ export class VoiceChatReceiver {
       this.eventBus.post(new MuteEvent(participant.identity))
     })
 
-    participant.addListener('isSpeakingChanged', (speaking) => {
+    participant.addListener('isSpeakingChanged', () => {
       const playerMicIcon = this.playerVoiceChatUis.get(participant.identity)?.playerMicIcon
       playerMicIcon?.setAlphaToMicIcon(participant.audioLevel * 5)
     })
@@ -61,7 +61,7 @@ export class VoiceChatReceiver {
   private onLeave(track: RemoteTrack, publication: RemoteTrackPublication, participant: RemoteParticipant): void {
     if (track.source !== Track.Source.Microphone) return
 
-    participant.getTrack(Track.Source.Microphone)?.track?.detach()
+    participant.getTrackPublication(Track.Source.Microphone)?.track?.detach()
     this.eventBus.post(new LeaveVoiceChatEvent(participant.identity))
   }
 }
