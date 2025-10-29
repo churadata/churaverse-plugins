@@ -248,6 +248,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
       player.hp
     )
     if (playerRenderer === undefined) throw new PlayerRendererNotFoundError(player.id)
+    playerRenderer.setOwnPlayerHighlight(player.id === this.playerPluginStore.ownPlayerId)
     this.playerPluginStore.playerRenderers.set(player.id, playerRenderer)
   }
 

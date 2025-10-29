@@ -17,6 +17,16 @@ import heroBlack from '../assets/hero_black.png'
 import heroBlue from '../assets/hero_blue.png'
 import heroGray from '../assets/hero_gray.png'
 
+const DEFAULT_NAMEPLATE_COLOR = '#ffffff'
+const DEFAULT_NAMEPLATE_STROKE = '#403c3c'
+const DEFAULT_NAMEPLATE_STROKE_WIDTH = 3
+const OWN_PLAYER_NAMEPLATE_COLOR = '#ffe066'
+const OWN_PLAYER_NAMEPLATE_STROKE = '#1f1400'
+const OWN_PLAYER_NAMEPLATE_STROKE_WIDTH = 4
+const NAMEPLATE_SHADOW_COLOR = '#000000'
+const DEFAULT_NAMEPLATE_FONT_SIZE = 16
+const OWN_PLAYER_NAMEPLATE_FONT_SIZE = 18
+
 /**
  * 初期色の名前 = basic
  */
@@ -102,7 +112,9 @@ export class PlayerRenderer implements IPlayerRenderer {
     this._playerNamePlate = scene.add
       .text(_relativePositionToNamePlate.x, _relativePositionToNamePlate.y, name)
       .setOrigin(0.5)
-      .setStroke('#403c3c', 3)
+      .setStroke(DEFAULT_NAMEPLATE_STROKE, DEFAULT_NAMEPLATE_STROKE_WIDTH)
+
+    this.applyDefaultNamePlateStyle()
 
     _anims.forEach((cfg) => {
       this.sprite.anims.create({
@@ -429,6 +441,19 @@ export class PlayerRenderer implements IPlayerRenderer {
     this._playerNamePlate.setText(name).setOrigin(0.5)
   }
 
+  public setOwnPlayerHighlight(enabled: boolean): void {
+    if (enabled) {
+      this._playerNamePlate
+        .setColor(OWN_PLAYER_NAMEPLATE_COLOR)
+        .setFontSize(OWN_PLAYER_NAMEPLATE_FONT_SIZE)
+        .setFontStyle('bold')
+        .setStroke(OWN_PLAYER_NAMEPLATE_STROKE, OWN_PLAYER_NAMEPLATE_STROKE_WIDTH)
+        .setShadow(0, 2, NAMEPLATE_SHADOW_COLOR, 6, true, true)
+    } else {
+      this.applyDefaultNamePlateStyle()
+    }
+  }
+
   /**
    * spriteを消滅させる関数
    */
@@ -447,6 +472,15 @@ export class PlayerRenderer implements IPlayerRenderer {
     _anims.forEach((cfg) => {
       this.sprite.anims.remove(cfg.key)
     })
+  }
+
+  private applyDefaultNamePlateStyle(): void {
+    this._playerNamePlate
+      .setColor(DEFAULT_NAMEPLATE_COLOR)
+      .setFontSize(DEFAULT_NAMEPLATE_FONT_SIZE)
+      .setFontStyle('normal')
+      .setStroke(DEFAULT_NAMEPLATE_STROKE, DEFAULT_NAMEPLATE_STROKE_WIDTH)
+      .setShadow(0, 0, NAMEPLATE_SHADOW_COLOR, 0, false, false)
   }
 
   public setParentContainer(container: GameObjects.Container): void {
