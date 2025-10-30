@@ -3,38 +3,23 @@ import { BaseMessage } from '@churaverse/network-plugin-client/message/baseMessa
 import { SendableObject } from '@churaverse/network-plugin-client/types/sendable'
 import { GameIds } from '../interface/gameIds'
 
-export interface RequestGameStartData extends SendableObject {
+export interface GameStartData extends SendableObject {
   gameId: GameIds
-  playerId: string
-}
-
-/**
- * クライアントからサーバーへのゲーム開始リクエストメッセージ
- */
-export class RequestGameStartMessage extends BaseMessage<IMainScene> {
-  public constructor(public readonly data: RequestGameStartData) {
-    super('requestGameStart', data)
-  }
-}
-
-export interface ResponseGameStartData extends SendableObject {
-  gameId: GameIds
-  playerId: string
+  ownerId: string
   participantIds: string[]
 }
 
 /**
- * サーバーからクライアントへのゲーム開始レスポンスメッセージ
+ * サーバーからクライアントへのゲーム開始メッセージ
  */
-export class ResponseGameStartMessage extends BaseMessage<IMainScene> {
-  public constructor(public readonly data: ResponseGameStartData) {
-    super('responseGameStart', data)
+export class GameStartMessage extends BaseMessage<IMainScene> {
+  public constructor(public readonly data: GameStartData) {
+    super('gameStart', data)
   }
 }
 
 declare module '@churaverse/network-plugin-client/message/messages' {
   export interface MainMessageMap {
-    requestGameStart: RequestGameStartMessage
-    responseGameStart: ResponseGameStartMessage
+    gameStart: GameStartMessage
   }
 }

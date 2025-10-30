@@ -2,11 +2,12 @@ import { DomManager, IMainScene, Store } from 'churaverse-engine-client'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { GameIds } from '../../interface/gameIds'
 import { GameState } from '../../type/gameState'
-import { IGameDescriptionDialogManager } from '../../interface/IGameDescriptionDialogManager'
-import { RequestGameStartMessage } from '../../message/gameStartMessage'
 import { RequestGameAbortMessage } from '../../message/gameAbortMessage'
 import { IGameSelectionListItemRenderer } from '../../interface/IGameSelectionListItemRenderer'
 import { GameSelectionListItem } from './components/GameListComponent'
+import { RequestGameHostMessage } from '../../message/gameHostMessage'
+import { GamePolicy } from '../../interface/gamePolicy'
+import { RequestGameMidwayJoinMessage } from '../../message/gameMidwayJoinMessage'
 
 const DEFAULT_ICON_SIZE = '40px'
 
@@ -45,7 +46,7 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
 
   public constructor(
     private readonly store: Store<IMainScene>,
-    private readonly gameDetailManager: IGameDescriptionDialogManager,
+    private readonly gamePolicy: GamePolicy,
     private readonly props: GameSelectionListItemProps
   ) {
     this.networkPlugin = this.store.of('networkPlugin')
@@ -81,17 +82,46 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
     this.gameContainer.style.order = value.toString()
   }
 
-  public onGameStart(gameId: GameIds): void {
-    if (this.props.gameId === gameId) {
-      this.setGameAbortText()
-      this.setGameStatusText()
-    } else {
+  public onPriorGameData(gameId: GameIds, gameState: GameState): void {
+    if (this.props.gameId !== gameId) {
       this.gameStartButtonGrayOut()
+      return
+    }
+
+    this.setGameStatusText()
+    if (gameState === 'host') {
+      this.setGameHostText()
+    } else if (gameState === 'start') {
+      this.setPlayingGameText()
+    }
+  }
+
+  public onGameHost(gameId: GameIds): void {
+    if (this.props.gameId !== gameId) {
+      this.gameStartButtonGrayOut()
+      return
+    }
+
+    this.setGameHostText()
+    this.setGameStatusText()
+  }
+
+  public onGameStart(gameId: GameIds, isJoin: boolean): void {
+    if (this.props.gameId !== gameId) {
+      this.gameStartButtonGrayOut()
+      return
+    }
+
+    this.setGameStatusText()
+    if (isJoin) {
+      this.setGameAbortText()
+    } else {
+      this.setPlayingGameText()
     }
   }
 
   public resetStartButton(): void {
-    if (this.currentButtonState === 'abort') {
+    if (this.currentButtonState === 'abort' || this.currentButtonState === 'playing') {
       const gameNameElement = DomManager.getElementById(GAME_NAME_DIV_ID(this.props.gameId))
       gameNameElement.textContent = `${this.props.gameName}`
     }
@@ -104,8 +134,18 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
     this.currentButtonState = 'start'
   }
 
+  private setGameHostText(): void {
+    const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
+    startButton.textContent = `開始待ち`
+    startButton.disabled = true
+    startButton.style.backgroundColor = 'lightgray'
+    startButton.style.color = 'var(--color-button-background)'
+    this.currentButtonState = 'host'
+  }
+
   private setGameAbortText(): void {
     const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
+    startButton.disabled = false
     startButton.textContent = '中止'
     startButton.style.color = 'red'
     startButton.style.backgroundColor = 'white'
@@ -123,16 +163,34 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
     startButton.disabled = true
     startButton.style.backgroundColor = 'lightgray'
     startButton.style.color = 'var(--color-button-background)'
-    this.currentButtonState = 'inActive'
+    this.currentButtonState = 'inactive'
+  }
+
+  private setPlayingGameText(): void {
+    const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
+    this.currentButtonState = 'playing'
+    if (this.gamePolicy.allowLateJoin) {
+      startButton.textContent = `途中参加`
+      startButton.disabled = false
+      startButton.style.color = 'white'
+      startButton.style.backgroundColor = 'var(--c-primary-deep)'
+    } else {
+      startButton.textContent = `プレイ中`
+      startButton.disabled = true
+      startButton.style.backgroundColor = 'lightgray'
+      startButton.style.color = 'var(--color-button-background)'
+    }
   }
 
   private setupGameStartButton(): void {
     const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
     startButton.addEventListener('click', () => {
       if (this.currentButtonState === 'start') {
-        this.sendGameStartMessage()
+        this.sendGameHostMessage()
       } else if (this.currentButtonState === 'abort') {
         this.sendGameAbortMessage()
+      } else if (this.currentButtonState === 'playing') {
+        this.sendGameMidwayJoinMessage()
       }
     })
   }
@@ -140,16 +198,16 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
   private setupGameDetailButton(): void {
     const detailButton = DomManager.getElementById<HTMLButtonElement>(GAME_DETAIL_BUTTON_ID(this.props.gameId))
     detailButton.addEventListener('click', () => {
-      this.gameDetailManager.showDialog(this.props.gameId)
+      this.store.of('gamePlugin').gameDescriptionDialogManager.showDialog(this.props.gameId, 'showCloseButton')
     })
   }
 
-  private sendGameStartMessage(): void {
-    const gameStartMessage = new RequestGameStartMessage({
+  private sendGameHostMessage(): void {
+    const gameHostMessage = new RequestGameHostMessage({
       gameId: this.props.gameId,
-      playerId: this.store.of('playerPlugin').ownPlayerId,
+      ownerId: this.store.of('playerPlugin').ownPlayerId,
     })
-    this.networkPlugin.messageSender.send(gameStartMessage)
+    this.networkPlugin.messageSender.send(gameHostMessage)
   }
 
   private sendGameAbortMessage(): void {
@@ -158,5 +216,12 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
       playerId: this.store.of('playerPlugin').ownPlayerId,
     })
     this.networkPlugin.messageSender.send(gameAbortMessage)
+  }
+
+  private sendGameMidwayJoinMessage(): void {
+    const gameMidwayJoinMessage = new RequestGameMidwayJoinMessage({
+      gameId: this.props.gameId,
+    })
+    this.networkPlugin.messageSender.send(gameMidwayJoinMessage)
   }
 }

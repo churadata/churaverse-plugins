@@ -1,7 +1,9 @@
 import { JSXFunc } from 'churaverse-engine-client'
 import style from './PopupGameDescriptionDialog.module.scss'
 import { GameIds } from '../../../interface/gameIds'
-import { GAME_DESCRIPTION_CLOSE_BUTTON_ID, GAME_DESCRIPTION_CONTAINER_ID } from '../gameDescriptionDialog'
+import { GAME_DESCRIPTION_CONTAINER_ID } from '../gameDescriptionDialog'
+import { CloseButtonComponent } from './CloseButtonComponent'
+import { GameParticipationButtons } from './GameParticipationButtons'
 
 export const PopupGameDescriptionDialog: JSXFunc<any> = ({
   gameId,
@@ -13,16 +15,11 @@ export const PopupGameDescriptionDialog: JSXFunc<any> = ({
   return (
     <div className={style.windowContainer}>
       <div className={style.windowLabel}>{gameName}</div>
-
       <div id={GAME_DESCRIPTION_CONTAINER_ID(gameId)} className={style.detailContainer}>
         {/* ここに ゲームの説明を入れる */}
       </div>
-
-      <div className={style.buttonsContainer}>
-        <button className={style.closeButton} id={GAME_DESCRIPTION_CLOSE_BUTTON_ID(gameId)} type="button">
-          閉じる
-        </button>
-      </div>
+      <GameParticipationButtons gameId={gameId} />
+      <CloseButtonComponent gameId={gameId} />
     </div>
   )
 }

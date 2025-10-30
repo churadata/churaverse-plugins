@@ -20,9 +20,13 @@ import { SynchroBreakTurnStartEvent } from './event/synchroBreakTurnStartEvent'
 import { SynchroBreakTurnStartMessage } from './message/synchroBreakTurnStartMessage'
 import { IGameSequence } from './interface/IGameSequence'
 import { GameSequence } from './logic/gameSequence'
+import { GamePolicy } from '@churaverse/game-plugin-server/interface/gamePolicy'
 
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
+  public readonly gamePolicy: GamePolicy = {
+    allowLateJoin: false,
+  }
 
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private synchroBreakPluginStore!: SynchroBreakPluginStore
