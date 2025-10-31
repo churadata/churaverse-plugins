@@ -1,3 +1,7 @@
+.title {
+  font-size: 30px;
+}
+
 .popupButton {
   padding: 0 25px;
   height: 35px;
@@ -34,4 +38,38 @@
   height: 70%;
   display: block;
   margin: 8px auto;
+}
+
+.section {
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.section h5 {
+  margin-bottom: 0.25rem; // 4px 相当
+}
+
+.sectionList {
+  list-style: decimal inside; // 番号と最初のテキストを同じ行に
+  margin-top: 1.5rem;
+  padding-left: 0; // insideにしたので0でもOK
+}
+
+.stepItem {
+  margin-bottom: 1.5rem;
+}
+
+.stepTitle {
+  display: inline; // ここがポイント
+  font-weight: 600;
+  margin-left: 0.25rem; // 番号とちょっとだけ間をあける
+}
+
+.churarenRule {
+  font-size: 25px;
+  font-family: 'Cinzel', system-ui, sans-serif;
+  background: rgba(0, 0, 0, 0.08); /* 薄いグレー */
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.5rem;
+  display: inline-block; /* 背景を文字の幅に合わせる */
 }

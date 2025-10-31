@@ -13,31 +13,33 @@ export const RuleExplanationWindowComponent: JSXFunc = () => {
   return (
     <div className={style.container} id={POPUP_GAME_START_WINDOW_BUTTON_ID}>
       <h2 className={style.title}>ちゅられん</h2>
-      <p className={style.description}>
-        ちゅられんは、みんなで協力し、制限時間内に強大なモンスターに立ち向かう協力型バトルゲーム！
-      </p>
+      <p className={style.description}>みんなで協力し、制限時間内に強大なモンスターに立ち向かう協力型バトルゲーム！</p>
 
       <div className={style.section}>
         <img src={headerImage} alt="プレイ中の様子を写した画像" className={style.headerImage} />
       </div>
 
-      <div className={style.section}>
-        <h4>1. アイテムを集めよう！</h4>
-        <p>ボス(※1)の攻撃を掻い潜りながら、フィールドに落ちている錬金アイテムを集めます。</p>
-        <img src={itemImage} alt="アイテムとプレイヤーの写った画像" className={style.image} />
-      </div>
+      <h2 className={style.churarenRule}>⚔️ちゅられんルール説明⚔️</h2>
 
-      <div className={style.section}>
-        <h4>2. 錬金窯で攻撃を錬金！</h4>
-        <p>集めた錬金アイテムを錬金窯に投入すると、攻撃を錬金することができます。</p>
-        <img src={alchemyImage} alt="錬金窯とアイテムを持ったプレイヤーの写った画像" className={style.image} />
-      </div>
+      <ol className={style.sectionList}>
+        <li className={style.stepItem}>
+          <p className={style.stepTitle}>アイテムを集めよう！</p>
+          <p>ボス(※1)の攻撃を掻い潜りながら、フィールドに落ちている錬金アイテムを集めます。</p>
+          <img src={itemImage} alt="アイテムとプレイヤーの写った画像" className={style.image} />
+        </li>
 
-      <div className={style.section}>
-        <h4>3. 錬金した攻撃でボスを撃破！</h4>
-        <p>錬金した攻撃(※2)を使って、ボスモンスターにダメージを与えましょう！</p>
-        <img src={bossImage} alt="錬金した攻撃とボスの写った画像" className={style.image} />
-      </div>
+        <li className={style.stepItem}>
+          <p className={style.stepTitle}>錬金窯で攻撃を錬金！</p>
+          <p>集めた錬金アイテムを錬金窯に投入すると、攻撃を錬金することができます。</p>
+          <img src={alchemyImage} alt="錬金窯とアイテムを持ったプレイヤーの写った画像" className={style.image} />
+        </li>
+
+        <li className={style.stepItem}>
+          <p className={style.stepTitle}>錬金した攻撃でボスを撃破！</p>
+          <p>錬金した攻撃(※2)を使って、ボスモンスターにダメージを与えましょう！</p>
+          <img src={bossImage} alt="錬金した攻撃とボスの写った画像" className={style.image} />
+        </li>
+      </ol>
 
       <div className={style.section}>
         <h3>ゴーストモード</h3>
