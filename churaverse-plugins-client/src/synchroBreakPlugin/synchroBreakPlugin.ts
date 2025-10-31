@@ -73,6 +73,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.subscribeEvent('synchroBreakTurnStart', this.synchroBreakTurnStart)
     this.bus.subscribeEvent('updatePlayersCoin', this.updatePlayersCoin)
     this.bus.subscribeEvent('synchroBreakResult', this.showSynchroBreakResult)
+    this.bus.subscribeEvent('synchroBreakMidResult', this.showSynchroBreakMidResult)
   }
 
   /**
@@ -90,6 +91,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.unsubscribeEvent('synchroBreakTurnStart', this.synchroBreakTurnStart)
     this.bus.unsubscribeEvent('updatePlayersCoin', this.updatePlayersCoin)
     this.bus.unsubscribeEvent('synchroBreakResult', this.showSynchroBreakResult)
+    this.bus.unsubscribeEvent('synchroBreakMidResult', this.showSynchroBreakMidResult)
   }
 
   private phaserSceneInit(ev: PhaserSceneInit): void {
@@ -343,6 +345,11 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.gamePluginStore.gameLogRenderer.gameLog(noNyokkiLogText, 100)
   }
 
+  private readonly showSynchroBreakMidResult = (): void => {
+    if (this.isOwnPlayerMidwayParticipant) return
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'resultScreen')?.createMiddleResultRanking()
+  }
+
   /**
    * ターンが開始した際の処理
    */
@@ -350,6 +357,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     if (this.isOwnPlayerMidwayParticipant) return
     this.resetPlayerNyokkiIcon()
     this.removeBetCoinUi()
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'resultScreen')?.close()
     const ownPlayerId = this.playerPluginStore.ownPlayerId
     const ownCoins = this.synchroBreakPluginStore.playersCoinRepository.get(ownPlayerId)
 
@@ -382,7 +390,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')?.remove()
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.remove()
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')?.displayResultMessage()
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'resultScreen')?.createResultRanking()
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'resultScreen')?.createFinalResultRanking()
   }
 
   /**
