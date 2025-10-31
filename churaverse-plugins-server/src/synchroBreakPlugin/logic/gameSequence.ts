@@ -11,6 +11,8 @@ import { SynchroBreakStartCountMessage } from '../message/synchroBreakStartCount
 import { SynchroBreakTurnTimerMessage } from '../message/synchroBreakTurnTimerMessage'
 import { SynchroBreakResultMessage } from '../message/synchroBreakResultMessage'
 import { UpdatePlayersCoinMessage } from '../message/updatePlayersCoinMessage'
+import { SynchroBreakMidResultMessage } from '../message/synchroBreakMidResultMessage'
+import { SYNCHRO_BREAK_MID_RESULT_TIME_LIMIT } from '../synchroBreakPlugin'
 
 export class GameSequence implements IGameSequence {
   private readonly synchroBreakPluginStore!: SynchroBreakPluginStore
@@ -93,6 +95,13 @@ export class GameSequence implements IGameSequence {
     } else {
       this.turnCountNumber++
 
+      const sortedPlayersCoin = this.synchroBreakPluginStore.playersCoinRepository.sortedPlayerCoins()
+      this.networkPluginStore.messageSender.send(new UpdatePlayersCoinMessage({ playersCoin: sortedPlayersCoin }))
+      this.networkPluginStore.messageSender.send(new SynchroBreakMidResultMessage())
+
+      await this.delay(SYNCHRO_BREAK_MID_RESULT_TIME_LIMIT)
+
+      if (!this.isActive) return
       const synchroBreakTurnStart = new SynchroBreakTurnStartEvent(this.turnCountNumber)
       this.eventBus.post(synchroBreakTurnStart)
     }
