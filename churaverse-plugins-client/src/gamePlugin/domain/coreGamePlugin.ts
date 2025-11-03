@@ -103,10 +103,10 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.gameInfoStore.games.set(this.gameId, this)
     this.gamePluginStore.countdownTimer.start(ev.timeoutSec)
     if (ev.ownerId === this.store.of('playerPlugin').ownPlayerId) {
-      this.gamePluginStore.gameDescriptionDialogManager.showDialog(this.gameId, 'showCloseButton')
+      this.gamePluginStore.gameDescriptionDialogManager.showDialog(this.gameId, 'viewOnly')
       this.bus.post(new SubmitGameJoinEvent(this.gameId, true))
     } else {
-      this.gamePluginStore.gameDescriptionDialogManager.showDialog(this.gameId, 'showParticipationButtons')
+      this.gamePluginStore.gameDescriptionDialogManager.showDialog(this.gameId, 'joinable')
     }
   }
 

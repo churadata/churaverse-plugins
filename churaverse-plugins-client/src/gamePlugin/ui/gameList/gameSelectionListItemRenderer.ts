@@ -169,7 +169,7 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
   private setPlayingGameText(): void {
     const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
     this.currentButtonState = 'playing'
-    if (this.gamePolicy.allowLateJoin) {
+    if (this.gamePolicy.allowMidwayJoin) {
       startButton.textContent = `途中参加`
       startButton.disabled = false
       startButton.style.color = 'white'
@@ -198,7 +198,7 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
   private setupGameDetailButton(): void {
     const detailButton = DomManager.getElementById<HTMLButtonElement>(GAME_DETAIL_BUTTON_ID(this.props.gameId))
     detailButton.addEventListener('click', () => {
-      this.store.of('gamePlugin').gameDescriptionDialogManager.showDialog(this.props.gameId, 'showCloseButton')
+      this.store.of('gamePlugin').gameDescriptionDialogManager.showDialog(this.props.gameId, 'viewOnly')
     })
   }
 

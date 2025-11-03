@@ -1,8 +1,8 @@
 import { GameIds } from '../interface/gameIds'
-import { GameDescriptionDialogState, IGameDescriptionDialog } from './IGameDescriptionDialog'
+import { GameDescriptionDialogType, IGameDescriptionDialog } from './IGameDescriptionDialog'
 
 export interface IGameDescriptionDialogManager {
   add: (gameId: GameIds, dialog: IGameDescriptionDialog) => void
-  showDialog: (gameId: GameIds, status: GameDescriptionDialogState) => void
+  showDialog: (gameId: GameIds, status: GameDescriptionDialogType) => void
   closeDialog: () => void
 }

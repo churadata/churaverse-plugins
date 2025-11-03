@@ -1,11 +1,11 @@
 export interface IGameDescriptionDialog {
-  open: (state: GameDescriptionDialogState) => void
+  open: (state: GameDescriptionDialogType) => void
   close: () => void
 }
 
 /**
  * ゲーム詳細ダイアログの状態
- * - showCloseButton: 閉じるボタンのみ表示
- * - showParticipationButtons: 参加・退出ボタンを表示
+ * - viewOnly: 閉じるボタンのみ表示
+ * - joinable: 参加・不参加ボタンを表示
  */
-export type GameDescriptionDialogState = 'showCloseButton' | 'showParticipationButtons'
+export type GameDescriptionDialogType = 'viewOnly' | 'joinable'
