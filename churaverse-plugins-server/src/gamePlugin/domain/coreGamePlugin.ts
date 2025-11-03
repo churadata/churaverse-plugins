@@ -16,13 +16,13 @@ import { BaseGamePlugin } from './baseGamePlugin'
 import { GamePlayerQuitEvent } from '../event/gamePlayerQuitEvent'
 import { GameHostEvent } from '../event/gameHostEvent'
 import { ResponseGameHostMessage } from '../message/gameHostMessage'
-import { GameParticipationManager } from '../gameParticipationManager'
-import { IGameParticipationManager } from '../interface/IGameParticipatioinManager'
-import { ParticipationResponseEvent } from '../event/participationResponseEvent'
 import { GameState } from '../type/gameState'
 import { GamePolicy } from '../interface/gamePolicy'
 import { GameMidwayJoinEvent } from '../event/gameMidwayJoinEvent'
 import { ResponseGameMidwayJoinMessage } from '../message/gameMidwayJoinMessage'
+import { SubmitGameJoinEvent } from '../event/submitGameJoinEvent'
+import { IGameJoinManager } from '../interface/IGameJoinManager'
+import { GameJoinManager } from '../gameParticipationManager'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -33,7 +33,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private _isActive: boolean = false
   private _gameOwnerId?: string
   private _gameState: GameState = 'inactive'
-  private gameParticipationManager!: IGameParticipationManager
+  private gameJoinManager!: IGameJoinManager
   private participationTimeoutId?: NodeJS.Timeout
 
   public get isActive(): boolean {
@@ -45,7 +45,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   }
 
   public get participantIds(): string[] {
-    return this.gameParticipationManager.getJoinPlayers()
+    return this.gameJoinManager.getParticipantIds()
   }
 
   public get gameState(): GameState {
@@ -58,7 +58,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.subscribeEvent('gameStart', this.gameStart.bind(this), 'HIGH')
     this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this))
     this.bus.subscribeEvent('gameHost', this.gameHost.bind(this))
-    this.bus.subscribeEvent('participationResponse', this.onParticipationResponse.bind(this))
+    this.bus.subscribeEvent('submitGameJoin', this.onSubmitGameJoin.bind(this))
   }
 
   protected subscribeGameEvent(): void {
@@ -80,7 +80,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   }
 
   private handleInit(): void {
-    this.gameParticipationManager = new GameParticipationManager(this.gameId)
+    this.gameJoinManager = new GameJoinManager(this.gameId)
   }
 
   private priorGameData(ev: PriorGameDataEvent): void {
@@ -109,17 +109,17 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     })
     this.store.of('networkPlugin').messageSender.send(responseGameHostMessage)
 
-    this.gameParticipationManager.init(this.store.of('playerPlugin').players.getAllId())
+    this.gameJoinManager.init(this.store.of('playerPlugin').players.getAllId())
     this.participationTimeoutId = setTimeout(() => {
-      this.closeParticipationRequest()
+      this.finalizeJoin()
     }, timeoutSec * 1000)
   }
 
-  private onParticipationResponse(ev: ParticipationResponseEvent): void {
+  private onSubmitGameJoin(ev: SubmitGameJoinEvent): void {
     if (!this.isActive) return
-    this.gameParticipationManager.set(ev.playerId, ev.isJoin)
-    if (this.gameParticipationManager.isAllPlayersResponded()) {
-      this.closeParticipationRequest()
+    this.gameJoinManager.set(ev.playerId, ev.willJoin)
+    if (this.gameJoinManager.isAllPlayersResponded()) {
+      this.finalizeJoin()
     }
   }
 
@@ -152,7 +152,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._isActive = false
     this._gameOwnerId = undefined
     this._gameState = 'inactive'
-    this.gameParticipationManager.clear()
+    this.gameJoinManager.clear()
     this.gamePluginStore.games.delete(this.gameId)
   }
 
@@ -164,7 +164,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (!isPlayer(ev.entity)) return
     const playerId: string = ev.entity.id
-    if (!this.gameParticipationManager.delete(playerId)) return
+    if (!this.gameJoinManager.delete(playerId)) return
     this.handlePlayerLeave(playerId)
   }
 
@@ -175,7 +175,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   protected abstract handlePlayerLeave(playerId: string): void
 
   private readonly onPlayerQuitGame = (ev: GamePlayerQuitEvent): void => {
-    if (!this.gameParticipationManager.delete(ev.playerId)) return
+    if (!this.gameJoinManager.delete(ev.playerId)) return
     this.handlePlayerQuitGame(ev.playerId)
   }
 
@@ -187,8 +187,8 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
 
   private readonly onPlayerMidwayJoin = (ev: GameMidwayJoinEvent): void => {
     if (!this.isActive) return
-    if (!this.gamePolicy.allowLateJoin) throw new Error('このゲームは途中参加を許可していません')
-    this.gameParticipationManager.midwayJoinPlayer(ev.playerId)
+    if (!this.gamePolicy.allowMidwayJoin) throw new Error('このゲームは途中参加を許可していません')
+    this.gameJoinManager.midwayJoinPlayer(ev.playerId)
     const responseGameMidwayJoinMessage = new ResponseGameMidwayJoinMessage({
       gameId: this.gameId,
       joinPlayerId: ev.playerId,
@@ -197,11 +197,11 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.store.of('networkPlugin').messageSender.send(responseGameMidwayJoinMessage)
   }
 
-  private closeParticipationRequest(): void {
+  private finalizeJoin(): void {
     if (!this.isActive || this.participationTimeoutId === undefined) return
     clearTimeout(this.participationTimeoutId)
     this.participationTimeoutId = undefined
-    this.gameParticipationManager.timeoutResponse()
+    this.gameJoinManager.timeoutResponse()
     const gameStartEvent = new GameStartEvent(this.gameId, this.gameOwnerId ?? '')
     this.bus.post(gameStartEvent)
   }

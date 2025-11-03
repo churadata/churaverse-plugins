@@ -3,22 +3,22 @@ import { BaseMessage } from '@churaverse/network-plugin-client/message/baseMessa
 import { SendableObject } from '@churaverse/network-plugin-client/types/sendable'
 import { GameIds } from '../interface/gameIds'
 
-export interface ParticipationResponseData extends SendableObject {
+export interface SubmitGameJoinData extends SendableObject {
   gameId: GameIds
-  isJoin: boolean
+  willJoin: boolean
 }
 
 /**
  * クライアントからサーバーへ送信される、ゲーム参加可否メッセージ
  */
-export class ParticipationResponseMessage extends BaseMessage<IMainScene> {
-  public constructor(public readonly data: ParticipationResponseData) {
-    super('participationResponse', data)
+export class SubmitGameJoinMessage extends BaseMessage<IMainScene> {
+  public constructor(public readonly data: SubmitGameJoinData) {
+    super('submitGameJoin', data)
   }
 }
 
 declare module '@churaverse/network-plugin-client/message/messages' {
   export interface MainMessageMap {
-    participationResponse: ParticipationResponseMessage
+    submitGameJoin: SubmitGameJoinMessage
   }
 }

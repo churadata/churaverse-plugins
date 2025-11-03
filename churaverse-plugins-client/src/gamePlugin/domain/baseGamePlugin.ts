@@ -4,8 +4,8 @@ import { GameIds } from '../interface/gameIds'
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { GameInfoStore } from '../store/defGamePluginStore'
-import { ParticipationResponseEvent } from '../event/participationResponseEvent'
 import { GameMidwayJoinEvent } from '../event/gameMidwayJoinEvent'
+import { SubmitGameJoinEvent } from '../event/submitGameJoinEvent'
 
 /**
  * 全てのゲームプラグインの基本となる抽象クラス
@@ -16,7 +16,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
 
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.getStores.bind(this))
-    this.bus.subscribeEvent('participationResponse', this.onParticipationResponse.bind(this))
+    this.bus.subscribeEvent('submitGameJoin', this.onSubmitGameJoin.bind(this))
     this.bus.subscribeEvent('gameMidwayJoin', this.onGameMidwayJoin.bind(this))
   }
 
@@ -46,8 +46,8 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     return this.gameInfoStore.games.get(this.gameId)?.isActive ?? false
   }
 
-  private onParticipationResponse(ev: ParticipationResponseEvent): void {
-    if (!this.isActive || !ev.isJoin) return
+  private onSubmitGameJoin(ev: SubmitGameJoinEvent): void {
+    if (!this.isActive || !ev.willJoin) return
     this.subscribeGameEvent()
   }
 

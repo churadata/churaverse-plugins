@@ -1,4 +1,4 @@
-export interface IGameParticipationManager {
+export interface IGameJoinManager {
   /**
    * 参加対象の全プレイヤーID配列を初期化する
    * @param allPlayers 参加対象の全プレイヤーID配列
@@ -9,10 +9,10 @@ export interface IGameParticipationManager {
   /**
    * プレイヤーの参加状況を設定する
    * @param playerId 参加するプレイヤーのID
-   * @param isJoin 参加する場合はtrue、退出する場合はfalse
+   * @param willJoin 参加する場合はtrue、退出する場合はfalse
    * @returns
    */
-  set: (playerId: string, isJoin: boolean) => void
+  set: (playerId: string, willJoin: boolean) => void
 
   /**
    * 参加者リストからプレイヤーを削除する
@@ -31,7 +31,7 @@ export interface IGameParticipationManager {
    * 参加しているプレイヤーID配列を取得する
    * @returns 参加しているプレイヤーID配列
    */
-  getJoinPlayers: () => string[]
+  getParticipantIds: () => string[]
 
   /**
    * 参加情報をクリアする

@@ -4,5 +4,5 @@
  */
 export interface GamePolicy {
   /** ミニゲームの途中参加可否 */
-  allowLateJoin: boolean
+  allowMidwayJoin: boolean
 }

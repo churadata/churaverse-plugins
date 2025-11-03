@@ -13,11 +13,11 @@ import { GamePlayerQuitEvent } from '../event/gamePlayerQuitEvent'
 import { GamePlayerQuitMessage } from '../message/gamePlayerQuitMessage'
 import { IGameSelectionListItemRenderer } from '../interface/IGameSelectionListItemRenderer'
 import { GameHostEvent } from '../event/gameHostEvent'
-import { ParticipationResponseEvent } from '../event/participationResponseEvent'
-import { ParticipationResponseMessage } from '../message/participationResponseMessage'
 import { GameState } from '../type/gameState'
 import { GamePolicy } from '../interface/gamePolicy'
 import { GameMidwayJoinEvent } from '../event/gameMidwayJoinEvent'
+import { SubmitGameJoinEvent } from '../event/submitGameJoinEvent'
+import { SubmitGameJoinMessage } from '../message/submitGameJoinMessage'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -60,7 +60,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.subscribeEvent('init', this.handleInit.bind(this))
     this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this), 'HIGH')
     this.bus.subscribeEvent('gameHost', this.gameHost.bind(this))
-    this.bus.subscribeEvent('participationResponse', this.participationResponse.bind(this))
+    this.bus.subscribeEvent('submitGameJoin', this.submitGameJoin.bind(this))
     this.bus.subscribeEvent('gameStart', this.gameStart.bind(this), 'HIGH')
     this.bus.subscribeEvent('gameAbort', this.gameAbort.bind(this))
     this.bus.subscribeEvent('gameEnd', this.gameEnd.bind(this))
@@ -104,15 +104,15 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.gamePluginStore.countdownTimer.start(ev.timeoutSec)
     if (ev.ownerId === this.store.of('playerPlugin').ownPlayerId) {
       this.gamePluginStore.gameDescriptionDialogManager.showDialog(this.gameId, 'showCloseButton')
-      this.bus.post(new ParticipationResponseEvent(this.gameId, true))
+      this.bus.post(new SubmitGameJoinEvent(this.gameId, true))
     } else {
       this.gamePluginStore.gameDescriptionDialogManager.showDialog(this.gameId, 'showParticipationButtons')
     }
   }
 
-  private participationResponse(ev: ParticipationResponseEvent): void {
+  private submitGameJoin(ev: SubmitGameJoinEvent): void {
     if (ev.gameId !== this.gameId) return
-    this._isJoinGame = ev.isJoin
+    this._isJoinGame = ev.willJoin
 
     if (!this.isJoinGame) {
       this.gamePluginStore.countdownTimer.close()
@@ -120,11 +120,11 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
       this.gamePluginStore.gameUiManager.initializeAllUis(this.gameId)
     }
 
-    const participationResponseMessage = new ParticipationResponseMessage({
+    const submitGameJoinMessage = new SubmitGameJoinMessage({
       gameId: this.gameId,
-      isJoin: this.isJoinGame,
+      willJoin: this.isJoinGame,
     })
-    this.networkPluginStore.messageSender.send(participationResponseMessage)
+    this.networkPluginStore.messageSender.send(submitGameJoinMessage)
   }
 
   protected gameStart(ev: GameStartEvent): void {

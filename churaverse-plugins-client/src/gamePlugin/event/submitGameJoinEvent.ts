@@ -1,17 +1,17 @@
 import { CVEvent, IMainScene } from 'churaverse-engine-client'
 import { GameIds } from '../interface/gameIds'
 
-export class ParticipationResponseEvent extends CVEvent<IMainScene> {
+export class SubmitGameJoinEvent extends CVEvent<IMainScene> {
   public constructor(
     public readonly gameId: GameIds,
-    public readonly isJoin: boolean
+    public readonly willJoin: boolean
   ) {
-    super('participationResponse', true)
+    super('submitGameJoin', true)
   }
 }
 
 declare module 'churaverse-engine-client' {
   export interface CVMainEventMap {
-    participationResponse: ParticipationResponseEvent
+    submitGameJoin: SubmitGameJoinEvent
   }
 }

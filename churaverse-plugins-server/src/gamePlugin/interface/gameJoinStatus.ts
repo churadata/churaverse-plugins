@@ -1,7 +1,7 @@
 /**
  * ゲームごとの参加プレイヤーを管理するインターフェース
  */
-export interface GameParticipationPlayers {
+export interface GameJoinStatus {
   /** ミニゲーム対象の全プレイヤー */
   allPlayers: Set<string>
   /** 「参加する」と回答したプレイヤー */
