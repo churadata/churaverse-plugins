@@ -50,7 +50,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   public listenEvent(): void {
     super.listenEvent()
     this.bus.subscribeEvent('phaserSceneInit', this.phaserSceneInit.bind(this))
-    this.bus.subscribeEvent('init', this.init.bind(this))
+    this.bus.subscribeEvent('start', this.start.bind(this))
 
     this.socketController = new SocketController(this.bus, this.store)
     this.bus.subscribeEvent('registerMessage', this.socketController.registerMessage.bind(this.socketController))
@@ -100,7 +100,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.scene = ev.scene
   }
 
-  private init(): void {
+  private start(): void {
     setupSynchroBreakDialogManager(this.bus, this.store)
     this.coinViewerIconUis = new Map<string, CoinViewerIcon>()
     this.gameInfoStore = this.store.of('gameInfo')

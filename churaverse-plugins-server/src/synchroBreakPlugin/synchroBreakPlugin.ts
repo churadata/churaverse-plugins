@@ -38,7 +38,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
 
   public listenEvent(): void {
     super.listenEvent()
-    this.bus.subscribeEvent('init', this.init.bind(this))
+    this.bus.subscribeEvent('start', this.start.bind(this))
 
     this.socketController = new SocketController(this.bus, this.store)
     this.bus.subscribeEvent('registerMessage', this.socketController.registerMessage.bind(this.socketController))
@@ -74,7 +74,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.unsubscribeEvent('synchroBreakTurnStart', this.synchroBreakTurnStart)
   }
 
-  private init(): void {
+  private start(): void {
     this.networkPluginStore = this.store.of('networkPlugin')
   }
 
