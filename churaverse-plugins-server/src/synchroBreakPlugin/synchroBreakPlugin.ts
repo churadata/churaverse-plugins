@@ -25,7 +25,7 @@ import { GamePolicy } from '@churaverse/game-plugin-server/interface/gamePolicy'
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
   public readonly gamePolicy: GamePolicy = {
-    allowLateJoin: false,
+    allowMidwayJoin: false,
   }
 
   private networkPluginStore!: NetworkPluginStore<IMainScene>

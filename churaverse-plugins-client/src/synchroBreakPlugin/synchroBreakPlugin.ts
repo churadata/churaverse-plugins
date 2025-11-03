@@ -34,7 +34,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
   protected readonly gameName = 'シンクロブレイク'
   public readonly gamePolicy: GamePolicy = {
-    allowLateJoin: false,
+    allowMidwayJoin: false,
   }
 
   private nyokkiActionMessage: string | undefined = undefined
