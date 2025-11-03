@@ -8,7 +8,7 @@ import { GamePolicy } from './gamePolicy'
 export interface IGameInfo {
   readonly gameId: GameIds
   readonly isActive: boolean
-  readonly isJoinGame: boolean
+  readonly isJoined: boolean
   readonly gameOwnerId: string | undefined
   readonly participantIds: string[]
   readonly gameState: GameState

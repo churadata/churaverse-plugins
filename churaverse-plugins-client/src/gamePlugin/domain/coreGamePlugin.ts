@@ -30,7 +30,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private _isActive: boolean = false
   private _gameOwnerId?: string
   private _participantIds: string[] = []
-  private _isJoinGame: boolean = false
+  private _isJoined: boolean = false
   private _gameState: GameState = 'inactive'
   protected gamePluginStore!: GamePluginStore
   private networkPluginStore!: NetworkPluginStore<IMainScene>
@@ -47,8 +47,8 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     return this._participantIds
   }
 
-  public get isJoinGame(): boolean {
-    return this._isJoinGame
+  public get isJoined(): boolean {
+    return this._isJoined
   }
 
   public get gameState(): GameState {
@@ -112,9 +112,9 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
 
   private submitGameJoin(ev: SubmitGameJoinEvent): void {
     if (ev.gameId !== this.gameId) return
-    this._isJoinGame = ev.willJoin
+    this._isJoined = ev.willJoin
 
-    if (!this.isJoinGame) {
+    if (!this.isJoined) {
       this.gamePluginStore.countdownTimer.close()
     } else {
       this.gamePluginStore.gameUiManager.initializeAllUis(this.gameId)
@@ -122,13 +122,13 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
 
     const submitGameJoinMessage = new SubmitGameJoinMessage({
       gameId: this.gameId,
-      willJoin: this.isJoinGame,
+      willJoin: this.isJoined,
     })
     this.networkPluginStore.messageSender.send(submitGameJoinMessage)
   }
 
   protected gameStart(ev: GameStartEvent): void {
-    this.gameEntryRenderer.onGameStart(ev.gameId, this.isJoinGame)
+    this.gameEntryRenderer.onGameStart(ev.gameId, this.isJoined)
     if (!this.isActive) return
     this._gameState = 'start'
     this._gameOwnerId = ev.playerId
@@ -159,9 +159,9 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.gameInfoStore.games.delete(this.gameId)
     this._gameState = 'inactive'
 
-    if (this.isJoinGame) {
+    if (this.isJoined) {
       this.gamePluginStore.gameUiManager.removeAllUis(this.gameId)
-      this._isJoinGame = false
+      this._isJoined = false
     }
   }
 
