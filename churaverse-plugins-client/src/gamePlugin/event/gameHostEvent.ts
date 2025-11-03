@@ -2,7 +2,7 @@ import { CVEvent, IMainScene } from 'churaverse-engine-client'
 import { GameIds } from '../interface/gameIds'
 
 /**
- * ゲーム開催イベント
+ * 参加者を募るためにゲームをホストした際に発火するイベント
  */
 export class GameHostEvent extends CVEvent<IMainScene> {
   public constructor(
