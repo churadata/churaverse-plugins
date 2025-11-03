@@ -1,5 +1,5 @@
 import { GameIds } from './interface/gameIds'
-import { GameDescriptionDialogState, IGameDescriptionDialog } from './interface/IGameDescriptionDialog'
+import { GameDescriptionDialogType, IGameDescriptionDialog } from './interface/IGameDescriptionDialog'
 import { IGameDescriptionDialogManager } from './interface/IGameDescriptionDialogManager'
 
 export class GameDescriptionDialogManager implements IGameDescriptionDialogManager {
@@ -10,8 +10,8 @@ export class GameDescriptionDialogManager implements IGameDescriptionDialogManag
     this.gameDialogs.set(name, dialog)
   }
 
-  public showDialog(gameId: GameIds, status: GameDescriptionDialogState): void {
-    if (this.showingDialogId === gameId && status === 'showCloseButton') {
+  public showDialog(gameId: GameIds, type: GameDescriptionDialogType): void {
+    if (this.showingDialogId === gameId && type === 'viewOnly') {
       return
     }
 
@@ -21,7 +21,7 @@ export class GameDescriptionDialogManager implements IGameDescriptionDialogManag
 
     const targetDialog = this.gameDialogs.get(gameId)
     if (targetDialog === undefined) return
-    targetDialog.open(status)
+    targetDialog.open(type)
     this.showingDialogId = gameId
   }
 

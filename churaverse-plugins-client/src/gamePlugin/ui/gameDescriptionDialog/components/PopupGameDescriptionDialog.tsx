@@ -3,7 +3,7 @@ import style from './PopupGameDescriptionDialog.module.scss'
 import { GameIds } from '../../../interface/gameIds'
 import { GAME_DESCRIPTION_CONTAINER_ID } from '../gameDescriptionDialog'
 import { CloseButtonComponent } from './CloseButtonComponent'
-import { GameParticipationButtons } from './GameParticipationButtons'
+import { GameJoinDeclineButtons } from './GameJoinDeclineButtons'
 
 export const PopupGameDescriptionDialog: JSXFunc<any> = ({
   gameId,
@@ -18,7 +18,7 @@ export const PopupGameDescriptionDialog: JSXFunc<any> = ({
       <div id={GAME_DESCRIPTION_CONTAINER_ID(gameId)} className={style.detailContainer}>
         {/* ここに ゲームの説明を入れる */}
       </div>
-      <GameParticipationButtons gameId={gameId} />
+      <GameJoinDeclineButtons gameId={gameId} />
       <CloseButtonComponent gameId={gameId} />
     </div>
   )

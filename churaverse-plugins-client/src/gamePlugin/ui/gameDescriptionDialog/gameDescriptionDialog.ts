@@ -1,9 +1,9 @@
 import { domLayerSetting, DomManager, IEventBus, IMainScene, Store } from 'churaverse-engine-client'
 import { GameIds } from '../../interface/gameIds'
 import { PopupGameDescriptionDialog } from './components/PopupGameDescriptionDialog'
-import { GameDescriptionDialogState, IGameDescriptionDialog } from '../../interface/IGameDescriptionDialog'
+import { GameDescriptionDialogType, IGameDescriptionDialog } from '../../interface/IGameDescriptionDialog'
 import { IGameDescriptionDialogManager } from '../../interface/IGameDescriptionDialogManager'
-import { ParticipationResponseEvent } from '../../event/participationResponseEvent'
+import { SubmitGameJoinEvent } from '../../event/submitGameJoinEvent'
 
 export const GAME_DESCRIPTION_CLOSE_BUTTON_ID = (gameId: GameIds): string => {
   return `game-detail-close-button-${gameId}`
@@ -17,12 +17,12 @@ export const GAME_JOIN_BUTTON_ID = (gameId: GameIds): string => {
   return `game-join-button-${gameId}`
 }
 
-export const GAME_LEAVE_BUTTON_ID = (gameId: GameIds): string => {
+export const GAME_DECLINE_BUTTON_ID = (gameId: GameIds): string => {
   return `game-leave-button-${gameId}`
 }
 
-export const GAME_PARTICIPATION_BUTTONS_CONTAINER_ID = (gameId: GameIds): string => {
-  return `game-participation-buttons-container-${gameId}`
+export const GAME_JOIN_DECLINE_CONTAINER_ID = (gameId: GameIds): string => {
+  return `game-join-buttons-container-${gameId}`
 }
 
 export abstract class GameDescriptionDialog implements IGameDescriptionDialog {
@@ -40,7 +40,7 @@ export abstract class GameDescriptionDialog implements IGameDescriptionDialog {
     domLayerSetting(this.container, 'higher')
     this.close()
     this.setupCloseButton()
-    this.setupParticipationButton()
+    this.setupJoinDeclineButtons()
   }
 
   public createGameDescription(detail: HTMLElement): void {
@@ -48,14 +48,14 @@ export abstract class GameDescriptionDialog implements IGameDescriptionDialog {
     container.appendChild(detail)
   }
 
-  public open(state: GameDescriptionDialogState): void {
+  public open(state: GameDescriptionDialogType): void {
     this.container.style.display = 'block'
     switch (state) {
-      case 'showCloseButton':
-        this.showDescriptionButton()
+      case 'viewOnly':
+        this.showCloseOnlyMode()
         break
-      case 'showParticipationButtons':
-        this.showParticipationButtons()
+      case 'joinable':
+        this.showJoinableMode()
         break
     }
   }
@@ -71,34 +71,34 @@ export abstract class GameDescriptionDialog implements IGameDescriptionDialog {
     })
   }
 
-  private setupParticipationButton(): void {
+  private setupJoinDeclineButtons(): void {
     const joinButton = DomManager.getElementById(GAME_JOIN_BUTTON_ID(this.gameId))
-    const leaveButton = DomManager.getElementById(GAME_LEAVE_BUTTON_ID(this.gameId))
+    const declineButton = DomManager.getElementById(GAME_DECLINE_BUTTON_ID(this.gameId))
     joinButton.addEventListener('click', () => {
-      this.postParticipationEvent(true)
+      this.postJoinEvent(true)
       this.gameDescriptionDialogManager.closeDialog()
     })
-    leaveButton.addEventListener('click', () => {
-      this.postParticipationEvent(false)
+    declineButton.addEventListener('click', () => {
+      this.postJoinEvent(false)
       this.gameDescriptionDialogManager.closeDialog()
     })
   }
 
-  private showDescriptionButton(): void {
+  private showCloseOnlyMode(): void {
     const closeButton = DomManager.getElementById(GAME_DESCRIPTION_CLOSE_BUTTON_ID(this.gameId))
-    const participantButtons = DomManager.getElementById(GAME_PARTICIPATION_BUTTONS_CONTAINER_ID(this.gameId))
+    const joinDeclineContainer = DomManager.getElementById(GAME_JOIN_DECLINE_CONTAINER_ID(this.gameId))
     closeButton.style.display = 'block'
-    participantButtons.style.display = 'none'
+    joinDeclineContainer.style.display = 'none'
   }
 
-  private showParticipationButtons(): void {
+  private showJoinableMode(): void {
     const closeButton = DomManager.getElementById(GAME_DESCRIPTION_CLOSE_BUTTON_ID(this.gameId))
-    const participantButtons = DomManager.getElementById(GAME_PARTICIPATION_BUTTONS_CONTAINER_ID(this.gameId))
+    const joinDeclineContainer = DomManager.getElementById(GAME_JOIN_DECLINE_CONTAINER_ID(this.gameId))
     closeButton.style.display = 'none'
-    participantButtons.style.display = 'flex'
+    joinDeclineContainer.style.display = 'flex'
   }
 
-  private postParticipationEvent(isJoin: boolean): void {
-    this.bus.post(new ParticipationResponseEvent(this.gameId, isJoin))
+  private postJoinEvent(isJoin: boolean): void {
+    this.bus.post(new SubmitGameJoinEvent(this.gameId, isJoin))
   }
 }

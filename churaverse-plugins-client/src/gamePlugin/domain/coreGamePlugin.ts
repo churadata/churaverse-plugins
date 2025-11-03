@@ -57,7 +57,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
 
   public listenEvent(): void {
     super.listenEvent()
-    this.bus.subscribeEvent('init', this.handleInit.bind(this))
+    this.bus.subscribeEvent('init', this.init.bind(this))
     this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this), 'HIGH')
     this.bus.subscribeEvent('gameHost', this.gameHost.bind(this))
     this.bus.subscribeEvent('submitGameJoin', this.submitGameJoin.bind(this))
@@ -79,7 +79,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.unsubscribeEvent('gamePlayerQuit', this.onPlayerQuitGame)
   }
 
-  private handleInit(): void {
+  private init(): void {
     this.gamePluginStore = this.store.of('gamePlugin')
     this.networkPluginStore = this.store.of('networkPlugin')
   }
