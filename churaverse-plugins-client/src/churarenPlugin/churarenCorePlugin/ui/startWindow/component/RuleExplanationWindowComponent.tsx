@@ -1,10 +1,10 @@
 import { JSXFunc } from 'churaverse-engine-client'
 import style from './RuleExplanationWindowComponent.module.scss'
-import headerImage from '../../../assets/ruleDescriptionImages/header.png'
-import itemImage from '../../../assets/ruleDescriptionImages/item_with_player.png'
-import alchemyImage from '../../../assets/ruleDescriptionImages/items_with_alchemy.png'
-import bossImage from '../../../assets/ruleDescriptionImages/attack_to_boss.png'
-import ghostImage from '../../../assets/ruleDescriptionImages/ghost_player.png'
+import playingImage from '../../../assets/ruleDescriptionImages/churaren_playing.png'
+import itemImage from '../../../assets/ruleDescriptionImages/churaren_item_with_player.png'
+import alchemyImage from '../../../assets/ruleDescriptionImages/churaren_items_with_alchemy.png'
+import bossImage from '../../../assets/ruleDescriptionImages/churaren_attack_to_boss.png'
+import ghostImage from '../../../assets/ruleDescriptionImages/churaren_ghost_player.png'
 
 export const POPUP_GAME_START_WINDOW_BUTTON_ID = 'churaren-game-start-form-open-button'
 export const GAME_START_BUTTON = 'churaren-game-start-button'
@@ -16,7 +16,7 @@ export const RuleExplanationWindowComponent: JSXFunc = () => {
       <p className={style.description}>みんなで協力し、制限時間内に強大なモンスターに立ち向かう協力型バトルゲーム！</p>
 
       <div className={style.section}>
-        <img src={headerImage} alt="プレイ中の様子を写した画像" className={style.headerImage} />
+        <img src={playingImage} alt="プレイ中の様子を写した画像" className={style.headerImage} />
       </div>
 
       <h2 className={style.churarenRule}>⚔️ちゅられんルール説明⚔️</h2>
