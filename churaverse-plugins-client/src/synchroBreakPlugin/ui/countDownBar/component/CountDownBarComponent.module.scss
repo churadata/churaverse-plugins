@@ -1,0 +1,59 @@
+/* 円形カウントダウンバー（1秒で一周、中央に残り秒数表示） */
+
+.progressItem {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  display: inline-block;
+}
+
+.svg {
+  width: 100%;
+  height: 100%;
+  /* 開始位置を回転で調整（デフォルトは上= -90deg） */
+  transform: rotate(var(--start-rotate, -90deg));
+}
+
+.bgCircle {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.35);
+  stroke-width: var(--stroke-width, 10);
+}
+
+.progressBar {
+  fill: none;
+  stroke: var(--stroke-color, #4caf50);
+  stroke-width: var(--stroke-width, 10);
+  stroke-linecap: round;
+  /* r=45 の円周長 2 * PI * 45 ≈ 282.743 */
+  stroke-dasharray: 282.743;
+  /* 初期値はフルオフセット（=全く描画されていない状態） */
+  stroke-dashoffset: var(--stroke-dashoffset, 282.743);
+  transition: stroke-dashoffset var(--duration, 1s) linear;
+  will-change: stroke-dashoffset;
+}
+
+.progressValue {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+/* 可視化トリガー（このクラスが付与されると 0 までアニメーション） */
+.progressItem.is-visible .progressBar {
+  stroke-dashoffset: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progressBar {
+    transition-duration: 0.2s;
+  }
+}

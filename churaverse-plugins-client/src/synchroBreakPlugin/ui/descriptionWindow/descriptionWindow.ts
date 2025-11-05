@@ -2,6 +2,7 @@ import { DomManager, domLayerSetting } from 'churaverse-engine-client'
 import { DescriptionWindowComponent } from './component/DescriptionWindowComponent'
 import '@churaverse/game-plugin-client/gameUiManager'
 import { IDescriptionWindow } from '../../interface/IDescriptionWindow'
+import { CountDownBar } from '../countDownBar/countDownBar'
 
 export class DescriptionWindow implements IDescriptionWindow {
   public element!: HTMLElement
@@ -9,6 +10,7 @@ export class DescriptionWindow implements IDescriptionWindow {
   private descriptionText: string = ''
   private gameName: string = 'ゲーム'
   private gameOwnerName: string = 'ゲームオーナー'
+  private countDownBar: CountDownBar | null = null
 
   public initialize(): void {
     this.element = DomManager.addJsxDom(DescriptionWindowComponent({ description: this.descriptionText }))
@@ -17,6 +19,10 @@ export class DescriptionWindow implements IDescriptionWindow {
 
   public remove(): void {
     this.descriptionText = ''
+    if (this.countDownBar !== null) {
+      this.countDownBar.remove()
+      this.countDownBar = null
+    }
   }
 
   public close(): void {
@@ -103,7 +109,26 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param timeLimit シンクロブレイクの制限時間
    */
   public displaySynchroBreakStart(timeLimit: number): void {
-    this.setDescriptionText(`${this.gameName}開始！！！<br>残り${timeLimit}秒以内にボタンを押してください！`)
+    this.setDescriptionText(`${this.gameName}開始！！！<br>${timeLimit}秒以内にボタンを押してください！`)
+
+    // 既存をクリア
+    if (this.countDownBar !== null) {
+      this.countDownBar.remove()
+      this.countDownBar = null
+    }
+
+    // 開始時に一度だけ作成（duration を総秒にする）
+    if (timeLimit > 0) {
+      this.countDownBar = new CountDownBar({
+        percent: timeLimit,
+        duration: timeLimit,
+        startPosition: 'top',
+        strokeColor: '#4CAF50',
+        strokeWidth: 10,
+      })
+      this.countDownBar.initialize()
+      this.element.appendChild(this.countDownBar.element)
+    }
   }
 
   /**
@@ -117,6 +142,11 @@ export class DescriptionWindow implements IDescriptionWindow {
     }
 
     this.setDescriptionText(descriptionText.join('<br>'))
+
+    // 進行中は中央の秒表示のみ更新（バーの減少は duration ベースで進行）
+    if (this.countDownBar !== null) {
+      this.countDownBar.updateValue(countdown)
+    }
   }
 
   /**
@@ -124,6 +154,10 @@ export class DescriptionWindow implements IDescriptionWindow {
    */
   public displaySynchroBreakEnd(): void {
     this.setDescriptionText(`${this.gameName}終了！！！`)
+    if (this.countDownBar !== null) {
+      this.countDownBar.remove()
+      this.countDownBar = null
+    }
   }
 
   /**
