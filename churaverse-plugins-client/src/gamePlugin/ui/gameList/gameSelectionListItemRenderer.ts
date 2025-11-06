@@ -106,14 +106,14 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
     this.setGameStatusText()
   }
 
-  public onGameStart(gameId: GameIds, isJoin: boolean): void {
+  public onGameStart(gameId: GameIds, isJoined: boolean): void {
     if (this.props.gameId !== gameId) {
       this.gameStartButtonGrayOut()
       return
     }
 
     this.setGameStatusText()
-    if (isJoin) {
+    if (isJoined) {
       this.setGameAbortText()
     } else {
       this.setPlayingGameText()

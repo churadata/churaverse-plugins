@@ -19,7 +19,7 @@ export class RequestGameMidwayJoinMessage extends BaseMessage<IMainScene> {
 export interface ResponseGameMidwayJoinData extends SendableObject {
   gameId: GameIds
   joinPlayerId: string
-  participantIds: string[]
+  joinedPlayerIds: string[]
 }
 
 /**

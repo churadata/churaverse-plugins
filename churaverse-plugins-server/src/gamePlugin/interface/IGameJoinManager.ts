@@ -31,7 +31,7 @@ export interface IGameJoinManager {
    * 参加しているプレイヤーID配列を取得する
    * @returns 参加しているプレイヤーID配列
    */
-  getParticipantIds: () => string[]
+  getJoinedPlayerIds: () => string[]
 
   /**
    * 参加情報をクリアする

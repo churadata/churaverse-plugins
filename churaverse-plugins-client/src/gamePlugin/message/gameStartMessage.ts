@@ -6,7 +6,7 @@ import { GameIds } from '../interface/gameIds'
 export interface GameStartData extends SendableObject {
   gameId: GameIds
   ownerId: string
-  participantIds: string[]
+  joinedPlayerIds: string[]
 }
 
 /**

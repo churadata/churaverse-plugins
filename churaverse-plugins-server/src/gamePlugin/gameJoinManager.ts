@@ -41,7 +41,7 @@ export class GameJoinManager implements IGameJoinManager {
     return status?.allPlayers.size === status?.respondedPlayers.size
   }
 
-  public getParticipantIds(): string[] {
+  public getJoinedPlayerIds(): string[] {
     const status = this.joinStatuses.get(this.gameId)
     return Array.from(status?.joinedPlayers ?? [])
   }

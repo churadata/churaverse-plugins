@@ -29,7 +29,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   public abstract gamePolicy: GamePolicy
   private _isActive: boolean = false
   private _gameOwnerId?: string
-  private _participantIds: string[] = []
+  private _joinedPlayerIds: string[] = []
   private _isJoined: boolean = false
   private _gameState: GameState = 'inactive'
   protected gamePluginStore!: GamePluginStore
@@ -43,8 +43,8 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     return this._gameOwnerId
   }
 
-  public get participantIds(): string[] {
-    return this._participantIds
+  public get joinedPlayerIds(): string[] {
+    return this._joinedPlayerIds
   }
 
   public get isJoined(): boolean {
@@ -132,7 +132,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     if (!this.isActive) return
     this._gameState = 'start'
     this._gameOwnerId = ev.playerId
-    this._participantIds = ev.participantIds
+    this._joinedPlayerIds = ev.joinedPlayerIds
     this.gamePluginStore.countdownTimer.close()
     this.gamePluginStore.gameDescriptionDialogManager.closeDialog()
     this.gamePluginStore.gameLogRenderer.gameStartLog(this.gameName, this.gameOwnerId ?? '')
@@ -155,7 +155,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private terminateGame(): void {
     this._isActive = false
     this._gameOwnerId = undefined
-    this._participantIds = []
+    this._joinedPlayerIds = []
     this.gameInfoStore.games.delete(this.gameId)
     this._gameState = 'inactive'
 
@@ -168,7 +168,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private readonly onPlayerLeave = (ev: EntityDespawnEvent): void => {
     if (!isPlayer(ev.entity)) return
     const playerId: string = ev.entity.id
-    if (!this.removeParticipant(playerId)) return
+    if (!this.removeJoinedPlayer(playerId)) return
     this.handlePlayerLeave(playerId)
   }
 
@@ -179,7 +179,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   protected abstract handlePlayerLeave(playerId: string): void
 
   private readonly onPlayerQuitGame = (ev: GamePlayerQuitEvent): void => {
-    if (!this.removeParticipant(ev.playerId)) return
+    if (!this.removeJoinedPlayer(ev.playerId)) return
     const gamePlayerQuitMessage = new GamePlayerQuitMessage({ gameId: ev.gameId, playerId: ev.playerId })
     this.networkPluginStore.messageSender.send(gamePlayerQuitMessage)
     this.handlePlayerQuitGame(ev.playerId)
@@ -194,8 +194,8 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private gameMidwayJoin(ev: GameMidwayJoinEvent): void {
     if (!this.isActive) return
     this.gamePluginStore.gameLogRenderer.gameMidwayJoinLog(this.gameName, ev.joinPlayerId)
-    if (!ev.participantIds.includes(this.store.of('playerPlugin').ownPlayerId)) return
-    this._participantIds = ev.participantIds
+    if (!ev.joinedPlayerIds.includes(this.store.of('playerPlugin').ownPlayerId)) return
+    this._joinedPlayerIds = ev.joinedPlayerIds
     if (ev.joinPlayerId === this.store.of('playerPlugin').ownPlayerId) {
       this.gameEntryRenderer.onGameStart(this.gameId, true)
     }
@@ -204,10 +204,10 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   /**
    * 退出したプレイヤーがゲーム参加者の場合、参加者リストから削除しtrueを返す
    */
-  private removeParticipant(playerId: string): boolean {
-    const idx = this._participantIds.indexOf(playerId)
+  private removeJoinedPlayer(playerId: string): boolean {
+    const idx = this._joinedPlayerIds.indexOf(playerId)
     if (idx === -1) return false
-    this._participantIds.splice(idx, 1)
+    this._joinedPlayerIds.splice(idx, 1)
     return true
   }
 }

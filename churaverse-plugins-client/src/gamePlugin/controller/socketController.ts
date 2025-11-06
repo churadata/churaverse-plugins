@@ -59,7 +59,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   private gameStart(msg: GameStartMessage): void {
-    this.eventBus.post(new GameStartEvent(msg.data.gameId, msg.data.ownerId, msg.data.participantIds))
+    this.eventBus.post(new GameStartEvent(msg.data.gameId, msg.data.ownerId, msg.data.joinedPlayerIds))
   }
 
   private gameEnd(msg: ResponseGameEndMessage): void {
@@ -71,6 +71,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   private gameMidwayJoin(msg: ResponseGameMidwayJoinMessage): void {
-    this.eventBus.post(new GameMidwayJoinEvent(msg.data.gameId, msg.data.joinPlayerId, msg.data.participantIds))
+    this.eventBus.post(new GameMidwayJoinEvent(msg.data.gameId, msg.data.joinPlayerId, msg.data.joinedPlayerIds))
   }
 }

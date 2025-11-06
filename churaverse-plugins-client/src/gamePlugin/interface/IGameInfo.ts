@@ -10,7 +10,7 @@ export interface IGameInfo {
   readonly isActive: boolean
   readonly isJoined: boolean
   readonly gameOwnerId: string | undefined
-  readonly participantIds: string[]
+  readonly joinedPlayerIds: string[]
   readonly gameState: GameState
   readonly gamePolicy: GamePolicy
 }

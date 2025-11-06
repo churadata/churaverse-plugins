@@ -22,7 +22,7 @@ import { GameMidwayJoinEvent } from '../event/gameMidwayJoinEvent'
 import { ResponseGameMidwayJoinMessage } from '../message/gameMidwayJoinMessage'
 import { SubmitGameJoinEvent } from '../event/submitGameJoinEvent'
 import { IGameJoinManager } from '../interface/IGameJoinManager'
-import { GameJoinManager } from '../gameParticipationManager'
+import { GameJoinManager } from '../gameJoinManager'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -34,7 +34,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private _gameOwnerId?: string
   private _gameState: GameState = 'inactive'
   private gameJoinManager!: IGameJoinManager
-  private participationTimeoutId?: NodeJS.Timeout
+  private joinTimeoutId?: NodeJS.Timeout
 
   public get isActive(): boolean {
     return this._isActive
@@ -44,8 +44,8 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     return this._gameOwnerId
   }
 
-  public get participantIds(): string[] {
-    return this.gameJoinManager.getParticipantIds()
+  public get joinedPlayerIds(): string[] {
+    return this.gameJoinManager.getJoinedPlayerIds()
   }
 
   public get gameState(): GameState {
@@ -110,7 +110,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.store.of('networkPlugin').messageSender.send(responseGameHostMessage)
 
     this.gameJoinManager.init(this.store.of('playerPlugin').players.getAllId())
-    this.participationTimeoutId = setTimeout(() => {
+    this.joinTimeoutId = setTimeout(() => {
       this.finalizeJoin()
     }, timeoutSec * 1000)
   }
@@ -129,7 +129,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     const gameStartMessage = new GameStartMessage({
       gameId: ev.gameId,
       ownerId: ev.playerId,
-      participantIds: this.participantIds,
+      joinedPlayerIds: this.joinedPlayerIds,
     })
     this.store.of('networkPlugin').messageSender.send(gameStartMessage)
   }
@@ -192,15 +192,15 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     const responseGameMidwayJoinMessage = new ResponseGameMidwayJoinMessage({
       gameId: this.gameId,
       joinPlayerId: ev.playerId,
-      participantIds: this.participantIds,
+      joinedPlayerIds: this.joinedPlayerIds,
     })
     this.store.of('networkPlugin').messageSender.send(responseGameMidwayJoinMessage)
   }
 
   private finalizeJoin(): void {
-    if (!this.isActive || this.participationTimeoutId === undefined) return
-    clearTimeout(this.participationTimeoutId)
-    this.participationTimeoutId = undefined
+    if (!this.isActive || this.joinTimeoutId === undefined) return
+    clearTimeout(this.joinTimeoutId)
+    this.joinTimeoutId = undefined
     this.gameJoinManager.timeoutResponse()
     const gameStartEvent = new GameStartEvent(this.gameId, this.gameOwnerId ?? '')
     this.bus.post(gameStartEvent)

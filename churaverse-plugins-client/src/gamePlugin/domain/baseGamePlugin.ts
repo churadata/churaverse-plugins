@@ -66,7 +66,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     if (!this.isActive) return
     if (this.store.of('playerPlugin').ownPlayerId !== ev.joinPlayerId) return
     this.subscribeGameEvent()
-    this.handleMidwayParticipant()
+    this.handleMidwayJoin()
   }
 
   /**
@@ -85,5 +85,5 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
    * ゲーム特有の途中参加時の処理を実装するための抽象メソッド
    * - 途中参加したプレイヤーにのみ実行される
    */
-  protected abstract handleMidwayParticipant(): void
+  protected abstract handleMidwayJoin(): void
 }

@@ -8,7 +8,7 @@ export class GameMidwayJoinEvent extends CVEvent<IMainScene> {
   public constructor(
     public readonly gameId: GameIds,
     public readonly joinPlayerId: string,
-    public readonly participantIds: string[]
+    public readonly joinedPlayerIds: string[]
   ) {
     super('gameMidwayJoin', true)
   }
