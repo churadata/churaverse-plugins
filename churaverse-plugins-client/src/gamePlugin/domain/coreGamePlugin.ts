@@ -114,10 +114,10 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     if (ev.gameId !== this.gameId) return
     this._isJoined = ev.willJoin
 
-    if (!this.isJoined) {
-      this.gamePluginStore.countdownTimer.close()
-    } else {
+    if (this.isJoined) {
       this.gamePluginStore.gameUiManager.initializeAllUis(this.gameId)
+    } else {
+      this.gamePluginStore.countdownTimer.close()
     }
 
     const submitGameJoinMessage = new SubmitGameJoinMessage({
@@ -192,9 +192,8 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   protected abstract handlePlayerQuitGame(playerId: string): void
 
   private gameMidwayJoin(ev: GameMidwayJoinEvent): void {
-    if (!this.isActive) return
+    if (!this.isActive || !ev.joinedPlayerIds.includes(this.store.of('playerPlugin').ownPlayerId)) return
     this.gamePluginStore.gameLogRenderer.gameMidwayJoinLog(this.gameName, ev.joinPlayerId)
-    if (!ev.joinedPlayerIds.includes(this.store.of('playerPlugin').ownPlayerId)) return
     this._joinedPlayerIds = ev.joinedPlayerIds
     if (ev.joinPlayerId === this.store.of('playerPlugin').ownPlayerId) {
       this.gameEntryRenderer.onGameStart(this.gameId, true)
