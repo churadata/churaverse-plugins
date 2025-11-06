@@ -48,9 +48,9 @@ export abstract class GameDescriptionDialog implements IGameDescriptionDialog {
     container.appendChild(detail)
   }
 
-  public open(state: GameDescriptionDialogType): void {
+  public open(type: GameDescriptionDialogType): void {
     this.container.style.display = 'block'
-    switch (state) {
+    switch (type) {
       case 'viewOnly':
         this.showCloseOnlyMode()
         break

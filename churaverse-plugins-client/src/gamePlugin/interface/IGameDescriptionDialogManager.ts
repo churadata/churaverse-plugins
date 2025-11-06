@@ -3,6 +3,6 @@ import { GameDescriptionDialogType, IGameDescriptionDialog } from './IGameDescri
 
 export interface IGameDescriptionDialogManager {
   add: (gameId: GameIds, dialog: IGameDescriptionDialog) => void
-  showDialog: (gameId: GameIds, status: GameDescriptionDialogType) => void
+  showDialog: (gameId: GameIds, type: GameDescriptionDialogType) => void
   closeDialog: () => void
 }

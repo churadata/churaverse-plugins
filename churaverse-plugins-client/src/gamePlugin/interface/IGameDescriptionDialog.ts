@@ -1,5 +1,5 @@
 export interface IGameDescriptionDialog {
-  open: (state: GameDescriptionDialogType) => void
+  open: (type: GameDescriptionDialogType) => void
   close: () => void
 }
 
