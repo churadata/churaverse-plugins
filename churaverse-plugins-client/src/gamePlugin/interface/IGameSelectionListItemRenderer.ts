@@ -1,6 +1,11 @@
+import { GameState } from '../type/gameState'
 import { GameIds } from './gameIds'
 
 export interface IGameSelectionListItemRenderer {
-  onGameStart: (gameId: GameIds) => void
+  onPriorGameData: (gameId: GameIds, gameState: GameState) => void
+  onGameHost: (gameId: GameIds) => void
+  onGameStart: (gameId: GameIds, isJoined: boolean) => void
   resetStartButton: () => void
 }
+
+export type StartButtonState = GameState | 'midwayJoin'

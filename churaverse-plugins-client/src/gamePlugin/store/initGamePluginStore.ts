@@ -6,6 +6,7 @@ import { GameUiManager } from '../gameUiManager'
 import { GameInfoRepository } from '../repository/gameInfoRepository'
 import { GameSelectionListContainer } from '../ui/gameList/gameSelectionListContainer'
 import { GameDescriptionDialogManager } from '../gameDescriptionDialogManager'
+import { CountdownTimer } from '../ui/countdownTimer/countdownTimer'
 
 export function initGamePluginStore(store: Store<IMainScene>, gameUiRegister: GameUiRegister): void {
   const pluginStore: GamePluginStore = {
@@ -13,6 +14,7 @@ export function initGamePluginStore(store: Store<IMainScene>, gameUiRegister: Ga
     gameLogRenderer: new GameLogRenderer(store),
     gameSelectionListContainer: new GameSelectionListContainer(),
     gameDescriptionDialogManager: new GameDescriptionDialogManager(),
+    countdownTimer: new CountdownTimer(),
   }
 
   const gameInfoStore: GameInfoStore = { games: new GameInfoRepository() }

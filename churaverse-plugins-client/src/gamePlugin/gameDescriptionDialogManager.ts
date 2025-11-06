@@ -1,5 +1,5 @@
 import { GameIds } from './interface/gameIds'
-import { IGameDescriptionDialog } from './interface/IGameDescriptionDialog'
+import { GameDescriptionDialogType, IGameDescriptionDialog } from './interface/IGameDescriptionDialog'
 import { IGameDescriptionDialogManager } from './interface/IGameDescriptionDialogManager'
 
 export class GameDescriptionDialogManager implements IGameDescriptionDialogManager {
@@ -10,10 +10,10 @@ export class GameDescriptionDialogManager implements IGameDescriptionDialogManag
     this.gameDialogs.set(name, dialog)
   }
 
-  public showDialog(gameId: GameIds): void {
-    if (this.showingDialogId === gameId) {
-      return
-    }
+  public showDialog(gameId: GameIds, type: GameDescriptionDialogType): void {
+    // 'viewOnly' で、既に同じダイアログが表示中の場合は、再表示せずに処理を終了する
+    // ('joinable' の場合は、ボタンの状態更新のため常に再表示を許可する)
+    if (this.showingDialogId === gameId && type === 'viewOnly') return
 
     if (this.showingDialogId !== null) {
       this.closeDialog()
@@ -21,7 +21,7 @@ export class GameDescriptionDialogManager implements IGameDescriptionDialogManag
 
     const targetDialog = this.gameDialogs.get(gameId)
     if (targetDialog === undefined) return
-    targetDialog.open()
+    targetDialog.open(type)
     this.showingDialogId = gameId
   }
 
