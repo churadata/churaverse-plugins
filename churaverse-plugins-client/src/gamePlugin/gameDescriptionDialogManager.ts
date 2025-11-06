@@ -11,9 +11,9 @@ export class GameDescriptionDialogManager implements IGameDescriptionDialogManag
   }
 
   public showDialog(gameId: GameIds, type: GameDescriptionDialogType): void {
-    if (this.showingDialogId === gameId && type === 'viewOnly') {
-      return
-    }
+    // 'viewOnly' で、既に同じダイアログが表示中の場合は、再表示せずに処理を終了する
+    // ('joinable' の場合は、ボタンの状態更新のため常に再表示を許可する)
+    if (this.showingDialogId === gameId && type === 'viewOnly') return
 
     if (this.showingDialogId !== null) {
       this.closeDialog()
