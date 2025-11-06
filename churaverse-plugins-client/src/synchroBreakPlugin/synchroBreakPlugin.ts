@@ -162,7 +162,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   /**
    * シンクロブレイク特有の途中参加時の処理
    */
-  protected handleMidwayParticipant(): void {
+  protected handleMidwayJoin(): void {
     this.socketController.registerMessageListener()
   }
 
@@ -188,7 +188,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * シンクロブレイク参加プレイヤーのUIアイコンを初期化する
    */
   private initSynchroBreakPlayerIcons(): void {
-    for (const playerId of this.participantIds) {
+    for (const playerId of this.joinedPlayerIds) {
       const coinViewer = new CoinViewerIcon(this.scene, this.store, playerId)
       this.coinViewerIconUis.set(playerId, coinViewer)
 
