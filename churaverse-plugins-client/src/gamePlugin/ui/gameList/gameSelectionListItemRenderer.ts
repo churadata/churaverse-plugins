@@ -3,7 +3,7 @@ import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defN
 import { GameIds } from '../../interface/gameIds'
 import { GameState } from '../../type/gameState'
 import { RequestGameAbortMessage } from '../../message/gameAbortMessage'
-import { IGameSelectionListItemRenderer } from '../../interface/IGameSelectionListItemRenderer'
+import { IGameSelectionListItemRenderer, StartButtonState } from '../../interface/IGameSelectionListItemRenderer'
 import { GameSelectionListItem } from './components/GameListComponent'
 import { RequestGameHostMessage } from '../../message/gameHostMessage'
 import { GamePolicy } from '../../interface/gamePolicy'
@@ -42,7 +42,7 @@ export interface GameSelectionListItemProps {
 export abstract class GameSelectionListItemRenderer implements IGameSelectionListItemRenderer {
   private readonly networkPlugin: NetworkPluginStore<IMainScene>
   protected readonly gameContainer: HTMLElement
-  private currentButtonState: GameState
+  private currentButtonState: StartButtonState
 
   public constructor(
     private readonly store: Store<IMainScene>,
@@ -121,36 +121,31 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
   }
 
   public resetStartButton(): void {
-    if (this.currentButtonState === 'abort' || this.currentButtonState === 'playing') {
+    if (this.currentButtonState !== 'inactive') {
       const gameNameElement = DomManager.getElementById(GAME_NAME_DIV_ID(this.props.gameId))
       gameNameElement.textContent = `${this.props.gameName}`
     }
     const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
     startButton.textContent = '開始'
     startButton.disabled = false
-    startButton.style.color = 'white'
-    startButton.style.backgroundColor = 'var(--c-primary-deep)'
-    startButton.style.border = 'none'
     this.currentButtonState = 'start'
+    this.styleButtonStart(startButton)
   }
 
   private setGameHostText(): void {
     const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
     startButton.textContent = `開始待ち`
     startButton.disabled = true
-    startButton.style.backgroundColor = 'lightgray'
-    startButton.style.color = 'var(--color-button-background)'
     this.currentButtonState = 'host'
+    this.styleButtonGrayOut(startButton)
   }
 
   private setGameAbortText(): void {
     const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
     startButton.disabled = false
     startButton.textContent = '中止'
-    startButton.style.color = 'red'
-    startButton.style.backgroundColor = 'white'
-    startButton.style.border = '1px solid red'
     this.currentButtonState = 'abort'
+    this.styleButtonAbort(startButton)
   }
 
   private setGameStatusText(): void {
@@ -161,24 +156,22 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
   private gameStartButtonGrayOut(): void {
     const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
     startButton.disabled = true
-    startButton.style.backgroundColor = 'lightgray'
-    startButton.style.color = 'var(--color-button-background)'
     this.currentButtonState = 'inactive'
+    this.styleButtonGrayOut(startButton)
   }
 
   private setPlayingGameText(): void {
     const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
-    this.currentButtonState = 'playing'
     if (this.gamePolicy.allowMidwayJoin) {
+      this.currentButtonState = 'midwayJoin'
       startButton.textContent = `途中参加`
       startButton.disabled = false
-      startButton.style.color = 'white'
-      startButton.style.backgroundColor = 'var(--c-primary-deep)'
+      this.styleButtonStart(startButton)
     } else {
+      this.currentButtonState = 'playing'
       startButton.textContent = `プレイ中`
       startButton.disabled = true
-      startButton.style.backgroundColor = 'lightgray'
-      startButton.style.color = 'var(--color-button-background)'
+      this.styleButtonGrayOut(startButton)
     }
   }
 
@@ -189,7 +182,7 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
         this.sendGameHostMessage()
       } else if (this.currentButtonState === 'abort') {
         this.sendGameAbortMessage()
-      } else if (this.currentButtonState === 'playing') {
+      } else if (this.currentButtonState === 'midwayJoin') {
         this.sendGameMidwayJoinMessage()
       }
     })
@@ -223,5 +216,26 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
       gameId: this.props.gameId,
     })
     this.networkPlugin.messageSender.send(gameMidwayJoinMessage)
+  }
+
+  // classNameでスタイルを上書きするとdefaultのスタイルが残ってしまうため、直接スタイルを変更する
+  private styleButtonGrayOut(button: HTMLButtonElement): void {
+    button.disabled = true
+    button.style.backgroundColor = 'lightgray'
+    button.style.color = 'black'
+  }
+
+  private styleButtonAbort(button: HTMLButtonElement): void {
+    button.disabled = false
+    button.style.backgroundColor = 'white'
+    button.style.color = 'red'
+    button.style.border = '1px solid red'
+  }
+
+  private styleButtonStart(button: HTMLButtonElement): void {
+    button.disabled = false
+    button.style.backgroundColor = 'var(--c-primary-deep)'
+    button.style.color = 'white'
+    button.style.border = 'none'
   }
 }

@@ -7,3 +7,5 @@ export interface IGameSelectionListItemRenderer {
   onGameStart: (gameId: GameIds, isJoined: boolean) => void
   resetStartButton: () => void
 }
+
+export type StartButtonState = GameState | 'midwayJoin'
