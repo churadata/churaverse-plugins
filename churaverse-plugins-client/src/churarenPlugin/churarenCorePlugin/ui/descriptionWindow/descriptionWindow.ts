@@ -1,7 +1,6 @@
 import { DomManager, IMainScene, Store, domLayerSetting } from 'churaverse-engine-client'
-import { DescriptionWindowComponent } from './component/DescriptionWindowComponent'
+import { DescriptionWindowComponent, CHURAREN_DESCRIPTION } from './component/DescriptionWindowComponent'
 import '@churaverse/game-plugin-client/gameUiManager'
-import { CHURAREN_DESCRIPTION } from '../startWindow/component/RuleExplanationWindowComponent'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { ChurarenPlayerReadyMessage } from '../../message/churarenPlayerReadyMessage'
 import { IDescriptionWindow } from '../../interface/IChurarenUiComponent'
