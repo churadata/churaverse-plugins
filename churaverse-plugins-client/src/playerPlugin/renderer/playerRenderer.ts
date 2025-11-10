@@ -399,6 +399,42 @@ export class PlayerRenderer implements IPlayerRenderer {
   }
 
   /**
+   * プレイヤーが回復を行うときのアニメーション
+   * @param healAmount 回復量
+   * @param hp 回復後のHP
+   */
+  public heal(healAmount: number, hp: number): void {
+    // プレイヤー近くに回復量をランダムに表記させる範囲
+    const X_MIN = -20
+    const X_MAX = 20
+    const Y_MIN = 0
+    const Y_MAX = 20
+    const x = this.sprite.x + Math.random() * (X_MAX - X_MIN) + X_MIN
+    const y = this.sprite.y + Math.random() * (Y_MAX - Y_MIN) + Y_MIN
+    const MOVE_Y = 30 // healTextが30ずつ上に上がる
+    const DURATION = 300 // 回復量が表示されて消えていく時間
+    const THICKNESS = 5 // healTextの縁の太さ
+    const healText = this.scene.add
+      .text(x, y, `+${healAmount}`, { fontSize: '23px' })
+      .setOrigin(0.5)
+      .setStroke('#FFC300', THICKNESS)
+    this.playerFrontContainer.add(healText)
+    const tween = this.scene.add.tween({
+      targets: [healText],
+      x,
+      y: y - MOVE_Y,
+      alpha: 0,
+      duration: DURATION, // DURATION時間かけてhealTextが30上に上がる
+      // tween完了時に実行される関数
+      onComplete: () => {
+        tween.stop()
+        healText.destroy()
+      },
+    })
+    this.hpBar.update(hp)
+  }
+
+  /**
    * プレイヤーの色を適用する色
    * @param color プレイヤーに適用する色の名前
    */
