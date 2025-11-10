@@ -11,7 +11,9 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@churaverse/churaren-boss-attack-plugin-server": "file:../churarenBossAttackPlugin",
     "@churaverse/churaren-alchemy-plugin-server": "file:../churarenAlchemyPlugin",
+    "@churaverse/churaren-boss-plugin-server": "file:../churarenBossPlugin",
     "@churaverse/churaren-core-plugin-server": "file:../churarenCorePlugin",
     "@churaverse/churaren-item-plugin-server": "file:../churarenItemPlugin",
     "@churaverse/game-plugin-server": "file:../../gamePlugin",
