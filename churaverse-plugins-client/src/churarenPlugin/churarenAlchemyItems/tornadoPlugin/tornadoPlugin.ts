@@ -158,24 +158,20 @@ export class TornadoPlugin extends BaseAlchemyItemPlugin {
 
       // nステップ目の竜巻の移動方向(stepIndexが偶数の時と奇数の時で切り替え)
       const attackDirection = stepIndex % 2 === 0 ? 1 : -1
+      const dir = tornado.direction
+      const perp = { x: -dir.y, y: dir.x } // 直交ベクトル
       let dest: Position
 
       // 1ステップ目は移動距離が半分(ジグザグの真ん中から開始するため)
       if (stepIndex === 0) {
         dest = new Position(
-          tornado.position.x +
-            (tornado.direction.x * moveDistance) / 2 +
-            (tornado.direction.y * attackDirection * moveDistance) / 2,
-          tornado.position.y +
-            (tornado.direction.y * moveDistance) / 2 +
-            (tornado.direction.x * attackDirection * moveDistance) / 2
+          tornado.position.x + (dir.x * moveDistance) / 2 + (perp.x * attackDirection * moveDistance) / 2,
+          tornado.position.y + (dir.y * moveDistance) / 2 + (perp.y * attackDirection * moveDistance) / 2
         )
       } else {
         dest = new Position(
-          tornado.position.x +
-            tornado.direction.x * moveDistance +
-            tornado.direction.y * attackDirection * moveDistance,
-          tornado.position.y + tornado.direction.y * moveDistance + tornado.direction.x * attackDirection * moveDistance
+          tornado.position.x + dir.x * moveDistance + perp.x * attackDirection * moveDistance,
+          tornado.position.y + dir.y * moveDistance + perp.y * attackDirection * moveDistance
         )
       }
 
