@@ -46,19 +46,24 @@ export const RuleExplanationWindowComponent: JSXFunc = () => {
         </p>
         <img src={ghostImage} alt="ゴーストモードプレイヤーの写った画像" className={style.image} />
       </div>
+      <hr className={style.divider} />
 
       <h2 className={style.churarenJudgeHeader}>🚩勝敗判定🚩</h2>
       <div className={style.section}>
         <h4 className={`${style.churarenJudge} ${style.win}`}>勝利条件</h4>
-        <li>制限時間3分以内にボスモンスターのHPをゼロにする</li>
+        <ul className={style.resultList}>
+          <li>制限時間3分以内にボスモンスターのHPをゼロにする</li>
+        </ul>
 
         <h4 className={`${style.churarenJudge} ${style.lose}`}>敗北条件</h4>
-        <li>制限時間経過後にボスのHPが残っている</li>
-        <li>参加プレイヤー全員がゴーストモードに移行した</li>
+        <ul className={style.resultList}>
+          <li>制限時間経過後にボスのHPが残っている</li>
+          <li>参加プレイヤー全員がゴーストモードに移行した</li>
+        </ul>
       </div>
       <div className={style.section}>
         <h5>補足</h5>
-        <ul>
+        <ul className={style.supplementList}>
           <li>(※1) 参加者が多いほど、それに応じてボスのHPも増加します</li>
           <li>(※2) 錬金に使うアイテムの組み合わせによって、攻撃の種類が変わります</li>
           <li>(※3) ゴーストモードでは攻撃・錬金などのアクションは無効になります</li>

@@ -63,14 +63,12 @@
   padding-left: 0;
 }
 
-/* 補足の箇条書きを無効にする */
 .supplementList {
   list-style: none;
   padding-left: 0;
   margin: 0;
 }
 
-/* 勝利/敗北などの通常の箇条書き（ディスク） */
 .resultList {
   list-style-type: disc;
   list-style-position: inside;
@@ -104,6 +102,8 @@
   padding: 0.35rem 0.75rem;
   border-radius: 0.5rem;
   display: inline-block;
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
 }
 
 .churarenJudge {
