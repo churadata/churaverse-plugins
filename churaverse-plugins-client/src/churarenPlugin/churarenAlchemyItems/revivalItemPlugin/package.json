@@ -1,5 +1,5 @@
 {
-  "name": "@churaverse/churaren-alchemy-item-plugins-client",
+  "name": "@churaverse/churaren-revival-item-plugin-client",
   "version": "0.1.0",
   "type": "module",
   "scripts": {
@@ -34,8 +34,13 @@
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "dependencies": {
-    "@churaverse/churaren-healing-potion-plugin-client": "file:../healingPotionPlugin",
-    "@churaverse/churaren-revival-item-plugin-client": "file:../revivalItemPlugin",
-    "@churaverse/churaren-alchemy-plugin-client": "file:../../churarenAlchemyPlugin"
+    "@churaverse/churaren-alchemy-plugin-client": "file:../../churarenAlchemyPlugin",
+    "@churaverse/churaren-core-plugin-client": "file:../../churarenCorePlugin",
+    "@churaverse/debug-screen-plugin-client": "~0.1.0",
+    "@churaverse/game-plugin-client": "file:../../../gamePlugin",
+    "@churaverse/network-plugin-client": "file:../../../networkPlugin",
+    "@churaverse/player-plugin-client": "file:../../../playerPlugin",
+    "churaverse-engine-client": "file:../../../../../../churaverse-engine/churaverse-engine-client",
+    "phaser": "^3.80.1"
   }
 }
