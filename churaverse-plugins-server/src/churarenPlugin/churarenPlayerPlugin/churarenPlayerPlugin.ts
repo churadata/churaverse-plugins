@@ -6,7 +6,7 @@ import { ItemPluginStore } from '@churaverse/churaren-item-plugin-server/store/d
 import { ChurarenPlayersStore } from './store/defChurarenPlayersStore'
 import { SocketController } from './controller/socketController'
 import { initChurarenPlayersStore, resetChurarenPlayersStore } from './store/initChurarenPlayersStore'
-import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
+import { CHURAREN_CONSTANTS, ChurarenEnemyDamageCause } from '@churaverse/churaren-core-plugin-server'
 import { GetChurarenItemEvent } from './event/getChurarenItemEvent'
 import { GetChurarenItemData, GetChurarenItemMessage } from './message/getChurarenItemMessage'
 import { DropChurarenItemEvent } from './event/dropChurarenItemEvent'
@@ -15,10 +15,11 @@ import { initPlayerItemStore, resetPlayerItemStore } from './store/initPlayerIte
 import { InvicibleTimeMessage } from './message/invicibleTimeMessage'
 import { isPlayer, Player } from '@churaverse/player-plugin-server/domain/player'
 import { ChurarenResultEvent } from '@churaverse/churaren-core-plugin-server/event/churarenResultEvent'
-import { PlayerHealEvent } from './event/playerHealEvent'
 import { PlayerRevivalMessage } from './message/playerRevivalMessage'
-import { PlayerHealMessage } from './message/playerHealMessage'
 import { UseRevivalItemEvent } from '@churaverse/churaren-revival-item-plugin-server/event/useRevivalItemEvent'
+import { ChurarenDamageMessage } from './message/churarenDamageMessage'
+import { isBoss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
+import { isBossAttack } from '@churaverse/churaren-boss-attack-plugin-server/domain/bossAttack'
 
 export const MAX_ITEMS = 3
 
@@ -55,8 +56,8 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('getChurarenItem', this.getItem)
     this.bus.subscribeEvent('dropChurarenItem', this.dropItem)
     this.bus.subscribeEvent('livingDamage', this.onChurarenDamageFromBoss)
+    this.bus.subscribeEvent('livingDamage', this.onChurarenDamageFromBossAttack)
     this.bus.subscribeEvent('livingDamage', this.skipDamage, 'HIGH')
-    this.bus.subscribeEvent('playerHeal', this.onLivingHeal)
     this.bus.subscribeEvent('useRevivalItem', this.onUseRevivalItem)
   }
 
@@ -65,8 +66,8 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.unsubscribeEvent('getChurarenItem', this.getItem)
     this.bus.unsubscribeEvent('dropChurarenItem', this.dropItem)
     this.bus.unsubscribeEvent('livingDamage', this.onChurarenDamageFromBoss)
+    this.bus.unsubscribeEvent('livingDamage', this.onChurarenDamageFromBossAttack)
     this.bus.unsubscribeEvent('livingDamage', this.skipDamage)
-    this.bus.unsubscribeEvent('playerHeal', this.onLivingHeal)
     this.bus.unsubscribeEvent('useRevivalItem', this.onUseRevivalItem)
   }
 
@@ -86,25 +87,10 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     resetPlayerItemStore(this.store)
   }
 
-  private readonly changeGhostPlayer = (player: Player): void => {
-    if (player === undefined) return
-    this.churarenPlayerStore.ghostModePlayers.set(player.id, player)
-    player.isCollidable = false
-    this.deleteItems(player.id)
-    if (
-      this.churarenPlayerStore.ghostModePlayers.size ===
-      this.gamePluginStore.games.get(this.gameId)?.participantIds.length
-    ) {
-      const updateChurarenUi = new ChurarenResultEvent('gameOver')
-      this.bus.post(updateChurarenUi)
-    }
-  }
-
   private readonly skipDamage = (ev: LivingDamageEvent): void => {
-    // TODO: ちゅられん特有の敵との衝突によるダメージのみ処理を行うように条件を追加
-    if (!this.isActive) return
-    const player = ev.target as Player
-    if (player === undefined) return
+    if (!(ev.cause instanceof ChurarenEnemyDamageCause)) return
+    if (!isPlayer(ev.target)) return
+    const player = ev.target
     if (this.churarenPlayerStore.ghostModePlayers.has(player.id)) return
     if (this.inviciblePlayersList.includes(player.id)) {
       ev.cancel()
@@ -140,18 +126,56 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   }
 
   private readonly onChurarenDamageFromBoss = (ev: LivingDamageEvent): void => {
-    // TODO: ボスから受けたダメージをclientに送信する処理の実装
+    if (!(ev.cause instanceof ChurarenEnemyDamageCause)) return
+    if (ev.cause.name !== 'collisionBoss') return
+    if (isPlayer(ev.target) && isBoss(ev.cause.entity)) {
+      const player = ev.target
+      const damageCause = new ChurarenDamageMessage({
+        targetId: player.id,
+        cause: ev.cause.name,
+        sourceId: ev.cause.entity.id,
+        amount: ev.amount,
+      })
+      this.networkPluginStore.messageSender.send(damageCause)
 
-    if (!isPlayer(ev.target)) return
-    const player = ev.target
-    if (player.isDead) {
-      this.changeGhostPlayer(player)
+      // 即時に死亡していればそのままゴースト化
+      if (player.isDead) {
+        this.changeGhostPlayer(player)
+      }
     }
   }
 
-  private readonly onLivingHeal = (ev: PlayerHealEvent): void => {
-    const player = this.playerPluginStore.players.get(ev.id)
-    player?.heal(ev.healAmount)
+  private readonly onChurarenDamageFromBossAttack = (ev: LivingDamageEvent): void => {
+    if (!(ev.cause instanceof ChurarenEnemyDamageCause)) return
+    if (ev.cause.name !== 'bossAttack') return
+    if (isPlayer(ev.target) && isBossAttack(ev.cause.entity)) {
+      const player = ev.target
+      const damageCause = new ChurarenDamageMessage({
+        targetId: player.id,
+        cause: ev.cause.name,
+        sourceId: ev.cause.entity.id,
+        amount: ev.amount,
+      })
+      this.networkPluginStore.messageSender.send(damageCause)
+      // 即時に死亡していればそのままゴースト化
+      if (player.isDead) {
+        this.changeGhostPlayer(player)
+      }
+    }
+  }
+
+  private changeGhostPlayer(player: Player): void {
+    if (player === undefined) return
+    this.churarenPlayerStore.ghostModePlayers.set(player.id, player)
+    player.isCollidable = false
+    this.deleteItems(player.id)
+    if (
+      this.churarenPlayerStore.ghostModePlayers.size ===
+      this.gamePluginStore.games.get(this.gameId)?.participantIds.length
+    ) {
+      const updateChurarenUi = new ChurarenResultEvent('gameOver')
+      this.bus.post(updateChurarenUi)
+    }
   }
 
   private readonly onUseRevivalItem = (ev: UseRevivalItemEvent): void => {

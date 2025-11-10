@@ -1,6 +1,6 @@
 import { IItemRepository } from './IItemRepository'
 import { Item } from './item'
-import { ItemKind, itemKinds } from '../domain/itemKind'
+import { ItemKind, ITEM_KINDS } from '../domain/itemKind'
 import { Vector } from 'churaverse-engine-server'
 import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
 import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
@@ -47,5 +47,5 @@ function itemInfoToSendableObject(item: Item): ChurarenItemInfo {
 }
 
 function getRandomItemKind(): ItemKind {
-  return itemKinds[Math.floor(Math.random() * itemKinds.length)]
+  return ITEM_KINDS[Math.floor(Math.random() * ITEM_KINDS.length)]
 }

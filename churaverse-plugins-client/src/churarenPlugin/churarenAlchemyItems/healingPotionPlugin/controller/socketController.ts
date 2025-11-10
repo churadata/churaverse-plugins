@@ -2,9 +2,8 @@ import { RegisterMessageEvent } from '@churaverse/network-plugin-client/event/re
 import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-client/event/registerMessageListenerEvent'
 import { BaseSocketController } from '@churaverse/network-plugin-client/interface/baseSocketController'
 import { IMessageListenerRegister } from '@churaverse/network-plugin-client/interface/IMessageListenerRegister'
-import { IEventBus, IMainScene, Store } from 'churaverse-engine-client'
+import { IEventBus, IMainScene, LivingHealEvent, Store } from 'churaverse-engine-client'
 import { UseHealingPotionMessage } from '../message/useHealingPotionMessage'
-import { PlayerHealEvent } from '@churaverse/churaren-player-plugin-client/event/playerHealEvent'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
@@ -31,7 +30,9 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   private readonly useHealingPotion = (msg: UseHealingPotionMessage): void => {
     const data = msg.data
-    const playerHealEvent = new PlayerHealEvent(data.playerId, data.healAmount)
+    const player = this.store.of('playerPlugin').players.get(data.playerId)
+    if (player === undefined) return
+    const playerHealEvent = new LivingHealEvent(player, data.healAmount)
     this.eventBus.post(playerHealEvent)
   }
 }

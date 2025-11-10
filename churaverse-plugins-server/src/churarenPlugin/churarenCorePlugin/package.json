@@ -11,10 +11,9 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@churaverse/churaren-player-plugin-server": "file:../churarenPlayerPlugin",
     "@churaverse/game-plugin-server": "file:../../gamePlugin",
     "@churaverse/network-plugin-server": "file:../../networkPlugin",
-    "@churaverse/player-plugin-server": "latest",
+    "@churaverse/player-plugin-server": "file:../../playerPlugin",
     "churaverse-engine-server": "file:../../../../../churaverse-engine/churaverse-engine-server"
   }
 }
