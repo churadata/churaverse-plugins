@@ -1,1 +1,0 @@
-@churaverse/churaren-tornado-plugin-client
