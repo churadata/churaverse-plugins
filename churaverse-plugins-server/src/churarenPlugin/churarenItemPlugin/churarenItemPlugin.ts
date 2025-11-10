@@ -69,7 +69,7 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
 
   protected handleGameStart(): void {
     this.churarenGameInfo = this.store.of('gamePlugin').games.get(this.gameId)
-    this.bus.post(new AlchemyItemRegisterEvent(this.itemPluginStore.alchemyItemManager))
+    this.bus.post(new AlchemyItemRegisterEvent(this.itemPluginStore.alchemyItemRegister))
   }
 
   protected handleGameTermination(): void {

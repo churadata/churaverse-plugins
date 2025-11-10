@@ -1,8 +1,6 @@
 import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItemKind'
 import { ItemKind } from '../domain/itemKind'
-import { AlchemyItemRecipe } from './IAlchemyItemRecipe'
 
-export interface IAlchemyItemManger {
-  get: (alchemyItemRecipe: AlchemyItemRecipe) => AlchemyItemKind
+export interface IAlchemyItemManager {
   getByMaterialItems: (materialItems: ItemKind[]) => AlchemyItemKind
 }
