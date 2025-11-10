@@ -5,7 +5,7 @@ import { AlchemyPotRepository } from '../repository/alchemyPotRepository'
 
 export function initAlchemyPluginStore(store: Store<IMainScene>): void {
   const alchemyPluginStore: AlchemyPluginStore = {
-    alchemyPot: new AlchemyPotRepository(store.of('mapPlugin').mapManager.currentMap),
+    alchemyPots: new AlchemyPotRepository(store.of('mapPlugin').mapManager.currentMap),
   }
   store.setInit('alchemyPlugin', alchemyPluginStore)
 }

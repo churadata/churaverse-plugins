@@ -88,7 +88,6 @@ export class FlamePillarPlugin extends BaseAlchemyItemPlugin {
   }
 
   protected useAlchemyItem = (ev: UseAlchemyItemEvent): void => {
-    console.log('useAlchemyItem received flamePillar', ev)
     if (ev.alchemyItem.kind !== 'flamePillar') return
 
     const gap = 65
