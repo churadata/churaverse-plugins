@@ -417,7 +417,7 @@ export class PlayerRenderer implements IPlayerRenderer {
     const healText = this.scene.add
       .text(x, y, `+${healAmount}`, { fontSize: '23px' })
       .setOrigin(0.5)
-      .setStroke('#505050', THICKNESS)
+      .setStroke('#FFC300', THICKNESS)
     this.playerFrontContainer.add(healText)
     const tween = this.scene.add.tween({
       targets: [healText],
