@@ -1,14 +1,6 @@
 import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-server/domain/baseAlchemyItemPlugin'
 import { SocketController } from './controller/socketController'
-import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-server/domain/IAlchemyItem'
-
-export const HEALING_POTION_ITEM: IAlchemyItem = {
-  kind: 'healingPotion',
-  recipe: {
-    pattern: 'two_same_one_diff',
-    materialKind: 'herb',
-  },
-}
+import { HEALING_POTION_ITEM } from './domain/healingPotion'
 
 export class HealingPotionPlugin extends BaseAlchemyItemPlugin {
   private socketController?: SocketController
