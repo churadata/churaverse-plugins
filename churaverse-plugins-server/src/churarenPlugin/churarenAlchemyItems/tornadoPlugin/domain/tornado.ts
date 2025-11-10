@@ -90,14 +90,16 @@ export class Tornado extends Entity implements ICollidableEntity, ChurarenWeapon
 
     // nステップ目の竜巻の移動方向(stepIndexが偶数の時と奇数の時で切り替え)
     const moveDirection = this.stepIndex % 2 === 0 ? 1 : -1
+    const dir = this._velocity
+    const perp = { x: -dir.y, y: dir.x } // dirの垂直ベクトル
 
     // 1ステップ目は移動距離が半分(ジグザグの真ん中から開始するため)
     if (this.stepIndex === 0) {
-      this.position.x += (this._velocity.x * dt * moveDirection) / 2
-      this.position.y += (this._velocity.y * dt * moveDirection) / 2
+      this.position.x += (dir.x * dt * moveDirection) / 2 + (perp.x * dt * moveDirection) / 2
+      this.position.y += (dir.y * dt * moveDirection) / 2 + (perp.y * dt * moveDirection) / 2
     } else {
-      this.position.x += this._velocity.x * dt * moveDirection
-      this.position.y += this._velocity.y * dt * moveDirection
+      this.position.x += dir.x * dt * moveDirection + perp.x * dt * moveDirection
+      this.position.y += dir.y * dt * moveDirection + perp.y * dt * moveDirection
     }
   }
 }
