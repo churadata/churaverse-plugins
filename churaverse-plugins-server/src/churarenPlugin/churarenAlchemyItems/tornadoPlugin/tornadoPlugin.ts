@@ -1,25 +1,24 @@
-import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
+import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-server/domain/baseAlchemyItemPlugin'
 import { MapPluginStore } from '@churaverse/map-plugin-server/store/defMapPluginStore'
-import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { EntitySpawnEvent, IMainScene, LivingDamageEvent, UpdateEvent } from 'churaverse-engine-server'
 import { SocketController } from './controller/socketController'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
 import { initTornadoPluginStore } from './store/initTornadoPluginStore'
 import { moveTornados, removeDieTornado } from './domain/tornadoService'
-import { Tornado } from './domain/tornado'
+import { Tornado, TORNADO_ITEM } from './domain/tornado'
 import { TornadoPluginStore } from './store/defTornadoPluginStore'
 import { TornadoHitMessage } from './message/tornadoHitMessage'
 import { Boss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
 import { TornadoDamageCause } from './domain/tornadoDamageCause'
 import '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
 
-export class TornadoPlugin extends BaseGamePlugin {
-  public gameId = CHURAREN_CONSTANTS.GAME_ID
+export class TornadoPlugin extends BaseAlchemyItemPlugin {
   private tornadoPluginStore!: TornadoPluginStore
   private mapPluginStore!: MapPluginStore
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private socketController?: SocketController
+  protected alchemyItem = TORNADO_ITEM
 
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.init.bind(this))

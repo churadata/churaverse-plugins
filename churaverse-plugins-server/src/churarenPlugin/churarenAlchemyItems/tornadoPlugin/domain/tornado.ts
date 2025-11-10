@@ -3,10 +3,18 @@ import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server
 import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
 import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
 import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-server'
+import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-server/domain/IAlchemyItem'
 
 export const TORNADO_WALK_LIMIT_GRIDS = 5
 export const TORNADO_WALK_LIMIT_MS = 500
 const totalSteps = 10
+export const TORNADO_ITEM: IAlchemyItem = {
+  kind: 'tornado',
+  recipe: {
+    pattern: 'two_same_one_diff',
+    materialKind: 'grassOre',
+  },
+}
 
 export class Tornado extends Entity implements ICollidableEntity, ChurarenWeaponEntity {
   public isCollidable = true
@@ -91,5 +99,11 @@ export class Tornado extends Entity implements ICollidableEntity, ChurarenWeapon
       this.position.x += this._velocity.x * dt * moveDirection
       this.position.y += this._velocity.y * dt * moveDirection
     }
+  }
+}
+
+declare module '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItemKind' {
+  export interface AlchemyItemKindMap {
+    tornado: Tornado
   }
 }
