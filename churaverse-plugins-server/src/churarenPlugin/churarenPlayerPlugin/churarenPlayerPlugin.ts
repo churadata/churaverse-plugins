@@ -20,6 +20,7 @@ import { UseRevivalItemEvent } from '@churaverse/churaren-revival-item-plugin-se
 import { ChurarenDamageMessage } from './message/churarenDamageMessage'
 import { isBoss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
 import { isBossAttack } from '@churaverse/churaren-boss-attack-plugin-server/domain/bossAttack'
+import { PlayerHealMessage } from '@churaverse/player-plugin-server/message/playerHealMessage'
 
 export const MAX_ITEMS = 3
 
