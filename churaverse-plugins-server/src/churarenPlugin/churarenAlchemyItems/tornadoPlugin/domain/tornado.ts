@@ -1,9 +1,10 @@
-import { Direction, Entity, Position, Vector } from 'churaverse-engine-server'
+import { Direction, Position, Vector } from 'churaverse-engine-server'
 import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/ICollidableEntity'
 import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
 import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
 import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-server'
 import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-server/domain/IAlchemyItem'
+import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItem'
 
 export const TORNADO_WALK_LIMIT_GRIDS = 5
 export const TORNADO_WALK_LIMIT_MS = 500
@@ -16,7 +17,7 @@ export const TORNADO_ITEM: IAlchemyItem = {
   },
 }
 
-export class Tornado extends Entity implements ICollidableEntity, ChurarenWeaponEntity {
+export class Tornado extends AlchemyItem implements ICollidableEntity, ChurarenWeaponEntity {
   public isCollidable = true
   public getRect(): IRectangle {
     return {
@@ -43,9 +44,11 @@ export class Tornado extends Entity implements ICollidableEntity, ChurarenWeapon
   public stepIndex = 0
 
   public constructor(tornadoId: string, ownerId: string, position: Position, direction: Direction, spawnTime: number) {
-    super(position, direction)
+    super(tornadoId, 'tornado')
     this.tornadoId = tornadoId
     this.churarenWeaponOwnerId = ownerId
+    this.position = position
+    this.direction = direction
     this.spawnTime = spawnTime
 
     // walkするまでは停止
