@@ -1,10 +1,18 @@
-import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
-import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
+import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-server/domain/baseAlchemyItemPlugin'
 import { SocketController } from './controller/socketController'
+import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-server/domain/IAlchemyItem'
 
-export class RevivalItemPlugin extends BaseGamePlugin {
-  public gameId = CHURAREN_CONSTANTS.GAME_ID
+export const REVIVAL_ITEM: IAlchemyItem = {
+  kind: 'revivalItem',
+  recipe: {
+    pattern: 'all_same',
+    materialKind: 'herb',
+  },
+}
+
+export class RevivalItemPlugin extends BaseAlchemyItemPlugin {
   private socketController?: SocketController
+  protected alchemyItem = REVIVAL_ITEM
 
   public listenEvent(): void {
     super.listenEvent()
