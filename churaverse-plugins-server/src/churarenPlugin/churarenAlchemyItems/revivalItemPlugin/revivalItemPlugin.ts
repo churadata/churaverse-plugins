@@ -1,14 +1,6 @@
 import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-server/domain/baseAlchemyItemPlugin'
 import { SocketController } from './controller/socketController'
-import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-server/domain/IAlchemyItem'
-
-export const REVIVAL_ITEM: IAlchemyItem = {
-  kind: 'revivalItem',
-  recipe: {
-    pattern: 'all_same',
-    materialKind: 'herb',
-  },
-}
+import { REVIVAL_ITEM } from './domain/revivalItem'
 
 export class RevivalItemPlugin extends BaseAlchemyItemPlugin {
   private socketController?: SocketController
