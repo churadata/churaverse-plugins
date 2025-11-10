@@ -1,26 +1,25 @@
 import { IMainScene, UpdateEvent, EntitySpawnEvent, LivingDamageEvent } from 'churaverse-engine-server'
-import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
+import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-server/domain/baseAlchemyItemPlugin'
 import { FlamePillarPluginStore } from './store/defFlamePillarPluginStore'
 import { MapPluginStore } from '@churaverse/map-plugin-server/store/defMapPluginStore'
-import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { initFlamePillarPluginStore } from './store/initFlamePillarPluginStore'
 import { removeDieFlamePillar } from './domain/flamePillarService'
 import { SocketController } from './controller/socketController'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
 import { FlamePillarDamageCause } from './domain/flamePillarDamageCause'
-import { FlamePillar } from './domain/flamePillar'
+import { FLAME_PILLAR_ITEM, FlamePillar } from './domain/flamePillar'
 import { Boss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
 import { FlamePillarHitMessage } from './message/flamePillarHitMessage'
 import '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
 import '@churaverse/churaren-core-plugin-server/event/churarenResultEvent'
 
-export class FlamePillarPlugin extends BaseGamePlugin {
-  public gameId = CHURAREN_CONSTANTS.GAME_ID
+export class FlamePillarPlugin extends BaseAlchemyItemPlugin {
   private flamePillarPluginStore!: FlamePillarPluginStore
   private mapPluginStore!: MapPluginStore
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private socketController?: SocketController
+  protected alchemyItem = FLAME_PILLAR_ITEM
 
   public listenEvent(): void {
     super.listenEvent()
