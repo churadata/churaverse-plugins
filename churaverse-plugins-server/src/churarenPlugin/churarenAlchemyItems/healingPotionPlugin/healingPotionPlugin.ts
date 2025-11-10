@@ -1,10 +1,18 @@
-import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
-import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
+import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-server/domain/baseAlchemyItemPlugin'
 import { SocketController } from './controller/socketController'
+import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-server/domain/IAlchemyItem'
 
-export class HealingPotionPlugin extends BaseGamePlugin {
-  public gameId = CHURAREN_CONSTANTS.GAME_ID
+export const HEALING_POTION_ITEM: IAlchemyItem = {
+  kind: 'healingPotion',
+  recipe: {
+    pattern: 'two_same_one_diff',
+    materialKind: 'herb',
+  },
+}
+
+export class HealingPotionPlugin extends BaseAlchemyItemPlugin {
   private socketController?: SocketController
+  protected alchemyItem = HEALING_POTION_ITEM
 
   public listenEvent(): void {
     super.listenEvent()
@@ -16,7 +24,7 @@ export class HealingPotionPlugin extends BaseGamePlugin {
     )
   }
 
-  // 回復は`ChruarenPlayerPlugin`で行っている
+  // 回復は`PlayerPlugin`で行っている
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
   }

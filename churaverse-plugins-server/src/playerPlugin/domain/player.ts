@@ -6,6 +6,11 @@ import { PlayerRole } from '../types/playerRole'
 
 export const PLAYER_RESPAWN_WAITING_TIME_MS = 2500
 
+/**
+ * PlayerのデフォルトHP
+ */
+export const DEFAULT_HP = 100
+
 export class Player extends LivingEntity implements ICollidableEntity {
   public isCollidable = true
 
@@ -81,12 +86,12 @@ export class Player extends LivingEntity implements ICollidableEntity {
   }
 
   public heal(amount: number): void {
-    this.hp = Math.min(this.hp + amount, 100)
+    this.hp = Math.min(this.hp + amount, DEFAULT_HP)
   }
 
   public respawn(position: Position): void {
     this.teleport(position)
-    this.hp = 100
+    this.hp = DEFAULT_HP
   }
 
   public setPlayerName(name: string): void {

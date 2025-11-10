@@ -1,0 +1,17 @@
+{
+  "name": "@churaverse/churaren-alchemy-item-plugins-server",
+  "version": "0.1.0",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tsc",
+    "link:cvPackages": "sh npm_link_cvPackages.sh"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@churaverse/churaren-healing-potion-plugin-server": "file:../healingPotionPlugin",
+    "@churaverse/churaren-alchemy-plugin-server": "file:../../churarenAlchemyPlugin"
+  }
+}

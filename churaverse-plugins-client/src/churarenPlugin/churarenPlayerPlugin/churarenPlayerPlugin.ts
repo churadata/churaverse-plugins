@@ -1,12 +1,12 @@
 import { BaseGamePlugin } from '@churaverse/game-plugin-client/domain/baseGamePlugin'
 import { ItemPluginStore } from '@churaverse/churaren-item-plugin-client/store/defItemPluginStore'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
-import { GRID_SIZE, IMainScene, LivingDamageEvent, Position } from 'churaverse-engine-client'
+import { GRID_SIZE, IMainScene, LivingDamageEvent } from 'churaverse-engine-client'
 import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { PlayerRespawnEvent } from '@churaverse/player-plugin-client/event/playerRespawnEvent'
 import { PlayerWalkEvent } from '@churaverse/player-plugin-client/event/playerWalkEvent'
 import { PlayerNameChangeEvent } from '@churaverse/player-plugin-client/event/playerNameChangeEvent'
-import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-client'
+import { CHURAREN_CONSTANTS, ChurarenEnemyDamageCause } from '@churaverse/churaren-core-plugin-client'
 import { ChurarenPlayersStore } from './store/defChurarenPlayersStore'
 import { KeyboardPluginStore } from '@churaverse/keyboard-plugin-client/store/defKeyboardPluginStore'
 import { GhostModeIndicatorUi } from './ui/ghostModeIndicatorUi'
@@ -14,7 +14,7 @@ import { DeathLogRepository } from '@churaverse/player-plugin-client/ui/deathLog
 import { SocketController } from './controller/socketController'
 import { KeyboardController } from './controller/keyboardController'
 import { initChurarenPlayersStore, resetChurarenPlayersStore } from './store/initChurarenPlayersStore'
-import { GRID_WALK_DURATION_MS } from '@churaverse/player-plugin-client/domain/player'
+import { GRID_WALK_DURATION_MS, isPlayer } from '@churaverse/player-plugin-client/domain/player'
 import { InvicibleTimeEvent } from './event/invicibleTimeEvent'
 import { Item } from '@churaverse/churaren-item-plugin-client/domain/item'
 import { materialItemImage } from '@churaverse/churaren-item-plugin-client/domain/itemKind'
@@ -25,8 +25,7 @@ import { initPlayerItemStore, resetPlayerItemStore } from './store/initPlayerIte
 import { DropChurarenItemEvent } from './event/dropChurarenItemEvent'
 import { DropChurarenItemData, DropChurarenItemMessage } from './message/dropChurarenItemMessage'
 import { GamePluginStore } from '@churaverse/game-plugin-client/store/defGamePluginStore'
-import { PlayerHealEvent } from './event/playerHealEvent'
-import { PlayerRevivalEvent } from './event/playerRevivalEvent'
+import { DeathLog } from '@churaverse/player-plugin-client/ui/deathLog/deathLog'
 
 export class ChurarenPlayerPlugin extends BaseGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
@@ -93,8 +92,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('playerRespawn', this.changeGhostMode, 'LOW')
     this.bus.subscribeEvent('playerNameChange', this.onChangePlayerName)
     this.bus.subscribeEvent('churarenResult', this.onChurarenResult)
-    this.bus.subscribeEvent('playerHeal', this.onPlayerHeal)
-    this.bus.subscribeEvent('playerRevival', this.onPlayerRevival)
   }
 
   protected unsubscribeGameEvent(): void {
@@ -107,8 +104,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.unsubscribeEvent('playerRespawn', this.changeGhostMode)
     this.bus.unsubscribeEvent('playerNameChange', this.onChangePlayerName)
     this.bus.unsubscribeEvent('churarenResult', this.onChurarenResult)
-    this.bus.unsubscribeEvent('playerHeal', this.onPlayerHeal)
-    this.bus.unsubscribeEvent('playerRevival', this.onPlayerRevival)
   }
 
   protected handleGameStart(): void {
@@ -235,34 +230,22 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   }
 
   private readonly logPlayerDeathByBoss = (ev: LivingDamageEvent): void => {
-    // TODO: プレイヤーがボスによって死亡した時のログを流す
-    //  (churarenBossPluginのChurarenEnemyDamageCauseかどうかを判定する)
+    if (!(ev.cause instanceof ChurarenEnemyDamageCause)) return
+    if (isPlayer(ev.target) && ev.target.isDead) {
+      const deathLog: DeathLog = {
+        victim: ev.target,
+        killer: ev.cause.entityName,
+        cause: ev.cause.entityName,
+        diedTime: new Date(),
+      }
+      this.playerPluginStore.deathLogRenderer.add(deathLog)
+      this.playerPluginStore.deathLogRepository.addDeathLog(deathLog)
+    }
   }
 
   private readonly onChangePlayerName = (ev: PlayerNameChangeEvent): void => {
     if (!this.isActive) return
     this.updateGhostPlayerList()
-  }
-
-  private readonly onPlayerHeal = (ev: PlayerHealEvent): void => {
-    const player = this.playerPluginStore.players.get(ev.id)
-    const renderer = this.playerPluginStore.playerRenderers.get(ev.id)
-    if (player === undefined || renderer === undefined) return
-    player.heal(ev.healAmount)
-    renderer.heal(ev.healAmount, player.hp)
-  }
-
-  private readonly onPlayerRevival = (ev: PlayerRevivalEvent): void => {
-    this.churarenPlayerStore.ghostModePlayerRepository.delete(ev.id)
-    const player = this.playerPluginStore.players.get(ev.id)
-    if (player === undefined) return
-    this.showPlayer(player.id)
-    this.updateGhostPlayerList()
-    if (player.id === this.playerPluginStore.ownPlayerId) {
-      this.ghostModeIndicatorUi?.ghostModeIcon.deactivate()
-      this.playerItemStore.materialItemBoxContainer.show()
-      this.playerItemStore.alchemyItemBoxContainer.show()
-    }
   }
 
   private clearPlayerItemBox(playerId?: string): void {
@@ -298,8 +281,8 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   }
 
   private updateMaterialItemBox(playerId: string): void {
-    const itemBoxes = this.playerItemStore.materialItems.getAllItem(playerId)
-    const itemImageList = itemBoxes.map((item) => materialItemImage[item.kind])
+    const items = this.playerItemStore.materialItems.getAllItem(playerId)
+    const itemImageList = items.map((item) => materialItemImage[item.kind])
     this.playerItemStore.materialItemBoxContainer.updateMaterialItemBox(itemImageList)
   }
 
