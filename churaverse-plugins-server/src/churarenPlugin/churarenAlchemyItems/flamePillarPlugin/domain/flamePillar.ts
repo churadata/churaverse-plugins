@@ -49,11 +49,6 @@ export class FlamePillar extends AlchemyItem implements ICollidableEntity, Chura
     this.spawnTime = spawnTime
     this.position = position
     this.direction = direction
-
-    // 10秒後にisDeadをtrueにする
-    setTimeout(() => {
-      this._isDead = true
-    }, FLAME_PILLAR_SPAWN_LIMIT_MS)
   }
 
   public get isDead(): boolean {
