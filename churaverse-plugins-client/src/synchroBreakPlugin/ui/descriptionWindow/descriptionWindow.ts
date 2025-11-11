@@ -198,6 +198,18 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param text 更新する文章
    */
   private setDescriptionText(text: string): void {
+    const textContainer = this.element.querySelector('[data-role="description-text"]')
+    if (textContainer !== null) {
+      textContainer.innerHTML = text
+      return
+    }
+    // フォールバック（コンテナが見つからない場合は従来通り。ただしバーは保持して再アタッチ）
+    const barEl = this.countDownBar?.element
     this.element.innerHTML = text
+    if (barEl !== undefined && barEl !== null) {
+      if (!barEl.isConnected || barEl.parentElement !== this.element) {
+        this.element.appendChild(barEl)
+      }
+    }
   }
 }

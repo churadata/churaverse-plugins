@@ -10,7 +10,11 @@ export const DescriptionWindowComponent: JSXFunc<DescriptionWindowProps> = ({
 }: DescriptionWindowProps) => {
   return (
     <div className={style.container}>
-      <p>{description}</p>
+      <div
+        className={style.descriptionText}
+        data-role="description-text"
+        dangerouslySetInnerHTML={{ __html: description }}
+      />
     </div>
   )
 }
