@@ -120,7 +120,7 @@ export class DescriptionWindow implements IDescriptionWindow {
     // 開始時に一度だけ作成（duration を総秒にする）
     if (timeLimit > 0) {
       this.countDownBar = new CountDownBar({
-        percent: timeLimit,
+        remainingSeconds: timeLimit,
         duration: timeLimit,
         startPosition: 'top',
         strokeColor: '#4CAF50',
@@ -136,7 +136,7 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param countdown シンクロブレイク終了までのカウントダウン
    */
   public displaySynchroBreakInProgress(countdown: number, playerName?: string, nyokkiActionMessage?: string): void {
-    const descriptionText = [`現在${this.gameName}進行中`, `残り${countdown}秒以内にボタンを押してください！`]
+    const descriptionText = [`現在${this.gameName}進行中`, `制限時間内にボタンを押してください！`]
     if (playerName !== undefined && nyokkiActionMessage !== undefined) {
       descriptionText.splice(1, 0, nyokkiActionMessage)
     }
@@ -175,9 +175,12 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param text ニョッキアクションの文章
    */
   public displayNyokkiAction(text: string): void {
-    const descriptionText = this.element.innerHTML.split('<br>')
-    descriptionText.splice(1, 0, text)
-    this.setDescriptionText(descriptionText.join('<br>'))
+    // 説明テキスト用コンテナの中身だけを読み書きして、バーDOMを巻き込まない
+    const textContainer = this.element.querySelector('[data-role="description-text"]')
+    const currentHtml = textContainer !== null ? textContainer.innerHTML : this.descriptionText
+    const lines = currentHtml.split('<br>')
+    lines.splice(1, 0, text)
+    this.setDescriptionText(lines.join('<br>'))
   }
 
   /**
@@ -198,9 +201,11 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param text 更新する文章
    */
   private setDescriptionText(text: string): void {
+    // 状態も保持しておく（再利用時に根DOMを触らずに済む）
+    this.descriptionText = text
     const textContainer = this.element.querySelector('[data-role="description-text"]')
     if (textContainer !== null) {
-      textContainer.innerHTML = text
+      ;(textContainer as HTMLElement).innerHTML = text
       return
     }
     // フォールバック（コンテナが見つからない場合は従来通り。ただしバーは保持して再アタッチ）

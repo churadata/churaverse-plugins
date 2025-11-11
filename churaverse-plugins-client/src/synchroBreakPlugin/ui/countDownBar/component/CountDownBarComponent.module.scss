@@ -1,5 +1,3 @@
-/* 円形カウントダウンバー（1秒で一周、中央に残り秒数表示） */
-
 .progressItem {
   position: relative;
   width: 72px;
@@ -10,7 +8,6 @@
 .svg {
   width: 100%;
   height: 100%;
-  /* 開始位置を回転で調整（デフォルトは上= -90deg） */
   transform: rotate(var(--start-rotate, -90deg));
 }
 
@@ -25,12 +22,16 @@
   stroke: var(--stroke-color, #4caf50);
   stroke-width: var(--stroke-width, 10);
   stroke-linecap: round;
-  /* r=45 の円周長 2 * PI * 45 ≈ 282.743 */
   stroke-dasharray: 282.743;
-  /* 初期値はフルオフセット（=全く描画されていない状態） */
   stroke-dashoffset: var(--stroke-dashoffset, 282.743);
-  transition: stroke-dashoffset var(--duration, 1s) linear;
+  transition:
+    stroke-dashoffset var(--duration, 1s) linear,
+    stroke 0.3s ease;
   will-change: stroke-dashoffset;
+}
+
+.progressBar.alert {
+  stroke: var(--alert-stroke-color, #e74c3c);
 }
 
 .progressValue {
