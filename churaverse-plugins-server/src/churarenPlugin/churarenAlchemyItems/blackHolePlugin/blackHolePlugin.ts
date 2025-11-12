@@ -1,23 +1,22 @@
-import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
+import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-server/domain/baseAlchemyItemPlugin'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { SocketController } from './controller/socketController'
-import { BlackHole } from './domain/blackHole'
+import { BLACK_HOLE_ITEM, BlackHole } from './domain/blackHole'
 import { moveBlackHoles, removeDieBlackHole } from './domain/blackHoleService'
 import { BlackHoleDespawnMessage } from './message/blackHoleDespawnMessage'
 import { BlackHolePluginStore } from './store/defBlackHolePluginStore'
 import { initBlackHolePluginStore } from './store/initBlackHolePluginStore'
-import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
 import { EntitySpawnEvent, IMainScene, LivingDamageEvent, UpdateEvent } from 'churaverse-engine-server'
 import { Boss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
 import '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
 import { BlackHoleDamageCause } from './domain/blackHoleDamageCause'
 
-export class BlackHolePlugin extends BaseGamePlugin {
-  public gameId = CHURAREN_CONSTANTS.GAME_ID
+export class BlackHolePlugin extends BaseAlchemyItemPlugin {
   private blackHolePluginStore!: BlackHolePluginStore
   private networkPlugin!: NetworkPluginStore<IMainScene>
   private socketController?: SocketController
+  protected alchemyItem = BLACK_HOLE_ITEM
 
   public listenEvent(): void {
     super.listenEvent()

@@ -2,17 +2,26 @@ import { Direction, Entity, GRID_SIZE, Position, Vector, vectorToName } from 'ch
 import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/ICollidableEntity'
 import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
 import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-server'
+import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItem'
+import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-server/domain/IAlchemyItem'
 
 const BLACK_HOLE_DISABLE_COLLISION_LIMIT_MS = 1000
 const BLACK_HOLE_SPAWN_LIMIT_MS = 10000
 const BLACK_HOLE_WALK_LIMIT_GRIDS = 2
 const BLACK_HOLE_WALK_LIMIT_MS = 1500
-const BLACK_HOLE_WALK_SPEED = BLACK_HOLE_WALK_LIMIT_GRIDS * GRID_SIZE / BLACK_HOLE_WALK_LIMIT_MS
+const BLACK_HOLE_WALK_SPEED = (BLACK_HOLE_WALK_LIMIT_GRIDS * GRID_SIZE) / BLACK_HOLE_WALK_LIMIT_MS
+export const BLACK_HOLE_ITEM: IAlchemyItem = {
+  kind: 'blackHole',
+  recipe: {
+    pattern: 'all_diff',
+    materialKind: 'fireOre', // all_diffなのでmaterialKindは影響しない
+  },
+}
 
 /**
  * blackHoleクラスの定義
  */
-export class BlackHole extends Entity implements ICollidableEntity, ChurarenWeaponEntity {
+export class BlackHole extends AlchemyItem implements ICollidableEntity, ChurarenWeaponEntity {
   public isCollidable = true
   public getRect(): IRectangle {
     return {
@@ -45,10 +54,12 @@ export class BlackHole extends Entity implements ICollidableEntity, ChurarenWeap
     direction: Direction,
     spawnTime: number
   ) {
-    super(position, direction)
+    super(blackHoleId, 'blackHole')
     this.blackHoleId = blackHoleId
     this.churarenWeaponOwnerId = ownerId
     this.spawnTime = spawnTime
+    this.position = position
+    this.direction = direction
     this._startPosition = this.position.copy()
     if (vectorToName(this.direction) === 'left' || vectorToName(this.direction) === 'up') {
       this._reversePosition = new Position(this.position.x - BLACK_HOLE_WALK_LIMIT_GRIDS, this.position.y)
@@ -105,5 +116,11 @@ export class BlackHole extends Entity implements ICollidableEntity, ChurarenWeap
 
   public get reversePosition(): Position {
     return this._reversePosition
+  }
+}
+
+declare module '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItemKind' {
+  export interface AlchemyItemKindMap {
+    blackHole: BlackHole
   }
 }
