@@ -1,6 +1,6 @@
-import { BaseMessage } from '@churaverse/network-plugin-client/message/baseMessage'
-import { SendableObject } from '@churaverse/network-plugin-client/types/sendable'
-import { IMainScene } from 'churaverse-engine-client'
+import { BaseMessage } from '@churaverse/network-plugin-server/message/baseMessage'
+import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
+import { IMainScene } from 'churaverse-engine-server'
 
 export interface PlayerHealData extends SendableObject {
   playerId: string
@@ -13,7 +13,7 @@ export class PlayerHealMessage extends BaseMessage<IMainScene> {
   }
 }
 
-declare module '@churaverse/network-plugin-client/message/messages' {
+declare module '@churaverse/network-plugin-server/message/messages' {
   export interface MainMessageMap {
     playerHeal: PlayerHealMessage
   }
