@@ -1,4 +1,4 @@
-import { Direction, Entity, GRID_SIZE, Position, Vector, vectorToName } from 'churaverse-engine-server'
+import { Direction, GRID_SIZE, Position, Vector, vectorToName } from 'churaverse-engine-server'
 import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/ICollidableEntity'
 import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
 import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-server'
