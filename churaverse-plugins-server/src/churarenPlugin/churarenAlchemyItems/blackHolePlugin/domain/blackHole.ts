@@ -1,13 +1,13 @@
-import { Direction, Entity, Position, Vector, vectorToName } from 'churaverse-engine-server'
+import { Direction, Entity, GRID_SIZE, Position, Vector, vectorToName } from 'churaverse-engine-server'
 import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/ICollidableEntity'
 import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
 import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-server'
 
 const BLACK_HOLE_DISABLE_COLLISION_LIMIT_MS = 1000
 const BLACK_HOLE_SPAWN_LIMIT_MS = 10000
-const BLACK_HOLE_WALK_LIMIT_GRIDS = 20
+const BLACK_HOLE_WALK_LIMIT_GRIDS = 2
 const BLACK_HOLE_WALK_LIMIT_MS = 1500
-const BLACK_HOLE_WALK_SPEED = BLACK_HOLE_WALK_LIMIT_GRIDS / BLACK_HOLE_WALK_LIMIT_MS
+const BLACK_HOLE_WALK_SPEED = BLACK_HOLE_WALK_LIMIT_GRIDS * GRID_SIZE / BLACK_HOLE_WALK_LIMIT_MS
 
 /**
  * blackHoleクラスの定義
@@ -57,10 +57,6 @@ export class BlackHole extends Entity implements ICollidableEntity, ChurarenWeap
     }
 
     this._velocity = { x: 0, y: 0 }
-    // 10秒後にisDeadをtrueにするタイマーを設定
-    setTimeout(() => {
-      this._isDead = true
-    }, BLACK_HOLE_SPAWN_LIMIT_MS)
   }
 
   public disableCollisionTemporarily(): void {
