@@ -1,0 +1,40 @@
+{
+  "name": "@churaverse/churaren-alchemy-item-plugins-client",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && bash copyAssetsToDist.sh",
+    "lint": "eslint src",
+    "format": "prettier --write src"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.27",
+    "@types/react": "^18.2.55",
+    "@types/react-dom": "^18.2.18",
+    "@types/uuid": "^9.0.8",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-standard-with-typescript": "^43.0.1",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-filename-rules": "^1.3.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "^3.2.5",
+    "sass": "^1.70.0",
+    "tiled-types": "^1.3.0",
+    "tsc-alias": "^1.8.8",
+    "typescript": "^5.2.2"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "license": "MIT",
+  "dependencies": {
+    "@churaverse/churaren-black-hole-plugin-client": "file:../blackHolePlugin",
+    "@churaverse/churaren-alchemy-plugin-client": "file:../../churarenAlchemyPlugin"
+  }
+}

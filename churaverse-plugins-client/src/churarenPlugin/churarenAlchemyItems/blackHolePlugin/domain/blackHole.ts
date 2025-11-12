@@ -1,7 +1,7 @@
 import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItem'
 import { Direction, GRID_SIZE, Position } from 'churaverse-engine-client'
 import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/IAlchemyItem'
-import blackHoelImage from '../assets/blackHole.gif'
+import blackHoleImage from '../assets/blackHole.gif'
 import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-client'
 
 export const BLACK_HOLE_MOVE_LIMIT_GRIDS = 20
@@ -9,7 +9,7 @@ export const BLACK_HOLE_MOVE_LIMIT_MS = 1500
 export const BLACK_HOLE_SPEED = (BLACK_HOLE_MOVE_LIMIT_GRIDS * GRID_SIZE) / BLACK_HOLE_MOVE_LIMIT_MS
 export const BLACK_HOLE_ITEM: IAlchemyItem = {
   kind: 'blackHole',
-  image: blackHoelImage,
+  image: blackHoleImage,
 } as const
 
 /**
@@ -35,5 +35,11 @@ export class BlackHole extends AlchemyItem implements ChurarenWeaponEntity {
     this.position = position
     this.spawnTime = spawnTime
     this.direction = direction
+  }
+}
+
+declare module '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind' {
+  export interface AlchemyItemKindMap {
+    blackHole: BlackHole
   }
 }
