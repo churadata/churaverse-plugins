@@ -1,0 +1,22 @@
+import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItem'
+import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-server/domain/IAlchemyItem'
+
+export const REVIVAL_ITEM: IAlchemyItem = {
+  kind: 'revivalItem',
+  recipe: {
+    pattern: 'all_same',
+    materialKind: 'herb',
+  },
+}
+
+export class RevivalItem extends AlchemyItem {
+  public constructor(itemId: string) {
+    super(itemId, 'revivalItem')
+  }
+}
+
+declare module '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItemKind' {
+  export interface AlchemyItemKindMap {
+    revivalItem: RevivalItem
+  }
+}

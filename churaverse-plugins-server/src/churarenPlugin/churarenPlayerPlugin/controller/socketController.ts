@@ -8,6 +8,7 @@ import { GetChurarenItemMessage } from '../message/getChurarenItemMessage'
 import { DropChurarenItemMessage } from '../message/dropChurarenItemMessage'
 import { DropChurarenItemEvent } from '../event/dropChurarenItemEvent'
 import { ChurarenDamageMessage } from '../message/churarenDamageMessage'
+import { PlayerRevivalMessage } from '../message/playerRevivalMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
@@ -21,6 +22,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('getChurarenItem', GetChurarenItemMessage, 'allClients')
     ev.messageRegister.registerMessage('dropChurarenItem', DropChurarenItemMessage, 'others')
     ev.messageRegister.registerMessage('churarenDamage', ChurarenDamageMessage, 'allClients')
+    ev.messageRegister.registerMessage('playerRevival', PlayerRevivalMessage, 'allClients')
   }
 
   public setupMessageListenerRegister(ev: RegisterMessageListenerEvent<IMainScene>): void {

@@ -16,6 +16,7 @@
     "@churaverse/churaren-boss-plugin-server": "file:../churarenBossPlugin",
     "@churaverse/churaren-core-plugin-server": "file:../churarenCorePlugin",
     "@churaverse/churaren-item-plugin-server": "file:../churarenItemPlugin",
+    "@churaverse/churaren-revival-item-plugin-server": "file:../churarenAlchemyItems/revivalItemPlugin",
     "@churaverse/game-plugin-server": "file:../../gamePlugin",
     "@churaverse/network-plugin-server": "file:../../networkPlugin",
     "@churaverse/player-plugin-server": "file:../../playerPlugin",
