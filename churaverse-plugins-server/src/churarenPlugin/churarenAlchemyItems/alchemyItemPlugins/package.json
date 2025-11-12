@@ -11,6 +11,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@churaverse/churaren-black-hole-plugin-server": "file:../blackHolePlugin",
     "@churaverse/churaren-alchemy-plugin-server": "file:../../churarenAlchemyPlugin"
   }
 }
