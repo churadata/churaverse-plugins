@@ -2,6 +2,7 @@ import { SocketController } from './controller/socketController'
 import {
   EntityDespawnEvent,
   EntitySpawnEvent,
+  GRID_SIZE,
   IMainScene,
   PhaserLoadAssets,
   PhaserSceneInit,
@@ -143,9 +144,15 @@ export class BlackHolePlugin extends BaseAlchemyItemPlugin {
     let reversePosition: Position
     // 下、左を向いている時、左方向スタート
     if (vectorToName(blackHole.direction) === 'left' || vectorToName(blackHole.direction) === 'up') {
-      reversePosition = new Position(blackHole.position.x - BLACK_HOLE_MOVE_LIMIT_GRIDS, blackHole.position.y)
+      reversePosition = new Position(
+        blackHole.position.x - BLACK_HOLE_MOVE_LIMIT_GRIDS * GRID_SIZE,
+        blackHole.position.y
+      )
     } else {
-      reversePosition = new Position(blackHole.position.x + BLACK_HOLE_MOVE_LIMIT_GRIDS, blackHole.position.y)
+      reversePosition = new Position(
+        blackHole.position.x + BLACK_HOLE_MOVE_LIMIT_GRIDS * GRID_SIZE,
+        blackHole.position.y
+      )
     }
     render.move(startPosition, reversePosition, (pos) => {
       blackHole.position = pos
