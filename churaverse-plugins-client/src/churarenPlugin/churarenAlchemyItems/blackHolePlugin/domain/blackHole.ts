@@ -4,7 +4,7 @@ import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/
 import blackHoleImage from '../assets/blackHole.gif'
 import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-client'
 
-export const BLACK_HOLE_MOVE_LIMIT_GRIDS = 20
+export const BLACK_HOLE_MOVE_LIMIT_GRIDS = 2
 export const BLACK_HOLE_MOVE_LIMIT_MS = 1500
 export const BLACK_HOLE_SPEED = (BLACK_HOLE_MOVE_LIMIT_GRIDS * GRID_SIZE) / BLACK_HOLE_MOVE_LIMIT_MS
 export const BLACK_HOLE_ITEM: IAlchemyItem = {
