@@ -122,9 +122,6 @@ export class DescriptionWindow implements IDescriptionWindow {
       this.countDownBar = new CountDownBar({
         remainingSeconds: timeLimit,
         duration: timeLimit,
-        startPosition: 'top',
-        strokeColor: '#4CAF50',
-        strokeWidth: 10,
       })
       this.countDownBar.initialize()
       this.element.appendChild(this.countDownBar.element)

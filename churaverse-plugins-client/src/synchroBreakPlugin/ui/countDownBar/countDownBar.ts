@@ -22,19 +22,16 @@ export class CountDownBar {
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue
-
           const remainingSecondsStr = this.element.dataset.remainingSeconds
           const durationStr = this.element.dataset.duration
-          const startPositionStr = this.element.dataset.startPosition
           const strokeColor = this.element.dataset.strokeColor
           const strokeWidth = this.element.dataset.strokeWidth
           const alertThresholdStr = this.element.dataset.alertThresholdSeconds
-          const alertColor = this.element.dataset.alertColor ?? '#e74c3c'
+          const alertColor = this.element.dataset.alertColor
 
           if (remainingSecondsStr !== undefined) {
             const remainingSeconds = parseFloat(remainingSecondsStr) // この値は残り秒数の表示に使う
             const duration = durationStr !== undefined ? parseFloat(durationStr) : 1 // 秒
-            const startPosition = (startPositionStr ?? 'top') as NonNullable<CountDownBarProps['startPosition']>
             const alertThreshold = alertThresholdStr !== undefined ? parseFloat(alertThresholdStr) : 3
 
             const progressBar = this.element.querySelector<SVGCircleElement>(`.${styles.progressBar}`)
@@ -46,18 +43,11 @@ export class CountDownBar {
               // カウントダウン: 初期はフル表示（offset=0）から、duration秒かけて空（offset=circumference）へ減少させる
               const offset = 0
 
-              // 開始位置の回転
-              let startRotate = -90
-              if (startPosition === 'right') startRotate = 0
-              else if (startPosition === 'bottom') startRotate = 90
-              else if (startPosition === 'left') startRotate = 180
-              else if (startPosition === 'top' || startPosition === 'default') startRotate = -90
-
               // 初期スタイル（即時反映、トランジションなし）
               progressBar.style.transition = 'none'
-              progressBar.style.setProperty('--start-rotate', `${startRotate}deg`)
+              progressBar.style.setProperty('--start-rotate', `${-90}deg`)
               if (strokeColor !== undefined) progressBar.style.setProperty('--stroke-color', strokeColor)
-              progressBar.style.setProperty('--alert-stroke-color', alertColor)
+              if (alertColor !== undefined) progressBar.style.setProperty('--alert-stroke-color', alertColor)
               if (strokeWidth !== undefined) progressBar.style.setProperty('--stroke-width', `${strokeWidth}`)
               // dasharray は SCSS 側で固定、ここでは offset のみ操作
               progressBar.style.strokeDashoffset = `${offset}`
@@ -77,7 +67,7 @@ export class CountDownBar {
 
             // 初期残秒がしきい値以下なら即時警告色に変更
             if (remainingSeconds <= alertThreshold && progressBar !== null) {
-              progressBar.classList.add('alert')
+              progressBar.classList.add(styles.alert)
             }
           }
 
@@ -112,9 +102,9 @@ export class CountDownBar {
     const alertThreshold = alertThresholdStr !== undefined ? parseFloat(alertThresholdStr) : 3
     if (progressBar !== null) {
       if (remainingSeconds <= alertThreshold) {
-        progressBar.classList.add('alert')
+        progressBar.classList.add(styles.alert)
       } else {
-        progressBar.classList.remove('alert')
+        progressBar.classList.remove(styles.alert)
       }
     }
   }

@@ -4,20 +4,16 @@ import style from './CountDownBarComponent.module.scss'
 export interface CountDownBarProps {
   remainingSeconds: number
   duration?: number
-  startPosition?: 'right' | 'bottom' | 'left' | 'top' | 'default'
   strokeColor?: string
   strokeWidth?: number
-  /** 残り秒数がこの値以下になったら警告色に切り替え（デフォルト: 5秒） */
   alertThresholdSeconds?: number
-  /** 警告色（デフォルト: 赤 #e74c3c） */
   alertColor?: string
 }
 
 export const CountDownBarComponent: JSXFunc<CountDownBarProps> = ({
   remainingSeconds,
   duration,
-  startPosition = 'top',
-  strokeColor = '#ff7b52',
+  strokeColor = '#3c79c4',
   strokeWidth = 10,
   alertThresholdSeconds,
   alertColor,
@@ -27,7 +23,6 @@ export const CountDownBarComponent: JSXFunc<CountDownBarProps> = ({
       className={`${style.progressItem} progress-item`}
       data-remaining-seconds={String(remainingSeconds)}
       data-duration={String(duration)}
-      data-start-position={startPosition}
       data-stroke-color={strokeColor}
       data-stroke-width={String(strokeWidth)}
       data-alert-threshold-seconds={alertThresholdSeconds !== undefined ? String(alertThresholdSeconds) : undefined}
