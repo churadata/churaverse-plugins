@@ -80,7 +80,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   }
 
   private init(): void {
-    this.gameJoinManager = new GameJoinManager(this.gameId)
+    this.gameJoinManager = new GameJoinManager()
   }
 
   private priorGameData(ev: PriorGameDataEvent): void {

@@ -1,5 +1,3 @@
-import { GameIds } from './interface/gameIds'
-import { GameJoinStatus } from './interface/gameJoinStatus'
 import { IGameJoinManager } from './interface/IGameJoinManager'
 
 /**
@@ -9,61 +7,53 @@ import { IGameJoinManager } from './interface/IGameJoinManager'
  * - タイムアウト時の自動不参加設定
  */
 export class GameJoinManager implements IGameJoinManager {
-  private readonly joinStatuses = new Map<GameIds, GameJoinStatus>()
-
-  public constructor(private readonly gameId: GameIds) {}
+  /** ミニゲーム対象の全プレイヤー */
+  private allPlayers = new Set<string>()
+  /** 「参加する」と回答したプレイヤー */
+  private readonly joinedPlayers = new Set<string>()
+  /** 回答済み（参加/不参加問わず）のプレイヤー */
+  private readonly respondedPlayers = new Set<string>()
 
   public init(allPlayers: string[]): void {
-    this.joinStatuses.set(this.gameId, {
-      allPlayers: new Set(allPlayers),
-      joinedPlayers: new Set(),
-      respondedPlayers: new Set(),
-    })
+    this.allPlayers = new Set(allPlayers)
   }
 
   public set(playerId: string, willJoin: boolean): void {
-    const status = this.joinStatuses.get(this.gameId)
-    if (status === undefined) return
-    status.respondedPlayers.add(playerId)
-    if (willJoin) status.joinedPlayers.add(playerId)
+    this.respondedPlayers.add(playerId)
+    if (willJoin) this.joinedPlayers.add(playerId)
   }
 
   public delete(playerId: string): boolean {
-    const status = this.joinStatuses.get(this.gameId)
-    if (status === undefined) return false
-    status.allPlayers.delete(playerId)
-    status.respondedPlayers.delete(playerId)
-    return status.joinedPlayers.delete(playerId)
+    this.allPlayers.delete(playerId)
+    this.respondedPlayers.delete(playerId)
+    return this.joinedPlayers.delete(playerId)
   }
 
   public isAllPlayersResponded(): boolean {
-    const status = this.joinStatuses.get(this.gameId)
-    return status?.allPlayers.size === status?.respondedPlayers.size
+    return this.allPlayers.size === this.respondedPlayers.size
   }
 
   public getJoinedPlayerIds(): string[] {
-    const status = this.joinStatuses.get(this.gameId)
-    return Array.from(status?.joinedPlayers ?? [])
+    return Array.from(this.joinedPlayers)
   }
 
   public clear(): void {
-    this.joinStatuses.delete(this.gameId)
+    this.allPlayers.clear()
+    this.joinedPlayers.clear()
+    this.respondedPlayers.clear()
   }
 
   public timeoutResponse(): void {
-    const status = this.joinStatuses.get(this.gameId)
-    if (status === undefined) return
-    status.allPlayers.forEach((playerId) => {
-      if (status.respondedPlayers.has(playerId)) return
-      status.respondedPlayers.add(playerId)
+    this.allPlayers.forEach((playerId) => {
+      if (this.respondedPlayers.has(playerId)) return
+      this.respondedPlayers.add(playerId)
     })
   }
 
   public midwayJoinPlayer(playerId: string): void {
-    const status = this.joinStatuses.get(this.gameId)
-    if (status === undefined) return
-    status.allPlayers.add(playerId)
-    status.joinedPlayers.add(playerId)
-    status.respondedPlayers.add(playerId)
+    if (this.allPlayers === undefined) return
+    this.allPlayers.add(playerId)
+    this.joinedPlayers.add(playerId)
+    this.respondedPlayers.add(playerId)
   }
 }
