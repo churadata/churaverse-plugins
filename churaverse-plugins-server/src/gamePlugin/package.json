@@ -1,6 +1,6 @@
 {
   "name": "@churaverse/game-plugin-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
@@ -11,9 +11,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "churaverse-engine-server": "file:../../../../churaverse-engine/churaverse-engine-server",
-    "@churaverse/network-plugin-server": "file:../networkPlugin",
-    "@churaverse/player-plugin-server": "file:../playerPlugin",
-    "@churaverse/synchro-break-plugin-server": "file:../synchroBreakPlugin"
+    "churaverse-engine-server": "~0.1.1",
+    "@churaverse/network-plugin-server": "~0.1.4",
+    "@churaverse/player-plugin-server": "~0.1.3"
   }
 }
