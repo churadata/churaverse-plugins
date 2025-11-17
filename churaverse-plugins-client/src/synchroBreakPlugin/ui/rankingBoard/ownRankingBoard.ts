@@ -1,29 +1,18 @@
-import {
-  Store,
-  IMainScene,
-  DomManager,
-  makeLayerHigherTemporary,
-  AbstractDOMLayerNames,
-  domLayerSetting,
-} from 'churaverse-engine-client'
+import { Store, IMainScene, DomManager, makeLayerHigherTemporary, domLayerSetting } from 'churaverse-engine-client'
 import { OwnRankingElement } from './component/OwnRankingElement'
 import { IOwnRankingBoard } from '../../interface/IOwnRankingBoard'
 import { NyokkiStatus } from '../../type/nyokkiStatus'
 
-export interface Props {
-  layer?: AbstractDOMLayerNames
-}
-
 /** 自分のランキング全体のUI */
-export const MY_RANKING_CONTAINER_ID = 'my-ranking-container'
+export const OWN_RANKING_CONTAINER_ID = 'own-ranking-container'
 /** 自分の順位表示要素ID */
-export const MY_RANKING_RANK_ID = 'my-ranking-rank'
+export const OWN_RANKING_RANK_ID = 'own-ranking-rank'
 /** 自分の名前表示要素ID */
-export const MY_RANKING_NAME_ID = 'my-ranking-name'
+export const OWN_RANKING_NAME_ID = 'own-ranking-name'
 /** 自分のコイン表示要素ID */
-export const MY_RANKING_COINS_ID = 'my-ranking-coins'
+export const OWN_RANKING_COINS_ID = 'own-ranking-coins'
 /** 自分のニョッキステータス表示要素ID */
-export const MY_RANKING_STATUS_ID = 'my-ranking-status'
+export const OWN_RANKING_STATUS_ID = 'own-ranking-status'
 
 export class OwnRankingBoard implements IOwnRankingBoard {
   public element!: HTMLElement
@@ -43,33 +32,21 @@ export class OwnRankingBoard implements IOwnRankingBoard {
   }
 
   /**
-   * プレイヤーの所持コイン数を変更する
-   */
-  public changePlayersCoin(playerId: string, coins: number): void {
-    const ownPlayerId = this.store.of('playerPlugin').ownPlayerId
-    if (playerId !== ownPlayerId) return
-
-    const myRankingCoins = DomManager.getElementById(MY_RANKING_COINS_ID)
-    if (myRankingCoins === null) return
-    myRankingCoins.textContent = `${coins}コイン`
-  }
-
-  /**
    * プレイヤーのニョッキステータスを変更する
    */
   public changeNyokkiStatus(playerId: string, status: NyokkiStatus): void {
     const ownPlayerId = this.store.of('playerPlugin').ownPlayerId
     if (playerId !== ownPlayerId) return
 
-    const myRankingStatus = DomManager.getElementById(MY_RANKING_STATUS_ID)
-    if (myRankingStatus === null) return
+    const ownRankingStatus = DomManager.getElementById(OWN_RANKING_STATUS_ID)
+    if (ownRankingStatus === undefined) return
 
-    myRankingStatus.textContent = status
-    myRankingStatus.dataset.status = status
+    ownRankingStatus.textContent = status
+    ownRankingStatus.dataset.status = status
   }
 
   /**
-   * ランキングボードを更新する
+   * 自身のランキングボード情報を更新する
    */
   public updateRanking(): void {
     const ownPlayerId = this.store.of('playerPlugin').ownPlayerId
@@ -92,24 +69,19 @@ export class OwnRankingBoard implements IOwnRankingBoard {
       previousCoins = player.coins
     })
 
-    const myRankingRank = DomManager.getElementById(MY_RANKING_RANK_ID)
-    const myRankingName = DomManager.getElementById(MY_RANKING_NAME_ID)
-    const myRankingCoins = DomManager.getElementById(MY_RANKING_COINS_ID)
+    const ownRankingRank = DomManager.getElementById(OWN_RANKING_RANK_ID)
+    const ownRankingName = DomManager.getElementById(OWN_RANKING_NAME_ID)
+    const ownRankingCoins = DomManager.getElementById(OWN_RANKING_COINS_ID)
 
-    if (myRankingRank !== null) {
-      myRankingRank.textContent = `${myRank}位`
-      // ランキングに応じた色を設定
-      myRankingRank.className = this.getRankColorClass(myRank)
-    }
+    if (ownRankingRank === undefined || ownRankingName === undefined || ownRankingCoins === undefined) return
 
-    if (myRankingName !== null) {
-      const myName = this.store.of('playerPlugin').players.get(ownPlayerId)?.name ?? '自分'
-      myRankingName.textContent = myName
-    }
+    ownRankingRank.textContent = `${myRank}位`
+    ownRankingRank.className = this.getRankColorClass(myRank)
 
-    if (myRankingCoins !== null) {
-      myRankingCoins.textContent = `${myCoins}コイン`
-    }
+    const myName = this.store.of('playerPlugin').players.get(ownPlayerId)?.name ?? '自分'
+    ownRankingName.textContent = myName
+
+    ownRankingCoins.textContent = `${myCoins}コイン`
   }
 
   /**

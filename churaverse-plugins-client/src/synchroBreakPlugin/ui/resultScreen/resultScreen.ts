@@ -27,7 +27,7 @@ export class ResultScreen implements ISynchroBreakResultScreen {
 
   public readonly visible: boolean = false
 
-  private readonly TOP_DISPLAY_COUNT = 4 // 上位表示人数
+  private readonly TOP_DISPLAY_COUNT = 3 // 上位表示人数
 
   public constructor(
     private readonly store: Store<IMainScene>,
@@ -82,7 +82,7 @@ export class ResultScreen implements ISynchroBreakResultScreen {
     for (let i = 0; i < Math.min(this.TOP_DISPLAY_COUNT, rankedPlayers.length); i++) {
       const rankedPlayer = rankedPlayers[i]
       const playerName = this.getPlayerName(rankedPlayer.playerId)
-      if (playerName === undefined) return
+      if (playerName === undefined) continue
 
       const playerListElement = DomManager.jsxToDom(
         ResultRankingListItem({ rank: rankedPlayer.rank, playerName, coinValue: rankedPlayer.coins })
