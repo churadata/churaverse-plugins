@@ -218,7 +218,6 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
     this.networkPlugin.messageSender.send(gameMidwayJoinMessage)
   }
 
-  // classNameでスタイルを上書きするとdefaultのスタイルが残ってしまうため、直接スタイルを変更する
   private styleButtonGrayOut(button: HTMLButtonElement): void {
     button.disabled = true
     button.style.backgroundColor = 'lightgray'
