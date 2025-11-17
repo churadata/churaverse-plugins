@@ -111,7 +111,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
 
     this.gameJoinManager.init(this.store.of('playerPlugin').players.getAllId())
     this.joinTimeoutId = setTimeout(() => {
-      this.finalizeJoin()
+      this.invokeGameStart()
     }, timeoutSec * 1000)
   }
 
@@ -119,7 +119,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     if (!this.isActive) return
     this.gameJoinManager.set(ev.playerId, ev.willJoin)
     if (this.gameJoinManager.isAllPlayersResponded()) {
-      this.finalizeJoin()
+      this.invokeGameStart()
     }
   }
 
@@ -197,7 +197,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.store.of('networkPlugin').messageSender.send(responseGameMidwayJoinMessage)
   }
 
-  private finalizeJoin(): void {
+  private invokeGameStart(): void {
     if (!this.isActive || this.joinTimeoutId === undefined) return
     clearTimeout(this.joinTimeoutId)
     this.joinTimeoutId = undefined
