@@ -98,7 +98,7 @@ export abstract class GameDescriptionDialog implements IGameDescriptionDialog {
     joinDeclineContainer.style.display = 'flex'
   }
 
-  private postJoinEvent(isJoin: boolean): void {
-    this.bus.post(new SubmitGameJoinEvent(this.gameId, isJoin))
+  private postJoinEvent(isJoined: boolean): void {
+    this.bus.post(new SubmitGameJoinEvent(this.gameId, isJoined))
   }
 }
