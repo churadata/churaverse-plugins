@@ -109,15 +109,13 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param timeLimit シンクロブレイクの制限時間
    */
   public displaySynchroBreakStart(timeLimit: number): void {
-    this.setDescriptionText(`${this.gameName}開始！！！<br>${timeLimit}秒以内にボタンを押してください！`)
+    this.setDescriptionText(`${this.gameName}開始！！！<br>制限時間以内にボタンを押してください！`)
 
-    // 既存をクリア
     if (this.countDownBar !== null) {
       this.countDownBar.remove()
       this.countDownBar = null
     }
 
-    // 開始時に一度だけ作成（duration を総秒にする）
     if (timeLimit > 0) {
       this.countDownBar = new CountDownBar({
         remainingSeconds: timeLimit,
@@ -140,7 +138,6 @@ export class DescriptionWindow implements IDescriptionWindow {
 
     this.setDescriptionText(descriptionText.join('<br>'))
 
-    // 進行中は中央の秒表示のみ更新（バーの減少は duration ベースで進行）
     if (this.countDownBar !== null) {
       this.countDownBar.updateValue(countdown)
     }
@@ -172,7 +169,6 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param text ニョッキアクションの文章
    */
   public displayNyokkiAction(text: string): void {
-    // 説明テキスト用コンテナの中身だけを読み書きして、バーDOMを巻き込まない
     const textContainer = this.element.querySelector('[data-role="description-text"]')
     const currentHtml = textContainer !== null ? textContainer.innerHTML : this.descriptionText
     const lines = currentHtml.split('<br>')
@@ -198,20 +194,21 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param text 更新する文章
    */
   private setDescriptionText(text: string): void {
-    // 状態も保持しておく（再利用時に根DOMを触らずに済む）
     this.descriptionText = text
     const textContainer = this.element.querySelector('[data-role="description-text"]')
     if (textContainer !== null) {
       ;(textContainer as HTMLElement).innerHTML = text
       return
     }
-    // フォールバック（コンテナが見つからない場合は従来通り。ただしバーは保持して再アタッチ）
-    const barEl = this.countDownBar?.element
-    this.element.innerHTML = text
-    if (barEl !== undefined && barEl !== null) {
-      if (!barEl.isConnected || barEl.parentElement !== this.element) {
-        this.element.appendChild(barEl)
-      }
+    const container = document.createElement('div')
+    container.setAttribute('data-role', 'description-text')
+    container.innerHTML = text
+
+    const barEl = this.countDownBar?.element ?? null
+    if (barEl !== null && barEl.parentElement === this.element) {
+      this.element.insertBefore(container, barEl)
+    } else {
+      this.element.appendChild(container)
     }
   }
 }

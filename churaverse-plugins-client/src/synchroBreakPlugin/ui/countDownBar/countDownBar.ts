@@ -13,6 +13,11 @@ export class CountDownBar {
   private lastRemainingSeconds: number | null = null
   private readonly radius = 45
   private readonly circumference = 2 * Math.PI * this.radius
+  private progressBarEl: SVGCircleElement | null = null
+  private progressValueEl: HTMLDivElement | null = null
+  private alertThreshold: number = 3
+  private static readonly DEFAULT_TRANSITION = 'stroke-dashoffset 0.25s linear, stroke 0.3s ease'
+  private static readonly JUMP_THRESHOLD_SECONDS = 2
 
   public constructor(private readonly props: CountDownBarProps) {}
 
@@ -28,45 +33,37 @@ export class CountDownBar {
           if (!entry.isIntersecting) continue
           const remainingSecondsStr = this.element.dataset.remainingSeconds
           const durationStr = this.element.dataset.duration
-          const strokeColor = this.element.dataset.strokeColor
-          const strokeWidth = this.element.dataset.strokeWidth
           const alertThresholdStr = this.element.dataset.alertThresholdSeconds
-          const alertColor = this.element.dataset.alertColor
 
           if (remainingSecondsStr !== undefined) {
-            const remainingSeconds = parseFloat(remainingSecondsStr)
-            const duration = durationStr !== undefined ? parseFloat(durationStr) : 1 // 秒
+            const remainingSecondsRaw = parseFloat(remainingSecondsStr)
+            const remainingSeconds = Number.isFinite(remainingSecondsRaw) ? remainingSecondsRaw : 0
+            const durationRaw = durationStr !== undefined ? parseFloat(durationStr) : NaN
+            const duration = Number.isFinite(durationRaw) ? durationRaw : 1 // 秒
             this.totalDuration = duration > 0 ? duration : 1
-            const alertThreshold = alertThresholdStr !== undefined ? parseFloat(alertThresholdStr) : 3
+            const alertThresholdRaw = alertThresholdStr !== undefined ? parseFloat(alertThresholdStr) : NaN
+            this.alertThreshold = Number.isFinite(alertThresholdRaw) ? alertThresholdRaw : 3
 
-            const progressBar = this.element.querySelector<SVGCircleElement>(`.${styles.progressBar}`)
-            const progressValue = this.element.querySelector<HTMLDivElement>(`.${styles.progressValue}`)
+            // 要素参照をキャッシュ
+            this.progressBarEl = this.element.querySelector<SVGCircleElement>(`.${styles.progressBar}`)
+            this.progressValueEl = this.element.querySelector<HTMLDivElement>(`.${styles.progressValue}`)
 
-            if (progressBar !== null) {
-              // 初期スタイル（即時反映、トランジションなし）
-              progressBar.style.transition = 'none'
-              progressBar.style.setProperty('--start-rotate', `${-90}deg`)
-              if (strokeColor !== undefined) progressBar.style.setProperty('--stroke-color', strokeColor)
-              if (alertColor !== undefined) progressBar.style.setProperty('--alert-stroke-color', alertColor)
-              if (strokeWidth !== undefined) progressBar.style.setProperty('--stroke-width', `${strokeWidth}`)
-              // 比率からオフセットを即時反映（サーバ同期初期値）
+            if (this.progressBarEl !== null) {
+              this.progressBarEl.style.transition = 'none'
               const ratio = Math.max(0, Math.min(1, remainingSeconds / this.totalDuration))
               const offset = this.circumference * (1 - ratio)
-              progressBar.style.strokeDashoffset = `${offset}`
-              // Reflow して初期値を確定後、短いトランジションに切替
-              // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-              progressBar.getBoundingClientRect()
-              progressBar.style.transition = 'stroke-dashoffset 0.25s linear, stroke 0.3s ease'
+              this.progressBarEl.style.strokeDashoffset = `${offset}`
+              this.progressBarEl.getBoundingClientRect()
+              this.progressBarEl.style.transition = CountDownBar.DEFAULT_TRANSITION
             }
 
-            if (progressValue !== null) {
-              progressValue.textContent = Math.floor(remainingSeconds).toString()
+            if (this.progressValueEl !== null) {
+              this.progressValueEl.textContent = Math.floor(remainingSeconds).toString()
             }
 
-            // 初期残秒がしきい値以下なら即時警告色に変更／解除
-            if (progressBar !== null) {
-              if (remainingSeconds <= alertThreshold) progressBar.classList.add(styles.alert)
-              else progressBar.classList.remove(styles.alert)
+            if (this.progressBarEl !== null) {
+              if (remainingSeconds <= this.alertThreshold) this.progressBarEl.classList.add(styles.alert)
+              else this.progressBarEl.classList.remove(styles.alert)
             }
 
             this.lastRemainingSeconds = remainingSeconds
@@ -94,17 +91,20 @@ export class CountDownBar {
    * サーバ同期型の描画更新。残り秒から比率を計算して stroke-dashoffset を更新する。
    */
   public updateValue(remainingSeconds: number): void {
-    const progressValue = this.element.querySelector<HTMLDivElement>(`.${styles.progressValue}`)
-    const progressBar = this.element.querySelector<SVGCircleElement>(`.${styles.progressBar}`)
-    if (progressValue !== null) {
-      progressValue.textContent = Math.floor(remainingSeconds).toString()
+    if (this.progressValueEl === null) {
+      this.progressValueEl = this.element.querySelector<HTMLDivElement>(`.${styles.progressValue}`)
     }
-    const alertThresholdStr = this.element.dataset.alertThresholdSeconds
-    const alertThreshold = alertThresholdStr !== undefined ? parseFloat(alertThresholdStr) : 3
-    if (progressBar !== null) {
+    if (this.progressBarEl === null) {
+      this.progressBarEl = this.element.querySelector<SVGCircleElement>(`.${styles.progressBar}`)
+    }
+
+    if (this.progressValueEl !== null) {
+      this.progressValueEl.textContent = Math.floor(remainingSeconds).toString()
+    }
+    if (this.progressBarEl !== null) {
       // 警告色切替
-      if (remainingSeconds <= alertThreshold) progressBar.classList.add(styles.alert)
-      else progressBar.classList.remove(styles.alert)
+      if (remainingSeconds <= this.alertThreshold) this.progressBarEl.classList.add(styles.alert)
+      else this.progressBarEl.classList.remove(styles.alert)
 
       // 比率からオフセットを同期
       const total = this.totalDuration > 0 ? this.totalDuration : 1
@@ -112,24 +112,23 @@ export class CountDownBar {
       const newOffset = this.circumference * (1 - ratio)
 
       const prev = this.lastRemainingSeconds ?? remainingSeconds
-      const isJump = Math.abs(remainingSeconds - prev) > 2
+      const isJump = Math.abs(remainingSeconds - prev) > CountDownBar.JUMP_THRESHOLD_SECONDS
       if (isJump) {
-        // 大きく飛んだら瞬間補正→次フレームでトランジション復帰
-        const prevTransition = progressBar.style.transition
-        progressBar.style.transition = 'none'
-        progressBar.style.strokeDashoffset = `${newOffset}`
-        // reflow
-        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-        progressBar.getBoundingClientRect()
+        const prevTransition = this.progressBarEl?.style.transition ?? ''
+        this.progressBarEl.style.transition = 'none'
+        this.progressBarEl.style.strokeDashoffset = `${newOffset}`
+        this.progressBarEl.getBoundingClientRect()
         requestAnimationFrame(() => {
-          progressBar.style.transition =
-            prevTransition !== '' ? prevTransition : 'stroke-dashoffset 0.25s linear, stroke 0.3s ease'
+          if (this.progressBarEl !== null) {
+            this.progressBarEl.style.transition =
+              prevTransition !== '' ? prevTransition : CountDownBar.DEFAULT_TRANSITION
+          }
         })
       } else {
-        if (progressBar.style.transition === '') {
-          progressBar.style.transition = 'stroke-dashoffset 0.25s linear, stroke 0.3s ease'
+        if (this.progressBarEl.style.transition === '') {
+          this.progressBarEl.style.transition = CountDownBar.DEFAULT_TRANSITION
         }
-        progressBar.style.strokeDashoffset = `${newOffset}`
+        this.progressBarEl.style.strokeDashoffset = `${newOffset}`
       }
     }
     this.lastRemainingSeconds = remainingSeconds
