@@ -1,55 +1,61 @@
-# ゲームプラグインのクラス図
+# gamePluginのクラス図
 
-このクラス図は、ゲームプラグインとそれを継承しているゲームの関係を示している。
 
 ```mermaid
 classDiagram
     BasePlugin <|-- BaseGamePlugin
-    BasePlugin <|-- GamePlugin
-    BaseGamePlugin <|-- SynchroBreakPlugin
-    BaseGamePlugin <|-- ChurarenPlugin
+    BaseGamePlugin <|-- CoreGamePlugin
+    IGameInfo <|.. CoreGamePlugin
 
     class BasePlugin {
         <<abstract>>
         #store: Store<Scene>
         #bus: IEventBus<Scene>
-        #sceneName: Scene["sceneName]
+        #sceneName: Scene["sceneName"]
 
-        *listenEvent()
+        listenEvent() void *
     }
-
-    class GamePlugin {
-        -init()
-        -registerGameUi()
+    
+    class IGameInfo {
+        <<interface>>
+        gameId: GameIds
+        isActive: boolean
+        isJoined: boolean
+        ownerId: string | undefined
+        joinedPlayerIds: string[]
+        gameState: GameState
+        gamePolicy: GamePolicy
     }
 
     class BaseGamePlugin {
         <<abstract>>
-        #gameId: GameIds
-        #gameName: string
-        -_isActive: boolean
-        -_gameOwnerId: string | undefined
-        -_participantIds: string[]
-        -_isOwnPlayerMidwayParticipant: boolean
+        gameId: GameIds *
+        +isActive: boolean
 
-        #isActive: boolean
-        #gameOwnerId: string | undefined
-        #participantIds: string[]
-        #isOwnPlayerMidwayParticipant: boolean
-
-        #gameStart(playerId: string): void
-        #gameAbort(playerId: string): void
-        #gameEnd(): void
-        #updateParticipantIds(ParticipantIds: string[]): void
-        -clearParticipantIds(): void
-        #processMidwayParticipant(): void
+        #subscribeGameEvent() void
+        #unsubscribeGameEvent() void
+        handleGameStart() void *
+        handleGameTermination() void *
+        handleMidwayJoin() void *
     }
 
-    class SynchroBreakPlugin {
+    class CoreGamePlugin {
+        <<abstract>>
+        gameId: GameIds *
+        gamePolicy: GamePolicy *
 
-    }
-
-    class ChurarenPlugin {
-
+        #subscribeGameEvent() void
+        #unsubscribeGameEvent() void
+        handlePlayerLeave(playerId: string) void *
+        handlePlayerQuitGame(playerId: string) void *
     }
 ```
+
+
+## 表記について
+|表記|意味|
+|---|---|
+|*斜体*|抽象関数 or 抽象プロパティ|
+|+|public|
+|-|private|
+|#|protected|
