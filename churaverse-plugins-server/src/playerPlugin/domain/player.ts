@@ -5,6 +5,7 @@ import { PlayerColor } from '../types/playerColor'
 import { PlayerRole } from '../types/playerRole'
 
 export const PLAYER_RESPAWN_WAITING_TIME_MS = 2500
+export const RESPAWN_INVINCIBLE_TIME_MS = 3000 // リスポーン後の無敵時間
 
 export class Player extends LivingEntity implements ICollidableEntity {
   public isCollidable = true

@@ -11,7 +11,7 @@ import {
 } from 'churaverse-engine-server'
 import { SocketController } from './controller/socketController'
 import { initPlayerPluginStore } from './store/initPlayerPluginStore'
-import { PLAYER_RESPAWN_WAITING_TIME_MS, Player } from './domain/player'
+import { PLAYER_RESPAWN_WAITING_TIME_MS, RESPAWN_INVINCIBLE_TIME_MS, Player } from './domain/player'
 import { PlayerPluginStore } from './store/defPlayerPluginStore'
 import { NetworkDisconnectEvent } from '@churaverse/network-plugin-server/event/networkDisconnectEvent'
 import { PlayerWalkEvent } from './event/playerWalkEvent'
@@ -26,11 +26,14 @@ import { PlayerDieMessage } from './message/playerDieMessage'
 import { MapPluginStore } from '@churaverse/map-plugin-server/store/defMapPluginStore'
 import { PlayerRespawnMessage } from './message/playerRespawnMessage'
 import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
+import { PlayerInvincibleTimeMessage } from './message/playerInvincibleTimeMessage'
 
 export class PlayerPlugin extends BasePlugin<IMainScene> {
   private playerPluginStore!: PlayerPluginStore
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private mapPluginStore!: MapPluginStore
+
+  private readonly respawnInvinciblePlayers: string[] = []
 
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.init.bind(this))
@@ -49,6 +52,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     this.bus.subscribeEvent('playerNameChange', this.onPlayerNameChange.bind(this))
     this.bus.subscribeEvent('playerColorChange', this.onPlayerColorChange.bind(this))
     this.bus.subscribeEvent('livingDamage', this.onLivingDamage.bind(this))
+    this.bus.subscribeEvent('livingDamage', this.handleRespawnInvincibility.bind(this), 'HIGH')
   }
 
   private init(ev: InitEvent): void {
@@ -124,6 +128,14 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     this.playerPluginStore.players.get(ev.id)?.setPlayerColor(ev.color)
   }
 
+  private handleRespawnInvincibility(ev: LivingDamageEvent): void {
+    if (!(ev.target instanceof Player)) return
+
+    if (this.respawnInvinciblePlayers.includes(ev.target.id)) {
+      ev.cancel()
+    }
+  }
+
   private onLivingDamage(ev: LivingDamageEvent): void {
     if (!(ev.target instanceof Player)) return
 
@@ -153,13 +165,32 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
         const position = this.mapPluginStore.mapManager.currentMap.getRandomSpawnPoint()
         player.respawn(position)
 
+        this.addRespawnInvinciblePlayer(player.id)
+
         const playerRespawnMessage = new PlayerRespawnMessage({
           playerId: player.id,
           position: player.position.toVector() as Vector & SendableObject,
           direction: player.direction,
         })
+        const invincibleTimeMessage = new PlayerInvincibleTimeMessage({
+          playerId: player.id,
+          invincibleTime: RESPAWN_INVINCIBLE_TIME_MS,
+        })
+
         this.networkPluginStore.messageSender.send(playerRespawnMessage)
+        this.networkPluginStore.messageSender.send(invincibleTimeMessage)
       }, PLAYER_RESPAWN_WAITING_TIME_MS)
     }
+  }
+
+  private addRespawnInvinciblePlayer(playerId: string): void {
+    this.respawnInvinciblePlayers.push(playerId)
+
+    setTimeout(() => {
+      const index = this.respawnInvinciblePlayers.indexOf(playerId)
+      if (index !== -1) {
+        this.respawnInvinciblePlayers.splice(index, 1)
+      }
+    }, RESPAWN_INVINCIBLE_TIME_MS)
   }
 }
