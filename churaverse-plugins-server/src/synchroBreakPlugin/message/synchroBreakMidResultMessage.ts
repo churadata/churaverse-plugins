@@ -2,7 +2,7 @@ import { IMainScene } from 'churaverse-engine-server'
 import { BaseMessage } from '@churaverse/network-plugin-server/message/baseMessage'
 
 /**
- * ゲーム終了後の結果ウィンドウ表示メッセージ
+ * ターン終了後の結果ウィンドウ表示メッセージ
  */
 export class SynchroBreakMidResultMessage extends BaseMessage<IMainScene> {
   public constructor() {

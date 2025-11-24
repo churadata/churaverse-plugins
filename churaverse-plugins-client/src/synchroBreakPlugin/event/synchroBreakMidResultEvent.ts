@@ -1,7 +1,7 @@
 import { CVEvent, IMainScene } from 'churaverse-engine-client'
 
 /**
- * ゲーム終了後の結果ウィンドウ表示イベント
+ * ターン終了後の結果ウィンドウ表示イベント
  */
 export class SynchroBreakMidResultEvent extends CVEvent<IMainScene> {
   public constructor() {
