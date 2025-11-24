@@ -21,8 +21,8 @@ import { GamePolicy } from '../interface/gamePolicy'
 import { GameMidwayJoinEvent } from '../event/gameMidwayJoinEvent'
 import { ResponseGameMidwayJoinMessage } from '../message/gameMidwayJoinMessage'
 import { SubmitGameJoinEvent } from '../event/submitGameJoinEvent'
-import { IGameJoinManager } from '../interface/IGameJoinManager'
 import { GameJoinManager } from '../gameJoinManager'
+import { IGameJoinManager } from '../interface/IGameJoinManager'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -33,7 +33,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private _isActive: boolean = false
   private _gameOwnerId?: string
   private _gameState: GameState = 'inactive'
-  private gameJoinManager!: IGameJoinManager
+  private readonly gameJoinManager: IGameJoinManager = new GameJoinManager()
   private joinTimeoutId?: NodeJS.Timeout
 
   public get isActive(): boolean {
@@ -54,7 +54,6 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
 
   public listenEvent(): void {
     super.listenEvent()
-    this.bus.subscribeEvent('init', this.init.bind(this))
     this.bus.subscribeEvent('gameStart', this.gameStart.bind(this), 'HIGH')
     this.bus.subscribeEvent('priorGameData', this.priorGameData.bind(this))
     this.bus.subscribeEvent('gameHost', this.gameHost.bind(this))
@@ -77,10 +76,6 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.bus.unsubscribeEvent('entityDespawn', this.onPlayerLeave)
     this.bus.unsubscribeEvent('gamePlayerQuit', this.onPlayerQuitGame)
     this.bus.unsubscribeEvent('gameMidwayJoin', this.onPlayerMidwayJoin)
-  }
-
-  private init(): void {
-    this.gameJoinManager = new GameJoinManager()
   }
 
   private priorGameData(ev: PriorGameDataEvent): void {
