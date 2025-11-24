@@ -43,7 +43,7 @@ classDiagram
         <<abstract>>
         gameId: GameIds *
         gamePolicy: GamePolicy *
-        -gameJoinManager: IGameJoinManager
+        -gameHostingManager: IGameHostingManager
 
         #subscribeGameEvent() void
         #unsubscribeGameEvent() void
@@ -51,23 +51,19 @@ classDiagram
         handlePlayerQuitGame(playerId: string) void *
     }
 
-    class GameJoinManager {
+    class GameHostingManager {
         - allPlayers Set~string~
         - joinedPlayers Set~string~
         - respondedPlayers Set~string~
     }
 
-    class IGameJoinManager {
+    class IGameHostingManager {
         <<interface>>
-        
-        +init(allPlayers: string[]) void
+
         +set(playerId: string, willJoin: boolean) void
-        +delete(playerId: string) boolean
         +getJoinedPlayerIds() string[]
         +isAllPlayerResponse() boolean
-        +clear() void
         +timeoutResponse() void
-        +midwayJoinPlayer(playerId: string) void
     }
 ```
 
