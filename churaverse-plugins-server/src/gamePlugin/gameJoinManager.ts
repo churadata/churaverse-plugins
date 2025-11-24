@@ -14,11 +14,11 @@ export class GameJoinManager implements IGameJoinManager {
   /** 回答済み（参加/不参加問わず）のプレイヤー */
   private readonly respondedPlayers = new Set<string>()
 
-  public init(allPlayers: string[]): void {
+  public setAllPlayers(allPlayers: string[]): void {
     this.allPlayers = new Set(allPlayers)
   }
 
-  public set(playerId: string, willJoin: boolean): void {
+  public recordResponse(playerId: string, willJoin: boolean): void {
     this.respondedPlayers.add(playerId)
     if (willJoin) this.joinedPlayers.add(playerId)
   }

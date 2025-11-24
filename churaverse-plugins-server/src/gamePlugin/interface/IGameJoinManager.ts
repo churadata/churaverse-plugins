@@ -1,18 +1,18 @@
 export interface IGameJoinManager {
   /**
-   * 参加対象の全プレイヤーID配列を初期化する
+   * 参加対象の全プレイヤーID配列を設定する
    * @param allPlayers 参加対象の全プレイヤーID配列
    * @returns
    */
-  init: (allPlayers: string[]) => void
+  setAllPlayers: (allPlayers: string[]) => void
 
   /**
-   * プレイヤーの参加状況を設定する
+   * プレイヤーの参加可否を設定する
    * @param playerId 参加するプレイヤーのID
    * @param willJoin 参加する場合はtrue、退出する場合はfalse
    * @returns
    */
-  set: (playerId: string, willJoin: boolean) => void
+  recordResponse: (playerId: string, willJoin: boolean) => void
 
   /**
    * 参加者リストからプレイヤーを削除する

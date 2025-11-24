@@ -104,7 +104,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     })
     this.store.of('networkPlugin').messageSender.send(responseGameHostMessage)
 
-    this.gameJoinManager.init(this.store.of('playerPlugin').players.getAllId())
+    this.gameJoinManager.setAllPlayers(this.store.of('playerPlugin').players.getAllId())
     this.joinTimeoutId = setTimeout(() => {
       this.invokeGameStart()
     }, timeoutSec * 1000)
@@ -112,7 +112,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
 
   private onSubmitGameJoin(ev: SubmitGameJoinEvent): void {
     if (!this.isActive) return
-    this.gameJoinManager.set(ev.playerId, ev.willJoin)
+    this.gameJoinManager.recordResponse(ev.playerId, ev.willJoin)
     if (this.gameJoinManager.isAllPlayersResponded()) {
       this.invokeGameStart()
     }
