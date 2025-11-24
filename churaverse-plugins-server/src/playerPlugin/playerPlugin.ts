@@ -33,8 +33,6 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private mapPluginStore!: MapPluginStore
 
-  private readonly respawnInvinciblePlayers: string[] = []
-
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.init.bind(this))
     this.bus.subscribeEvent('update', this.update.bind(this))
@@ -131,7 +129,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
   private handleRespawnInvincibility(ev: LivingDamageEvent): void {
     if (!(ev.target instanceof Player)) return
 
-    if (this.respawnInvinciblePlayers.includes(ev.target.id)) {
+    if (ev.target.isInvincible) {
       ev.cancel()
     }
   }
@@ -165,8 +163,6 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
         const position = this.mapPluginStore.mapManager.currentMap.getRandomSpawnPoint()
         player.respawn(position)
 
-        this.addRespawnInvinciblePlayer(player.id)
-
         const playerRespawnMessage = new PlayerRespawnMessage({
           playerId: player.id,
           position: player.position.toVector() as Vector & SendableObject,
@@ -181,16 +177,5 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
         this.networkPluginStore.messageSender.send(invincibleTimeMessage)
       }, PLAYER_RESPAWN_WAITING_TIME_MS)
     }
-  }
-
-  private addRespawnInvinciblePlayer(playerId: string): void {
-    this.respawnInvinciblePlayers.push(playerId)
-
-    setTimeout(() => {
-      const index = this.respawnInvinciblePlayers.indexOf(playerId)
-      if (index !== -1) {
-        this.respawnInvinciblePlayers.splice(index, 1)
-      }
-    }, RESPAWN_INVINCIBLE_TIME_MS)
   }
 }
