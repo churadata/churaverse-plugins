@@ -297,6 +297,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       isSuccess,
       ev.nyokkiTime
     )
+    if (nyokkiLogText === undefined) return
     this.gamePluginStore.gameLogRenderer.gameLog(nyokkiLogText, 0)
 
     const status: NyokkiStatus = isSuccess ? 'success' : 'nyokki'
@@ -304,7 +305,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       this.getRankingBoard.changeNyokkiStatus(nyokkiCollectionPlayerId, status)
 
       // ニョッキアクションの実行結果をプレイヤーに通知する
-      if (nyokkiCollectionPlayerId === this.playerPluginStore.ownPlayerId) {
+      if (nyokkiCollectionPlayerId === this.playerPluginStore.ownPlayerId && nyokkiLogText !== undefined) {
         this.ownNyokkiSatatus = status
         this.nyokkiActionMessage = nyokkiLogText
         this.descriptionWindow.displayNyokkiAction(nyokkiLogText)
