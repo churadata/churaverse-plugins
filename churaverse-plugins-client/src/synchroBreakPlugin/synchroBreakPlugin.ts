@@ -292,9 +292,8 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       isSuccess,
       ev.nyokkiTime
     )
-    if (nyokkiLogText !== undefined) {
-      this.gamePluginStore.gameLogRenderer.gameLog(nyokkiLogText, 0)
-    }
+    if (nyokkiLogText === undefined) return
+    this.gamePluginStore.gameLogRenderer.gameLog(nyokkiLogText, 0)
 
     const status: NyokkiStatus = isSuccess ? 'success' : 'nyokki'
     for (const nyokkiCollectionPlayerId of nyokkiCollectionPlayerIds) {
