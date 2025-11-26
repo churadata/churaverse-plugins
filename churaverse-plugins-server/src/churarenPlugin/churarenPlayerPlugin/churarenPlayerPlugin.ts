@@ -15,9 +15,12 @@ import { initPlayerItemStore, resetPlayerItemStore } from './store/initPlayerIte
 import { InvicibleTimeMessage } from './message/invicibleTimeMessage'
 import { isPlayer, Player } from '@churaverse/player-plugin-server/domain/player'
 import { ChurarenResultEvent } from '@churaverse/churaren-core-plugin-server/event/churarenResultEvent'
+import { PlayerRevivalMessage } from './message/playerRevivalMessage'
+import { UseRevivalItemEvent } from '@churaverse/churaren-revival-item-plugin-server/event/useRevivalItemEvent'
 import { ChurarenDamageMessage } from './message/churarenDamageMessage'
 import { isBoss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
 import { isBossAttack } from '@churaverse/churaren-boss-attack-plugin-server/domain/bossAttack'
+import { PlayerHealMessage } from '@churaverse/player-plugin-server/message/playerHealMessage'
 
 export const MAX_ITEMS = 3
 
@@ -56,6 +59,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.subscribeEvent('livingDamage', this.onChurarenDamageFromBoss)
     this.bus.subscribeEvent('livingDamage', this.onChurarenDamageFromBossAttack)
     this.bus.subscribeEvent('livingDamage', this.skipDamage, 'HIGH')
+    this.bus.subscribeEvent('useRevivalItem', this.onUseRevivalItem)
   }
 
   protected unsubscribeGameEvent(): void {
@@ -65,6 +69,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.bus.unsubscribeEvent('livingDamage', this.onChurarenDamageFromBoss)
     this.bus.unsubscribeEvent('livingDamage', this.onChurarenDamageFromBossAttack)
     this.bus.unsubscribeEvent('livingDamage', this.skipDamage)
+    this.bus.unsubscribeEvent('useRevivalItem', this.onUseRevivalItem)
   }
 
   protected handleGameStart(): void {
@@ -171,6 +176,24 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     ) {
       const updateChurarenUi = new ChurarenResultEvent('gameOver')
       this.bus.post(updateChurarenUi)
+    }
+  }
+
+  private readonly onUseRevivalItem = (ev: UseRevivalItemEvent): void => {
+    if (this.churarenPlayerStore.ghostModePlayers.size === 0) {
+      const healAmount = 100
+      const player = this.playerPluginStore.players.get(ev.playerId)
+      if (player === undefined) return
+      player.heal(healAmount)
+      this.networkPluginStore.messageSender.send(new PlayerHealMessage({ playerId: player.id, healAmount }))
+    } else {
+      const revivalPlayerId = this.churarenPlayerStore.ghostModePlayers.getRandomPlayerId()
+      const revivalPlayer = this.playerPluginStore.players.get(revivalPlayerId)
+      if (revivalPlayer === undefined) return
+      this.churarenPlayerStore.ghostModePlayers.delete(revivalPlayerId)
+      revivalPlayer.isCollidable = true
+      const revivalItemMessage = new PlayerRevivalMessage({ playerId: revivalPlayer.id })
+      this.networkPluginStore.messageSender.send(revivalItemMessage)
     }
   }
 
