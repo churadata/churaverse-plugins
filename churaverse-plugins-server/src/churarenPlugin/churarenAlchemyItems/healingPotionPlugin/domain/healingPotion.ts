@@ -11,7 +11,7 @@ export const HEALING_POTION_ITEM: IAlchemyItem = {
 
 export class HealingPotion extends AlchemyItem {
   public constructor(itemId: string) {
-    super(itemId, 'healingPotion')
+    super(itemId, HEALING_POTION_ITEM.kind)
   }
 }
 

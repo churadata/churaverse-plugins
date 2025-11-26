@@ -43,7 +43,7 @@ export class FlamePillar extends AlchemyItem implements ICollidableEntity, Chura
     direction: Direction,
     spawnTime: number
   ) {
-    super(flamePillarId, 'flamePillar')
+    super(flamePillarId, FLAME_PILLAR_ITEM.kind)
     this.flamePillarId = flamePillarId
     this.churarenWeaponOwnerId = ownerId
     this.spawnTime = spawnTime
