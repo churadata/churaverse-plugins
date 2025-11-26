@@ -1,5 +1,4 @@
 import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItem'
-import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind'
 import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/IAlchemyItem'
 import { Direction, Position } from 'churaverse-engine-client'
 import tornadoImage from '../assets/tornado.gif'
@@ -7,7 +6,6 @@ import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-client'
 
 export const TORNADO_WALK_LIMIT_GRIDS = 5
 export const TORNADO_WALK_LIMIT_MS = 500
-export const tornado: AlchemyItemKind = 'tornado'
 export const TORNADO_ITEM: IAlchemyItem = {
   kind: 'tornado',
   image: tornadoImage,
@@ -46,5 +44,11 @@ export class Tornado extends AlchemyItem implements ChurarenWeaponEntity {
    */
   public die(): void {
     this.isDead = true
+  }
+}
+
+declare module '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind' {
+  export interface AlchemyItemKindMap {
+    tornado: Tornado
   }
 }

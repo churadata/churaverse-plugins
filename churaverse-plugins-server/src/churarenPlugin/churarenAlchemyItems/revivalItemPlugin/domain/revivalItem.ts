@@ -11,7 +11,7 @@ export const REVIVAL_ITEM: IAlchemyItem = {
 
 export class RevivalItem extends AlchemyItem {
   public constructor(itemId: string) {
-    super(itemId, 'revivalItem')
+    super(itemId, REVIVAL_ITEM.kind)
   }
 }
 
