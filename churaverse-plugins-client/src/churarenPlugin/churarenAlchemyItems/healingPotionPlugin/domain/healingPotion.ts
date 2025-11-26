@@ -1,10 +1,8 @@
 import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItem'
-import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind'
 import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/IAlchemyItem'
 import { Direction, Position } from 'churaverse-engine-client'
 import healingPotionImage from '../assets/healingPotion.png'
 
-export const healignPotion: AlchemyItemKind = 'healingPotion'
 export const HEALING_POTION_ITEM: IAlchemyItem = {
   kind: 'healingPotion',
   image: healingPotionImage,

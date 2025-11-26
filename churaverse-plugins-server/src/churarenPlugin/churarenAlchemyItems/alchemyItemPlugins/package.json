@@ -12,6 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "@churaverse/churaren-black-hole-plugin-server": "file:../blackHolePlugin",
+    "@churaverse/churaren-flame-pillar-plugin-server": "file:../flamePillarPlugin",
     "@churaverse/churaren-healing-potion-plugin-server": "file:../healingPotionPlugin",
     "@churaverse/churaren-revival-item-plugin-server": "file:../revivalItemPlugin",
     "@churaverse/churaren-explosion-plugin-server": "file:../explosionPlugin",

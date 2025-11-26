@@ -1,10 +1,8 @@
 import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItem'
-import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind'
 import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/IAlchemyItem'
 import { Direction, Position } from 'churaverse-engine-client'
 import revivalItemImage from '../assets/revivalItem.png'
 
-export const revivalItem: AlchemyItemKind = 'revivalItem'
 export const REVIVAL_ITEM: IAlchemyItem = {
   kind: 'revivalItem',
   image: revivalItemImage,
@@ -48,5 +46,11 @@ export class RevivalItem extends AlchemyItem {
    */
   public die(): void {
     this.isDead = true
+  }
+}
+
+declare module '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind' {
+  export interface AlchemyItemKindMap {
+    revivalItem: RevivalItem
   }
 }
