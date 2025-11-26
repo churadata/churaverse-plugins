@@ -139,7 +139,7 @@ export class DescriptionWindow implements IDescriptionWindow {
     this.setDescriptionText(descriptionText.join('<br>'))
 
     if (this.countDownBar !== null) {
-      this.countDownBar.updateValue(countdown)
+      this.countDownBar.updateDashOffset(countdown)
     }
   }
 
