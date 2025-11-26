@@ -1,11 +1,9 @@
 import { Position, Direction } from 'churaverse-engine-client'
 import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/IAlchemyItem'
 import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItem'
-import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind'
 import flamePillarImage from '../assets/flamePillar.gif'
 import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-client'
 
-export const flamePillar: AlchemyItemKind = 'flamePillar'
 export const FLAME_PILLAR_ITEM: IAlchemyItem = {
   kind: 'flamePillar',
   image: flamePillarImage,
@@ -33,5 +31,11 @@ export class FlamePillar extends AlchemyItem implements ChurarenWeaponEntity {
     this.spawnTime = spawnTime
     this.position = position
     this.direction = direction
+  }
+}
+
+declare module '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind' {
+  export interface AlchemyItemKindMap {
+    flamePillar: FlamePillar
   }
 }
