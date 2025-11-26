@@ -1,4 +1,12 @@
-import { IMainScene, IEventBus, Store, Position, EntitySpawnEvent, EntityDespawnEvent } from 'churaverse-engine-client'
+import {
+  IMainScene,
+  IEventBus,
+  Store,
+  Position,
+  EntitySpawnEvent,
+  EntityDespawnEvent,
+  LivingHealEvent,
+} from 'churaverse-engine-client'
 import { Player } from '../domain/player'
 import { PlayerWalkEvent } from '../event/playerWalkEvent'
 import { RegisterMessageEvent } from '@churaverse/network-plugin-client/event/registerMessageEvent'
@@ -21,6 +29,7 @@ import { PlayerDieEvent } from '../event/playerDieEvent'
 import { PlayerRespawnMessage } from '../message/playerRespawnMessage'
 import { PlayerRespawnEvent } from '../event/playerRespawnEvent'
 import { WeaponDamageMessage } from '../message/weaponDamageMessage'
+import { PlayerHealMessage } from '../message/playerHealMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private playerPluginStore!: PlayerPluginStore
@@ -46,6 +55,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('playerDie', PlayerDieMessage, 'queue')
     ev.messageRegister.registerMessage('playerRespawn', PlayerRespawnMessage, 'queue')
     ev.messageRegister.registerMessage('weaponDamage', WeaponDamageMessage, 'queue')
+    ev.messageRegister.registerMessage('playerHeal', PlayerHealMessage, 'dest=onlySelf')
 
     // this.socket.listenEvent('disconnected', this.playerLeave.bind(this))
     // this.socket.listenAction('profile', this.playerProfileUpdate.bind(this))
@@ -61,6 +71,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageListenerRegister.on('playerColorChange', this.playerColorChange.bind(this))
     ev.messageListenerRegister.on('playerDie', this.playerDie.bind(this))
     ev.messageListenerRegister.on('playerRespawn', this.playerRespawn.bind(this))
+    ev.messageListenerRegister.on('playerHeal', this.playerHeal.bind(this))
   }
 
   private receivePriorData(msg: PriorPlayerDataMessage): void {
@@ -140,5 +151,13 @@ export class SocketController extends BaseSocketController<IMainScene> {
       data.direction
     )
     this.eventBus.post(respawnEvent)
+  }
+
+  private playerHeal(msg: PlayerHealMessage): void {
+    const data = msg.data
+    const player = this.playerPluginStore.players.get(data.playerId)
+    if (player === undefined) return
+    const playerHealEvent = new LivingHealEvent(player, data.healAmount)
+    this.eventBus.post(playerHealEvent)
   }
 }
