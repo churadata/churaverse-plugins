@@ -44,7 +44,7 @@ export class Tornado extends AlchemyItem implements ICollidableEntity, ChurarenW
   public stepIndex = 0
 
   public constructor(tornadoId: string, ownerId: string, position: Position, direction: Direction, spawnTime: number) {
-    super(tornadoId, 'tornado')
+    super(tornadoId, TORNADO_ITEM.kind)
     this.tornadoId = tornadoId
     this.churarenWeaponOwnerId = ownerId
     this.position = position
