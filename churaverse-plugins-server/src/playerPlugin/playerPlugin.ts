@@ -8,6 +8,7 @@ import {
   EntitySpawnEvent,
   WeaponDamageCause,
   Vector,
+  LivingHealEvent,
 } from 'churaverse-engine-server'
 import { SocketController } from './controller/socketController'
 import { initPlayerPluginStore } from './store/initPlayerPluginStore'
@@ -49,6 +50,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     this.bus.subscribeEvent('playerNameChange', this.onPlayerNameChange.bind(this))
     this.bus.subscribeEvent('playerColorChange', this.onPlayerColorChange.bind(this))
     this.bus.subscribeEvent('livingDamage', this.onLivingDamage.bind(this))
+    this.bus.subscribeEvent('livingHeal', this.onLivingHeal.bind(this))
   }
 
   private init(ev: InitEvent): void {
@@ -161,5 +163,12 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
         this.networkPluginStore.messageSender.send(playerRespawnMessage)
       }, PLAYER_RESPAWN_WAITING_TIME_MS)
     }
+  }
+
+  private onLivingHeal(ev: LivingHealEvent): void {
+    if (!(ev.target instanceof Player)) return
+    const player = this.playerPluginStore.players.get(ev.target.id)
+    if (player === undefined) return
+    player.heal(ev.amount)
   }
 }
