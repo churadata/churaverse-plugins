@@ -54,7 +54,7 @@ export class BlackHole extends AlchemyItem implements ICollidableEntity, Churare
     direction: Direction,
     spawnTime: number
   ) {
-    super(blackHoleId, 'blackHole')
+    super(blackHoleId, BLACK_HOLE_ITEM.kind)
     this.blackHoleId = blackHoleId
     this.churarenWeaponOwnerId = ownerId
     this.spawnTime = spawnTime
