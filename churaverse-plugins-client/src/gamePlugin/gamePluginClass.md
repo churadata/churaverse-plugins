@@ -3,9 +3,9 @@
 
 ```mermaid
 classDiagram
-    BasePlugin <|-- BaseGamePlugin
-    BaseGamePlugin <|-- CoreGamePlugin
-    IGameInfo <|.. CoreGamePlugin
+    BasePlugin <|-- BaseGamePlugin : extend
+    BaseGamePlugin <|-- CoreGamePlugin : extend
+    IGameInfo <|.. CoreGamePlugin : implement
 
     class BasePlugin {
         <<abstract>>
@@ -30,8 +30,8 @@ classDiagram
     class BaseGamePlugin {
         <<abstract>>
         gameId: GameIds *
-        +isActive: boolean
 
+        #isActive() boolean
         #subscribeGameEvent() void
         #unsubscribeGameEvent() void
         handleGameStart() void *
