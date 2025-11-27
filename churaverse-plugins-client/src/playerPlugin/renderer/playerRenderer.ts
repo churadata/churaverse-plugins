@@ -17,6 +17,16 @@ import heroBlack from '../assets/hero_black.png'
 import heroBlue from '../assets/hero_blue.png'
 import heroGray from '../assets/hero_gray.png'
 
+const DEFAULT_NAMEPLATE_COLOR = '#ffffff'
+const DEFAULT_NAMEPLATE_STROKE = '#403c3c'
+const DEFAULT_NAMEPLATE_STROKE_WIDTH = 3
+const DEFAULT_NAMEPLATE_FONT_SIZE = 16
+const OWN_PLAYER_NAMEPLATE_COLOR = '#00BFFF'
+const OWN_PLAYER_NAMEPLATE_STROKE = '#1f1400'
+const OWN_PLAYER_NAMEPLATE_STROKE_WIDTH = 4
+const OWN_PLAYER_NAMEPLATE_FONT_SIZE = 18
+const NAMEPLATE_SHADOW_COLOR = '#000000'
+
 /**
  * 初期色の名前 = basic
  */
@@ -59,7 +69,7 @@ const _anims = new Map<string, { key: string; frameStart: number; frameEnd: numb
 /**
  * PlayerのSpriteから名前プレートの相対座標
  */
-const _relativePositionToNamePlate = { x: 0, y: -40 }
+const _relativePositionToNameplate = { x: 0, y: -40 }
 
 /**
  * Player描画クラス
@@ -69,12 +79,12 @@ export class PlayerRenderer implements IPlayerRenderer {
   private sprite
 
   private tween?: Phaser.Tweens.Tween
-  private readonly _playerNamePlateTween?: Phaser.Tweens.Tween
+  private readonly _playerNameplateTween?: Phaser.Tweens.Tween
   private damagetween?: Phaser.Tweens.Tween
   private color: PlayerColor
   private readonly playerContainer: Phaser.GameObjects.Container
   private readonly playerFrontContainer: Phaser.GameObjects.Container
-  private readonly _playerNamePlate: Phaser.GameObjects.Text
+  private readonly _playerNameplate: Phaser.GameObjects.Text
   private readonly hpBar: HpBarRenderer
 
   public constructor(
@@ -99,10 +109,12 @@ export class PlayerRenderer implements IPlayerRenderer {
     this.playerContainer.add(this.sprite)
     layerSetting(this.playerContainer, 'player')
 
-    this._playerNamePlate = scene.add
-      .text(_relativePositionToNamePlate.x, _relativePositionToNamePlate.y, name)
+    this._playerNameplate = scene.add
+      .text(_relativePositionToNameplate.x, _relativePositionToNameplate.y, name)
       .setOrigin(0.5)
-      .setStroke('#403c3c', 3)
+      .setStroke(DEFAULT_NAMEPLATE_STROKE, DEFAULT_NAMEPLATE_STROKE_WIDTH)
+
+    this.applyDefaultNameplateStyle()
 
     _anims.forEach((cfg) => {
       this.sprite.anims.create({
@@ -118,7 +130,7 @@ export class PlayerRenderer implements IPlayerRenderer {
 
     this.turn(direction)
 
-    this.playerFrontContainer.add(this._playerNamePlate)
+    this.playerFrontContainer.add(this._playerNameplate)
     this.hpBar.addContainer(this.playerFrontContainer)
     layerSetting(this.playerFrontContainer, 'abovePlayer')
     this.hpBar.update(hp)
@@ -190,7 +202,7 @@ export class PlayerRenderer implements IPlayerRenderer {
     this.playerContainer.setVisible(true)
     this.playerFrontContainer.setVisible(true)
     this.sprite.alpha = 1
-    this._playerNamePlate.alpha = 1
+    this._playerNameplate.alpha = 1
   }
 
   /**
@@ -201,7 +213,7 @@ export class PlayerRenderer implements IPlayerRenderer {
     this.playerContainer.setVisible(false)
     this.playerFrontContainer.setVisible(false)
     this.sprite.alpha = 0
-    this._playerNamePlate.alpha = 0
+    this._playerNameplate.alpha = 0
   }
 
   /**
@@ -222,7 +234,7 @@ export class PlayerRenderer implements IPlayerRenderer {
     this.stop()
     this.disappear()
     this.sprite.destroy()
-    this._playerNamePlate.destroy()
+    this._playerNameplate.destroy()
     this.hpBar.destroy()
     this.playerContainer.destroy()
     this.playerFrontContainer.destroy()
@@ -311,7 +323,7 @@ export class PlayerRenderer implements IPlayerRenderer {
    */
   public stop(): void {
     this.sprite.anims.stop()
-    this._playerNamePlateTween?.stop()
+    this._playerNameplateTween?.stop()
     this.stopAllTweens(this.playerContainer)
     this.stopAllTweens(this.playerFrontContainer)
   }
@@ -462,7 +474,16 @@ export class PlayerRenderer implements IPlayerRenderer {
    * @param name 変更後の名前
    */
   public applyPlayerName(name: string): void {
-    this._playerNamePlate.setText(name).setOrigin(0.5)
+    this._playerNameplate.setText(name).setOrigin(0.5)
+  }
+
+  public highlightNameplate(): void {
+      this._playerNameplate
+        .setColor(OWN_PLAYER_NAMEPLATE_COLOR)
+        .setFontSize(OWN_PLAYER_NAMEPLATE_FONT_SIZE)
+        .setFontStyle('bold')
+        .setStroke(OWN_PLAYER_NAMEPLATE_STROKE, OWN_PLAYER_NAMEPLATE_STROKE_WIDTH)
+        .setShadow(0, 2, NAMEPLATE_SHADOW_COLOR, 6, true, true)
   }
 
   /**
@@ -473,7 +494,7 @@ export class PlayerRenderer implements IPlayerRenderer {
     this.playerContainer.destroy()
     this.playerFrontContainer.destroy()
     this.sprite.destroy()
-    this._playerNamePlate.destroy()
+    this._playerNameplate.destroy()
   }
 
   /**
@@ -483,6 +504,15 @@ export class PlayerRenderer implements IPlayerRenderer {
     _anims.forEach((cfg) => {
       this.sprite.anims.remove(cfg.key)
     })
+  }
+
+  private applyDefaultNameplateStyle(): void {
+    this._playerNameplate
+      .setColor(DEFAULT_NAMEPLATE_COLOR)
+      .setFontSize(DEFAULT_NAMEPLATE_FONT_SIZE)
+      .setFontStyle('normal')
+      .setStroke(DEFAULT_NAMEPLATE_STROKE, DEFAULT_NAMEPLATE_STROKE_WIDTH)
+      .setShadow(0, 0, NAMEPLATE_SHADOW_COLOR, 0, false, false)
   }
 
   public setParentContainer(container: GameObjects.Container): void {

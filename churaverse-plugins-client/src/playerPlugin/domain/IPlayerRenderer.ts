@@ -33,6 +33,7 @@ export interface IPlayerRenderer extends IFocusableRenderer {
   heal: (healAmount: number, hp: number) => void
   applyPlayerColor: (color: PlayerColor) => void
   applyPlayerName: (name: string) => void
+  highlightNameplate: () => void
   destroy: () => void
   setParentContainer: (container: GameObjects.Container) => void
   addToPlayerContainer: (child: Phaser.GameObjects.GameObject) => void
