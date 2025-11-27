@@ -1,4 +1,5 @@
 export interface IKey {
+  logicalUp: boolean
   duration: number
   keyCode: string
   isJustDown: boolean
@@ -6,4 +7,6 @@ export interface IKey {
   isHold: boolean
   resetHoldTime: () => void
   updateHoldTime: (dt: number) => void
+  logicalRelease: () => void
+  onPhysicalKeyDown: () => void
 }
