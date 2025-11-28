@@ -19,7 +19,6 @@ export class DescriptionWindow implements IDescriptionWindow {
 
   public remove(): void {
     this.descriptionText = ''
-    this.countDownBar = null
   }
 
   public close(): void {
@@ -36,9 +35,7 @@ export class DescriptionWindow implements IDescriptionWindow {
    */
   public displayCountDownBar(countDownBar: ICountDownBar): void {
     this.countDownBar = countDownBar
-    if (countDownBar !== null) {
-      this.element.appendChild(countDownBar.element)
-    }
+    this.element.appendChild(countDownBar.element)
   }
 
   /**
@@ -114,9 +111,8 @@ export class DescriptionWindow implements IDescriptionWindow {
   /**
    * シンクロブレイク開始の文章更新処理
    */
-  public displaySynchroBreakStart(_timeLimit: number): void {
+  public displaySynchroBreakStart(): void {
     this.setDescriptionText(`${this.gameName}開始！！！<br>制限時間以内にボタンを押してください！`)
-    // CountDownBar の生成・管理は Plugin 側の責務
   }
 
   /**
@@ -141,7 +137,6 @@ export class DescriptionWindow implements IDescriptionWindow {
    */
   public displaySynchroBreakEnd(): void {
     this.setDescriptionText(`${this.gameName}終了！！！`)
-    this.countDownBar = null
   }
 
   /**

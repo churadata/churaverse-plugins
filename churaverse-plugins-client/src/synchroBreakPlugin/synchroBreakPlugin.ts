@@ -330,7 +330,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.nyokkiActionMessage = undefined
     this.ownNyokkiSatatus = 'yet'
 
-    // CountDownBar を削除
     this.removeCountDownBar()
     this.descriptionWindow.displaySynchroBreakEnd()
     const noNyokkiPlayerIds = ev.noNyokkiPlayerIds
@@ -437,8 +436,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   }
 
   /**
-   * CountDownBar を生成して DescriptionWindow に注入する
-   * @param timeLimit シンクロブレイクの制限時間
+   * カウントダウンバーを生成
    */
   private createCountDownBar(timeLimit: number): void {
     if (timeLimit <= 0) return
