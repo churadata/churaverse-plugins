@@ -1,7 +1,9 @@
 import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
+import { ICountDownBar } from './ICountDownBar'
 
 export interface IDescriptionWindow extends IGameUiComponent {
   setGameBaseInfo: (gameName: string, ownerName: string) => void
+  displayCountDownBar: (countDownBar: ICountDownBar) => void
   displayGameStartForOwner: () => void
   displayGameStartForGuest: () => void
   displayTurnSelectionForOwner: (turn: number) => void
