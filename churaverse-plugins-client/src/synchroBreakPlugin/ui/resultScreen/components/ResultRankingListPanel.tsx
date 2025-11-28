@@ -5,9 +5,8 @@ import resultStyle from './ResultStyle.module.scss'
 
 export const ResultRankingListPanel: JSXFunc = () => {
   return (
-    <div className={resultStyle.container}>
+    <div className={resultStyle.container} id={RESULT_CONTAINER_ID}>
       <div className={resultStyle.dialogLabel}>
-        <div id={RESULT_CONTAINER_ID}></div>
       </div>
       <div id={RESULT_LIST_ID} className={style.playerList}></div>
     </div>

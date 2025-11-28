@@ -12,10 +12,10 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  transform-origin: center;
   width: 69vh;
   height: 82vh;
-  overflow-y: scroll;
-  overflow-x: hidden;
+  overflow: hidden;
   font-size: 40px;
 }
 
