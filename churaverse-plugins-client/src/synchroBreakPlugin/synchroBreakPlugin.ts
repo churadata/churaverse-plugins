@@ -15,6 +15,8 @@ import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
 import { SendBetCoinResponseEvent } from './event/sendBetCoinResponseEvent'
 import { registerSynchroBreakUi } from './ui/registerSynchroBreakUi'
 import { IDescriptionWindow } from './interface/IDescriptionWindow'
+import { ICountDownBar } from './interface/ICountDownBar'
+import { CountDownBar } from './ui/countDownBar/countDownBar'
 import { PlayerNyokkiStatusIcon } from './ui/synchroBreakIcon/playerNyokkiStatusIcon'
 import { CoinViewer } from './ui/coinViewer/coinViewer'
 import { CoinViewerIcon } from './ui/coinViewer/coinViewerIcon'
@@ -42,6 +44,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   private scene!: Scene
   private coinViewerIconUis = new Map<string, CoinViewerIcon>()
   private socketController!: SocketController
+  private countDownBar: ICountDownBar | null = null
 
   public listenEvent(): void {
     super.listenEvent()
@@ -269,6 +272,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const ownPlayerId = this.playerPluginStore.ownPlayerId
     const ownPlayerName = this.playerPluginStore.players.get(ownPlayerId)?.name
     if (ev.remainingSeconds === this.synchroBreakPluginStore.timeLimit) {
+      this.createCountDownBar(ev.remainingSeconds)
       this.descriptionWindow.displaySynchroBreakStart(ev.remainingSeconds)
       this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.open()
     } else {
@@ -326,12 +330,13 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.nyokkiActionMessage = undefined
     this.ownNyokkiSatatus = 'yet'
 
+    // CountDownBar を削除
+    this.removeCountDownBar()
     this.descriptionWindow.displaySynchroBreakEnd()
     const noNyokkiPlayerIds = ev.noNyokkiPlayerIds
     const status: NyokkiStatus = 'nyokki'
 
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.close()
-    this.descriptionWindow.displaySynchroBreakEnd()
 
     if (noNyokkiPlayerIds.length === 0) return
     for (const noNyokkiPlayerId of noNyokkiPlayerIds) {
@@ -429,6 +434,34 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.synchroBreakPluginStore.synchroBreakIcons.forEach((value) => {
       value.resetStatusIcon()
     })
+  }
+
+  /**
+   * CountDownBar を生成して DescriptionWindow に注入する
+   * @param timeLimit シンクロブレイクの制限時間
+   */
+  private createCountDownBar(timeLimit: number): void {
+    if (timeLimit <= 0) return
+
+    // 既存の CountDownBar があれば削除
+    this.removeCountDownBar()
+
+    this.countDownBar = new CountDownBar({
+      remainingSeconds: timeLimit,
+      duration: timeLimit,
+    })
+    this.countDownBar.initialize()
+    this.descriptionWindow.displayCountDownBar(this.countDownBar)
+  }
+
+  /**
+   * CountDownBar を削除する
+   */
+  private removeCountDownBar(): void {
+    if (this.countDownBar !== null) {
+      this.countDownBar.remove()
+      this.countDownBar = null
+    }
   }
 }
 

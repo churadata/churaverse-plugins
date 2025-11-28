@@ -159,7 +159,7 @@ export class CountDownBar implements ICountDownBar {
     const prevTransition = this.progressBarEl.style.transition
     this.progressBarEl.style.transition = 'none'
     this.progressBarEl.style.strokeDashoffset = `${newOffset}`
-    this.progressBarEl.getBoundingClientRect() // reflow を強制
+    this.progressBarEl.getBoundingClientRect()
 
     requestAnimationFrame(() => {
       if (this.progressBarEl === null) return

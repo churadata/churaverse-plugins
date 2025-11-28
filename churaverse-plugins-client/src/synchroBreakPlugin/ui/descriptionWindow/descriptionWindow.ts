@@ -2,7 +2,7 @@ import { DomManager, domLayerSetting } from 'churaverse-engine-client'
 import { DescriptionWindowComponent } from './component/DescriptionWindowComponent'
 import '@churaverse/game-plugin-client/gameUiManager'
 import { IDescriptionWindow } from '../../interface/IDescriptionWindow'
-import { CountDownBar } from '../countDownBar/countDownBar'
+import { ICountDownBar } from '../../interface/ICountDownBar'
 
 export class DescriptionWindow implements IDescriptionWindow {
   public element!: HTMLElement
@@ -10,7 +10,7 @@ export class DescriptionWindow implements IDescriptionWindow {
   private descriptionText: string = ''
   private gameName: string = 'ゲーム'
   private gameOwnerName: string = 'ゲームオーナー'
-  private countDownBar: CountDownBar | null = null
+  private countDownBar: ICountDownBar | null = null
 
   public initialize(): void {
     this.element = DomManager.addJsxDom(DescriptionWindowComponent({ description: this.descriptionText }))
@@ -19,10 +19,7 @@ export class DescriptionWindow implements IDescriptionWindow {
 
   public remove(): void {
     this.descriptionText = ''
-    if (this.countDownBar !== null) {
-      this.countDownBar.remove()
-      this.countDownBar = null
-    }
+    this.countDownBar = null
   }
 
   public close(): void {
@@ -32,6 +29,16 @@ export class DescriptionWindow implements IDescriptionWindow {
   public setGameBaseInfo(gameName: string, ownerName: string): void {
     this.gameName = gameName
     this.gameOwnerName = ownerName
+  }
+
+  /**
+   * 外部から CountDownBar を注入して表示する
+   */
+  public displayCountDownBar(countDownBar: ICountDownBar): void {
+    this.countDownBar = countDownBar
+    if (countDownBar !== null) {
+      this.element.appendChild(countDownBar.element)
+    }
   }
 
   /**
@@ -106,24 +113,10 @@ export class DescriptionWindow implements IDescriptionWindow {
 
   /**
    * シンクロブレイク開始の文章更新処理
-   * @param timeLimit シンクロブレイクの制限時間
    */
-  public displaySynchroBreakStart(timeLimit: number): void {
+  public displaySynchroBreakStart(_timeLimit: number): void {
     this.setDescriptionText(`${this.gameName}開始！！！<br>制限時間以内にボタンを押してください！`)
-
-    if (this.countDownBar !== null) {
-      this.countDownBar.remove()
-      this.countDownBar = null
-    }
-
-    if (timeLimit > 0) {
-      this.countDownBar = new CountDownBar({
-        remainingSeconds: timeLimit,
-        duration: timeLimit,
-      })
-      this.countDownBar.initialize()
-      this.element.appendChild(this.countDownBar.element)
-    }
+    // CountDownBar の生成・管理は Plugin 側の責務
   }
 
   /**
@@ -148,10 +141,7 @@ export class DescriptionWindow implements IDescriptionWindow {
    */
   public displaySynchroBreakEnd(): void {
     this.setDescriptionText(`${this.gameName}終了！！！`)
-    if (this.countDownBar !== null) {
-      this.countDownBar.remove()
-      this.countDownBar = null
-    }
+    this.countDownBar = null
   }
 
   /**
@@ -205,6 +195,7 @@ export class DescriptionWindow implements IDescriptionWindow {
     container.innerHTML = text
 
     const barEl = this.countDownBar?.element ?? null
+
     if (barEl !== null && barEl.parentElement === this.element) {
       this.element.insertBefore(container, barEl)
     } else {
