@@ -19,17 +19,17 @@ export class GameDescriptionDialogManager implements IGameDescriptionDialogManag
       this.closeDialog()
     }
 
-    const showingDialogIdDialog = this.gameDialogs.get(gameId)
-    if (showingDialogIdDialog === undefined) return
-    showingDialogIdDialog.open()
+    const targetDialog = this.gameDialogs.get(gameId)
+    if (targetDialog === undefined) return
+    targetDialog.open()
     this.showingDialogId = gameId
   }
 
   public closeDialog(): void {
     if (this.showingDialogId !== null) {
-      const showingDialogIdDialog = this.gameDialogs.get(this.showingDialogId)
-      if (showingDialogIdDialog === undefined) return
-      showingDialogIdDialog.close()
+      const targetDialog = this.gameDialogs.get(this.showingDialogId)
+      if (targetDialog === undefined) return
+      targetDialog.close()
       this.showingDialogId = null
     }
   }

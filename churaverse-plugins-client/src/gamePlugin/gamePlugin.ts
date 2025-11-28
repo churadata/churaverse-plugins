@@ -22,7 +22,7 @@ export class GamePlugin extends BasePlugin<IMainScene> {
 
   private init(): void {
     this.gameUiRegister = new GameUiRegister()
-    this.gameDialogManager = new GameDialogManager(this.store, this.bus)
+    this.gameDialogManager = new GameDialogManager(this.store)
     initGamePluginStore(this.store, this.gameUiRegister)
     this.gameDialogManager.init(this.store.of('gamePlugin').gameSelectionListContainer)
   }
