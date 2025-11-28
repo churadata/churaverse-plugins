@@ -7,7 +7,6 @@ export const ResultRankingListPanel: JSXFunc = () => {
   return (
     <div className={resultStyle.container} id={RESULT_CONTAINER_ID}>
       <div className={resultStyle.dialogLabel}>
-        <div></div>
       </div>
       <div id={RESULT_LIST_ID} className={style.playerList}></div>
     </div>

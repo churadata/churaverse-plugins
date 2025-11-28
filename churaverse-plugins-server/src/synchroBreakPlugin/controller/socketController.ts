@@ -19,7 +19,6 @@ import { SynchroBreakTurnEndMessage } from '../message/synchroBreakTurnEndMessag
 import { SynchroBreakTurnStartMessage } from '../message/synchroBreakTurnStartMessage'
 import { UpdatePlayersCoinMessage } from '../message/updatePlayersCoinMessage'
 import { SynchroBreakResultMessage } from '../message/synchroBreakResultMessage'
-import { SynchroBreakMidResultMessage } from '../message/synchroBreakMidResultMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
@@ -41,7 +40,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('synchroBreakTurnStart', SynchroBreakTurnStartMessage, 'allClients')
     ev.messageRegister.registerMessage('updatePlayersCoin', UpdatePlayersCoinMessage, 'allClients')
     ev.messageRegister.registerMessage('synchroBreakResult', SynchroBreakResultMessage, 'allClients')
-    ev.messageRegister.registerMessage('synchroBreakMidResult', SynchroBreakMidResultMessage, 'allClients')
   }
 
   /**
