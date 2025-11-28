@@ -11,8 +11,8 @@ import { SynchroBreakStartCountMessage } from '../message/synchroBreakStartCount
 import { SynchroBreakTurnTimerMessage } from '../message/synchroBreakTurnTimerMessage'
 import { SynchroBreakResultMessage } from '../message/synchroBreakResultMessage'
 import { UpdatePlayersCoinMessage } from '../message/updatePlayersCoinMessage'
-import { SynchroBreakMidResultMessage } from '../message/synchroBreakMidResultMessage'
 import { SYNCHRO_BREAK_MID_RESULT_TIME_LIMIT } from '../synchroBreakPlugin'
+import { RESULT_SCREEN_TYPES } from '../type/resultScreenType'
 
 export class GameSequence implements IGameSequence {
   private readonly synchroBreakPluginStore!: SynchroBreakPluginStore
@@ -89,15 +89,13 @@ export class GameSequence implements IGameSequence {
     if (!this.isActive || turnSelect === undefined) return
     if (turnSelect <= this.turnCountNumber) {
       this.turnCountNumber = 1
-      const sortedPlayersCoin = this.synchroBreakPluginStore.playersCoinRepository.sortedPlayerCoins()
-      this.networkPluginStore.messageSender.send(new UpdatePlayersCoinMessage({ playersCoin: sortedPlayersCoin }))
-      this.networkPluginStore.messageSender.send(new SynchroBreakResultMessage())
+      this.sendSortedPlayersCoin()
+      this.networkPluginStore.messageSender.send(new SynchroBreakResultMessage({ resultScreenType: RESULT_SCREEN_TYPES.FINAL }))
     } else {
       this.turnCountNumber++
 
-      const sortedPlayersCoin = this.synchroBreakPluginStore.playersCoinRepository.sortedPlayerCoins()
-      this.networkPluginStore.messageSender.send(new UpdatePlayersCoinMessage({ playersCoin: sortedPlayersCoin }))
-      this.networkPluginStore.messageSender.send(new SynchroBreakMidResultMessage())
+      this.sendSortedPlayersCoin()
+      this.networkPluginStore.messageSender.send(new SynchroBreakResultMessage({ resultScreenType: RESULT_SCREEN_TYPES.TURN }))
 
       await this.delay(SYNCHRO_BREAK_MID_RESULT_TIME_LIMIT)
 
@@ -105,6 +103,14 @@ export class GameSequence implements IGameSequence {
       const synchroBreakTurnStart = new SynchroBreakTurnStartEvent(this.turnCountNumber)
       this.eventBus.post(synchroBreakTurnStart)
     }
+  }
+
+  /**
+   * ソート済みのプレイヤーコイン情報を送信
+   */
+  private sendSortedPlayersCoin(): void {
+    const sortedPlayersCoin = this.synchroBreakPluginStore.playersCoinRepository.sortedPlayerCoins()
+    this.networkPluginStore.messageSender.send(new UpdatePlayersCoinMessage({ playersCoin: sortedPlayersCoin }))
   }
 
   private get isActive(): boolean {
