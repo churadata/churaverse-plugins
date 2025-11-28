@@ -5,9 +5,9 @@ import { ResultRankingSeparator } from './components/ResultRankingSeparator'
 import { ResultExitButton } from './components/ResultExitButton'
 import { ISynchroBreakResultScreen } from '../../interface/ISynchroBreakResultScreen'
 import { GamePlayerQuitEvent } from '@churaverse/game-plugin-client/event/gamePlayerQuitEvent'
-import { ResultScreenType } from '../../type/resultScreenType'
+import { RESULT_SCREEN_TYPES, ResultScreenType } from '../../type/resultScreenType'
 import finalResultRankingBoard from '../../assets/final_rankingBoard.png'
-import middleResultRankingBoard from '../../assets/mid_rankingBoard.png'
+import turnResultRankingBoard from '../../assets/turn_rankingBoard.png'
 
 // resultRankingのID
 export const RESULT_LIST_ID = 'result-list'
@@ -17,6 +17,11 @@ export const RESULT_CONTAINER_ID = 'result-container'
  * addElementToEachRowで追加される要素の親要素が持つクラス名
  */
 export const ROW_CONTENT_CONTAINER_CLASS_NAME = 'result-ranking-list-row-container'
+
+const rankingBoardMap = {
+      [RESULT_SCREEN_TYPES.FINAL]: finalResultRankingBoard,
+      [RESULT_SCREEN_TYPES.TURN]: turnResultRankingBoard,
+    } as const
 
 export class ResultScreen implements ISynchroBreakResultScreen {
   protected readonly gameId = 'synchroBreak'
@@ -46,19 +51,15 @@ export class ResultScreen implements ISynchroBreakResultScreen {
   /**
    * 結果画面の作成
    */
-  public createFinalResultRanking(): void {
+  public createResultRanking(type: ResultScreenType): void {
     this.element.style.display = ''
     this.resultListContainer.innerHTML = ''
 
-    this.createResultRankingList('final')
-    this.createExitButton()
-  }
+    this.createResultRankingList(type)
 
-  public createMiddleResultRanking(): void {
-    this.element.style.display = ''
-    this.resultListContainer.innerHTML = ''
-
-    this.createResultRankingList('middle')
+    if (type === RESULT_SCREEN_TYPES.FINAL) {
+      this.createExitButton()
+    }
   }
 
   /**
@@ -66,8 +67,7 @@ export class ResultScreen implements ISynchroBreakResultScreen {
    */
   private createResultRankingList(screenType: ResultScreenType): void {
     const sortedPlayers = this.store.of('synchroBreakPlugin').playersCoinRepository.getPlayersSortedByCoins()
-    this.resultScreenContainer.style.backgroundImage =
-      screenType === 'final' ? `url(${finalResultRankingBoard})` : `url(${middleResultRankingBoard})`
+    this.resultScreenContainer.style.backgroundImage = `url(${rankingBoardMap[screenType]})`
     this.resultListContainer.style.display = 'block'
 
     const rankedPlayers = this.calculatePlayerRanks(sortedPlayers)
