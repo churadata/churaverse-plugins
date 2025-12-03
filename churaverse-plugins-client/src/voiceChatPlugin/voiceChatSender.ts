@@ -20,8 +20,10 @@ import { VoiceChatPluginStore } from './store/defVoiceChatPluginStore'
 export class VoiceChatSender implements IVoiceChatSender {
   private readonly networkPluginStore!: NetworkPluginStore<IMainScene>
   private readonly voiceChatPluginStore!: VoiceChatPluginStore
+  // ローカルのマイクストリームを RNNoise で処理して MediaStreamTrack を提供するパイプライン
   private readonly micPipeline = new RnnoiseMicPipeline()
   private micPublication?: LocalTrackPublication
+  // start/stop の多重実行を防ぐためのフラグ
   private isStarting = false
   private isStopping = false
   public constructor(
@@ -73,10 +75,13 @@ export class VoiceChatSender implements IVoiceChatSender {
   }
 
   public async startStream(): Promise<boolean> {
+    // 既に開始処理中であれば現在の状態をそのまま返す
     if (this.isStarting) return this.micPublication?.track !== undefined
     this.isStarting = true
     try {
-      // 既存のマイクトラックがあれば除去
+      // LiveKit 側に既にマイクトラックが存在する場合、
+      // そのまま publishTrack すると「同じ Source のトラックが二重に publish される」問題が発生する。
+      // 事前に unpublish + stop しておき、常に 1 本のマイクトラックだけが存在する状態に揃える。
       const existingMic = this.room.localParticipant.getTrack(Track.Source.Microphone)
       if (existingMic?.track !== undefined) {
         await this.room.localParticipant.unpublishTrack(existingMic.track as LocalAudioTrack)
@@ -88,14 +93,16 @@ export class VoiceChatSender implements IVoiceChatSender {
         source: Track.Source.Microphone,
         name: 'microphone-processed',
       })
-      // デバッグ用: publishした情報をグローバルに置いて確認できるようにする
+      // デバッグ用: publish したトラックと Room をグローバルに公開しておき、
+      // ブラウザコンソールから getSettings などを確認できるようにする
       ;(window as unknown as { __micPub?: LocalTrackPublication }).__micPub = this.micPublication
       ;(window as unknown as { __lkRoom?: Room }).__lkRoom = this.room
       console.info('[MicPipeline] published track', this.micPublication?.track?.mediaStreamTrack?.getSettings())
       return this.micPublication.track !== undefined
     } catch (error) {
       console.error('Failed to start microphone pipeline', error)
-      // 最低限のフォールバックとしてLiveKitデフォルトを有効化
+      // パイプラインの立ち上げに失敗した場合でも、
+      // 完全にマイクが使えなくなると困るため LiveKit のデフォルト実装にフォールバックする。
       await this.room.localParticipant.setMicrophoneEnabled(true)
       return this.room.localParticipant.isMicrophoneEnabled
     } finally {
@@ -104,6 +111,7 @@ export class VoiceChatSender implements IVoiceChatSender {
   }
 
   public async stopStream(): Promise<boolean> {
+    // stop が多重で呼ばれても 1 回だけ実行されるようにする
     if (this.isStopping) return true
     this.isStopping = true
     try {
@@ -123,7 +131,9 @@ export class VoiceChatSender implements IVoiceChatSender {
       }
     } finally {
       this.micPublication = undefined
+      // AudioContext / Worklet / getUserMedia ストリームなどをまとめて解放
       await this.micPipeline.stop()
+      // LiveKit 側の状態も明示的にオフにしておく
       await this.room.localParticipant.setMicrophoneEnabled(false)
       this.isStopping = false
     }
