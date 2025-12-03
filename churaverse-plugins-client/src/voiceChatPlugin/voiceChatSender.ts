@@ -1,4 +1,5 @@
 import {
+  LocalAudioTrack,
   LocalParticipant,
   LocalTrackPublication,
   Participant,
@@ -7,6 +8,7 @@ import {
   Track,
   TrackPublication,
 } from 'livekit-client'
+import { RnnoiseMicPipeline } from './audio/rnnoiseMicPipeline'
 import { IVoiceChatSender } from './domain/IVoiceChatSender'
 import { IEventBus, IMainScene, Store } from 'churaverse-engine-client'
 import { UnmuteEvent } from './event/unmuteEvent'
@@ -18,6 +20,10 @@ import { VoiceChatPluginStore } from './store/defVoiceChatPluginStore'
 export class VoiceChatSender implements IVoiceChatSender {
   private readonly networkPluginStore!: NetworkPluginStore<IMainScene>
   private readonly voiceChatPluginStore!: VoiceChatPluginStore
+  private readonly micPipeline = new RnnoiseMicPipeline()
+  private micPublication?: LocalTrackPublication
+  private isStarting = false
+  private isStopping = false
   public constructor(
     private readonly room: Room,
     private readonly eventBus: IEventBus<IMainScene>,
@@ -67,12 +73,60 @@ export class VoiceChatSender implements IVoiceChatSender {
   }
 
   public async startStream(): Promise<boolean> {
-    await this.room.localParticipant.setMicrophoneEnabled(true)
-    return this.room.localParticipant.isMicrophoneEnabled
+    if (this.isStarting) return this.micPublication?.track !== undefined
+    this.isStarting = true
+    try {
+      // 既存のマイクトラックがあれば除去
+      const existingMic = this.room.localParticipant.getTrack(Track.Source.Microphone)
+      if (existingMic?.track !== undefined) {
+        await this.room.localParticipant.unpublishTrack(existingMic.track as LocalAudioTrack)
+        existingMic.track.stop()
+      }
+
+      const processedTrack = await this.micPipeline.start()
+      this.micPublication = await this.room.localParticipant.publishTrack(processedTrack, {
+        source: Track.Source.Microphone,
+        name: 'microphone-processed',
+      })
+      // デバッグ用: publishした情報をグローバルに置いて確認できるようにする
+      ;(window as unknown as { __micPub?: LocalTrackPublication }).__micPub = this.micPublication
+      ;(window as unknown as { __lkRoom?: Room }).__lkRoom = this.room
+      console.info('[MicPipeline] published track', this.micPublication?.track?.mediaStreamTrack?.getSettings())
+      return this.micPublication.track !== undefined
+    } catch (error) {
+      console.error('Failed to start microphone pipeline', error)
+      // 最低限のフォールバックとしてLiveKitデフォルトを有効化
+      await this.room.localParticipant.setMicrophoneEnabled(true)
+      return this.room.localParticipant.isMicrophoneEnabled
+    } finally {
+      this.isStarting = false
+    }
   }
 
   public async stopStream(): Promise<boolean> {
-    await this.room.localParticipant.setMicrophoneEnabled(false)
+    if (this.isStopping) return true
+    this.isStopping = true
+    try {
+      const publication = this.micPublication ?? this.room.localParticipant.getTrack(Track.Source.Microphone)
+      const track = publication?.track as LocalAudioTrack | undefined
+      if (track !== undefined) {
+        try {
+          await this.room.localParticipant.unpublishTrack(track)
+        } catch (e) {
+          console.warn('unpublishTrack failed, continue teardown', e)
+        }
+        try {
+          track.stop?.()
+        } catch (e) {
+          console.warn('stop track failed, continue teardown', e)
+        }
+      }
+    } finally {
+      this.micPublication = undefined
+      await this.micPipeline.stop()
+      await this.room.localParticipant.setMicrophoneEnabled(false)
+      this.isStopping = false
+    }
 
     // 終了失敗=isMicrophoneEnabledがtrueの時なので, isMicrophoneEnabledの否定を返す
     return !this.room.localParticipant.isMicrophoneEnabled
