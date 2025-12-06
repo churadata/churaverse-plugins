@@ -32,12 +32,7 @@ export class WebRtc {
   private async connect(ownPlayerId: string): Promise<void> {
     try {
       const token = await this.getAccessToken(ownPlayerId)
-      const iceServers = [{ urls: ['stun:stun.l.google.com:19302'] }]
-      await this.room.connect(`${import.meta.env.VITE_LIVEKIT_URL ?? 'ws://localhost:8080/livekit'}`, token, {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        iceServers,
-      })
+      await this.room.connect(`${import.meta.env.VITE_LIVEKIT_URL ?? 'ws://localhost:8080/livekit'}`, token)
       console.log(`connected to room. roomName: ${this.room.name}`)
     } catch (e) {
       console.error(`Failed to connect to room.`, e)
