@@ -26,7 +26,6 @@ export class WebRtc {
       },
     }
     this.room = new Room(roomOptions)
-
     void this.connect(ownPlayerId)
   }
 
@@ -34,10 +33,9 @@ export class WebRtc {
     try {
       const token = await this.getAccessToken(ownPlayerId)
       await this.room.connect(`${import.meta.env.VITE_LIVEKIT_URL ?? 'ws://localhost:8080/livekit'}`, token)
-
       console.log(`connected to room. roomName: ${this.room.name}`)
     } catch (e) {
-      console.error(`Failed to connect to room.`,e)
+      console.error(`Failed to connect to room.`, e)
       window.alert('chromeでの利用を推奨します')
     }
   }
