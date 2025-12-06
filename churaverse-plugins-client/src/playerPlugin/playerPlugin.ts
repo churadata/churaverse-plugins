@@ -72,6 +72,7 @@ import { DeathLogRepository } from './ui/deathLog/deathLogRepository'
 import { JoinLeaveLogRenderer } from './ui/joinLeaveLogRenderer/joinLeaveLogRenderer'
 import { PlayerUi } from './ui/setupPlayerUi'
 import { Sendable } from '@churaverse/network-plugin-client/types/sendable'
+import { PlayerInvincibleTimeEvent } from './event/playerInvincibleTimeEvent'
 import '@churaverse/network-plugin-client/event/networkConnectEvent'
 import '@churaverse/network-plugin-client/event/networkDisconnectEvent'
 
@@ -98,6 +99,9 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
   private playerPositionGridDebugScreen!: IPlayerPositionDebugScreen
   private playerRoleDebugScreen!: IPlayerRoleDebugScreen
   private playerUi!: PlayerUi
+
+  private readonly INVINCIBLE_BLINK_DURATION_MS = 100
+  private readonly INVINCIBLE_BLINK_CYCLE_MS = 200
 
   public listenEvent(): void {
     this.bus.subscribeEvent('phaserSceneInit', this.phaserSceneInit.bind(this))
@@ -130,6 +134,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     this.bus.subscribeEvent('livingDamage', this.onLivingDamage.bind(this))
     this.bus.subscribeEvent('playerDie', this.onDiePlayer.bind(this))
     this.bus.subscribeEvent('playerRespawn', this.onRespawnPlayer.bind(this))
+    this.bus.subscribeEvent('playerInvincibleTime', this.onInvincibleTimePlayer.bind(this))
     this.bus.subscribeEvent('dumpDebugData', this.dumpDebugData.bind(this))
     this.bus.subscribeEvent('networkConnect', this.onNetworkConnect.bind(this))
     this.bus.subscribeEvent('networkDisconnect', this.onNetworkDisconnect.bind(this))
@@ -418,6 +423,15 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     if (ev.id === this.playerPluginStore.ownPlayerId) {
       this.updateDebugScreenPlayerHp()
     }
+  }
+
+  private onInvincibleTimePlayer(ev: PlayerInvincibleTimeEvent): void {
+    const playerRenderer = this.playerPluginStore.playerRenderers.get(ev.id)
+    if (playerRenderer === undefined) {
+      throw new PlayerRendererNotFoundError(ev.id)
+    }
+    // ev.invincibleTimeミリ秒間、200msごとに点滅させる
+    playerRenderer.blinkTarget(this.INVINCIBLE_BLINK_DURATION_MS, ev.invincibleTime / this.INVINCIBLE_BLINK_CYCLE_MS)
   }
 
   private onChangePlayerName(ev: PlayerNameChangeEvent): void {
