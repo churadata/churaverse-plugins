@@ -46,7 +46,6 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
 
   public constructor(
     private readonly store: Store<IMainScene>,
-    private readonly gameDetailManager: IGameDescriptionDialogManager,
     private readonly gamePolicy: GamePolicy,
     private readonly props: GameSelectionListItemProps
   ) {
