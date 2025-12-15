@@ -67,7 +67,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     client ->> client: EntityDespawnEvent
-    Note over client, client: 画面の移動などによるプレイヤーの退室イベントを発火
+    Note over client, client: タイトルに戻る、ブラウザを閉じるなどによるプレイヤーの退室イベントを発火
 
     client ->>+ server: PlayerLeaveMessage
     Note over client, server: ゲームからの離脱をサーバに通知
@@ -80,6 +80,7 @@ sequenceDiagram
 ```
 
 ### ミニゲームから退室した場合
+
 `gamePlayerQuitEvent`は、プレイヤー側で結果表示ウィンドウを閉じる操作が行われたことを通知するためのイベントである。
 
 現在このイベントは、最終結果ウィンドウを閉じたプレイヤーをゲームから退室したと見なすために使用されている。
