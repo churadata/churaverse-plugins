@@ -31,7 +31,7 @@ export const GameSelectionListItem: JSXFunc<GameSelectionListItemProps> = (props
 export const GameSelectionList: JSXFunc = () => {
   return (
     <div id={GAME_SELECTION_LIST_ID} className={style.tableRowContainer}>
-      {/* ここにGameListItemが入る */}
+      {/* ここに GameSelectionListItem が入る */}
     </div>
   )
 }

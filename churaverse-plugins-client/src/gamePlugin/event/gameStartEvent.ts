@@ -4,14 +4,14 @@ import { GameIds } from '../interface/gameIds'
 /**
  * ゲーム開始時のイベント
  * @param playerId ゲームを開始したプレイヤーid
- * @param participantIds ゲーム参加者のプレイヤーid
+ * @param joinedPlayerIds ゲーム参加者のプレイヤーid
  *
  */
 export class GameStartEvent extends CVEvent<IMainScene> {
   public constructor(
     public readonly gameId: GameIds,
     public readonly playerId: string,
-    public readonly participantIds: string[]
+    public readonly joinedPlayerIds: string[]
   ) {
     super('gameStart', true)
   }

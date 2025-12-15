@@ -1,4 +1,6 @@
+import { GameState } from '../type/gameState'
 import { GameIds } from './gameIds'
+import { GamePolicy } from './gamePolicy'
 
 /**
  * ゲームのメタ情報
@@ -6,7 +8,9 @@ import { GameIds } from './gameIds'
 export interface IGameInfo {
   readonly gameId: GameIds
   readonly isActive: boolean
+  readonly isJoined: boolean
   readonly gameOwnerId: string | undefined
-  readonly participantIds: string[]
-  readonly isOwnPlayerMidwayParticipant: boolean
+  readonly joinedPlayerIds: string[]
+  readonly gameState: GameState
+  readonly gamePolicy: GamePolicy
 }

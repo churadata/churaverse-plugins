@@ -4,6 +4,8 @@ import { IGameInfoRepository } from '../interface/IGameInfoRepository'
 import { IGameSelectionListContainer } from '../interface/IGameSelectionListContainer'
 import { IGameDescriptionDialogManager } from '../interface/IGameDescriptionDialogManager'
 import { IGameAbortAlertConfirm } from '../interface/IGameAbortAlertConfirm'
+import { ICountdownTimer } from '../interface/ICountdownTimer'
+
 declare module 'churaverse-engine-client' {
   export interface StoreInMain {
     gamePlugin: GamePluginStore
@@ -17,6 +19,7 @@ export interface GamePluginStore {
   readonly gameSelectionListContainer: IGameSelectionListContainer
   readonly gameDescriptionDialogManager: IGameDescriptionDialogManager
   readonly gameAbortAlertConfirm: IGameAbortAlertConfirm
+  readonly countdownTimer: ICountdownTimer
 }
 
 export interface GameInfoStore {
