@@ -2,23 +2,20 @@ import { CVEvent, IMainScene } from 'churaverse-engine-client'
 import { GameIds } from '../interface/gameIds'
 
 /**
- * ゲーム開始時のイベント
- * @param playerId ゲームを開始したプレイヤーid
- * @param joinedPlayerIds ゲーム参加者のプレイヤーid
- *
+ * ゲーム途中参加イベント
  */
-export class GameStartEvent extends CVEvent<IMainScene> {
+export class GameMidwayJoinEvent extends CVEvent<IMainScene> {
   public constructor(
     public readonly gameId: GameIds,
-    public readonly playerId: string,
+    public readonly joinPlayerId: string,
     public readonly joinedPlayerIds: string[]
   ) {
-    super('gameStart', true)
+    super('gameMidwayJoin', true)
   }
 }
 
 declare module 'churaverse-engine-client' {
   export interface CVMainEventMap {
-    gameStart: GameStartEvent
+    gameMidwayJoin: GameMidwayJoinEvent
   }
 }

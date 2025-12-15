@@ -2,11 +2,12 @@ import { DomManager, IMainScene, Store } from 'churaverse-engine-client'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { GameIds } from '../../interface/gameIds'
 import { GameState } from '../../type/gameState'
-import { IGameDescriptionDialogManager } from '../../interface/IGameDescriptionDialogManager'
-import { RequestGameStartMessage } from '../../message/gameStartMessage'
 import { RequestGameAbortMessage } from '../../message/gameAbortMessage'
-import { IGameSelectionListItemRenderer } from '../../interface/IGameSelectionListItemRenderer'
+import { IGameSelectionListItemRenderer, StartButtonState } from '../../interface/IGameSelectionListItemRenderer'
 import { GameSelectionListItem } from './components/GameListComponent'
+import { RequestGameHostMessage } from '../../message/gameHostMessage'
+import { GamePolicy } from '../../interface/gamePolicy'
+import { RequestGameMidwayJoinMessage } from '../../message/gameMidwayJoinMessage'
 
 const DEFAULT_ICON_SIZE = '40px'
 
@@ -41,11 +42,11 @@ export interface GameSelectionListItemProps {
 export abstract class GameSelectionListItemRenderer implements IGameSelectionListItemRenderer {
   private readonly networkPlugin: NetworkPluginStore<IMainScene>
   protected readonly gameContainer: HTMLElement
-  private currentButtonState: GameState
+  private currentButtonState: StartButtonState
 
   public constructor(
     private readonly store: Store<IMainScene>,
-    private readonly gameDetailManager: IGameDescriptionDialogManager,
+    private readonly gamePolicy: GamePolicy,
     private readonly props: GameSelectionListItemProps
   ) {
     this.networkPlugin = this.store.of('networkPlugin')
@@ -81,36 +82,70 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
     this.gameContainer.style.order = value.toString()
   }
 
-  public onGameStart(gameId: GameIds): void {
-    if (this.props.gameId === gameId) {
-      this.setGameAbortText()
-      this.setGameStatusText()
-    } else {
+  public onPriorGameData(gameId: GameIds, gameState: GameState): void {
+    if (this.props.gameId !== gameId) {
       this.gameStartButtonGrayOut()
+      return
+    }
+
+    this.setGameStatusText()
+    if (gameState === 'host') {
+      this.setGameHostText()
+    } else if (gameState === 'start') {
+      this.setPlayingGameText()
+    }
+  }
+
+  public onGameHost(gameId: GameIds): void {
+    if (this.props.gameId !== gameId) {
+      this.gameStartButtonGrayOut()
+      return
+    }
+
+    this.setGameHostText()
+    this.setGameStatusText()
+  }
+
+  public onGameStart(gameId: GameIds, isJoined: boolean): void {
+    if (this.props.gameId !== gameId) {
+      this.gameStartButtonGrayOut()
+      return
+    }
+
+    this.setGameStatusText()
+    if (isJoined) {
+      this.setGameAbortText()
+    } else {
+      this.setPlayingGameText()
     }
   }
 
   public resetStartButton(): void {
-    if (this.currentButtonState === 'abort') {
+    if (this.currentButtonState !== 'inactive') {
       const gameNameElement = DomManager.getElementById(GAME_NAME_DIV_ID(this.props.gameId))
       gameNameElement.textContent = `${this.props.gameName}`
     }
     const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
     startButton.textContent = '開始'
     startButton.disabled = false
-    startButton.style.color = 'white'
-    startButton.style.backgroundColor = 'var(--c-primary-deep)'
-    startButton.style.border = 'none'
     this.currentButtonState = 'start'
+    this.styleButtonStart(startButton)
+  }
+
+  private setGameHostText(): void {
+    const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
+    startButton.textContent = `開始待ち`
+    startButton.disabled = true
+    this.currentButtonState = 'host'
+    this.styleButtonGrayOut(startButton)
   }
 
   private setGameAbortText(): void {
     const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
+    startButton.disabled = false
     startButton.textContent = '中止'
-    startButton.style.color = 'red'
-    startButton.style.backgroundColor = 'white'
-    startButton.style.border = '1px solid red'
     this.currentButtonState = 'abort'
+    this.styleButtonAbort(startButton)
   }
 
   private setGameStatusText(): void {
@@ -121,18 +156,34 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
   private gameStartButtonGrayOut(): void {
     const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
     startButton.disabled = true
-    startButton.style.backgroundColor = 'lightgray'
-    startButton.style.color = 'var(--color-button-background)'
-    this.currentButtonState = 'inActive'
+    this.currentButtonState = 'inactive'
+    this.styleButtonGrayOut(startButton)
+  }
+
+  private setPlayingGameText(): void {
+    const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
+    if (this.gamePolicy.allowMidwayJoin) {
+      this.currentButtonState = 'midwayJoin'
+      startButton.textContent = `途中参加`
+      startButton.disabled = false
+      this.styleButtonStart(startButton)
+    } else {
+      this.currentButtonState = 'playing'
+      startButton.textContent = `プレイ中`
+      startButton.disabled = true
+      this.styleButtonGrayOut(startButton)
+    }
   }
 
   private setupGameStartButton(): void {
     const startButton = DomManager.getElementById<HTMLButtonElement>(GAME_START_BUTTON_ID(this.props.gameId))
     startButton.addEventListener('click', () => {
       if (this.currentButtonState === 'start') {
-        this.sendGameStartMessage()
+        this.sendGameHostMessage()
       } else if (this.currentButtonState === 'abort') {
         this.sendGameAbortMessage()
+      } else if (this.currentButtonState === 'midwayJoin') {
+        this.sendGameMidwayJoinMessage()
       }
     })
   }
@@ -140,16 +191,16 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
   private setupGameDetailButton(): void {
     const detailButton = DomManager.getElementById<HTMLButtonElement>(GAME_DETAIL_BUTTON_ID(this.props.gameId))
     detailButton.addEventListener('click', () => {
-      this.gameDetailManager.showDialog(this.props.gameId)
+      this.store.of('gamePlugin').gameDescriptionDialogManager.showDialog(this.props.gameId, 'viewOnly')
     })
   }
 
-  private sendGameStartMessage(): void {
-    const gameStartMessage = new RequestGameStartMessage({
+  private sendGameHostMessage(): void {
+    const gameHostMessage = new RequestGameHostMessage({
       gameId: this.props.gameId,
-      playerId: this.store.of('playerPlugin').ownPlayerId,
+      ownerId: this.store.of('playerPlugin').ownPlayerId,
     })
-    this.networkPlugin.messageSender.send(gameStartMessage)
+    this.networkPlugin.messageSender.send(gameHostMessage)
   }
 
   private sendGameAbortMessage(): void {
@@ -158,5 +209,32 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
       playerId: this.store.of('playerPlugin').ownPlayerId,
     })
     this.networkPlugin.messageSender.send(gameAbortMessage)
+  }
+
+  private sendGameMidwayJoinMessage(): void {
+    const gameMidwayJoinMessage = new RequestGameMidwayJoinMessage({
+      gameId: this.props.gameId,
+    })
+    this.networkPlugin.messageSender.send(gameMidwayJoinMessage)
+  }
+
+  private styleButtonGrayOut(button: HTMLButtonElement): void {
+    button.disabled = true
+    button.style.backgroundColor = 'lightgray'
+    button.style.color = 'black'
+  }
+
+  private styleButtonAbort(button: HTMLButtonElement): void {
+    button.disabled = false
+    button.style.backgroundColor = 'white'
+    button.style.color = 'red'
+    button.style.border = '1px solid red'
+  }
+
+  private styleButtonStart(button: HTMLButtonElement): void {
+    button.disabled = false
+    button.style.backgroundColor = 'var(--c-primary-deep)'
+    button.style.color = 'white'
+    button.style.border = 'none'
   }
 }
