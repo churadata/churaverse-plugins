@@ -1,7 +1,7 @@
 import { Store, IMainScene, DomManager, domLayerSetting, IEventBus } from 'churaverse-engine-client'
 import { ResultRankingListItem } from './components/ResultRankingListItem'
 import { ResultRankingListPanel } from './components/ResultRankingListPanel'
-import { ResultExitButton } from './components/ResultExitButton'
+import { ResultCloseButton } from './components/ResultCloseButton'
 import { ISynchroBreakResultScreen } from '../../interface/ISynchroBreakResultScreen'
 import { GamePlayerQuitEvent } from '@churaverse/game-plugin-client/event/gamePlayerQuitEvent'
 
@@ -67,14 +67,14 @@ export class ResultScreen implements ISynchroBreakResultScreen {
       previousCoins = player.coins
     })
 
-    this.createExitButton()
+    this.createCloseButton()
   }
 
   /**
    * 結果画面を閉じるボタンを作成する
    */
-  private createExitButton(): void {
-    const exitButton = DomManager.jsxToDom(ResultExitButton())
+  private createCloseButton(): void {
+    const exitButton = DomManager.jsxToDom(ResultCloseButton())
     this.element.appendChild(exitButton)
     exitButton.addEventListener('click', () => {
       const playerId = this.store.of('playerPlugin').ownPlayerId
