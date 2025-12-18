@@ -35,9 +35,9 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   private _isJoined: boolean = false
   private _gameState: GameState = 'inactive'
   protected gamePluginStore!: GamePluginStore
-  private networkPluginStore!: NetworkPluginStore<IMainScene>
   protected playerPluginStore!: PlayerPluginStore
-  protected coreUiPluginStore!: CoreUiPluginStore
+  private networkPluginStore!: NetworkPluginStore<IMainScene>
+  private coreUiPluginStore!: CoreUiPluginStore
 
   public get isActive(): boolean {
     return this._isActive
@@ -85,6 +85,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
 
   private init(): void {
     this.gamePluginStore = this.store.of('gamePlugin')
+    this.playerPluginStore = this.store.of('playerPlugin')
     this.networkPluginStore = this.store.of('networkPlugin')
     this.coreUiPluginStore = this.store.of('coreUiPlugin')
   }
@@ -107,7 +108,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._gameOwnerId = ev.ownerId
     this.gameInfoStore.games.set(this.gameId, this)
     this.gamePluginStore.countdownTimer.start(ev.timeoutSec)
-    if (ev.ownerId === this.store.of('playerPlugin').ownPlayerId) {
+    if (ev.ownerId === this.playerPluginStore.ownPlayerId) {
       this.gamePluginStore.gameDescriptionDialogManager.showDialog(this.gameId, 'viewOnly')
       this.bus.post(new SubmitGameJoinEvent(this.gameId, true))
     } else {
@@ -143,7 +144,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.gamePluginStore.gameLogRenderer.gameStartLog(this.gameName, this.gameOwnerId ?? '')
     this.gameInfoStore.games.set(this.gameId, this)
     this.gamePluginStore.gameAbortAlertConfirm.setGameAbortMessage(this.gameName)
-    if (this._gameOwnerId === this.store.of('playerPlugin').ownPlayerId) {
+    if (this._gameOwnerId === this.playerPluginStore.ownPlayerId) {
       this.coreUiPluginStore.exitButton.setGameOwnerExitMessage(
         'あなたはゲームオーナーです。あなたが退出すると' + this.gameName + 'が終了します'
       )
@@ -206,10 +207,10 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   protected abstract handlePlayerQuitGame(playerId: string): void
 
   private gameMidwayJoin(ev: GameMidwayJoinEvent): void {
-    if (!this.isActive || !ev.joinedPlayerIds.includes(this.store.of('playerPlugin').ownPlayerId)) return
+    if (!this.isActive || !ev.joinedPlayerIds.includes(this.playerPluginStore.ownPlayerId)) return
     this.gamePluginStore.gameLogRenderer.gameMidwayJoinLog(this.gameName, ev.joinPlayerId)
     this._joinedPlayerIds = ev.joinedPlayerIds
-    if (ev.joinPlayerId === this.store.of('playerPlugin').ownPlayerId) {
+    if (ev.joinPlayerId === this.playerPluginStore.ownPlayerId) {
       this.gameEntryRenderer.onGameStart(this.gameId, true)
     }
   }
