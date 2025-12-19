@@ -291,6 +291,31 @@ export class AudioPipelineService implements IAudioService {
   }
 
   /**
+   * 送受信チェーンを全て解放し、AudioContext も必要に応じて閉じる。
+   * ルーム離脱/プラグイン停止時に呼び出す想定。
+   */
+  public async dispose(): Promise<void> {
+    // 受信チェーンをまとめて破棄
+    for (const playerId of Array.from(this.remoteChains.keys())) {
+      this.removeRemoteTrack(playerId)
+    }
+
+    // 送信チェーンを停止
+    await this.stopLocalMic()
+
+    // AudioContext を閉じる（再利用する場合は再生成される前提）
+    if (this.context !== undefined) {
+      try {
+        await this.context.close()
+        this.debug('AudioContext closed')
+      } catch {
+        /* ignore */
+      }
+      this.context = undefined
+    }
+  }
+
+  /**
    * 遠隔プレイヤーのトラックを Web Audio グラフに接続する。
    */
   public addRemoteTrack(playerId: string, track: RemoteAudioTrack): void {

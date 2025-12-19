@@ -119,6 +119,15 @@ export class VoiceChatPlugin extends BasePlugin<IMainScene> {
     void this.audioService?.unlock()
   }
 
+  // プラグイン停止やルーム離脱時に明示的に呼び出す想定のクリーンアップ
+  public async disposeAudio(): Promise<void> {
+    if (this.volumeUpdateTimer !== undefined) {
+      clearInterval(this.volumeUpdateTimer)
+      this.volumeUpdateTimer = undefined
+    }
+    await this.audioService?.dispose()
+  }
+
   private setupDebugScreen(): void {
     const debugDetailScreenContainer = this.debugScreenPluginStore.debugDetailScreenContainer
     debugDetailScreenContainer.addSection(new DebugDetailScreenSection('voiceChatInfo', 'VoiceChat'))

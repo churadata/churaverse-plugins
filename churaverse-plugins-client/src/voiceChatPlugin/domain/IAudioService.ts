@@ -35,6 +35,11 @@ export interface IAudioService {
    * ローカルマイクの送信チェーンを停止し、LiveKit から unpublish する。
    */
   stopLocalMic: () => Promise<boolean>
+
+  /**
+   * 送受信チェーン・AudioContext をまとめて解放する。ルーム離脱/プラグイン停止時に呼び出す。
+   */
+  dispose: () => Promise<void>
 }
 
 /**
