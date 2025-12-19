@@ -81,7 +81,8 @@ export class VoiceChatPlugin extends BasePlugin<IMainScene> {
       this.webRtcPluginStore.webRtc.room,
       this.bus,
       this.store,
-      this.playerPluginStore.ownPlayerId
+      this.playerPluginStore.ownPlayerId,
+      this.audioService
     )
     this.voiceChatUi = new VoiceChatUi(this.store, this.bus, this.voiceChatSender)
     this.voiceChatVolumeController = new VoiceChatVolumeController(this.audioService)

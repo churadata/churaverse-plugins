@@ -9,9 +9,9 @@
 - デバイス切替やリソース解放の抜け漏れを防ぎ、今後の機能追加コストを下げる。
 
 ## 変更概要
-- **契約層**：`IAudioService` を新設し、`unlock` / `addRemoteTrack` / `removeRemoteTrack` / `setRemoteVolume` を統一インターフェース化。
-- **実装層**：`AudioPipelineService` を追加。RemoteAudioTrack を隠し `<audio>` に attach し、`MediaElementSource -> Gain -> destination` の Web Audio グラフで再生・音量制御。ActiveDeviceChanged に応じて `setSinkId` を試行。
-- **接線**：Receiver は RemoteAudioTrack を直接 AudioService に渡し、VolumeController は AudioService 経由で音量を指示。Plugin は定期距離減衰のタイマーを管理し、起動時に `unlock()` を試行。
+- **契約層**：`IAudioService` を新設し、`unlock` / `addRemoteTrack` / `removeRemoteTrack` / `setRemoteVolume` に加えローカル送信 `startLocalMic/stopLocalMic` も含めて統一。
+- **実装層**：`AudioPipelineService` を追加。RemoteAudioTrack を隠し `<audio>` に attach し、`MediaElementSource -> Gain -> destination` の Web Audio グラフで再生・音量制御。ActiveDeviceChanged に応じて `setSinkId` を試行。ローカル送信も Web Audio 経由（動かない場合は raw publish にフォールバックして無音を回避）。
+- **接線**：Receiver は RemoteAudioTrack を直接 AudioService に渡し（source Unknown も受ける）、VolumeController は AudioService 経由で音量を指示。Sender は AudioService の送信チェーンを優先し、Plugin は定期距離減衰のタイマー管理と起動時 `unlock()` を実施。
 
 ## 詳細な実施内容
 1. **IAudioService 追加**  
@@ -20,13 +20,15 @@
    - `service/audioPipelineService.ts` で Web Audio グラフを構築。  
      - AudioContext を遅延生成し、Room の ActiveDeviceChanged（audiooutput）にフックして `setSinkId` を試行。  
      - 互換性重視で `track.attach(隠し <audio>)` を入口にし、`MediaElementSource -> Gain -> destination` で後段処理を集約。  
+     - ローカル送信：`getUserMedia -> MediaStreamSource -> Gain -> MediaStreamDestination -> publishTrack`。AudioContext が走らない場合は raw track publish へフォールバックし、無音を防止。既存マイクは unpublish 後に差し替え。  
      - `unlock()` は `AudioContext.resume()` と `room.startAudio()`、隠し `<audio>.play()` を併用し、autoplay 制限下の復帰率を向上。  
-     - `remoteChains` でノード・DOM を一元管理し、切断時に detach/remove を確実に行う。  
-     - `localStorage.__CV_DEBUG_AUDIO__ = "true"` でデバッグログを有効化。
+     - `remoteChains`/`localChain` でノード・DOM を一元管理し、切断時に detach/remove/stop を確実に行う。  
+     - `localStorage.__CV_DEBUG_AUDIO__ = "true"` でデバッグログを有効化。送信チェーン作成時に `mode: web-audio/raw` を出力。
 3. **上位ロジックの付け替え**  
-   - `voiceChatReceiver.ts`：マイクの RemoteAudioTrack を AudioService に登録し、detach は AudioService 側に任せる。  
+   - `voiceChatReceiver.ts`：音声 track.kind=audio で受信（source Unknown も許可）し、RemoteAudioTrack を AudioService に登録。  
    - `voiceChatVolumeController.ts`：メガホン状態のみ保持し、距離減衰後に `audioService.setRemoteVolume()` を発行。HTMLAudioElement 依存を排除。  
-   - `voiceChatPlugin.ts`：AudioPipelineService を生成して Receiver/Controller に渡す。音量更新タイマーを再利用可能にし、開始時に `unlock()` を試みて自動再生制限を緩和。
+   - `voiceChatSender.ts`：マイクの on/off は `audioService.startLocalMic/stopLocalMic` を優先、未提供時は従来の `setMicrophoneEnabled` にフォールバック。  
+   - `voiceChatPlugin.ts`：AudioPipelineService を生成して Receiver/Sender/Controller に渡す。音量更新タイマーを再利用可能にし、開始時に `unlock()` を試みて自動再生制限を緩和。
 4. **イベント**  
    - `JoinVoiceChatEvent` のペイロードを playerId のみに簡素化（プロジェクト内に他利用なし）。イベント自体は残し、将来の拡張に備える。
 

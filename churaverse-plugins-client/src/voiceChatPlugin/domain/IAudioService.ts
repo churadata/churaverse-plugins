@@ -14,7 +14,7 @@ export interface IAudioService {
   /**
    * 受信した遠隔プレイヤーの音声トラックを管線に接続する。
    */
-  addRemoteTrack: (playerId: string, track: RemoteAudioTrack) => void
+ addRemoteTrack: (playerId: string, track: RemoteAudioTrack) => void
 
   /**
    * 遠隔プレイヤーの音声トラックを管線から外し、関連リソースをクリーンアップする。
@@ -25,6 +25,16 @@ export interface IAudioService {
    * プレイヤーごとの音量（0-1）を設定する。Web Audio の GainNode を経由。
    */
   setRemoteVolume: (playerId: string, volume: number) => void
+
+  /**
+   * ローカルマイクの送信チェーンを構築して LiveKit に publish する。
+   */
+  startLocalMic: () => Promise<boolean>
+
+  /**
+   * ローカルマイクの送信チェーンを停止し、LiveKit から unpublish する。
+   */
+  stopLocalMic: () => Promise<boolean>
 }
 
 /**

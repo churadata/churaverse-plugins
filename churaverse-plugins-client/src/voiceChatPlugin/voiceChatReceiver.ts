@@ -32,31 +32,31 @@ export class VoiceChatReceiver {
 
   /**
    * ボイスチャット開始時に実行される関数
-   */
+   * LiveKit が source を Unknown と扱っても track.kind=audio なら受ける。
+  */
   private onJoin(track: RemoteTrack, publication: RemoteTrackPublication, participant: RemoteParticipant): void {
-    if (track.source !== Track.Source.Microphone) return
+    // LiveKit が source を Unknown として扱うケースがあるため、音声トラックなら受ける
+    if (track.kind !== Track.Kind.Audio) return
 
-    const remoteTrackPublication = participant.getTrack(Track.Source.Microphone)
-    if (remoteTrackPublication === undefined) return
-
-    const audioTrack = remoteTrackPublication.audioTrack
-    if (audioTrack == null || !(audioTrack instanceof RemoteAudioTrack)) return
+    // publication から audioTrack を優先的に取得し、無ければ track を RemoteAudioTrack として扱う
+    const audioTrack = (publication.audioTrack as RemoteAudioTrack | null) ?? (track as RemoteAudioTrack | null)
+    if (audioTrack == null) return
 
     // LiveKit の RemoteAudioTrack を AudioService に委譲して Web Audio グラフへ接続
     this.audioService.addRemoteTrack(participant.identity, audioTrack)
     this.eventBus.post(new JoinVoiceChatEvent(participant.identity))
 
-    remoteTrackPublication.addListener('subscriptionStatusChanged', () => {
+    publication.addListener('subscriptionStatusChanged', () => {
       if (!track.isMuted) {
         this.eventBus.post(new UnmuteEvent(participant.identity))
       }
     })
 
-    remoteTrackPublication.addListener('unmuted', () => {
+    publication.addListener('unmuted', () => {
       this.eventBus.post(new UnmuteEvent(participant.identity))
     })
 
-    remoteTrackPublication.addListener('muted', () => {
+    publication.addListener('muted', () => {
       this.eventBus.post(new MuteEvent(participant.identity))
     })
 
@@ -70,7 +70,7 @@ export class VoiceChatReceiver {
    * ボイスチャット終了時に実行される関数
    */
   private onLeave(track: RemoteTrack, publication: RemoteTrackPublication, participant: RemoteParticipant): void {
-    if (track.source !== Track.Source.Microphone) return
+    if (track.kind !== Track.Kind.Audio) return
 
     this.audioService.removeRemoteTrack(participant.identity)
     this.eventBus.post(new LeaveVoiceChatEvent(participant.identity))

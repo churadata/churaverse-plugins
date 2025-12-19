@@ -1,4 +1,4 @@
-import { RemoteAudioTrack, Room, RoomEvent } from 'livekit-client'
+import { RemoteAudioTrack, Room, RoomEvent, Track } from 'livekit-client'
 import { IAudioService } from '../domain/IAudioService'
 
 type RemoteChain = {
@@ -7,6 +7,15 @@ type RemoteChain = {
   inputTrack: MediaStreamTrack
   source: MediaElementAudioSourceNode | MediaStreamAudioSourceNode
   gain: GainNode
+}
+
+type LocalChain = {
+  stream: MediaStream
+  inputTrack: MediaStreamTrack
+  processedTrack: MediaStreamTrack
+  source?: MediaStreamAudioSourceNode
+  gain?: GainNode
+  destination?: MediaStreamAudioDestinationNode
 }
 
 /**
@@ -18,6 +27,7 @@ type RemoteChain = {
 export class AudioPipelineService implements IAudioService {
   private context?: AudioContext
   private readonly remoteChains = new Map<string, RemoteChain>()
+  private localChain?: LocalChain
 
   public constructor(private readonly room?: Room) {
     // 出力デバイスの切り替えを捕捉して AudioContext に同期させる
@@ -135,6 +145,149 @@ export class AudioPipelineService implements IAudioService {
         this.debug('audioEl.play failed', { error: String(error) })
       }
     }
+  }
+
+  /**
+   * ローカルマイクの送信チェーンを構築し、処理後のトラックを LiveKit に publish する。
+   * - getUserMedia -> Web Audio(Gain) -> MediaStreamDestination で処理済トラックを作る
+   * - AudioContext が走らない場合は「生トラック publish」にフォールバックして無音を防ぐ
+   * - 既存マイクがあれば先に unpublish して差し替える
+   */
+  public async startLocalMic(): Promise<boolean> {
+    if (this.room === undefined) {
+      this.debug('startLocalMic aborted: room not provided')
+      return false
+    }
+    if (this.localChain !== undefined) return true
+    if (typeof navigator === 'undefined' || typeof navigator.mediaDevices?.getUserMedia !== 'function') {
+      this.debug('startLocalMic aborted: no navigator/mediaDevices')
+      return false
+    }
+
+    const ctx = this.getOrCreateContext()
+    await this.ensureRunning(ctx)
+
+    let stream: MediaStream | undefined
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    } catch (error) {
+      this.debug('getUserMedia failed', { error: String(error) })
+      return false
+    }
+
+    const inputTrack = stream.getAudioTracks()[0]
+    if (inputTrack === undefined) {
+      this.debug('startLocalMic aborted: no audio track')
+      stream.getTracks().forEach((t) => t.stop())
+      return false
+    }
+
+    try {
+      // AudioContext が動かない場合は生トラックをそのまま publish して音声途絶を防ぐ
+      const useRawTrack = ctx.state !== 'running'
+
+      // Web Audio が動く場合のみ処理ノードを差し込む。動かない場合は生トラックで publish。
+      const source = useRawTrack ? undefined : ctx.createMediaStreamSource(stream)
+      const gain = useRawTrack ? undefined : ctx.createGain()
+      const destination = useRawTrack ? undefined : ctx.createMediaStreamDestination()
+      if (source !== undefined && gain !== undefined && destination !== undefined) {
+        source.connect(gain).connect(destination)
+      }
+
+      const processedTrack =
+        destination?.stream.getAudioTracks()[0] !== undefined
+          ? destination.stream.getAudioTracks()[0]
+          : inputTrack
+      if (processedTrack === undefined) {
+        this.debug('startLocalMic aborted: destination track missing')
+        source?.disconnect()
+        gain?.disconnect()
+        destination?.disconnect()
+        stream.getTracks().forEach((t) => t.stop())
+        return false
+      }
+
+      const participant = this.room.localParticipant
+
+      // 既存のマイクトラックを一旦外してから publish する
+      const currentMic = participant.getTrack(Track.Source.Microphone)
+      if (currentMic?.track !== undefined) {
+        try {
+          await participant.unpublishTrack(currentMic.track)
+        } catch (error) {
+          this.debug('unpublish existing mic failed', { error: String(error) })
+        }
+      }
+
+      await participant.publishTrack(processedTrack, { source: Track.Source.Microphone, name: 'microphone' })
+
+      this.localChain = { stream, inputTrack, processedTrack, source, gain, destination }
+      this.debug('local chain created', {
+        trackId: processedTrack.id,
+        ctxState: ctx.state,
+        mode: useRawTrack ? 'raw' : 'web-audio',
+      })
+      return true
+    } catch (error) {
+      this.debug('startLocalMic failed', { error: String(error) })
+      stream.getTracks().forEach((t) => t.stop())
+      return false
+    }
+  }
+
+  /**
+   * ローカルマイクの送信チェーンを停止し、LiveKit から unpublish する。
+   */
+  public async stopLocalMic(): Promise<boolean> {
+    if (this.room === undefined) return false
+
+    const participant = this.room.localParticipant
+    const currentMic = participant.getTrack(Track.Source.Microphone)
+    if (currentMic?.track !== undefined) {
+      try {
+        await participant.unpublishTrack(currentMic.track)
+      } catch (error) {
+        this.debug('unpublish mic failed', { error: String(error) })
+      }
+    }
+
+    const chain = this.localChain
+    if (chain !== undefined) {
+      try {
+        chain.source?.disconnect()
+      } catch {
+        /* ignore */
+      }
+      try {
+        chain.gain?.disconnect()
+      } catch {
+        /* ignore */
+      }
+      try {
+        chain.destination?.disconnect()
+      } catch {
+        /* ignore */
+      }
+      try {
+        chain.processedTrack.stop()
+      } catch {
+        /* ignore */
+      }
+      try {
+        chain.inputTrack.stop()
+      } catch {
+        /* ignore */
+      }
+      try {
+        chain.stream.getTracks().forEach((t) => t.stop())
+      } catch {
+        /* ignore */
+      }
+    }
+
+    this.localChain = undefined
+    this.debug('local chain removed')
+    return true
   }
 
   /**
