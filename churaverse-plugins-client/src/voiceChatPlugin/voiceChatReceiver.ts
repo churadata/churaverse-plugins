@@ -1,10 +1,19 @@
-import { RemoteParticipant, RemoteTrack, RemoteTrackPublication, Room, RoomEvent, Track } from 'livekit-client'
+import {
+  RemoteAudioTrack,
+  RemoteParticipant,
+  RemoteTrack,
+  RemoteTrackPublication,
+  Room,
+  RoomEvent,
+  Track,
+} from 'livekit-client'
 import { IEventBus, IMainScene } from 'churaverse-engine-client'
 import { JoinVoiceChatEvent } from './event/joinVoiceChatEvent'
 import { UnmuteEvent } from './event/unmuteEvent'
 import { MuteEvent } from './event/muteEvent'
 import { LeaveVoiceChatEvent } from './event/leaveVoiceChatEvent'
 import { PlayerVoiceChatIcons } from './ui/playerVoiceChatIcons'
+import { IAudioService } from './domain/IAudioService'
 
 /**
  * 他プレイヤーのボイスチャットの開始・終了を受け取るクラス
@@ -12,6 +21,7 @@ import { PlayerVoiceChatIcons } from './ui/playerVoiceChatIcons'
 export class VoiceChatReceiver {
   public constructor(
     private readonly room: Room,
+    private readonly audioService: IAudioService,
     private readonly eventBus: IEventBus<IMainScene>,
     private readonly playerVoiceChatUis: Map<string, PlayerVoiceChatIcons>
   ) {
@@ -27,13 +37,14 @@ export class VoiceChatReceiver {
     if (track.source !== Track.Source.Microphone) return
 
     const remoteTrackPublication = participant.getTrack(Track.Source.Microphone)
-    if (remoteTrackPublication?.audioTrack == null || remoteTrackPublication.track == null) {
-      return
-    }
+    if (remoteTrackPublication === undefined) return
 
-    const voice = remoteTrackPublication.track.attach()
+    const audioTrack = remoteTrackPublication.audioTrack
+    if (audioTrack == null || !(audioTrack instanceof RemoteAudioTrack)) return
 
-    this.eventBus.post(new JoinVoiceChatEvent(participant.identity, voice))
+    // LiveKit の RemoteAudioTrack を AudioService に委譲して Web Audio グラフへ接続
+    this.audioService.addRemoteTrack(participant.identity, audioTrack)
+    this.eventBus.post(new JoinVoiceChatEvent(participant.identity))
 
     remoteTrackPublication.addListener('subscriptionStatusChanged', () => {
       if (!track.isMuted) {
@@ -61,7 +72,7 @@ export class VoiceChatReceiver {
   private onLeave(track: RemoteTrack, publication: RemoteTrackPublication, participant: RemoteParticipant): void {
     if (track.source !== Track.Source.Microphone) return
 
-    participant.getTrack(Track.Source.Microphone)?.track?.detach()
+    this.audioService.removeRemoteTrack(participant.identity)
     this.eventBus.post(new LeaveVoiceChatEvent(participant.identity))
   }
 }

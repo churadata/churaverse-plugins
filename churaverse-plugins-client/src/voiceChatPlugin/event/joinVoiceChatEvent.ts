@@ -8,11 +8,7 @@ export class JoinVoiceChatEvent extends CVEvent<IMainScene> {
     /**
      * ボイスチャットを開始したプレイヤーのid
      */
-    public readonly playerId: string,
-    /**
-     * ボイスチャットの音声データ
-     */
-    public readonly voice: HTMLMediaElement
+    public readonly playerId: string
   ) {
     super('joinVoiceChat', true)
   }
