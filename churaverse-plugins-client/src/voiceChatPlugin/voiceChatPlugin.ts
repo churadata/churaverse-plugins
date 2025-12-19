@@ -6,8 +6,6 @@ import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPla
 import { WebRtcPluginStore } from '@churaverse/web-rtc-plugin-client/store/defWebRtcPluginStore'
 import { SocketController } from './controller/socketController'
 import { IVoiceChatSender } from './domain/IVoiceChatSender'
-import { JoinVoiceChatEvent } from './event/joinVoiceChatEvent'
-import { LeaveVoiceChatEvent } from './event/leaveVoiceChatEvent'
 import { MuteEvent } from './event/muteEvent'
 import { ToggleMegaphoneEvent } from './event/toggleMegaphoneEvent'
 import { UnmuteEvent } from './event/unmuteEvent'
@@ -29,6 +27,8 @@ import {
   IMicrophoneMyStatusDebugDetailScreen,
 } from './debugScreen/IDebugScreen/IVoiceChatInfoDebugDetailScreen'
 import { DumpDebugDataEvent } from '@churaverse/debug-screen-plugin-client/event/dumpDebugDataEvent'
+import { AudioPipelineService } from './service/audioPipelineService'
+import { IAudioService } from './domain/IAudioService'
 
 export class VoiceChatPlugin extends BasePlugin<IMainScene> {
   private voiceChatPluginStore!: VoiceChatPluginStore
@@ -39,9 +39,11 @@ export class VoiceChatPlugin extends BasePlugin<IMainScene> {
   private voiceChatSender?: IVoiceChatSender
   private voiceChatUi?: VoiceChatUi
   private voiceChatVolumeController?: VoiceChatVolumeController
+  private audioService?: IAudioService
   private scene?: Scene
   private microphoneMyStatusDebugDetailScreen!: IMicrophoneMyStatusDebugDetailScreen
   private megaphoneMyStatusDebugDetailScreen!: IMegaphoneMyStatusDebugDetailScreen
+  private volumeUpdateTimer?: ReturnType<typeof setInterval>
 
   public listenEvent(): void {
     this.bus.subscribeEvent('phaserSceneInit', this.phaserSceneInit.bind(this))
@@ -54,8 +56,6 @@ export class VoiceChatPlugin extends BasePlugin<IMainScene> {
     this.bus.subscribeEvent('registerMessageListener', socketController.registerMessageListener.bind(socketController))
 
     this.bus.subscribeEvent('entitySpawn', this.onJoinPlayer.bind(this))
-    this.bus.subscribeEvent('joinVoiceChat', this.joinVoiceChat.bind(this))
-    this.bus.subscribeEvent('leaveVoiceChat', this.leaveVoiceChat.bind(this))
     this.bus.subscribeEvent('mute', this.onMute.bind(this))
     this.bus.subscribeEvent('unmute', this.onUnmute.bind(this))
     this.bus.subscribeEvent('toggleMegaphone', this.toggleMegaphone.bind(this))
@@ -69,9 +69,11 @@ export class VoiceChatPlugin extends BasePlugin<IMainScene> {
   private init(): void {
     initVoiceChatPluginStore(this.store)
     this.getStores()
+    this.audioService = new AudioPipelineService(this.webRtcPluginStore.webRtc.room)
 
     void new VoiceChatReceiver(
       this.webRtcPluginStore.webRtc.room,
+      this.audioService,
       this.bus,
       this.voiceChatPluginStore.playerVoiceChatUis
     )
@@ -79,10 +81,11 @@ export class VoiceChatPlugin extends BasePlugin<IMainScene> {
       this.webRtcPluginStore.webRtc.room,
       this.bus,
       this.store,
-      this.playerPluginStore.ownPlayerId
+      this.playerPluginStore.ownPlayerId,
+      this.audioService
     )
     this.voiceChatUi = new VoiceChatUi(this.store, this.bus, this.voiceChatSender)
-    this.voiceChatVolumeController = new VoiceChatVolumeController()
+    this.voiceChatVolumeController = new VoiceChatVolumeController(this.audioService)
     this.setupDebugScreen()
   }
 
@@ -104,10 +107,25 @@ export class VoiceChatPlugin extends BasePlugin<IMainScene> {
     if (ownPlayer === undefined) return
 
     // 300ms毎に更新
-    setInterval(() => {
+    if (this.volumeUpdateTimer !== undefined) {
+      clearInterval(this.volumeUpdateTimer)
+    }
+
+    this.volumeUpdateTimer = setInterval(() => {
       this.voiceChatVolumeController?.updateAccordingToDistance(ownPlayerId, players)
     }, 300)
-    // this.setupDebugScreen()
+
+    // LiveKit/ブラウザの自動再生制限で再生が止まるのを防ぐため、可能な限り早く復帰を試みる
+    void this.audioService?.unlock()
+  }
+
+  // プラグイン停止やルーム離脱時に明示的に呼び出す想定のクリーンアップ
+  public async disposeAudio(): Promise<void> {
+    if (this.volumeUpdateTimer !== undefined) {
+      clearInterval(this.volumeUpdateTimer)
+      this.volumeUpdateTimer = undefined
+    }
+    await this.audioService?.dispose()
   }
 
   private setupDebugScreen(): void {
@@ -130,14 +148,6 @@ export class VoiceChatPlugin extends BasePlugin<IMainScene> {
     if (this.scene === undefined) return
     const playerVoiceChatUi = new PlayerVoiceChatIcons(this.scene, this.store, ev.entity.id)
     this.voiceChatPluginStore.playerVoiceChatUis.set(playerId, playerVoiceChatUi)
-  }
-
-  private joinVoiceChat(ev: JoinVoiceChatEvent): void {
-    this.voiceChatVolumeController?.addVoice(ev.playerId, ev.voice)
-  }
-
-  private leaveVoiceChat(ev: LeaveVoiceChatEvent): void {
-    this.voiceChatVolumeController?.deleteVoice(ev.playerId)
   }
 
   private onMute(ev: MuteEvent): void {
