@@ -1,55 +1,54 @@
-# ボイスチャット音声パイプライン改修レポート（日本語）
 
-## 背景
-- ノイズ抑制導入を急いだ結果、LiveKit の RemoteTrack をそのまま `<audio>` に attach し、距離減衰は `<audio>.volume` を直接操作していた。処理ノードを挿し込む余地がなく、EQ/録音/空間化/分析などを追加するには大規模な書き換えが必要だった。
 
-## 目的
-- 上位層は「誰が来た/去った」「音量」「マイクやメガホンの状態」だけを表明し、`<audio>` や LiveKit の細部には触れない。
-- 音声処理・ライフサイクル（遠端再生チェーン、将来の送信チェーン）を一箇所で管理し、効果挿入やデバッグが容易な音声グラフを提供する。
-- デバイス切替やリソース解放の抜け漏れを防ぎ、今後の機能追加コストを下げる。
+# ボイスチャット音声パイプライン改修レポート
 
-## 変更概要
-- **契約層**：`IAudioService` を新設し、`unlock` / `addRemoteTrack` / `removeRemoteTrack` / `setRemoteVolume` に加えローカル送信 `startLocalMic/stopLocalMic` も含めて統一。
-- **実装層**：`AudioPipelineService` を追加。RemoteAudioTrack を隠し `<audio>` に attach し、`MediaElementSource -> Gain -> destination` の Web Audio グラフで再生・音量制御。ActiveDeviceChanged に応じて `setSinkId` を試行。ローカル送信も Web Audio 経由（動かない場合は raw publish にフォールバックして無音を回避）。
-- **接線**：Receiver は RemoteAudioTrack を直接 AudioService に渡し（source Unknown も受ける）、VolumeController は AudioService 経由で音量を指示。Sender は AudioService の送信チェーンを優先し、Plugin は定期距離減衰のタイマー管理と起動時 `unlock()` を実施。
+## 概要（今回のリファクタで伝えたいこと）
 
-## 詳細な実施内容
-1. **IAudioService 追加**  
-   - `domain/IAudioService.ts` を作成。上位はこの契約のみを見るため、実装を差し替えても UI/イベント層への影響を最小化できる。
-2. **AudioPipelineService 実装**  
-   - `service/audioPipelineService.ts` で Web Audio グラフを構築。  
-     - AudioContext を遅延生成し、Room の ActiveDeviceChanged（audiooutput）にフックして `setSinkId` を試行。  
-     - 互換性重視で `track.attach(隠し <audio>)` を入口にし、`MediaElementSource -> Gain -> destination` で後段処理を集約。  
-     - ローカル送信：`getUserMedia -> MediaStreamSource -> Gain -> MediaStreamDestination -> publishTrack`。AudioContext が走らない場合は raw track publish へフォールバックし、無音を防止。既存マイクは unpublish 後に差し替え。  
-     - `unlock()` は `AudioContext.resume()` と `room.startAudio()`、隠し `<audio>.play()` を併用し、autoplay 制限下の復帰率を向上。  
-     - `remoteChains`/`localChain` でノード・DOM を一元管理し、切断時に detach/remove/stop を確実に行う。  
-     - `localStorage.__CV_DEBUG_AUDIO__ = "true"` でデバッグログを有効化。送信チェーン作成時に `mode: web-audio/raw` を出力。
-3. **上位ロジックの付け替え**  
-   - `voiceChatReceiver.ts`：音声 track.kind=audio で受信（source Unknown も許可）し、RemoteAudioTrack を AudioService に登録。  
-   - `voiceChatVolumeController.ts`：メガホン状態のみ保持し、距離減衰後に `audioService.setRemoteVolume()` を発行。HTMLAudioElement 依存を排除。  
-   - `voiceChatSender.ts`：マイクの on/off は `audioService.startLocalMic/stopLocalMic` を優先、未提供時は従来の `setMicrophoneEnabled` にフォールバック。  
-   - `voiceChatPlugin.ts`：AudioPipelineService を生成して Receiver/Sender/Controller に渡す。音量更新タイマーを再利用可能にし、開始時に `unlock()` を試みて自動再生制限を緩和。
-4. **イベント**  
-   - `JoinVoiceChatEvent` のペイロードを playerId のみに簡素化（プロジェクト内に他利用なし）。イベント自体は残し、将来の拡張に備える。
+1. 音声パイプラインは送受信ともに Web Audio Node ベースへ全面移行し、契約（定義）と実装を分離。実装を差し替えるだけで各種処理を容易に導入でき、Web Audio を採用したことで既存の音声処理ライブラリを無痛で組み込める。将来的には UI から音声効果を切り替える（例：声質変換）といった拡張も実現しやすい。
 
-## 影響・リスク
-- 音量挙動は従来と同等（初期 Gain=1、距離減衰しきい値 400、二次減衰曲線）。  
-- `unlock()` はユーザー操作が絡まないと失敗するブラウザがあるため、UI 側での再呼び出し導線が望ましい。  
-- `setSinkId` は非対応環境では no-op。対応ブラウザでは LiveKit のスピーカー切替と同期。  
-- MediaStreamTrack の stop は SDK に委ねており、再購読シナリオを阻害しないようにしている。
+2. 以前のノイズ処理 PR も、今回のリファクタを土台に、ライブラリの推奨手順でノイズ抑制ノードを挿入する形に置き換えられる。これにより、従来の苦しい実装を避け、きれいに効果を組み込める。実習終了につき、後続の先輩に引き継ぎをお願いしたい。https://github.com/churadata/churaverse-plugins/pull/92
+https://github.com/churadata/churaverse_private/pull/403
 
-## 今後の提案
-- 送信チェーン（getUserMedia -> 処理 -> publish）にも AudioService を適用し、耳返し・録音・降噪切替・レベルメータを実装可能にする。  
-- 距離減衰のパラメータを設定化し、ゲームデザインに合わせたチューニングを容易にする。  
-- RemoteTrack モックを用いた最小限のユニット/統合テストで add/remove/volume を検証。  
-- UI に「クリックで音声を有効化」等の案内を追加し、ユーザー操作で確実に `unlock()` を呼べる導線を整える。
-- ライフサイクル整理：`audioService.dispose()` を用意（デフォルトでは自動呼び出ししない）。ルーム離脱/プラグイン停止など上位で適切に呼べば、送受信チェーン・AudioContext・定期タイマーをまとめて解放できる。
-  - ※ルーム機構全体のリファクタに絡むため現時点では自動導線を入れていない。将来のルームリファクタ時に有効化する想定で共通のリソース解放関数を先行実装しており、現行運用に支障はない。
+3. 第1・第2コミットで送受信の Web Audio 化を完了し、テストも通過済み。第3コミットでリソース解放用スイッチ（dispose）を用意したが、現状は未接続の予備。詳細は**手動解放スイッチ**の項を参照。
+
+## 何が問題だったか
+- LiveKit の RemoteTrack を直接 `<audio>` に attach し、距離減衰も `<audio>.volume` を直叩き。処理ノードを挟めず、EQ/録音/空間化/分析などを入れるたびに大改修が必要だった。
+- 送信前の加工入口がなく、降噪/耳返し/録音を柔軟に挿せない。
+- 上位ロジックが LiveKit / `<audio>` に強く依存していて差し替えが困難。
+- リソース解放がバラバラで、長時間稼働や入退室を繰り返すと hidden `<audio>` や Web Audio ノードが残留する懸念。
+
+## 今回の解決方針
+- 上位は「誰の音量をどうする」「マイク ON/OFF」だけを契約 (`IAudioService`) 経由で指示し、LiveKit/HTML の詳細は触らない。
+- 下位は Web Audio を核に送受信チェーンを一元管理し、効果挿入や録音を行いやすい音声グラフを用意。
+- リソース解放用の手動スイッチ `dispose()` を先行実装。現状は自動で呼ばないが、将来のルーム/Lifecycle リファクタ時（同時接続増・パフォーマンス改善のタイミング）に正しい離脱イベントへ結線できるようにする。
+
+## 実装ハイライト
+- **契約層** `IAudioService`  
+  - `unlock / addRemoteTrack / removeRemoteTrack / setRemoteVolume / startLocalMic / stopLocalMic / dispose` を定義。
+  - その他の操作／機能を追加する必要がある場合は、ここに定義できます。
+- **受信チェーン**  
+  - track.source が Unknown でも `track.kind === audio` なら受信。  
+  - 隠し `<audio>` に attach → `MediaElementSource -> Gain -> destination` で Web Audio グラフへ。  
+  - 距離減衰・音量操作は Gain 経由で実施。
+  - 受信側の機能実装についても、同様に各種機能を柔軟に追加可能です。
+- **送信チェーン**  
+  - `getUserMedia -> MediaStreamSource -> Gain -> MediaStreamDestination -> publishTrack`。  
+  - AudioContext が動かない場合は raw publish にフォールバックし無音を回避。  
+  - デバッグで `mode: web-audio/raw` を確認可能。
+  - 送信側の機能実装については、ノイズ抑制や波形表示などの機能を容易に組み込める構成になっています。
+- **手動解放スイッチ** `dispose()`  
+  - 送受信チェーン断開、hidden `<audio>` detach/remove、AudioContext close を一括実行。  
+  - 現時点ではライフサイクル管理が未完全なため、ローカル側の一部リソースが完全に解放されない可能性があります。
+多数のユーザーが利用する場合や、ルームへの入退室を繰り返した場合に蓄積する恐れはありますが、あくまでローカルリソースに限定されるため、サーバーへの影響はなく、現状では影響は限定的と考えています。
+ - 現状の room を含むゲーム側の仕組みと整合しない状態で無理に有効化すると、オーディオパイプラインが正常に機能しなくなるため、現時点では実際には使用せず、将来的なリファクタリング時に活用することを想定しています。
+
+
 
 ## 変更ファイル
-- 新規: `src/voiceChatPlugin/domain/IAudioService.ts`  
-- 新規: `src/voiceChatPlugin/service/audioPipelineService.ts`  
-- 変更: `src/voiceChatPlugin/voiceChatReceiver.ts`  
-- 変更: `src/voiceChatPlugin/voiceChatVolumeController.ts`  
-- 変更: `src/voiceChatPlugin/voiceChatPlugin.ts`  
+- 新規: `src/voiceChatPlugin/domain/IAudioService.ts`
+- 新規: `src/voiceChatPlugin/service/audioPipelineService.ts`
+- 変更: `src/voiceChatPlugin/voiceChatReceiver.ts`
+- 変更: `src/voiceChatPlugin/voiceChatSender.ts`
+- 変更: `src/voiceChatPlugin/voiceChatVolumeController.ts`
+- 変更: `src/voiceChatPlugin/voiceChatPlugin.ts`
 - 変更: `src/voiceChatPlugin/event/joinVoiceChatEvent.ts`
