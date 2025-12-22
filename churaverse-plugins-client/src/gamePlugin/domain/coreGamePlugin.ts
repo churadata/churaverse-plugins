@@ -108,10 +108,14 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._gameState = 'host'
     this._gameOwnerId = ev.ownerId
     this.gameInfoStore.games.set(this.gameId, this)
+    this.gamePluginStore.gameAbortAlertConfirm.setGameAbortMessage(this.gameName)
     this.gamePluginStore.countdownTimer.start(ev.timeoutSec)
+
     if (ev.ownerId === this.playerPluginStore.ownPlayerId) {
       this.gamePluginStore.gameDescriptionDialogManager.showDialog(this.gameId, 'viewOnly')
       this.bus.post(new SubmitGameJoinEvent(this.gameId, true))
+
+      this.coreUiPluginStore.exitButton.setExitMessage(`${this.ownerExitMessage}`)
     } else {
       this.gamePluginStore.gameDescriptionDialogManager.showDialog(this.gameId, 'joinable')
     }
