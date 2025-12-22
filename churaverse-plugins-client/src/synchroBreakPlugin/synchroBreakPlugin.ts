@@ -36,10 +36,12 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     allowMidwayJoin: false,
   }
 
+  protected readonly ownerExitMessage =
+    'あなたはゲームオーナーです。あなたが退出すると' + this.gameName + 'が終了します'
+
   private nyokkiActionMessage: string | undefined = undefined
   private ownNyokkiSatatus: NyokkiStatus = 'yet'
   protected gameEntryRenderer!: IGameSelectionListItemRenderer
-
   private synchroBreakPluginStore!: SynchroBreakPluginStore
   private scene!: Scene
   private coinViewerIconUis = new Map<string, CoinViewerIcon>()

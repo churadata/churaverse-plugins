@@ -29,6 +29,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   protected abstract gameEntryRenderer: IGameSelectionListItemRenderer
   protected abstract gameName: string
   public abstract gamePolicy: GamePolicy
+  protected abstract ownerExitMessage: string
   private _isActive: boolean = false
   private _gameOwnerId?: string
   private _joinedPlayerIds: string[] = []
@@ -145,9 +146,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.gameInfoStore.games.set(this.gameId, this)
     this.gamePluginStore.gameAbortAlertConfirm.setGameAbortMessage(this.gameName)
     if (this._gameOwnerId === this.playerPluginStore.ownPlayerId) {
-      this.coreUiPluginStore.exitButton.setGameOwnerExitMessage(
-        'あなたはゲームオーナーです。あなたが退出すると' + this.gameName + 'が終了します'
-      )
+      this.coreUiPluginStore.exitButton.setExitMessage(`${this.ownerExitMessage}`)
     }
   }
 
@@ -172,7 +171,7 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.gameInfoStore.games.delete(this.gameId)
     this._gameState = 'inactive'
 
-    this.coreUiPluginStore.exitButton.resetGameExitMessage()
+    this.coreUiPluginStore.exitButton.setExitMessage('このミーティングから退出しますか？')
 
     if (this.isJoined) {
       this.gamePluginStore.gameUiManager.removeAllUis(this.gameId)
