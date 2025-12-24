@@ -8,7 +8,7 @@ import VIDEO_OFF_ICON_PATH from './assets/video_off.png'
 
 export class VideoChatIcon extends TopBarIconRenderer {
   private readonly iconDivContainer: HTMLDivElement
-  private isLocked = false
+  private readonly _isEnabled = true
 
   public constructor(
     iconContainer: ITopBarIconContainer,
@@ -34,15 +34,13 @@ export class VideoChatIcon extends TopBarIconRenderer {
   }
 
   public enableButton(): void {
-    this.isLocked = false
-    this.setButtonDisabled(false)
+    this.isEnabled = true
   }
 
   /** buttonが押されたときの動作 */
   private onClick(isActive: boolean): void {
-    if (this.isLocked) return
-    this.isLocked = true
-    this.setButtonDisabled(true)
+    if (!this.isEnabled) return
+    this.isEnabled = false
 
     if (isActive) {
       super.deactivate()
@@ -53,7 +51,11 @@ export class VideoChatIcon extends TopBarIconRenderer {
     }
   }
 
-  private setButtonDisabled(disabled: boolean): void {
-    super.node.style.cursor = disabled ? 'not-allowed' : 'default'
+  private get isEnabled(): boolean {
+    return this._isEnabled
+  }
+
+  private set isEnabled(isEnabled: boolean) {
+    super.node.style.cursor = isEnabled ? 'default' : 'not-allowed'
   }
 }
