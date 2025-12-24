@@ -35,6 +35,7 @@ export class CameraVideoChatPlugin extends BasePlugin<IMainScene> {
     this.bus.subscribeEvent('init', this.init.bind(this))
     this.bus.subscribeEvent('triggerVideoSending', this.triggerVideoSending.bind(this))
     this.bus.subscribeEvent('dumpDebugData', this.dumpDebugData.bind(this))
+    this.bus.subscribeEvent('videoChatStatusChanged', this.enableVideoChatButton.bind(this))
   }
 
   private triggerVideoSending(ev: TriggerVideoSendingEvent): void {
@@ -52,6 +53,7 @@ export class CameraVideoChatPlugin extends BasePlugin<IMainScene> {
     this.cameraVideoSender = new CameraVideoSender(
       this.webRtcPluginStore.webRtc.room,
       this.store,
+      this.bus,
       this.effectManager,
       this.webCameraIdDebugDetailScreen,
       this.webCameraMyStatusDebugDetailScreen
@@ -91,5 +93,9 @@ export class CameraVideoChatPlugin extends BasePlugin<IMainScene> {
     }
     const idsText = cameraEnabledIds.length > 0 ? cameraEnabledIds.join(', ') : ''
     ev.dataDumper.dump('webCameraId', `${cameraEnabledIds.length}: ${idsText}`)
+  }
+
+  private enableVideoChatButton(): void {
+    this.videoChatUI.videoChatIcon.enableButton()
   }
 }

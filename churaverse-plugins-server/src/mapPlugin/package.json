@@ -10,6 +10,9 @@
     "link:cvPackages": "sh npm_link_cvPackages.sh"
   },
   "license": "MIT",
+  "devDependencies": {
+    "tiled-types": "^1.3.0"
+  },
   "dependencies": {
     "churaverse-engine-server": "^0.1.0",
     "@churaverse/network-plugin-server": "^0.1.0"
