@@ -4,6 +4,7 @@ import { IJoinButtonRenderer } from '../domain/IJoinButtonRenderer'
 import { PlayerRole } from '@churaverse/player-plugin-client/types/playerRole'
 import { TitlePlayerPluginStore } from '../../titlePlayerPlugin/store/defTitlePlayerPlugin'
 import { TransitionPluginStore } from '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
+import { GameModeSelectorRenderer } from './gameModeSelectorRenderer'
 
 const BUTTON_COLOR = {
   /* eslint-disable */
@@ -28,10 +29,17 @@ export class JoinButtonRenderer implements IJoinButtonRenderer {
   private joinButtonColor = BUTTON_COLOR
   private readonly titlePlayerPluginStore: TitlePlayerPluginStore
   private readonly transitionPluginStore: TransitionPluginStore<ITitleScene>
+  private readonly gameModeSelectorRenderer: GameModeSelectorRenderer
 
-  public constructor(scene: Scene, store: Store<ITitleScene>, private readonly eventBus: IEventBus<ITitleScene>) {
+  public constructor(
+    scene: Scene,
+    store: Store<ITitleScene>,
+    private readonly eventBus: IEventBus<ITitleScene>,
+    gameModeSelectorRenderer: GameModeSelectorRenderer
+  ) {
     this.titlePlayerPluginStore = store.of('titlePlayerPlugin')
     this.transitionPluginStore = store.of('transitionPlugin')
+    this.gameModeSelectorRenderer = gameModeSelectorRenderer
 
     const buttonWidth = 40
     const buttonHeight = 20
@@ -88,9 +96,11 @@ export class JoinButtonRenderer implements IJoinButtonRenderer {
       // 処理が重複しないように処理中はボタンを押せないようにロック
       this.joinButton.disableInteractive()
 
-      // MainSceneに遷移
+      // モードに応じて遷移先を決定
+      const targetScene = this.gameModeSelectorRenderer.isGameModeEnabled() ? 'MainScene' : 'MeetingScene'
+
       DomManager.removeAll()
-      this.transitionPluginStore.transitionManager.transitionTo('MainScene')
+      this.transitionPluginStore.transitionManager.transitionTo(targetScene)
     } else {
       alert('名前は1文字以上15文字以内で入力してください')
     }

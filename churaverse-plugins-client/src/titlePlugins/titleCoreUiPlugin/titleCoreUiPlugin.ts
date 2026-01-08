@@ -10,6 +10,7 @@ import { Scene } from 'phaser'
 import { JoinButtonRenderer } from './renderer/joinButtonRenderer'
 import { TitleBackgroundRenderer } from './renderer/titleBackgroundRenderer'
 import { ChuraDataLogoRenderer } from './renderer/churaDataLogoRenderer'
+import { GameModeSelectorRenderer } from './renderer/gameModeSelectorRenderer'
 import { TitlePlayerRoleChangeEvent } from './event/titlePlayerRoleChangeEvent'
 import { TitlePlayerPluginStore } from '../titlePlayerPlugin/store/defTitlePlayerPlugin'
 
@@ -17,6 +18,7 @@ export class TitleCoreUiPlugin extends BasePlugin<ITitleScene> {
   private scene!: Scene
   private titlePlayerPluginStore!: TitlePlayerPluginStore
   private joinButtonRenderer!: JoinButtonRenderer
+  private gameModeSelectorRenderer!: GameModeSelectorRenderer
 
   public listenEvent(): void {
     this.bus.subscribeEvent('phaserSceneInit', this.phaserSceneInit.bind(this))
@@ -41,7 +43,8 @@ export class TitleCoreUiPlugin extends BasePlugin<ITitleScene> {
   }
 
   private start(ev: StartEvent): void {
-    this.joinButtonRenderer = new JoinButtonRenderer(this.scene, this.store, this.bus)
+    this.gameModeSelectorRenderer = new GameModeSelectorRenderer()
+    this.joinButtonRenderer = new JoinButtonRenderer(this.scene, this.store, this.bus, this.gameModeSelectorRenderer)
     void new TitleBackgroundRenderer(this.scene)
     void new ChuraDataLogoRenderer(this.scene, this.store, this.bus)
   }
