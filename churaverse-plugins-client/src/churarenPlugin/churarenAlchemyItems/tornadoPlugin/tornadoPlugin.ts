@@ -146,7 +146,7 @@ export class TornadoPlugin extends BaseAlchemyItemPlugin {
 
   private walkTornado(tornado: Tornado, render: ITornadoAttackRenderer): void {
     const totalSteps = 10 // アニメーションの総ステップ数
-      const unitStepDistance = TORNADO_WALK_LIMIT_GRIDS * GRID_SIZE // 1ステップあたりの移動距離
+    const unitStepDistance = TORNADO_WALK_LIMIT_GRIDS * GRID_SIZE // 1ステップあたりの移動距離
 
     let stepIndex = 0 // 現在のステップ数
 
