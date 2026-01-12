@@ -1,5 +1,5 @@
 import { DomManager } from 'churaverse-engine-client'
-import { CountDownBarComponent, CountDownBarProps } from './component/CountDownBarComponent'
+import { CountDownBarComponent } from './component/CountDownBarComponent'
 import styles from './component/CountDownBarComponent.module.scss'
 import { ICountDownBar } from '../../interface/ICountDownBar'
 
@@ -14,31 +14,44 @@ export class CountDownBar implements ICountDownBar {
   private observer: IntersectionObserver | undefined = undefined
   private totalDuration: number = 1
   private lastRemainingSeconds: number | undefined = undefined
-  private alertThreshold: number = 3
+  private readonly alertThreshold: number = 3
   private progressBarEl: SVGCircleElement | undefined = undefined
   private progressValueEl: HTMLDivElement | undefined = undefined
 
   private readonly radius = 45
   private readonly circumference = 2 * Math.PI * this.radius
 
-  private static readonly DEFAULT_TRANSITION = 'stroke-dashoffset 0.25s linear, stroke 0.3s ease'
+  private static readonly DEFAULT_TRANSITION = 'stroke-dashoffset 1s linear, stroke 0.3s ease'
   private static readonly JUMP_THRESHOLD_SECONDS = 2
   /** IntersectionObserverのrootMargin。画面下部40%に入ったら初期化を開始 */
   private static readonly OBSERVER_ROOT_MARGIN = '0px 0px -40% 0px'
 
-  public constructor(private readonly props: CountDownBarProps) {}
-
   public initialize(): void {
-    this.element = DomManager.addJsxDom(CountDownBarComponent(this.props))
+    if (this.element !== undefined) {
+      this.element.remove()
+      if (this.observer !== undefined) {
+        this.observer.disconnect()
+        this.observer = undefined
+      }
+      this.progressBarEl = undefined
+      this.progressValueEl = undefined
+    }
+
+    this.element = DomManager.addJsxDom(CountDownBarComponent())
+    this.element.style.display = 'none'
     this.setupObserver()
+    this.ensureElementsCached()
+    if (this.progressBarEl !== undefined) {
+      this.progressBarEl.style.strokeDasharray = `${this.circumference}`
+      this.progressBarEl.style.strokeDashoffset = `${this.circumference}`
+    }
   }
 
-  public remove(): void {
-    if (this.observer !== undefined) {
-      this.observer.disconnect()
-      this.observer = undefined
-    }
-    this.element.remove()
+  /**
+   * 全体の時間を設定する
+   */
+  public setTotalDuration(duration: number): void {
+    this.totalDuration = duration > 0 ? duration : 1
   }
 
   /**
@@ -49,11 +62,18 @@ export class CountDownBar implements ICountDownBar {
 
     // 残り秒数表示を更新
     if (this.progressValueEl !== undefined) {
-      this.progressValueEl.textContent = Math.floor(remainingSeconds).toString()
+      const newText = Math.floor(remainingSeconds).toString()
+      this.progressValueEl.textContent = newText
     }
 
-    this.updateProgressBar(remainingSeconds)
-    this.lastRemainingSeconds = remainingSeconds
+    if (this.lastRemainingSeconds === undefined) {
+      this.initializeProgress(remainingSeconds)
+      this.lastRemainingSeconds = remainingSeconds
+      this.updateProgressBar(remainingSeconds)
+    } else {
+      this.updateProgressBar(remainingSeconds)
+      this.lastRemainingSeconds = remainingSeconds
+    }
   }
 
   private setupObserver(): void {
@@ -61,7 +81,7 @@ export class CountDownBar implements ICountDownBar {
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
-            this.initializeFromDataset()
+            this.ensureElementsCached()
             observer.disconnect()
           }
         }
@@ -75,31 +95,6 @@ export class CountDownBar implements ICountDownBar {
 
     observer.observe(this.element)
     this.observer = observer
-  }
-
-  private initializeFromDataset(): void {
-    const remainingSecondsStr = this.element.dataset.remainingSeconds
-    if (remainingSecondsStr === undefined) return
-
-    const remainingSeconds = this.parseNumeric(remainingSecondsStr, 0)
-    this.totalDuration = this.parseNumeric(this.element.dataset.duration, 1, true)
-    this.alertThreshold = this.parseNumeric(this.element.dataset.alertThresholdSeconds, 3)
-
-    this.ensureElementsCached()
-    this.initializeProgress(remainingSeconds)
-    this.updateAlertState(remainingSeconds)
-    this.lastRemainingSeconds = remainingSeconds
-  }
-
-  /**
-   * 数値パース
-   */
-  private parseNumeric(value: string | undefined, defaultValue: number, positiveOnly = false): number {
-    if (value === undefined) return defaultValue
-    const parsed = parseFloat(value)
-    if (!Number.isFinite(parsed)) return defaultValue
-    if (positiveOnly && parsed <= 0) return defaultValue
-    return parsed
   }
 
   /**
@@ -129,16 +124,18 @@ export class CountDownBar implements ICountDownBar {
       this.progressBarEl.getBoundingClientRect()
       this.progressBarEl.style.transition = CountDownBar.DEFAULT_TRANSITION
     }
+
+    this.updateAlertState(remainingSeconds)
   }
 
   /**
    * プログレスバーの描画を更新する
+   * 現在の秒数から次の秒へ1秒かけてトランジション
    */
   private updateProgressBar(remainingSeconds: number): void {
     if (this.progressBarEl === undefined) return
 
     this.updateAlertState(remainingSeconds)
-    const newOffset = this.calculateStrokeDashoffset(remainingSeconds)
 
     // 大きなジャンプがあった場合はトランジションなしで即座に更新
     const prev = this.lastRemainingSeconds ?? remainingSeconds
@@ -147,7 +144,8 @@ export class CountDownBar implements ICountDownBar {
     if (isLargeJump) {
       const prevTransition = this.progressBarEl.style.transition
       this.progressBarEl.style.transition = 'none'
-      this.progressBarEl.style.strokeDashoffset = `${newOffset}`
+      const currentOffset = this.calculateStrokeDashoffset(remainingSeconds)
+      this.progressBarEl.style.strokeDashoffset = `${currentOffset}`
       this.progressBarEl.getBoundingClientRect()
 
       requestAnimationFrame(() => {
@@ -155,10 +153,12 @@ export class CountDownBar implements ICountDownBar {
         this.progressBarEl.style.transition = prevTransition !== '' ? prevTransition : CountDownBar.DEFAULT_TRANSITION
       })
     } else {
+      // 現在の秒数から次の秒へトランジション
       if (this.progressBarEl.style.transition === '') {
         this.progressBarEl.style.transition = CountDownBar.DEFAULT_TRANSITION
       }
-      this.progressBarEl.style.strokeDashoffset = `${newOffset}`
+      const nextOffset = this.calculateStrokeDashoffset(remainingSeconds - 1)
+      this.progressBarEl.style.strokeDashoffset = `${nextOffset}`
     }
   }
 
@@ -168,7 +168,8 @@ export class CountDownBar implements ICountDownBar {
   private calculateStrokeDashoffset(remainingSeconds: number): number {
     const total = this.totalDuration > 0 ? this.totalDuration : 1
     const ratio = Math.max(0, Math.min(1, remainingSeconds / total))
-    return this.circumference * (1 - ratio)
+    const offset = this.circumference * (1 - ratio)
+    return offset
   }
 
   /**
@@ -182,5 +183,35 @@ export class CountDownBar implements ICountDownBar {
     } else {
       this.progressBarEl.classList.remove(styles.alert)
     }
+  }
+
+  public open(): void {
+    this.element.style.display = 'block'
+  }
+
+  public close(): void {
+    this.element.style.display = 'none'
+  }
+
+  public reset(): void {
+    this.lastRemainingSeconds = undefined
+    this.ensureElementsCached()
+
+    if (this.progressValueEl !== undefined) {
+      this.progressValueEl.textContent = '0'
+    }
+
+    if (this.progressBarEl !== undefined) {
+      this.progressBarEl.style.transition = 'none'
+      this.progressBarEl.style.strokeDashoffset = `${this.circumference}`
+    }
+  }
+
+  public remove(): void {
+    if (this.observer !== undefined) {
+      this.observer.disconnect()
+      this.observer = undefined
+    }
+    this.element.remove()
   }
 }

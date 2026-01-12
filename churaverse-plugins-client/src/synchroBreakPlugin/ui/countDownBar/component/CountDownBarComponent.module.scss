@@ -22,11 +22,6 @@
   stroke: #3c79c4;
   stroke-width: 10;
   stroke-linecap: round;
-  stroke-dasharray: 282.743;
-  stroke-dashoffset: 282.743;
-  transition:
-    stroke-dashoffset 1s linear,
-    stroke 0.3s ease;
   will-change: stroke-dashoffset;
 }
 
