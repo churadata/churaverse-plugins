@@ -49,15 +49,8 @@ export class BetCoinFormContainer implements IBetCoinFormContainer {
   public postBetCoinOnTimeout(ownPlayerId: string): void {
     if (this.isSend) return
 
-    const betCoins = this.inputFieldValue
-    const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
-    if (SYNCHRO_BREAK_MIN_BET_COIN <= betCoins && betCoins <= ownPlayerCoins) {
-      this.store.of('networkPlugin').messageSender.send(new SendBetCoinMessage({ playerId: ownPlayerId, betCoins }))
-    } else {
-      this.store
-        .of('networkPlugin')
-        .messageSender.send(new SendBetCoinMessage({ playerId: ownPlayerId, betCoins: SYNCHRO_BREAK_MIN_BET_COIN }))
-    }
+    const betCoins = this.isValidBetAmount(ownPlayerId) ? this.inputFieldValue : SYNCHRO_BREAK_MIN_BET_COIN
+    this.store.of('networkPlugin').messageSender.send(new SendBetCoinMessage({ playerId: ownPlayerId, betCoins }))
     this.inputFieldValue = SYNCHRO_BREAK_MIN_BET_COIN
     this.isSend = true
     this.close()
@@ -70,10 +63,10 @@ export class BetCoinFormContainer implements IBetCoinFormContainer {
     this.betCoinInputField = DomManager.getElementById<HTMLInputElement>(BET_COIN_INPUT_FIELD_ID)
     const sendButton = DomManager.getElementById(BET_COIN_SEND_BUTTON_ID)
     sendButton.onclick = () => {
-      const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
-      const betCoins = this.inputFieldValue
+      const isBetAmountValid = this.isValidBetAmount(ownPlayerId)
+      const betCoins = isBetAmountValid ? this.inputFieldValue : SYNCHRO_BREAK_MIN_BET_COIN
 
-      if (SYNCHRO_BREAK_MIN_BET_COIN <= betCoins && betCoins <= ownPlayerCoins) {
+      if (isBetAmountValid) {
         this.store.of('networkPlugin').messageSender.send(new SendBetCoinMessage({ playerId: ownPlayerId, betCoins }))
         this.inputFieldValue = SYNCHRO_BREAK_MIN_BET_COIN
         this.isSend = true
@@ -102,6 +95,15 @@ export class BetCoinFormContainer implements IBetCoinFormContainer {
     this.setupLongPress(minusButton, () => {
       this.decrementBetCoin()
     })
+  }
+
+  /**
+   * ベットコイン枚数が有効な範囲内かチェックする
+   */
+  private isValidBetAmount(ownPlayerId: string): boolean {
+    const betCoins = this.inputFieldValue
+    const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
+    return SYNCHRO_BREAK_MIN_BET_COIN <= betCoins && betCoins <= ownPlayerCoins
   }
 
   /**
