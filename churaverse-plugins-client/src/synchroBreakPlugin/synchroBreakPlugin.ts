@@ -359,20 +359,17 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       this.showResult(RESULT_SCREEN_TYPES.TURN)
     },
     [RESULT_SCREEN_TYPES.FINAL]: () => {
+      this.ownRankingBoard.remove()
+      this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.remove()
+      this.descriptionWindow.displayResultMessage()
       this.showResult(RESULT_SCREEN_TYPES.FINAL)
     },
   }
 
   /**
-   * 結果を表示
+   * 結果画面を表示
    */
   private showResult(type: ResultScreenType): void {
-    if (type === RESULT_SCREEN_TYPES.FINAL) {
-      this.ownRankingBoard.remove()
-      this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.remove()
-      this.descriptionWindow.displayResultMessage()
-    }
-
     const resultScreen = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'resultScreen')
     if (resultScreen === undefined) throw new SynchroBreakUiNotFoundError('resultScreen')
 
