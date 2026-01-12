@@ -2,7 +2,6 @@ import { DomManager, domLayerSetting } from 'churaverse-engine-client'
 import { DescriptionWindowComponent } from './component/DescriptionWindowComponent'
 import '@churaverse/game-plugin-client/gameUiManager'
 import { IDescriptionWindow } from '../../interface/IDescriptionWindow'
-import { ICountDownBar } from '../../interface/ICountDownBar'
 
 export class DescriptionWindow implements IDescriptionWindow {
   public element!: HTMLElement
@@ -10,7 +9,6 @@ export class DescriptionWindow implements IDescriptionWindow {
   private descriptionText: string = ''
   private gameName: string = 'ゲーム'
   private gameOwnerName: string = 'ゲームオーナー'
-  private countDownBar: ICountDownBar | null = null
 
   public initialize(): void {
     this.element = DomManager.addJsxDom(DescriptionWindowComponent({ description: this.descriptionText }))
@@ -28,14 +26,6 @@ export class DescriptionWindow implements IDescriptionWindow {
   public setGameBaseInfo(gameName: string, ownerName: string): void {
     this.gameName = gameName
     this.gameOwnerName = ownerName
-  }
-
-  /**
-   * 外部から CountDownBar を注入して表示する
-   */
-  public displayCountDownBar(countDownBar: ICountDownBar): void {
-    this.countDownBar = countDownBar
-    this.element.appendChild(countDownBar.element)
   }
 
   /**
@@ -117,19 +107,14 @@ export class DescriptionWindow implements IDescriptionWindow {
 
   /**
    * シンクロブレイク進行中の文章更新処理
-   * @param countdown シンクロブレイク終了までのカウントダウン
    */
-  public displaySynchroBreakInProgress(countdown: number, playerName?: string, nyokkiActionMessage?: string): void {
+  public displaySynchroBreakInProgress(playerName?: string, nyokkiActionMessage?: string): void {
     const descriptionText = [`現在${this.gameName}進行中`, `制限時間内にボタンを押してください！`]
     if (playerName !== undefined && nyokkiActionMessage !== undefined) {
       descriptionText.splice(1, 0, nyokkiActionMessage)
     }
 
     this.setDescriptionText(descriptionText.join('<br>'))
-
-    if (this.countDownBar !== null) {
-      this.countDownBar.updateDashOffset(countdown)
-    }
   }
 
   /**
@@ -188,13 +173,6 @@ export class DescriptionWindow implements IDescriptionWindow {
     const container = document.createElement('div')
     container.setAttribute('data-role', 'description-text')
     container.innerHTML = text
-
-    const barEl = this.countDownBar?.element ?? null
-
-    if (barEl !== null && barEl.parentElement === this.element) {
-      this.element.insertBefore(container, barEl)
-    } else {
-      this.element.appendChild(container)
-    }
+    this.element.appendChild(container)
   }
 }

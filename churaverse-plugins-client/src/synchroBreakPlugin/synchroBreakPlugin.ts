@@ -16,7 +16,6 @@ import { SendBetCoinResponseEvent } from './event/sendBetCoinResponseEvent'
 import { registerSynchroBreakUi } from './ui/registerSynchroBreakUi'
 import { IDescriptionWindow } from './interface/IDescriptionWindow'
 import { ICountDownBar } from './interface/ICountDownBar'
-import { CountDownBar } from './ui/countDownBar/countDownBar'
 import { PlayerNyokkiStatusIcon } from './ui/synchroBreakIcon/playerNyokkiStatusIcon'
 import { CoinViewer } from './ui/coinViewer/coinViewer'
 import { CoinViewerIcon } from './ui/coinViewer/coinViewerIcon'
@@ -44,7 +43,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   private scene!: Scene
   private coinViewerIconUis = new Map<string, CoinViewerIcon>()
   private socketController!: SocketController
-  private countDownBar: ICountDownBar | null = null
 
   public listenEvent(): void {
     super.listenEvent()
@@ -184,7 +182,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   protected handlePlayerQuitGame(playerId: string): void {
     this.removeSynchroBreakIcons()
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')?.remove()
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')?.close()
+    this.descriptionWindow.close()
   }
 
   /**
@@ -272,18 +270,16 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const ownPlayerId = this.playerPluginStore.ownPlayerId
     const ownPlayerName = this.playerPluginStore.players.get(ownPlayerId)?.name
     if (ev.remainingSeconds === this.synchroBreakPluginStore.timeLimit) {
-      this.createCountDownBar(ev.remainingSeconds)
-      this.descriptionWindow.displaySynchroBreakStart(ev.remainingSeconds)
+      this.displayCountDownBar()
+      this.countDownBar.updateDashOffset(ev.remainingSeconds)
+      this.descriptionWindow.displaySynchroBreakStart()
       this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.open()
     } else {
+      this.countDownBar.updateDashOffset(ev.remainingSeconds)
       if (this.ownNyokkiSatatus === 'yet') {
-        this.descriptionWindow.displaySynchroBreakInProgress(ev.remainingSeconds)
+        this.descriptionWindow.displaySynchroBreakInProgress()
       } else {
-        this.descriptionWindow.displaySynchroBreakInProgress(
-          ev.remainingSeconds,
-          ownPlayerName,
-          this.nyokkiActionMessage
-        )
+        this.descriptionWindow.displaySynchroBreakInProgress(ownPlayerName, this.nyokkiActionMessage)
       }
     }
   }
@@ -330,7 +326,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.nyokkiActionMessage = undefined
     this.ownNyokkiSatatus = 'yet'
 
-    this.removeCountDownBar()
+    this.countDownBar.close()
     this.descriptionWindow.displaySynchroBreakEnd()
     const noNyokkiPlayerIds = ev.noNyokkiPlayerIds
     const status: NyokkiStatus = 'nyokki'
@@ -408,6 +404,33 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   }
 
   /**
+   * カウントダウンバーを取得する
+   */
+  private get countDownBar(): ICountDownBar {
+    const countDownBar = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'countDownBar')
+    if (countDownBar === undefined) throw new SynchroBreakUiNotFoundError('countDownBar')
+    return countDownBar
+  }
+
+  /**
+   * カウントダウンバーを表示する
+   */
+  private displayCountDownBar(): void {
+    this.countDownBar.reset()
+
+    const timeLimit = this.synchroBreakPluginStore.timeLimit
+    if (timeLimit !== undefined) {
+      this.countDownBar.setTotalDuration(timeLimit)
+    }
+
+    if (this.countDownBar.element.parentElement !== this.descriptionWindow.element) {
+      this.descriptionWindow.element.appendChild(this.countDownBar.element)
+    }
+
+    this.countDownBar.open()
+  }
+
+  /**
    * プレイヤーの周囲のアイコンを削除する
    */
   private removeSynchroBreakIcons(): void {
@@ -433,33 +456,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.synchroBreakPluginStore.synchroBreakIcons.forEach((value) => {
       value.resetStatusIcon()
     })
-  }
-
-  /**
-   * カウントダウンバーを生成
-   */
-  private createCountDownBar(timeLimit: number): void {
-    if (timeLimit <= 0) return
-
-    // 既存の CountDownBar があれば削除
-    this.removeCountDownBar()
-
-    this.countDownBar = new CountDownBar({
-      remainingSeconds: timeLimit,
-      duration: timeLimit,
-    })
-    this.countDownBar.initialize()
-    this.descriptionWindow.displayCountDownBar(this.countDownBar)
-  }
-
-  /**
-   * CountDownBar を削除する
-   */
-  private removeCountDownBar(): void {
-    if (this.countDownBar !== null) {
-      this.countDownBar.remove()
-      this.countDownBar = null
-    }
   }
 }
 
