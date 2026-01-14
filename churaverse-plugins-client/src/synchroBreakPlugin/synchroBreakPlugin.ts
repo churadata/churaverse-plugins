@@ -249,13 +249,13 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   private readonly sendBetCoinResponse = (ev: SendBetCoinResponseEvent): void => {
     if (this.isOwnPlayerMidwayParticipant) return
-    this.betTimer.close()
 
     const coinViewerIcon = this.coinViewerIconUis.get(ev.playerId)
     coinViewerIcon?.coinViewer?.setBetCoins(ev.betCoins)
 
     if (ev.playerId === this.playerPluginStore.ownPlayerId) {
       this.descriptionWindow.displayBetCoinSelection(ev.betCoins)
+      this.betTimer.close()
     }
 
     this.synchroBreakPluginStore.playersCoinRepository.set(ev.playerId, ev.currentCoins)
