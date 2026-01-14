@@ -9,16 +9,19 @@ export class DescriptionWindow implements IDescriptionWindow {
   public element!: HTMLElement
   public visible: boolean = false
   private descriptionText: string = ''
+  private descriptionTextElement: HTMLElement | null = null
   private gameName: string = 'ゲーム'
   private gameOwnerName: string = 'ゲームオーナー'
 
   public initialize(): void {
     this.element = DomManager.addJsxDom(DescriptionWindowComponent({ description: this.descriptionText }))
+    this.descriptionTextElement = DomManager.getElementById(SYNCHRO_BREAK_DESCRIPTION_TEXT_ID)
     domLayerSetting(this.element, 'lowest')
   }
 
   public remove(): void {
     this.descriptionText = ''
+    this.descriptionTextElement = null
   }
 
   public close(): void {
@@ -166,8 +169,8 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param text 更新する文章
    */
   private setDescriptionText(text: string): void {
-    const descriptionText = this.element.querySelector(`#${SYNCHRO_BREAK_DESCRIPTION_TEXT_ID}`)
-    if (descriptionText === null) return
-    descriptionText.innerHTML = text
+    this.descriptionTextElement = this.descriptionTextElement ?? DomManager.getElementById(SYNCHRO_BREAK_DESCRIPTION_TEXT_ID)
+    if (this.descriptionTextElement === null) return
+    this.descriptionTextElement.innerHTML = text
   }
 }
