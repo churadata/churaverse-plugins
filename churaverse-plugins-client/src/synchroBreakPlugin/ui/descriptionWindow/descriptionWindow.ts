@@ -3,7 +3,7 @@ import { DescriptionWindowComponent } from './component/DescriptionWindowCompone
 import '@churaverse/game-plugin-client/gameUiManager'
 import { IDescriptionWindow } from '../../interface/IDescriptionWindow'
 
-export const DESCRIPTION_TEXT_ID = 'description-text'
+export const SYNCHRO_BREAK_DESCRIPTION_TEXT_ID = 'synchro-break-description-text'
 
 export class DescriptionWindow implements IDescriptionWindow {
   public element!: HTMLElement
@@ -166,7 +166,7 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param text 更新する文章
    */
   private setDescriptionText(text: string): void {
-    const descriptionText = this.element.querySelector(`#${DESCRIPTION_TEXT_ID}`)
+    const descriptionText = this.element.querySelector(`#${SYNCHRO_BREAK_DESCRIPTION_TEXT_ID}`)
     if (descriptionText === null) return
     descriptionText.innerHTML = text
   }
