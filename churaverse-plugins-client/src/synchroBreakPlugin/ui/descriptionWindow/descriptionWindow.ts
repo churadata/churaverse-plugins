@@ -3,15 +3,19 @@ import { DescriptionWindowComponent } from './component/DescriptionWindowCompone
 import '@churaverse/game-plugin-client/gameUiManager'
 import { IDescriptionWindow } from '../../interface/IDescriptionWindow'
 
+export const SYNCHRO_BREAK_DESCRIPTION_TEXT_ID = 'synchro-break-description-text'
+
 export class DescriptionWindow implements IDescriptionWindow {
   public element!: HTMLElement
   public visible: boolean = false
   private descriptionText: string = ''
+  private descriptionTextElement?: HTMLElement
   private gameName: string = 'ゲーム'
   private gameOwnerName: string = 'ゲームオーナー'
 
   public initialize(): void {
     this.element = DomManager.addJsxDom(DescriptionWindowComponent({ description: this.descriptionText }))
+    this.descriptionTextElement = DomManager.getElementById(SYNCHRO_BREAK_DESCRIPTION_TEXT_ID)
     domLayerSetting(this.element, 'lowest')
   }
 
@@ -139,11 +143,9 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param text ニョッキアクションの文章
    */
   public displayNyokkiAction(text: string): void {
-    const textContainer = this.element.querySelector('[data-role="description-text"]')
-    const currentHtml = textContainer !== null ? textContainer.innerHTML : this.descriptionText
-    const lines = currentHtml.split('<br>')
-    lines.splice(1, 0, text)
-    this.setDescriptionText(lines.join('<br>'))
+    const descriptionText = this.descriptionText.split('<br>')
+    descriptionText.splice(1, 0, text)
+    this.setDescriptionText(descriptionText.join('<br>'))
   }
 
   /**
@@ -164,15 +166,9 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param text 更新する文章
    */
   private setDescriptionText(text: string): void {
+    this.descriptionTextElement = this.descriptionTextElement ?? DomManager.getElementById(SYNCHRO_BREAK_DESCRIPTION_TEXT_ID)
+    if (this.descriptionTextElement === null) return
+    this.descriptionTextElement.innerHTML = text
     this.descriptionText = text
-    const textContainer = this.element.querySelector('[data-role="description-text"]')
-    if (textContainer !== null) {
-      ;(textContainer as HTMLElement).innerHTML = text
-      return
-    }
-    const container = document.createElement('div')
-    container.setAttribute('data-role', 'description-text')
-    container.innerHTML = text
-    this.element.appendChild(container)
   }
 }
