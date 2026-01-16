@@ -74,9 +74,9 @@ export class ResultScreen implements ISynchroBreakResultScreen {
    * 結果画面を閉じるボタンを作成する
    */
   private createCloseButton(): void {
-    const exitButton = DomManager.jsxToDom(ResultCloseButton())
-    this.element.appendChild(exitButton)
-    exitButton.addEventListener('click', () => {
+    const closeButton = DomManager.jsxToDom(ResultCloseButton())
+    this.element.appendChild(closeButton)
+    closeButton.addEventListener('click', () => {
       const playerId = this.store.of('playerPlugin').ownPlayerId
       this.eventBus.post(new GamePlayerQuitEvent(this.gameId, playerId))
       this.remove()
