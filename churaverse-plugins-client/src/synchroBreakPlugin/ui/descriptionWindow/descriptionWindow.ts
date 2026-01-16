@@ -3,15 +3,19 @@ import { DescriptionWindowComponent } from './component/DescriptionWindowCompone
 import '@churaverse/game-plugin-client/gameUiManager'
 import { IDescriptionWindow } from '../../interface/IDescriptionWindow'
 
+export const SYNCHRO_BREAK_DESCRIPTION_TEXT_ID = 'synchro-break-description-text'
+
 export class DescriptionWindow implements IDescriptionWindow {
   public element!: HTMLElement
   public visible: boolean = false
   private descriptionText: string = ''
+  private descriptionTextElement?: HTMLElement
   private gameName: string = 'ゲーム'
   private gameOwnerName: string = 'ゲームオーナー'
 
   public initialize(): void {
     this.element = DomManager.addJsxDom(DescriptionWindowComponent({ description: this.descriptionText }))
+    this.descriptionTextElement = DomManager.getElementById(SYNCHRO_BREAK_DESCRIPTION_TEXT_ID)
     domLayerSetting(this.element, 'lowest')
   }
 
@@ -100,18 +104,16 @@ export class DescriptionWindow implements IDescriptionWindow {
 
   /**
    * シンクロブレイク開始の文章更新処理
-   * @param timeLimit シンクロブレイクの制限時間
    */
-  public displaySynchroBreakStart(timeLimit: number): void {
-    this.setDescriptionText(`${this.gameName}開始！！！<br>残り${timeLimit}秒以内にボタンを押してください！`)
+  public displaySynchroBreakStart(): void {
+    this.setDescriptionText(`${this.gameName}開始！！！<br>制限時間以内にボタンを押してください！`)
   }
 
   /**
    * シンクロブレイク進行中の文章更新処理
-   * @param countdown シンクロブレイク終了までのカウントダウン
    */
-  public displaySynchroBreakInProgress(countdown: number, playerName?: string, nyokkiActionMessage?: string): void {
-    const descriptionText = [`現在${this.gameName}進行中`, `残り${countdown}秒以内にボタンを押してください！`]
+  public displaySynchroBreakInProgress(playerName?: string, nyokkiActionMessage?: string): void {
+    const descriptionText = [`現在${this.gameName}進行中`, `制限時間内にボタンを押してください！`]
     if (playerName !== undefined && nyokkiActionMessage !== undefined) {
       descriptionText.splice(1, 0, nyokkiActionMessage)
     }
@@ -141,7 +143,7 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param text ニョッキアクションの文章
    */
   public displayNyokkiAction(text: string): void {
-    const descriptionText = this.element.innerHTML.split('<br>')
+    const descriptionText = this.descriptionText.split('<br>')
     descriptionText.splice(1, 0, text)
     this.setDescriptionText(descriptionText.join('<br>'))
   }
@@ -164,6 +166,9 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param text 更新する文章
    */
   private setDescriptionText(text: string): void {
-    this.element.innerHTML = text
+    this.descriptionTextElement = this.descriptionTextElement ?? DomManager.getElementById(SYNCHRO_BREAK_DESCRIPTION_TEXT_ID)
+    if (this.descriptionTextElement === null) return
+    this.descriptionTextElement.innerHTML = text
+    this.descriptionText = text
   }
 }
