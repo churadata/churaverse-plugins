@@ -68,12 +68,11 @@ export class CountdownBar implements ICountdownBar {
 
     if (this.lastRemainingSeconds === undefined) {
       this.initializeProgress(remainingSeconds)
-      this.lastRemainingSeconds = remainingSeconds
-      this.updateProgressBar(remainingSeconds)
+      this.updateProgressBar(remainingSeconds, remainingSeconds)
     } else {
-      this.updateProgressBar(remainingSeconds)
-      this.lastRemainingSeconds = remainingSeconds
+      this.updateProgressBar(remainingSeconds, this.lastRemainingSeconds)
     }
+    this.lastRemainingSeconds = remainingSeconds
   }
 
   private setupObserver(): void {
@@ -132,14 +131,13 @@ export class CountdownBar implements ICountdownBar {
    * プログレスバーの描画を更新する
    * 現在の秒数から次の秒へ1秒かけてトランジション
    */
-  private updateProgressBar(remainingSeconds: number): void {
+  private updateProgressBar(remainingSeconds: number, lastRemainingSeconds: number): void {
     if (this.progressBarEl === undefined) return
 
     this.updateAlertState(remainingSeconds)
 
     // 大きなジャンプがあった場合はトランジションなしで即座に更新
-    const prev = this.lastRemainingSeconds ?? remainingSeconds
-    const isLargeJump = Math.abs(remainingSeconds - prev) > CountdownBar.JUMP_THRESHOLD_SECONDS
+    const isLargeJump = Math.abs(remainingSeconds - lastRemainingSeconds) > CountdownBar.JUMP_THRESHOLD_SECONDS
 
     if (isLargeJump) {
       const prevTransition = this.progressBarEl.style.transition
