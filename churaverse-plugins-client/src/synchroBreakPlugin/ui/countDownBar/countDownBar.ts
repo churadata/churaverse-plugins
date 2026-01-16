@@ -11,12 +11,12 @@ export class CountdownBar implements ICountdownBar {
   public element!: HTMLElement
   public readonly visible: boolean = false
 
-  private observer: IntersectionObserver | undefined = undefined
+  private observer?: IntersectionObserver
   private totalDuration: number = 1
-  private lastRemainingSeconds: number | undefined = undefined
+  private lastRemainingSeconds?: number
   private readonly alertThreshold: number = 3
-  private progressBarEl: SVGCircleElement | undefined = undefined
-  private progressValueEl: HTMLDivElement | undefined = undefined
+  private progressBarEl?: SVGCircleElement
+  private progressValueEl?: HTMLDivElement
 
   private readonly radius = 45
   private readonly circumference = 2 * Math.PI * this.radius
