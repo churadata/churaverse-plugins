@@ -15,7 +15,7 @@ import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
 import { SendBetCoinResponseEvent } from './event/sendBetCoinResponseEvent'
 import { registerSynchroBreakUi } from './ui/registerSynchroBreakUi'
 import { IDescriptionWindow } from './interface/IDescriptionWindow'
-import { ICountDownBar } from './interface/ICountDownBar'
+import { ICountdownBar } from './interface/ICountdownBar'
 import { PlayerNyokkiStatusIcon } from './ui/synchroBreakIcon/playerNyokkiStatusIcon'
 import { CoinViewer } from './ui/coinViewer/coinViewer'
 import { CoinViewerIcon } from './ui/coinViewer/coinViewerIcon'
@@ -270,12 +270,12 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const ownPlayerId = this.playerPluginStore.ownPlayerId
     const ownPlayerName = this.playerPluginStore.players.get(ownPlayerId)?.name
     if (ev.remainingSeconds === this.synchroBreakPluginStore.timeLimit) {
-      this.displayCountDownBar()
-      this.countDownBar.updateDashOffset(ev.remainingSeconds)
+      this.displayCountdownBar()
+      this.countdownBar.updateDashOffset(ev.remainingSeconds)
       this.descriptionWindow.displaySynchroBreakStart()
       this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.open()
     } else {
-      this.countDownBar.updateDashOffset(ev.remainingSeconds)
+      this.countdownBar.updateDashOffset(ev.remainingSeconds)
       if (this.ownNyokkiSatatus === 'yet') {
         this.descriptionWindow.displaySynchroBreakInProgress()
       } else {
@@ -326,7 +326,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.nyokkiActionMessage = undefined
     this.ownNyokkiSatatus = 'yet'
 
-    this.countDownBar.close()
+    this.countdownBar.close()
     this.descriptionWindow.displaySynchroBreakEnd()
     const noNyokkiPlayerIds = ev.noNyokkiPlayerIds
     const status: NyokkiStatus = 'nyokki'
@@ -406,28 +406,28 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   /**
    * カウントダウンバーを取得する
    */
-  private get countDownBar(): ICountDownBar {
-    const countDownBar = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'countDownBar')
-    if (countDownBar === undefined) throw new SynchroBreakUiNotFoundError('countDownBar')
-    return countDownBar
+  private get countdownBar(): ICountdownBar {
+    const countdownBar = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'countdownBar')
+    if (countdownBar === undefined) throw new SynchroBreakUiNotFoundError('countdownBar')
+    return countdownBar
   }
 
   /**
    * カウントダウンバーを表示する
    */
-  private displayCountDownBar(): void {
-    this.countDownBar.reset()
+  private displayCountdownBar(): void {
+    this.countdownBar.reset()
 
     const timeLimit = this.synchroBreakPluginStore.timeLimit
     if (timeLimit !== undefined) {
-      this.countDownBar.setTotalDuration(timeLimit)
+      this.countdownBar.setTotalDuration(timeLimit)
     }
 
-    if (this.countDownBar.element.parentElement !== this.descriptionWindow.element) {
-      this.descriptionWindow.element.appendChild(this.countDownBar.element)
+    if (this.countdownBar.element.parentElement !== this.descriptionWindow.element) {
+      this.descriptionWindow.element.appendChild(this.countdownBar.element)
     }
 
-    this.countDownBar.open()
+    this.countdownBar.open()
   }
 
   /**

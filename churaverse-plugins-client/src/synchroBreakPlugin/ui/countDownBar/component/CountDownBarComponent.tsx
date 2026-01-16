@@ -1,7 +1,7 @@
 import { JSXFunc } from 'churaverse-engine-client'
-import style from './CountDownBarComponent.module.scss'
+import style from './CountdownBarComponent.module.scss'
 
-export const CountDownBarComponent: JSXFunc = () => {
+export const CountdownBarComponent: JSXFunc = () => {
   return (
     <div className={`${style.progressItem} progress-item`}>
       <svg className={style.svg} viewBox="0 0 100 100">

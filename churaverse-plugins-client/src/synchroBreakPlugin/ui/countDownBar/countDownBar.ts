@@ -1,13 +1,13 @@
 import { DomManager } from 'churaverse-engine-client'
-import { CountDownBarComponent } from './component/CountDownBarComponent'
-import styles from './component/CountDownBarComponent.module.scss'
-import { ICountDownBar } from '../../interface/ICountDownBar'
+import { CountdownBarComponent } from './component/CountdownBarComponent'
+import styles from './component/CountdownBarComponent.module.scss'
+import { ICountdownBar } from '../../interface/ICountdownBar'
 
 /**
  * 円形カウントダウンバー
  * - 中央に残り秒数を表示（percent をそのまま数値表示）
  */
-export class CountDownBar implements ICountDownBar {
+export class CountdownBar implements ICountdownBar {
   public element!: HTMLElement
   public readonly visible: boolean = false
 
@@ -37,7 +37,7 @@ export class CountDownBar implements ICountDownBar {
       this.progressValueEl = undefined
     }
 
-    this.element = DomManager.addJsxDom(CountDownBarComponent())
+    this.element = DomManager.addJsxDom(CountdownBarComponent())
     this.element.style.display = 'none'
     this.setupObserver()
     this.ensureElementsCached()
@@ -88,7 +88,7 @@ export class CountDownBar implements ICountDownBar {
       },
       {
         root: null,
-        rootMargin: CountDownBar.OBSERVER_ROOT_MARGIN,
+        rootMargin: CountdownBar.OBSERVER_ROOT_MARGIN,
         threshold: 0
       }
     )
@@ -122,7 +122,7 @@ export class CountDownBar implements ICountDownBar {
       const offset = this.calculateStrokeDashoffset(remainingSeconds)
       this.progressBarEl.style.strokeDashoffset = `${offset}`
       this.progressBarEl.getBoundingClientRect()
-      this.progressBarEl.style.transition = CountDownBar.DEFAULT_TRANSITION
+      this.progressBarEl.style.transition = CountdownBar.DEFAULT_TRANSITION
     }
 
     this.updateAlertState(remainingSeconds)
@@ -139,7 +139,7 @@ export class CountDownBar implements ICountDownBar {
 
     // 大きなジャンプがあった場合はトランジションなしで即座に更新
     const prev = this.lastRemainingSeconds ?? remainingSeconds
-    const isLargeJump = Math.abs(remainingSeconds - prev) > CountDownBar.JUMP_THRESHOLD_SECONDS
+    const isLargeJump = Math.abs(remainingSeconds - prev) > CountdownBar.JUMP_THRESHOLD_SECONDS
 
     if (isLargeJump) {
       const prevTransition = this.progressBarEl.style.transition
@@ -150,12 +150,12 @@ export class CountDownBar implements ICountDownBar {
 
       requestAnimationFrame(() => {
         if (this.progressBarEl === undefined) return
-        this.progressBarEl.style.transition = prevTransition !== '' ? prevTransition : CountDownBar.DEFAULT_TRANSITION
+        this.progressBarEl.style.transition = prevTransition !== '' ? prevTransition : CountdownBar.DEFAULT_TRANSITION
       })
     } else {
       // 現在の秒数から次の秒へトランジション
       if (this.progressBarEl.style.transition === '') {
-        this.progressBarEl.style.transition = CountDownBar.DEFAULT_TRANSITION
+        this.progressBarEl.style.transition = CountdownBar.DEFAULT_TRANSITION
       }
       const nextOffset = this.calculateStrokeDashoffset(remainingSeconds - 1)
       this.progressBarEl.style.strokeDashoffset = `${nextOffset}`

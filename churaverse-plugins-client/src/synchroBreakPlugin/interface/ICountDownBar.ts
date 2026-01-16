@@ -1,6 +1,6 @@
 import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
 
-export interface ICountDownBar extends IGameUiComponent {
+export interface ICountdownBar extends IGameUiComponent {
   setTotalDuration: (duration: number) => void
   updateDashOffset: (remainingSeconds: number) => void
   reset: () => void
