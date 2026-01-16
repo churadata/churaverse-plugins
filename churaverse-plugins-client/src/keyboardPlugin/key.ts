@@ -8,6 +8,15 @@ export class Key implements IKey {
    */
   private holdTime = 0
 
+  /**
+   * キーが押されているかの論理値
+   */
+  private _logicalUp = false
+
+  public get logicalUp(): boolean {
+    return this._logicalUp
+  }
+
   public constructor(
     public readonly keyCode: KeyCode,
     public readonly duration: number,
@@ -51,5 +60,13 @@ export class Key implements IKey {
     } else {
       this.resetHoldTime()
     }
+  }
+
+  public logicalRelease(): void {
+    this._logicalUp = true
+  }
+
+  public onPhysicalKeyDown(): void {
+    this._logicalUp = false
   }
 }
