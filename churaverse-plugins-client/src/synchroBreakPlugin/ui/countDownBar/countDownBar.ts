@@ -19,7 +19,7 @@ export class CountdownBar implements ICountdownBar {
   private progressValueEl?: HTMLDivElement
 
   private readonly radius = 45
-  private readonly circumference = 2 * Math.PI * this.radius
+  private readonly circumference = this.radius * 2 * Math.PI
 
   private static readonly DEFAULT_TRANSITION = 'stroke-dashoffset 1s linear, stroke 0.3s ease'
   private static readonly JUMP_THRESHOLD_SECONDS = 2
@@ -51,7 +51,7 @@ export class CountdownBar implements ICountdownBar {
    * 全体の時間を設定する
    */
   public setTotalDuration(duration: number): void {
-    this.totalDuration = duration > 0 ? duration : 1
+    this.totalDuration = Math.max(duration, 1)
   }
 
   /**
