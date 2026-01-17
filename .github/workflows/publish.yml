@@ -1,0 +1,65 @@
+name: publish packages
+run-name: publish packages
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+
+      - name: configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Check publish.txt
+        run: |
+          if [ ! -f publish.txt ]; then
+            echo "publish.txt not found, skip publish"
+            exit 0
+          fi
+
+      - name: Publish packages
+        run: |
+          set -e
+
+          while read ENTRY; do
+            # ENTRY 例: @churaverse/bomb-plugin-server/v1.2.3
+
+            # ENTRY からパッケージ名を取り出す
+            PKG=$(echo "$ENTRY" | sed 's|/v[0-9].*$||')
+            PKG_PATH=$(./.github/scripts/resolve-package-path.sh "$PKG")
+
+            echo "🚀 publishing $ENTRY"
+            npm publish --access public --prefix "$PKG_PATH"
+
+            git tag "$ENTRY"
+          done < publish.txt
+
+      - name: Cleanup publish.txt
+        run: |
+          rm publish.txt
+          git add publish.txt
+          git commit -m "chore: consume publish.txt after publish"
+          git push origin main
+
+      - name: Push tags
+        run: |
+          git push origin --tags
