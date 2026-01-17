@@ -9,7 +9,7 @@ on:
         required: true
         options: [patch, minor, major]
       packages:
-        description: package.jsonのname（カンマ区切りで入力、例: @churaverse/bomb-plugin-server, @churaverse/bomb-plugin-client）
+        description: "package.jsonのname（カンマ区切りで入力、例: @churaverse/bomb-plugin-server, @churaverse/bomb-plugin-client）"
         required: true
 
 permissions:
