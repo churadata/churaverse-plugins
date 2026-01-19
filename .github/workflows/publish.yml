@@ -52,7 +52,7 @@ jobs:
             PKG_PATH=$(./.github/scripts/resolve-package-path.sh "$PKG")
 
             echo "📦 install $PKG"
-            npm ci --prefix "$PKG_PATH"
+            npm i --prefix "$PKG_PATH"
 
             echo "🏗️ build $PKG"
             npm run build --prefix "$PKG_PATH"
