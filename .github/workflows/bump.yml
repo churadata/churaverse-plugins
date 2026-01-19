@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: test/CV-854/test-workflow
 
       - uses: actions/setup-node@v4
         with:
@@ -55,7 +55,7 @@ jobs:
           while read -r PKG; do
             PKG_PATH=$(./.github/scripts/resolve-package-path.sh "$PKG")
 
-            OLD_VERSION=$(jq -r '.version' "$PATH/package.json")
+            OLD_VERSION=$(jq -r '.version' "$PKG_PATH/package.json")
 
             echo "▶ bump $PKG ($SEMVER)"
             npm version "$SEMVER" \
@@ -63,16 +63,16 @@ jobs:
               --prefix "$PKG_PATH"
 
             NEW_VERSION=$(jq -r '.version' "$PKG_PATH/package.json")
-            echo "- \`$PKG\`: $OLD_VERSION -> $NEW_VERSION ($SEMVER)" >> pr-summary.txt
+            echo "- \`$PKG\`: $OLD_VERSION -> $NEW_VERSION ($SEMVER)" > pr-summary.txt
             echo "$PKG/v$NEW_VERSION" >> publish.txt
 
             git add "$PKG_PATH/package.json" publish.txt
-            git commit -m "chore($PKG): bump to $VERSION"
+            git commit -m "chore($PKG): bump to $NEW_VERSION"
           done < packages.txt
 
       - name: Push branch
         run: |
-          git push origin HEAD
+          git push origin bump/${{ github.run_id }}
 
       - name: Build PR body
         id: pr_body
@@ -89,5 +89,6 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           branch: bump/${{ github.run_id }}
+          base: test/CV-854/test-workflow
           title: "chore: bump packages (${{ inputs.semver }})"
           body: ${{ steps.pr_body.outputs.body }}

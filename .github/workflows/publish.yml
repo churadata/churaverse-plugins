@@ -2,9 +2,12 @@ name: publish packages
 run-name: publish packages
 
 on:
-  push:
+  pull_request:
     branches:
-      - main
+      - test/CV-854/test-workflow
+    types:
+      - closed
+
 
 permissions:
   contents: write
@@ -12,12 +15,13 @@ permissions:
 
 jobs:
   publish:
+    if: ${{ github.event.pull_request.merged == true }}
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: test/CV-854/test-workflow
 
       - uses: actions/setup-node@v4
         with:
@@ -64,7 +68,7 @@ jobs:
           rm publish.txt
           git add publish.txt
           git commit -m "chore: consume publish.txt after publish"
-          git push origin main
+          git push origin test/CV-854/test-workflow
 
       - name: Push tags
         run: |

@@ -33,5 +33,8 @@
   "@churaverse/shark-plugin-server": "churaverse-plugins-server/src/sharkPlugin",
   "@churaverse/synchro-break-plugin-server": "churaverse-plugins-server/src/synchroBreakPlugin",
   "@churaverse/textchat-plugin-server": "churaverse-plugins-server/src/textChatPlugin",
-  "@churaverse/voicechat-plugin-server": "churaverse-plugins-server/src/voiceChatPlugin"
+  "@churaverse/voicechat-plugin-server": "churaverse-plugins-server/src/voiceChatPlugin",
+
+  "@churaverse-ci-test/test-plugin-server": "churaverse-plugins-server/src/testPlugin",
+  "@churaverse-ci-test/test-plugin-client": "churaverse-plugins-client/src/testPlugin"
 }

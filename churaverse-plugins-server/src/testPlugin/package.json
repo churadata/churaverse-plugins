@@ -1,0 +1,12 @@
+{
+  "name": "@churaverse-ci-test/test-plugin-server",
+  "version": "1.0.0",
+  "description": "CI publish workflow test package",
+  "main": "./dist/index.js",
+  "files": ["dist"],
+  "scripts": {
+    "build": "mkdir -p dist && echo \"module.exports = { test: () => 'ok' }\" > dist/index.js"
+  },
+  "author": "",
+  "license": "MIT"
+}
