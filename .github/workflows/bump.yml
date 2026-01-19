@@ -76,17 +76,19 @@ jobs:
 
       - name: Create PR
         run: |
-          gh pr create \
-            --base test/CV-854/test-workflow \
-            --head bump/${{ github.run_id }} \
-            --title "chore: bump packages (${{ inputs.semver }})" \
-            --body "$(cat <<'EOF'
-          ### publish対象パッケージ
+          BODY=$(cat <<EOF
+          ## publish対象パッケージ
 
           $(cat pr-summary.txt)
 
           ※このPRをmergeすると、publish workflowが自動実行されます。
           EOF
-          )"
+          )
+
+          gh pr create \
+            --base test/CV-854/test-workflow \
+            --head bump/${{ github.run_id }} \
+            --title "chore: bump packages (${{ inputs.semver }})" \
+            --body "$BODY"
         env:
           GH_TOKEN: ${{ github.token }}
