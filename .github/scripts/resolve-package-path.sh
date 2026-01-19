@@ -3,11 +3,11 @@
 set -e
 
 PKG="$1"
-PATH=$(jq -r --arg pkg "$PKG" '.[$pkg]' packages-map.json)
+PKG_PATH=$(jq -r --arg pkg "$PKG" '.[$pkg]' packages-map.json)
 
-if [ "$PATH" = "null" ]; then
+if [ "$PKG_PATH" = "null" ]; then
   echo "❌ unknown package: $PKG" >&2
   exit 1
 fi
 
-echo "$PATH"
+echo "$PKG_PATH"
