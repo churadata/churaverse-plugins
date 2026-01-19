@@ -1,0 +1,2 @@
+@churaverse-ci-test/test-plugin-server
+@churaverse-ci-test/test-plugin-client
