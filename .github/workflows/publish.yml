@@ -47,6 +47,12 @@ jobs:
             PKG=$(echo "$ENTRY" | sed 's|/v[0-9].*$||')
             PKG_PATH=$(./.github/scripts/resolve-package-path.sh "$PKG")
 
+            echo "📦 install $PKG"
+            npm ci --prefix "$PKG_PATH"
+
+            echo "🏗️ build $PKG"
+            npm run build --prefix "$PKG_PATH"
+
             echo "🚀 publishing $ENTRY"
             npm publish --access public --prefix "$PKG_PATH"
 
