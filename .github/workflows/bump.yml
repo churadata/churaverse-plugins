@@ -63,7 +63,7 @@ jobs:
               --prefix "$PKG_PATH"
 
             NEW_VERSION=$(jq -r '.version' "$PKG_PATH/package.json")
-            echo "- \`$PKG\`: $OLD_VERSION -> $NEW_VERSION ($SEMVER)" > pr-summary.txt
+            echo "- \`$PKG\`: $OLD_VERSION -> $NEW_VERSION ($SEMVER)" >> pr-summary.txt
             echo "$PKG/v$NEW_VERSION" >> publish.txt
 
             git add "$PKG_PATH/package.json" publish.txt
@@ -74,21 +74,19 @@ jobs:
         run: |
           git push origin bump/${{ github.run_id }}
 
-      - name: Build PR body
-        id: pr_body
-        run: |
-          echo "body<<EOF" >> $GITHUB_OUTPUT
-          echo "### publish対象パッケージ" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          cat pr-summary.txt >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "※このPRをmergeすると、publish workflowが自動実行されます。" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
       - name: Create PR
-        uses: peter-evans/create-pull-request@v6
-        with:
-          branch: bump/${{ github.run_id }}
-          base: test/CV-854/test-workflow
-          title: "chore: bump packages (${{ inputs.semver }})"
-          body: ${{ steps.pr_body.outputs.body }}
+        run: |
+          gh pr create \
+            --base test/CV-854/test-workflow \
+            --head bump/${{ github.run_id }} \
+            --title "chore: bump packages (${{ inputs.semver }})" \
+            --body "$(cat <<'EOF'
+          ### publish対象パッケージ
+
+          $(cat pr-summary.txt)
+
+          ※このPRをmergeすると、publish workflowが自動実行されます。
+          EOF
+          )"
+        env:
+          GH_TOKEN: ${{ github.token }}
