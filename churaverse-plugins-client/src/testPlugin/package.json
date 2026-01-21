@@ -1,6 +1,6 @@
 {
   "name": "@churaverse-ci-test/test-plugin-client",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "CI publish workflow test package",
   "main": "./dist/index.js",
   "files": [
