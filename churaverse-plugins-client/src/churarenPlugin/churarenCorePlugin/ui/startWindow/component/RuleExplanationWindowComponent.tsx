@@ -22,7 +22,7 @@ export const RuleExplanationWindowComponent: JSXFunc = () => {
       <ol className={style.sectionList}>
         <li className={style.stepItem}>
           <p className={style.stepTitle}>アイテムを集めよう！</p>
-          <p>ボス(※1)の攻撃を掻い潜りながら、フィールドに落ちている錬金アイテムを集めます。</p>
+          <p>ボスモンスター(※1)の攻撃を掻い潜りながら、フィールドに落ちている錬金アイテムを集めます。</p>
           <img src={itemImage} alt="アイテムとプレイヤーの写った画像" className={style.image} />
         </li>
 
@@ -33,7 +33,7 @@ export const RuleExplanationWindowComponent: JSXFunc = () => {
         </li>
 
         <li className={style.stepItem}>
-          <p className={style.stepTitle}>錬金した攻撃でボスを撃破！</p>
+          <p className={style.stepTitle}>錬金した攻撃でボスモンスターを撃破！</p>
           <p>錬金した攻撃(※2)を使って、ボスモンスターにダメージを与えましょう！</p>
           <img src={bossImage} alt="錬金した攻撃とボスの写った画像" className={style.image} />
         </li>
@@ -42,7 +42,7 @@ export const RuleExplanationWindowComponent: JSXFunc = () => {
       <h3 className={style.churarenMode}>👻ゴーストモードについて👻</h3>
       <div className={style.section}>
         <p>
-          ゲーム途中でボスの攻撃によってHPがゼロになってしまったプレイヤーは、ゴーストモード(※3)へ移行し、最後まで観戦することができます。
+          ゲーム途中でボスモンスターの攻撃によってHPがゼロになってしまったプレイヤーは、ゴーストモード(※3)へ移行し、最後まで観戦することができます。
         </p>
         <img src={ghostImage} alt="ゴーストモードプレイヤーの写った画像" className={style.image} />
       </div>
@@ -57,14 +57,14 @@ export const RuleExplanationWindowComponent: JSXFunc = () => {
 
         <h4 className={`${style.churarenJudge} ${style.lose}`}>敗北条件</h4>
         <ul className={style.resultList}>
-          <li>制限時間経過後にボスのHPが残っている</li>
+          <li>制限時間経過後にボスモンスターのHPが残っている</li>
           <li>参加プレイヤー全員がゴーストモードに移行した</li>
         </ul>
       </div>
       <div className={style.section}>
         <h5>補足</h5>
         <ul className={style.supplementList}>
-          <li>(※1) 参加者が多いほど、それに応じてボスのHPも増加します</li>
+          <li>(※1) 参加者が多いほど、それに応じてボスモンスターのHPも増加します</li>
           <li>(※2) 錬金に使うアイテムの組み合わせによって、攻撃の種類が変わります</li>
           <li>(※3) ゴーストモードでは攻撃・錬金などのアクションは無効になります</li>
         </ul>

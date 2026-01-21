@@ -7,7 +7,7 @@ interface DescriptionWindowProps {
 }
 
 export const CHURAREN_DESCRIPTION =
-  'ちゅられんは、みんなで協力し、制限時間内に強大なモンスターに立ち向かう協力型バトルゲーム！ フィールドでアイテムを集め、錬金窯で攻撃を錬金し、チームでボスを撃破しよう！'
+  'ちゅられんは、みんなで協力し、制限時間内に強大なモンスターに立ち向かう協力型バトルゲーム！ フィールドでアイテムを集め、錬金窯で攻撃を錬金し、チームでボスモンスターを撃破しよう！'
 
 export const DescriptionWindowComponent: JSXFunc<DescriptionWindowProps> = ({
   description,
