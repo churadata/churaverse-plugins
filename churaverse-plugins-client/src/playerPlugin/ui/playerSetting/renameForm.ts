@@ -17,7 +17,7 @@ export const SEND_BUTTON_ID = 'name-send-button'
  * プレイヤー名変更欄
  */
 export class RenameForm {
-  private readonly playerId: string
+  private playerId: string
 
   public constructor(
     playerId: string,
@@ -64,5 +64,9 @@ export class RenameForm {
         this.eventBus.post(changeNameEvent)
       }
     }
+  }
+
+  public updatePlayerId(playerId: string): void {
+    this.playerId = playerId
   }
 }

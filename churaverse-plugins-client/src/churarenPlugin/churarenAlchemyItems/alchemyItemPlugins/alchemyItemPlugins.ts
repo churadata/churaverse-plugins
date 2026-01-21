@@ -1,3 +1,12 @@
 import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-client/domain/baseAlchemyItemPlugin'
+import { FlamePillarPlugin } from '@churaverse/churaren-flame-pillar-plugin-client'
+import { HealingPotionPlugin } from '@churaverse/churaren-healing-potion-plugin-client'
+import { RevivalItemPlugin } from '@churaverse/churaren-revival-item-plugin-client'
+import { ExplosionPlugin } from '@churaverse/churaren-explosion-plugin-client'
 
-export const alchemyItemPlugins: Array<typeof BaseAlchemyItemPlugin> = []
+export const alchemyItemPlugins: Array<typeof BaseAlchemyItemPlugin> = [
+  HealingPotionPlugin,
+  RevivalItemPlugin,
+  ExplosionPlugin,
+  FlamePillarPlugin,
+]
