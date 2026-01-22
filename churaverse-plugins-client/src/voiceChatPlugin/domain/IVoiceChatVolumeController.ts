@@ -8,16 +8,6 @@ export interface IVoiceChatVolumeController {
   setVolume: (playerId: string, volume: number) => void
 
   /**
-   * 音量をコントロールする対象の音声を追加する
-   */
-  addVoice: (playerId: string, voice: HTMLAudioElement) => void
-
-  /**
-   * 音量をコントロールする対象から除外する
-   */
-  deleteVoice: (playerId: string) => void
-
-  /**
    * idで指定したプレイヤーの音量がupdateAccordingToDistance()によらず常に1になる
    * @param playerId
    */
