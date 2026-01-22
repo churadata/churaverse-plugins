@@ -1,0 +1,38 @@
+.container {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #1976d2;
+  }
+
+  &:active {
+    background-color: #1565c0;
+  }
+}
+
+.icon {
+  font-size: 20px;
+}
+
+.label {
+  user-select: none;
+}
