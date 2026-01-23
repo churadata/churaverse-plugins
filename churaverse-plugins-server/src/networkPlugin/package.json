@@ -10,7 +10,12 @@
     "link:cvPackages": "sh npm_link_cvPackages.sh"
   },
   "license": "MIT",
+  "devDependencies": {
+    "@types/async-lock": "^1.4.2"
+  },
   "dependencies": {
-    "churaverse-engine-server": "~0.1.1"
+    "churaverse-engine-server": "~0.1.1",
+    "async-lock": "^1.4.1",
+    "socket.io": "^4.7.4"
   }
 }

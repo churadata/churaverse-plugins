@@ -21,7 +21,7 @@ export const effectIdToElementId = (effectId: CameraEffectId): string => {
   return `VideoEffector_${effectId}`
 }
 
-declare module '../../../coreUiPlugin/settingDialog/settingDialog' {
+declare module '@churaverse/core-ui-plugin-client/settingDialog/settingDialog' {
   export interface SettingDialogSectionMap {
     cameraEffectSetting: SettingSection
   }
