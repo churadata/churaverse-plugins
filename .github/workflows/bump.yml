@@ -46,11 +46,9 @@ jobs:
             | sed 's/^ *//;s/ *$//' \
             > packages.txt
 
-      - name: Bump packages & record publish.txt
+      - name: Bump packages
         run: |
           SEMVER="${{ inputs.semver }}"
-
-          > publish.txt
 
           while read -r PKG; do
             PKG_PATH=$(./.github/scripts/resolve-package-path.sh "$PKG")
@@ -64,10 +62,55 @@ jobs:
 
             NEW_VERSION=$(jq -r '.version' "$PKG_PATH/package.json")
             echo "- \`$PKG\`: $OLD_VERSION -> $NEW_VERSION ($SEMVER)" >> pr-summary.txt
-            echo "$PKG/v$NEW_VERSION" >> publish.txt
 
-            git add "$PKG_PATH/package.json" publish.txt
+            git add "$PKG_PATH/package.json"
             git commit -m "chore($PKG): bump to $NEW_VERSION"
+          done < packages.txt
+
+      - name: install & build bumped packages
+        run: |
+          set -e
+
+          while read -r PKG; do
+            PKG_PATH=$(./.github/scripts/resolve-package-path.sh "$PKG")
+
+            echo ""
+            echo "🔧 install & build: $PKG"
+            echo "📁 path: $PKG_PATH"
+
+            echo "⬇️ npm install"
+            npm install --prefix "$PKG_PATH"
+
+            if jq -e '.scripts.build' "$PKG_PATH/package.json" > /dev/null; then
+              echo "🏗️ npm run build"
+              npm run build --prefix "$PKG_PATH"
+            else
+              echo "↪ no build script, skip"
+            fi
+
+          done < packages.txt
+
+      - name: npm publish dry-run
+        run: |
+          set -e
+
+          while read -r PKG; do
+            PKG_PATH=$(./.github/scripts/resolve-package-path.sh "$PKG")
+
+            echo ""
+            echo "🧪 dry-run publish: $PKG"
+
+            echo "📁 cd $PKG_PATH"
+            cd "$PKG_PATH"
+
+            echo "📦 npm pack"
+            npm pack > /dev/null
+
+            echo "🚫 npm publish --dry-run"
+            npm publish --dry-run > /dev/null
+
+            cd - > /dev/null
+
           done < packages.txt
 
       - name: Push branch
