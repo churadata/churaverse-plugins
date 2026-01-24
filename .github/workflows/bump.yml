@@ -25,9 +25,17 @@ jobs:
         with:
           ref: test/CV-854/test-workflow
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
+
+      - name: show Node.js and npm versions
+        run: |
+          echo "Node.js version"
+          node -v
+          echo ""
+          echo "npm version"
+          npm -v
 
       - name: configure git
         run: |
