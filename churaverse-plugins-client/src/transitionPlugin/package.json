@@ -1,6 +1,10 @@
 {
   "name": "@churaverse/transition-plugin-client",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/churadata/churaverse-plugins.git"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc",
