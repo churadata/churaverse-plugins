@@ -32,7 +32,10 @@ jobs:
       - name: Update npm
         run: |
           npm install -g npm@latest
+          echo "Node.js version"
           node -v
+          echo ""
+          echo "npm version"
           npm -v
 
       - name: configure git

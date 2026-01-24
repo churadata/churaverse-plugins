@@ -2,6 +2,10 @@
   "name": "@churaverse-ci-test/test-plugin-server",
   "version": "1.0.1",
   "description": "CI publish workflow test package",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/churadata/churaverse-plugins.git"
+  },
   "main": "./dist/index.js",
   "files": [
     "dist"
