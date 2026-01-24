@@ -119,7 +119,7 @@ jobs:
             npm publish --dry-run > /dev/null
 
             echo "🚀 npm publish"
-            npm publish --access public
+            npm publish --provenance --access public
 
             echo "🏷️ tag $NAME/v$NEW_VERSION"
             git tag "$NAME/v$NEW_VERSION"
