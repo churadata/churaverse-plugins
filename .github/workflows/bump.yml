@@ -29,12 +29,10 @@ jobs:
         with:
           node-version: 20
 
-      - name: show Node.js and npm versions
+      - name: Update npm
         run: |
-          echo "Node.js version"
+          npm install -g npm@latest
           node -v
-          echo ""
-          echo "npm version"
           npm -v
 
       - name: configure git
