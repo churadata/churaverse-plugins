@@ -53,7 +53,10 @@ export class TextChatPlugin extends BasePlugin<IMainScene> {
     this.textChatPluginStore.textChatService.addChat(ev.textChat)
     this.textChatUi.textChatBoard.add(ev.textChat)
     if (!this.textChatUi.textChatDialog.isOpen) {
+      this.textChatPluginStore.unreadCount++
       this.textChatUi.textChatIcon.badge.activate()
+
+      this.textChatUi.textChatToast.show(ev.textChat)
     }
   }
 
