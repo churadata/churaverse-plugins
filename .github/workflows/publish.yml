@@ -107,11 +107,14 @@ jobs:
               echo "↪ no build script, skip"
             fi
 
+            echo "🧪 assert npm publish --dry-run"
+            npm publish --dry-run > /dev/null
+
             echo "🚀 npm publish"
             npm publish --access public
 
-            echo "🏷️ tag $NAME@$NEW_VERSION"
-            git tag "$NAME@$NEW_VERSION"
+            echo "🏷️ tag $NAME/v$NEW_VERSION"
+            git tag "$NAME/v$NEW_VERSION"
 
             cd - > /dev/null
 
