@@ -5,6 +5,7 @@ import { TextChatService } from '../service/textChatService'
 export function initTextChatPluginStore(store: Store<IMainScene>): void {
   const pluginStore: TextChatPluginStore = {
     textChatService: new TextChatService(),
+    unreadCount: 0,
   }
   store.setInit('textChatPlugin', pluginStore)
 }

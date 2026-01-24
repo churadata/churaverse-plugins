@@ -7,4 +7,6 @@ declare module 'churaverse-engine-client' {
 }
 export interface TextChatPluginStore {
   readonly textChatService: TextChatService
+
+  unreadCount: number
 }

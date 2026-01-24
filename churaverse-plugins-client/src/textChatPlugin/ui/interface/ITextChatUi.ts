@@ -3,10 +3,12 @@ import { ITextChatDialog } from './ITextChatDialog'
 import { IChatInputRenderer } from '../textChatInput/IChatInputRenderer'
 import { ITopBarIconRenderer } from '@churaverse/core-ui-plugin-client/interface/IDialogIconRenderer'
 import { IBadgeHolder } from '@churaverse/core-ui-plugin-client/interface/ITopBarIconHasBadge'
+import { IToastRenderer } from './IToastRenderer'
 
 export interface ITextChatUi {
   textChatDialog: ITextChatDialog
   textChatBoard: IChatBoardRenderer
   textChatInput: IChatInputRenderer
   textChatIcon: ITopBarIconRenderer & IBadgeHolder
+  textChatToast: IToastRenderer
 }

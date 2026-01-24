@@ -7,6 +7,7 @@ import { TextChatDialog } from './textChatDialog/textChatDialog'
 import { TextChatIcon } from './textChatDialog/textChatIcon'
 import { IChatInputRenderer } from './textChatInput/IChatInputRenderer'
 import { TextChatInput } from './textChatInput/textChatInput'
+import { TextChatToast } from './textChatToast/textChatToast'
 import { OwnPlayerUndefinedError } from '@churaverse/player-plugin-client/errors/ownPlayerUndefinedError'
 import { IBadgeHolder } from '@churaverse/core-ui-plugin-client/interface/ITopBarIconHasBadge'
 import { ITopBarIconRenderer } from '@churaverse/core-ui-plugin-client/interface/IDialogIconRenderer'
@@ -17,10 +18,11 @@ export class TextChatUi implements ITextChatUi {
   public textChatBoard: IChatBoardRenderer
   public textChatInput: IChatInputRenderer
   public textChatIcon: ITopBarIconRenderer & IBadgeHolder
+  public textChatToast: TextChatToast
   public constructor(store: Store<IMainScene>, eventBus: IEventBus<IMainScene>) {
     this.textChatDialog = new TextChatDialog()
     this.textChatBoard = new TextChatBoard(store.of('playerPlugin').ownPlayerId, this.textChatDialog)
-    
+
     const coreUiPluginStore = store.of('coreUiPlugin')
     const playerPluginStoreUi = store.of('playerPlugin')
     const player = playerPluginStoreUi.players.get(playerPluginStoreUi.ownPlayerId)
@@ -32,7 +34,9 @@ export class TextChatUi implements ITextChatUi {
       coreUiPluginStore.switcher,
       this.textChatDialog,
       coreUiPluginStore.topBarIconContainer,
-      new Badge()
+      new Badge(store)
     )
+
+    this.textChatToast = new TextChatToast(coreUiPluginStore.switcher, store, this.textChatIcon)
   }
 }
