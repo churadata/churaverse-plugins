@@ -20,49 +20,98 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: test/CV-854/test-workflow # 動作確認用のパッケージが存在するブランチ（修正予定）
+          ref: main
+          fetch-depth: 0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
+
+      - name: update npm
+        run: |
+          npm install -g npm@11.8.0
+          echo "Node.js version"
+          node -v
+          echo ""
+          echo "npm version"
+          npm -v
 
       - name: configure git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Check publish.txt
-        run: |
-          if [ ! -f publish.txt ]; then
-            echo "publish.txt not found, skip publish"
-            exit 0
-          fi
-
-      - name: Publish packages
+      - name: detect publishable package.json
         run: |
           set -e
 
-          while read ENTRY; do
-            # ENTRY 例: @churaverse/bomb-plugin-server/v1.2.3
+          BASE="${{ github.event.pull_request.base.sha }}"
 
-            # ENTRY からパッケージ名を取り出す
-            PKG=$(echo "$ENTRY" | sed 's|/v[0-9].*$||')
-            PKG_PATH=$(./.github/scripts/resolve-package-path.sh "$PKG")
+          echo "🔍 diff from $BASE to HEAD"
 
-            echo "🚀 publishing $ENTRY"
-            npm publish --access public --prefix "$PKG_PATH"
+          > publish_targets.txt
 
-            git tag "$ENTRY"
-          done < publish.txt
+          git diff --name-only "$BASE" HEAD \
+            | grep '/package.json$' \
+            | while read -r PACKAGE_JSON; do
+                NAME=$(jq -r '.name' "$PACKAGE_JSON")
 
-      - name: Cleanup publish.txt
+                if jq -e --arg name "$NAME" 'has($name)' packages-map.json > /dev/null; then
+                  echo "$PACKAGE_JSON" >> publish_targets.txt
+                else
+                  echo "↪ skip $NAME (not in packages-map.json)"
+                fi
+              done
+
+          if [ ! -s publish_targets.txt ]; then
+            echo "no_packages=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "no_packages=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: publish packages
+        if: steps.detect.outputs.no_packages == 'false'
         run: |
-          rm publish.txt
-          git add publish.txt
-          git commit -m "chore: consume publish.txt after publish"
-          git push origin main
+          set -e
 
-      - name: Push tags
-        run: |
-          git push origin --tags
+          BASE="${{ github.event.pull_request.base.sha }}"
+
+          while read -r PACKAGE_JSON; do
+            PKG_PATH=$(dirname "$PACKAGE_JSON")
+
+            NAME=$(jq -r '.name' "$PACKAGE_JSON")
+            NEW_VERSION=$(jq -r '.version' "$PACKAGE_JSON")
+            OLD_VERSION=$(git show "$BASE:$PACKAGE_JSON" | jq -r '.version')
+
+            echo ""
+            echo "📦 $NAME"
+            echo "  old: $OLD_VERSION"
+            echo "  new: $NEW_VERSION"
+
+            if npm view "$NAME@$NEW_VERSION" > /dev/null 2>&1; then
+              echo "  ↪ already published, skip"
+              continue
+            fi
+
+            cd "$PKG_PATH"
+
+            echo "⬇️ npm install"
+            npm install
+
+            if jq -e '.scripts.build' package.json > /dev/null; then
+              echo "🏗️ npm run build"
+              npm run build
+            else
+              echo "↪ no build script, skip"
+            fi
+
+            echo "🧪 npm publish --dry-run"
+            npm publish --dry-run
+
+            echo "🚀 npm publish"
+            npm publish --provenance --access public
+
+            cd - > /dev/null
+
+          done < publish_targets.txt
