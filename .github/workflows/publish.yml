@@ -4,7 +4,7 @@ run-name: publish packages
 on:
   pull_request:
     branches:
-      - test/CV-854/test-workflow # 動作確認用のパッケージが存在するブランチ（修正予定）
+      - main
     types:
       - closed
 
