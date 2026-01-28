@@ -203,12 +203,17 @@ export abstract class GameSelectionListItemRenderer implements IGameSelectionLis
     this.networkPlugin.messageSender.send(gameHostMessage)
   }
 
-  private sendGameAbortMessage(): void {
-    const gameAbortMessage = new RequestGameAbortMessage({
-      gameId: this.props.gameId,
-      playerId: this.store.of('playerPlugin').ownPlayerId,
-    })
-    this.networkPlugin.messageSender.send(gameAbortMessage)
+  protected sendGameAbortMessage(): void {
+    // 中止前に確認ダイアログを表示
+    const shouldAbort: boolean = this.store.of('gamePlugin').gameAbortAlertConfirm.showAlert()
+    if (shouldAbort) {
+      // ユーザーがOKした場合のみ中止メッセージを送信
+      const gameAbortMessage = new RequestGameAbortMessage({
+        gameId: this.props.gameId,
+        playerId: this.store.of('playerPlugin').ownPlayerId,
+      })
+      this.networkPlugin.messageSender.send(gameAbortMessage)
+    }
   }
 
   private sendGameMidwayJoinMessage(): void {

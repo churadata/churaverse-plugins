@@ -2,7 +2,6 @@ import { PhaserLoadAssets, PhaserSceneInit } from 'churaverse-engine-client'
 import { Scene } from 'phaser'
 import { CoreGamePlugin } from '@churaverse/game-plugin-client/domain/coreGamePlugin'
 import { RegisterGameUiEvent } from '@churaverse/game-plugin-client/event/registerGameUiEvent'
-import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { PlayerRendererNotFoundError } from '@churaverse/player-plugin-client/errors/playerRendererNotFoundError'
 import { SynchroBreakPluginStore } from './store/defSynchroBreakPluginStore'
 import { setupSynchroBreakDialogManager } from './ui/startWindow/setupSynchroBreakDialogManager'
@@ -37,12 +36,13 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     allowMidwayJoin: false,
   }
 
+  protected readonly ownerExitMessage =
+    'あなたはゲームオーナーです。あなたが退出すると' + this.gameName + 'が終了します'
+
   private nyokkiActionMessage: string | undefined = undefined
   private ownNyokkiSatatus: NyokkiStatus = 'yet'
   protected gameEntryRenderer!: IGameSelectionListItemRenderer
-
   private synchroBreakPluginStore!: SynchroBreakPluginStore
-  private playerPluginStore!: PlayerPluginStore
   private scene!: Scene
   private coinViewerIconUis = new Map<string, CoinViewerIcon>()
   private socketController!: SocketController
