@@ -1,6 +1,10 @@
 {
   "name": "@churaverse/kick-plugin-server",
   "version": "0.1.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/churadata/churaverse-plugins.git"
+  },
   "description": "",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",

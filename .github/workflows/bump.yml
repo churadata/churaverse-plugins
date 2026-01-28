@@ -23,22 +23,31 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: test/CV-854/test-workflow # 動作確認用のパッケージが存在するブランチ（修正予定）
+          ref: main
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
+
+      - name: update npm
+        run: |
+          npm install -g npm@11.8.0
+          echo "Node.js version"
+          node -v
+          echo ""
+          echo "npm version"
+          npm -v
 
       - name: configure git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Create bump branch
+      - name: create bump branch
         run: |
           git checkout -b bump/${{ github.run_id }}
 
-      - name: Normalize package input
+      - name: normalize package input
         run: |
           # カンマを改行に変換して、前後の空白を削除
           echo "${{ inputs.packages }}" \
@@ -46,11 +55,9 @@ jobs:
             | sed 's/^ *//;s/ *$//' \
             > packages.txt
 
-      - name: Bump packages & record publish.txt
+      - name: bump packages
         run: |
           SEMVER="${{ inputs.semver }}"
-
-          > publish.txt
 
           while read -r PKG; do
             PKG_PATH=$(./.github/scripts/resolve-package-path.sh "$PKG")
@@ -63,32 +70,49 @@ jobs:
               --prefix "$PKG_PATH"
 
             NEW_VERSION=$(jq -r '.version' "$PKG_PATH/package.json")
-            echo "- \`$PKG\`: $OLD_VERSION -> $NEW_VERSION ($SEMVER)" > pr-summary.txt
-            echo "$PKG/v$NEW_VERSION" >> publish.txt
+            echo "- \`$PKG\`: $OLD_VERSION -> $NEW_VERSION ($SEMVER)" >> pr-summary.txt
 
-            git add "$PKG_PATH/package.json" publish.txt
-            git commit -m "chore($PKG): bump to $NEW_VERSION"
+            git add "$PKG_PATH/package.json"
           done < packages.txt
 
-      - name: Push branch
+          git commit -m "chore: bump to $SEMVER"
+
+      - name: validate packages by npm pack
+        run: |
+          set -e
+
+          while read -r PKG; do
+            PKG_PATH=$(./.github/scripts/resolve-package-path.sh "$PKG")
+
+            echo ""
+            echo "🧪 npm pack --dry-run: $PKG"
+            echo "📁 path: $PKG_PATH"
+
+            cd "$PKG_PATH"
+            npm pack --dry-run
+            cd - > /dev/null
+
+          done < packages.txt
+
+      - name: push branch
         run: |
           git push origin bump/${{ github.run_id }}
 
-      - name: Build PR body
-        id: pr_body
+      - name: create PR
         run: |
-          echo "body<<EOF" >> $GITHUB_OUTPUT
-          echo "### publish対象パッケージ" >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          cat pr-summary.txt >> $GITHUB_OUTPUT
-          echo "" >> $GITHUB_OUTPUT
-          echo "※このPRをmergeすると、publish workflowが自動実行されます。" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
+          BODY=$(cat <<EOF
+          ## publish対象パッケージ
 
-      - name: Create PR
-        uses: peter-evans/create-pull-request@v6
-        with:
-          branch: bump/${{ github.run_id }}
-          base: test/CV-854/test-workflow # 動作確認用のパッケージが存在するブランチ（修正予定）
-          title: "chore: bump packages (${{ inputs.semver }})"
-          body: ${{ steps.pr_body.outputs.body }}
+          $(cat pr-summary.txt)
+
+          ※このPRをmergeすると、publish workflowが自動実行されます。
+          EOF
+          )
+
+          gh pr create \
+            --base main \
+            --head bump/${{ github.run_id }} \
+            --title "chore: bump packages (${{ inputs.semver }})" \
+            --body "$BODY"
+        env:
+          GH_TOKEN: ${{ github.token }}
