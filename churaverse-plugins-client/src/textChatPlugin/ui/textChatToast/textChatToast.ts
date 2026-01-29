@@ -1,9 +1,9 @@
-import { DomManager, Store, IMainScene } from 'churaverse-engine-client' // Store, IMainSceneを追加
+import { DomManager, Store, IMainScene } from 'churaverse-engine-client'
 import { TextChat } from '../../model/textChat'
 import { IToastRenderer } from '../interface/IToastRenderer'
 import { IDialogSwitcher } from '@churaverse/core-ui-plugin-client/interface/IDialogSwitcher'
-import { ITopBarIconRenderer } from '@churaverse/core-ui-plugin-client/interface/IDialogIconRenderer' // 追加
-import { IBadgeHolder } from '@churaverse/core-ui-plugin-client/interface/ITopBarIconHasBadge' // 追加
+import { ITopBarIconRenderer } from '@churaverse/core-ui-plugin-client/interface/IDialogIconRenderer'
+import { IBadgeHolder } from '@churaverse/core-ui-plugin-client/interface/ITopBarIconHasBadge'
 import { TextChatToastComponent } from './components/TextChatToastComponent'
 import style from './components/TextChatToastComponent.module.scss'
 
@@ -15,7 +15,6 @@ export class TextChatToast implements IToastRenderer {
   private activeToasts: HTMLElement[] = []
   private readonly container: HTMLDivElement
 
-  // コンストラクタに store と icon を追加
   public constructor(
     private readonly switcher: IDialogSwitcher,
     private readonly store: Store<IMainScene>,
