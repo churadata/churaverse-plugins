@@ -7,9 +7,13 @@ import { IBadgeHolder } from '@churaverse/core-ui-plugin-client/interface/ITopBa
 import { TextChatToastComponent } from './components/TextChatToastComponent'
 import style from './components/TextChatToastComponent.module.scss'
 
+const MAX_TOAST_COUNT = 3
+const TOAST_DISPLAY_DURATION = 3500
+const FADE_OUT_DURATION = 500
+
 export class TextChatToast implements IToastRenderer {
   private activeToasts: HTMLElement[] = []
-  private container: HTMLDivElement
+  private readonly container: HTMLDivElement
 
   // コンストラクタに store と icon を追加
   public constructor(
@@ -23,39 +27,36 @@ export class TextChatToast implements IToastRenderer {
   }
 
   public show(textChat: TextChat): void {
-    if (this.activeToasts.length >= 3) {
+    if (this.activeToasts.length >= MAX_TOAST_COUNT) {
       const oldest = this.activeToasts.shift()
       oldest?.remove()
     }
 
-    const toastElement = DomManager.jsxToDom(TextChatToastComponent({ textChat, onClick: () => {} }))
+    const toastElement = DomManager.jsxToDom(TextChatToastComponent({ textChat }))
 
-    // ×ボタンを探して、クリックイベントをつける
-    const closeButton = toastElement.querySelector(`.${style.closeButton}`)
+    this.container.prepend(toastElement)
+    this.activeToasts.push(toastElement)
+
+    const closeButtonId = `toast-close-${textChat.playerId}`
+    const closeButton = DomManager.getElementById(closeButtonId)
+
     closeButton?.addEventListener('click', (event) => {
-      // バブリングを止める
       event.stopPropagation()
-
-      console.log('×ボタンが押されました。通知を削除します。')
       this.removeToast(toastElement)
     })
 
     // 本体クリック（ダイアログを開く）
     toastElement.addEventListener('click', () => {
-      console.log('通知本体が押されました。ダイアログを開きます。')
-      this.store.of('textChatPlugin').unreadCount = 0
-      this.icon.activate()
-      this.icon.badge.deactivate()
-      this.switcher.open('chat', () => {})
       this.removeToast(toastElement)
+      this.switcher.open('chat', () => {
+        this.icon.activate()
+        this.icon.badge.deactivate()
+      })
     })
-
-    this.container.prepend(toastElement)
-    this.activeToasts.push(toastElement)
 
     setTimeout(() => {
       this.removeToast(toastElement)
-    }, 3500)
+    }, TOAST_DISPLAY_DURATION)
   }
 
   private removeToast(element: HTMLElement): void {
@@ -64,6 +65,6 @@ export class TextChatToast implements IToastRenderer {
     setTimeout(() => {
       element.remove()
       this.activeToasts = this.activeToasts.filter((t) => t !== element)
-    }, 500)
+    }, FADE_OUT_DURATION)
   }
 }
