@@ -27,8 +27,8 @@ export class TextChatToast implements IToastRenderer {
 
   public show(textChat: TextChat): void {
     if (this.activeToasts.length >= MAX_TOAST_COUNT) {
-      const oldest = this.activeToasts.shift()
-      oldest?.remove()
+      const oldest = this.activeToasts[0]
+      this.removeToast(oldest)
     }
 
     const toastElement = DomManager.jsxToDom(TextChatToastComponent({ textChat }))
@@ -50,6 +50,7 @@ export class TextChatToast implements IToastRenderer {
       this.switcher.open('chat', () => {
         this.icon.activate()
         this.icon.badge.deactivate()
+        this.store.of('textChatPlugin').unreadCount = 0
       })
     })
 
