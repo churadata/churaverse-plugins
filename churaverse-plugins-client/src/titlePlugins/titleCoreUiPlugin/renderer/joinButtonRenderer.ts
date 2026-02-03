@@ -85,6 +85,11 @@ export class JoinButtonRenderer implements IJoinButtonRenderer {
         ? 'MainScene'
         : 'MeetingScene'
 
+      if (targetScene === 'MeetingScene') {
+        const player = this.titlePlayerPluginStore.ownPlayer
+        sessionStorage.setItem('meetingPlayerName', player.name)
+      }
+
       DomManager.removeAll()
       this.transitionPluginStore.transitionManager.transitionTo(targetScene)
     } else {

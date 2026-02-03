@@ -1,5 +1,5 @@
 import { BasePlugin, DomManager, getChuraverseConfig, IMeetingScene } from 'churaverse-engine-client'
-import { Room, RoomEvent, RoomOptions, VideoPresets, Track, RemoteTrack, Participant } from 'livekit-client'
+import { Room, RoomEvent, RoomOptions, VideoPresets, Track, RemoteTrack, RemoteParticipant, Participant, DataPacket_Kind } from 'livekit-client'
 import { videoGridStyles } from './components/VideoGridComponent'
 import { controlBarStyles } from './components/MeetingControlBarComponent'
 import { sidebarStyles } from './components/MeetingSidebarComponent'
@@ -8,13 +8,24 @@ interface AccessTokenResponse {
   token: string
 }
 
+interface ChatMessage {
+  type: 'chat' | 'chat_history'
+  sender: string
+  text: string
+  timestamp: number
+  history?: ChatMessage[]
+}
+
 export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   private room?: Room
   private participantId: string = ''
+  private displayName: string = ''
   private isMicEnabled: boolean = false
   private isCameraEnabled: boolean = false
   private isScreenShareEnabled: boolean = false
   private isConnected: boolean = false
+  private chatHistory: ChatMessage[] = []
+  private participantNames: Map<string, string> = new Map()
 
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.init.bind(this))
@@ -22,8 +33,21 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private init(): void {
-    this.participantId = this.generateParticipantId()
+    this.displayName = sessionStorage.getItem('meetingPlayerName') ?? this.readCookie('name') ?? ''
+    this.participantId = this.displayName !== '' ? this.displayName : this.generateParticipantId()
+    this.participantNames.set(this.participantId, this.displayName !== '' ? this.displayName : this.participantId)
     window.addEventListener('beforeunload', () => this.cleanup())
+  }
+
+  private readCookie(property: string): string | undefined {
+    const savedInfos = document.cookie.split(';')
+    for (const savedInfo of savedInfos) {
+      const [key, value] = savedInfo.trim().split('=')
+      if (key === property) {
+        return decodeURIComponent(value)
+      }
+    }
+    return undefined
   }
 
   private async start(): Promise<void> {
@@ -77,6 +101,22 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       console.log(`[MeetingWebRtc] Connected to room: ${this.room.name}`)
 
       this.addParticipantTile(this.room.localParticipant)
+
+      this.room.participants.forEach((participant: RemoteParticipant) => {
+        console.log(`[MeetingWebRtc] Adding existing participant: ${participant.identity}`)
+        this.addParticipantTile(participant)
+
+        participant.videoTracks.forEach((publication) => {
+          if (publication.track !== undefined && publication.isSubscribed) {
+            this.attachTrack(publication.track, participant.identity)
+          }
+        })
+        participant.audioTracks.forEach((publication) => {
+          if (publication.track !== undefined && publication.isSubscribed) {
+            this.attachTrack(publication.track, participant.identity)
+          }
+        })
+      })
     } catch (e) {
       console.error('[MeetingWebRtc] Failed to connect:', e)
       this.isConnected = false
@@ -89,6 +129,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     this.room.on(RoomEvent.ParticipantConnected, (participant) => {
       console.log(`[MeetingWebRtc] Participant connected: ${participant.identity}`)
       this.addParticipantTile(participant)
+      this.sendChatHistory()
     })
 
     this.room.on(RoomEvent.ParticipantDisconnected, (participant) => {
@@ -96,27 +137,66 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       this.removeParticipantTile(participant.identity)
     })
 
-    this.room.on(RoomEvent.TrackSubscribed, (track, _publication, participant) => {
-      console.log(`[MeetingWebRtc] Track subscribed: ${track.kind} from ${participant.identity}`)
-      this.attachTrack(track, participant.identity)
+    this.room.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
+      console.log(`[MeetingWebRtc] Track subscribed: ${track.kind} (source: ${publication.source}) from ${participant.identity}`)
+      if (publication.source === Track.Source.ScreenShare) {
+        this.attachScreenShareTrack(track, participant.identity)
+      } else {
+        this.attachTrack(track, participant.identity)
+      }
     })
 
-    this.room.on(RoomEvent.TrackUnsubscribed, (track, _publication, participant) => {
-      console.log(`[MeetingWebRtc] Track unsubscribed: ${track.kind} from ${participant.identity}`)
-      this.detachTrack(track, participant.identity)
+    this.room.on(RoomEvent.TrackUnsubscribed, (track, publication, participant) => {
+      console.log(`[MeetingWebRtc] Track unsubscribed: ${track.kind} (source: ${publication.source}) from ${participant.identity}`)
+      if (publication.source === Track.Source.ScreenShare) {
+        this.detachScreenShareTrack(participant.identity)
+      } else {
+        this.detachTrack(track, participant.identity)
+      }
     })
 
     this.room.on(RoomEvent.LocalTrackPublished, (publication, participant) => {
-      console.log(`[MeetingWebRtc] Local track published: ${publication.kind}`)
+      console.log(`[MeetingWebRtc] Local track published: ${publication.kind} (source: ${publication.source})`)
       if (publication.track !== undefined) {
-        this.attachTrack(publication.track, participant.identity)
+        if (publication.source === Track.Source.ScreenShare) {
+          this.attachScreenShareTrack(publication.track, participant.identity)
+        } else {
+          this.attachTrack(publication.track, participant.identity)
+        }
       }
     })
 
     this.room.on(RoomEvent.LocalTrackUnpublished, (publication, participant) => {
-      console.log(`[MeetingWebRtc] Local track unpublished: ${publication.kind}`)
+      console.log(`[MeetingWebRtc] Local track unpublished: ${publication.kind} (source: ${publication.source})`)
       if (publication.track !== undefined) {
-        this.detachTrack(publication.track, participant.identity)
+        if (publication.source === Track.Source.ScreenShare) {
+          this.detachScreenShareTrack(participant.identity)
+        } else {
+          this.detachTrack(publication.track, participant.identity)
+        }
+      }
+    })
+
+    this.room.on(RoomEvent.DataReceived, (payload, participant) => {
+      try {
+        const decoder = new TextDecoder()
+        const jsonStr = decoder.decode(payload)
+        const message = JSON.parse(jsonStr) as ChatMessage
+
+        if (message.type === 'chat_history' && message.history !== undefined) {
+          message.history.forEach((historyMsg) => {
+            const exists = this.chatHistory.some((m) => m.timestamp === historyMsg.timestamp && m.sender === historyMsg.sender)
+            if (!exists) {
+              this.chatHistory.push(historyMsg)
+              this.addChatMessage(historyMsg.sender, historyMsg.text)
+            }
+          })
+        } else if (message.type === 'chat' && message.text !== undefined && participant !== undefined) {
+          this.chatHistory.push(message)
+          this.addChatMessage(participant.identity, message.text)
+        }
+      } catch (e) {
+        console.error('[MeetingWebRtc] Failed to parse chat message:', e)
       }
     })
   }
@@ -161,7 +241,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     const name = document.createElement('span')
     name.className = videoGridStyles.name
-    name.textContent = participant.identity === this.participantId ? 'You' : participant.identity.slice(0, 8)
+    name.textContent = participant.identity === this.participantId ? `${this.participantId} (自分)` : participant.identity
     nameBar.appendChild(name)
 
     tile.appendChild(videoArea)
@@ -184,12 +264,10 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     const countEl = document.getElementById('participants-count')
     if (list === null || this.room === undefined) return
 
-    // リストをクリア
     while (list.firstChild !== null) {
       list.removeChild(list.firstChild)
     }
 
-    // 参加者を収集（ローカル + リモート）
     const participants: Participant[] = [this.room.localParticipant]
     this.room.participants.forEach((p: Participant) => {
       if (p !== this.room?.localParticipant) {
@@ -197,7 +275,6 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       }
     })
 
-    // 各参加者のアイテムを追加
     participants.forEach((p) => {
       const item = document.createElement('div')
       item.className = sidebarStyles.participantItem
@@ -209,10 +286,9 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
       const name = document.createElement('span')
       name.className = sidebarStyles.participantName
-      name.textContent = p.identity === this.participantId ? 'You' : p.identity.slice(0, 8)
+      name.textContent = p.identity === this.participantId ? `${this.participantId} (自分)` : p.identity
       item.appendChild(name)
 
-      // マイクがOFFの場合はミュートアイコンを表示
       if (!p.isMicrophoneEnabled) {
         const mutedIcon = this.createMutedIcon()
         mutedIcon.classList.add(sidebarStyles.mutedIcon)
@@ -222,7 +298,6 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       list.appendChild(item)
     })
 
-    // 参加者カウントを更新
     if (countEl !== null) {
       countEl.textContent = `参加者 (${participants.length})`
     }
@@ -260,6 +335,72 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       const element = track.attach()
       document.body.appendChild(element)
     }
+  }
+
+  private attachScreenShareTrack(track: RemoteTrack | Track, participantId: string): void {
+    const grid = document.getElementById('video-grid')
+    if (grid === null) {
+      console.error('[MeetingWebRtc] video-grid element not found!')
+      return
+    }
+
+    const tileId = `tile-screenshare-${participantId}`
+    const existingTile = document.getElementById(tileId)
+    if (existingTile !== null) {
+      return
+    }
+
+    const tile = document.createElement('div')
+    tile.id = tileId
+    tile.className = videoGridStyles.screenShareTile
+
+    const badge = document.createElement('div')
+    badge.className = videoGridStyles.screenShareBadge
+    badge.textContent = '画面共有'
+    tile.appendChild(badge)
+
+    const videoArea = document.createElement('div')
+    videoArea.className = videoGridStyles.videoArea
+    videoArea.style.cssText = 'position:relative;'
+
+    const videoContainer = document.createElement('div')
+    videoContainer.style.cssText = 'width:100%;height:100%;position:absolute;top:0;left:0;'
+    const element = track.attach()
+    element.style.cssText = 'width:100%;height:100%;object-fit:contain;'
+    videoContainer.appendChild(element)
+    videoArea.appendChild(videoContainer)
+
+    const nameBar = document.createElement('div')
+    nameBar.className = videoGridStyles.nameBar
+
+    const name = document.createElement('span')
+    name.className = videoGridStyles.name
+    const displayName = participantId === this.participantId ? 'You' : participantId
+    name.textContent = `${displayName}の画面`
+    nameBar.appendChild(name)
+
+    tile.appendChild(videoArea)
+    tile.appendChild(nameBar)
+    grid.appendChild(tile)
+
+    this.updateGridLayout()
+    console.log(`[MeetingWebRtc] Screen share tile attached from ${participantId}`)
+  }
+
+  private detachScreenShareTrack(participantId?: string): void {
+    const grid = document.getElementById('video-grid')
+    if (grid === null) return
+
+    if (participantId !== undefined) {
+      const tile = document.getElementById(`tile-screenshare-${participantId}`)
+      tile?.remove()
+    } else {
+      const tiles = grid.querySelectorAll('[id^="tile-screenshare-"]')
+      tiles.forEach((tile) => tile.remove())
+    }
+
+    this.updateGridLayout()
+    console.log('[MeetingWebRtc] Screen share tile detached')
   }
 
   private detachTrack(track: RemoteTrack | Track, participantId: string): void {
@@ -320,6 +461,24 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     cameraButton?.addEventListener('click', () => void this.toggleCamera())
     screenShareButton?.addEventListener('click', () => void this.toggleScreenShare())
     exitButton?.addEventListener('click', () => this.exitMeeting())
+
+    const chatInput = document.getElementById('chat-input') as HTMLInputElement | null
+    const chatSendButton = document.getElementById('chat-send-button')
+
+    chatSendButton?.addEventListener('click', () => {
+      if (chatInput !== null && chatInput.value.trim() !== '') {
+        void this.sendChatMessage(chatInput.value.trim())
+        chatInput.value = ''
+      }
+    })
+
+    chatInput?.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey && chatInput.value.trim() !== '') {
+        e.preventDefault()
+        void this.sendChatMessage(chatInput.value.trim())
+        chatInput.value = ''
+      }
+    })
   }
 
   private exitMeeting(): void {
@@ -366,5 +525,68 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     } else {
       button.classList.remove(controlBarStyles.activeButton)
     }
+  }
+
+  private async sendChatMessage(text: string): Promise<void> {
+    if (this.room === undefined || !this.isConnected) return
+
+    const message: ChatMessage = {
+      type: 'chat',
+      sender: this.participantId,
+      text,
+      timestamp: Date.now(),
+    }
+
+    try {
+      const encoder = new TextEncoder()
+      const data = encoder.encode(JSON.stringify(message))
+      await this.room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE)
+      this.chatHistory.push(message)
+      this.addChatMessage(this.participantId, text)
+    } catch (e) {
+      console.error('[MeetingWebRtc] Failed to send chat message:', e)
+    }
+  }
+
+  private sendChatHistory(): void {
+    if (this.room === undefined || !this.isConnected || this.chatHistory.length === 0) return
+
+    const historyMessage: ChatMessage = {
+      type: 'chat_history',
+      sender: this.participantId,
+      text: '',
+      timestamp: Date.now(),
+      history: this.chatHistory,
+    }
+
+    try {
+      const encoder = new TextEncoder()
+      const data = encoder.encode(JSON.stringify(historyMessage))
+      void this.room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE)
+      console.log(`[MeetingWebRtc] Sent chat history (${this.chatHistory.length} messages)`)
+    } catch (e) {
+      console.error('[MeetingWebRtc] Failed to send chat history:', e)
+    }
+  }
+
+  private addChatMessage(senderId: string, text: string): void {
+    const chatMessages = document.getElementById('chat-messages')
+    if (chatMessages === null) return
+
+    const messageEl = document.createElement('div')
+    messageEl.className = sidebarStyles.chatMessage
+
+    const authorEl = document.createElement('span')
+    authorEl.className = sidebarStyles.chatAuthor
+    authorEl.textContent = senderId === this.participantId ? `${this.participantId} (自分)` : senderId
+    messageEl.appendChild(authorEl)
+
+    const textEl = document.createElement('span')
+    textEl.className = sidebarStyles.chatText
+    textEl.textContent = text
+    messageEl.appendChild(textEl)
+
+    chatMessages.appendChild(messageEl)
+    chatMessages.scrollTop = chatMessages.scrollHeight
   }
 }

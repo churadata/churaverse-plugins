@@ -28,7 +28,17 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@churaverse/bomb-plugin-server": "file:src/bombPlugin",
+    "@churaverse/collision-detection-plugin-server": "file:src/collisionDetectionPlugin",
+    "@churaverse/kick-plugin-server": "file:src/kickPlugin",
+    "@churaverse/map-plugin-server": "file:src/mapPlugin",
+    "@churaverse/network-plugin-server": "file:src/networkPlugin",
+    "@churaverse/player-plugin-server": "file:src/playerPlugin",
+    "@churaverse/shark-plugin-server": "file:src/sharkPlugin",
+    "@churaverse/textchat-plugin-server": "file:src/textChatPlugin",
+    "@churaverse/voicechat-plugin-server": "file:src/voiceChatPlugin",
     "async-lock": "^1.4.1",
+    "churaverse-engine-server": "file:../../churaverse-engine/churaverse-engine-server",
     "socket.io": "^4.7.4"
   }
 }
