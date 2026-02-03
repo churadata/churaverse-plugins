@@ -1,6 +1,9 @@
 import { JSXFunc } from 'churaverse-engine-client'
 import style from './MeetingControlBarComponent.module.scss'
 
+// スタイルのエクスポート（MeetingWebRtcPluginで使用）
+export { style as controlBarStyles }
+
 export const MeetingControlBarComponent: JSXFunc = () => {
   return (
     <div className={style.controlBar}>
