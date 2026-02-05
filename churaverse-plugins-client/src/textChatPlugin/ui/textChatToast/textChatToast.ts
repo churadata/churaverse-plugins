@@ -1,6 +1,6 @@
 import { DomManager, Store, IMainScene } from 'churaverse-engine-client'
 import { TextChat } from '../../model/textChat'
-import { IToastRenderer } from '../interface/IToastRenderer'
+import { IChatToastRenderer } from '../interface/IChatToastRenderer'
 import { IDialogSwitcher } from '@churaverse/core-ui-plugin-client/interface/IDialogSwitcher'
 import { ITopBarIconRenderer } from '@churaverse/core-ui-plugin-client/interface/IDialogIconRenderer'
 import { IBadgeHolder } from '@churaverse/core-ui-plugin-client/interface/ITopBarIconHasBadge'
@@ -11,7 +11,7 @@ const MAX_TOAST_COUNT = 3
 const TOAST_DISPLAY_DURATION = 3500
 const FADE_OUT_DURATION = 500
 
-export class TextChatToast implements IToastRenderer {
+export class TextChatToast implements IChatToastRenderer {
   private activeToasts: HTMLElement[] = []
   private readonly container: HTMLDivElement
 

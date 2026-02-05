@@ -4,7 +4,9 @@ import { Store, IMainScene } from 'churaverse-engine-client'
 export class Badge implements IBadge {
   private readonly badgeElement: HTMLDivElement
 
-  public constructor(private readonly store: Store<IMainScene>) {
+  public constructor(
+    private readonly store: Store<IMainScene>
+  ) {
     const BADGE_SIZE = '20px'
 
     const div = document.createElement('div')
