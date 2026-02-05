@@ -177,6 +177,28 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       }
     })
 
+    // Feature: マイクのミュート状態を監視
+    this.room.on(RoomEvent.TrackMuted, (publication, participant) => {
+      console.log(`[MeetingWebRtc] Track muted: ${publication.kind} from ${participant.identity}`)
+      if (publication.kind === Track.Kind.Audio) {
+        this.updateMicIcon(participant.identity, true)
+        this.updateParticipantList()
+      }
+    })
+
+    this.room.on(RoomEvent.TrackUnmuted, (publication, participant) => {
+      console.log(`[MeetingWebRtc] Track unmuted: ${publication.kind} from ${participant.identity}`)
+      if (publication.kind === Track.Kind.Audio) {
+        this.updateMicIcon(participant.identity, false)
+        this.updateParticipantList()
+      }
+    })
+
+    // Feature: 発話中の参加者をハイライト
+    this.room.on(RoomEvent.ActiveSpeakersChanged, (speakers: Participant[]) => {
+      this.updateActiveSpeakers(speakers)
+    })
+
     this.room.on(RoomEvent.DataReceived, (payload, participant) => {
       try {
         const decoder = new TextDecoder()
@@ -243,6 +265,15 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     name.className = videoGridStyles.name
     name.textContent = participant.identity === this.participantId ? `${this.participantId} (自分)` : participant.identity
     nameBar.appendChild(name)
+
+    // Feature: マイクアイコンを名前の横に追加
+    const micIcon = document.createElement('div')
+    micIcon.id = `mic-icon-${participant.identity}`
+    micIcon.className = videoGridStyles.micIcon
+    micIcon.appendChild(this.createMutedIcon())
+    // 初期状態: マイクがOFFなら表示
+    micIcon.style.display = participant.isMicrophoneEnabled ? 'none' : 'flex'
+    nameBar.appendChild(micIcon)
 
     tile.appendChild(videoArea)
     tile.appendChild(nameBar)
@@ -383,7 +414,8 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     tile.appendChild(nameBar)
     grid.appendChild(tile)
 
-    this.updateGridLayout()
+    // Feature: スポットライトレイアウトに切り替え
+    this.updateSpotlightLayout(true)
     console.log(`[MeetingWebRtc] Screen share tile attached from ${participantId}`)
   }
 
@@ -399,7 +431,9 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       tiles.forEach((tile) => tile.remove())
     }
 
-    this.updateGridLayout()
+    // 画面共有がなくなったらグリッドレイアウトに戻す
+    const remainingScreenShares = grid.querySelectorAll('[id^="tile-screenshare-"]')
+    this.updateSpotlightLayout(remainingScreenShares.length > 0)
     console.log('[MeetingWebRtc] Screen share tile detached')
   }
 
@@ -462,6 +496,11 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     screenShareButton?.addEventListener('click', () => void this.toggleScreenShare())
     exitButton?.addEventListener('click', () => this.exitMeeting())
 
+    // 初期状態でボタンのスタイルを設定（マイク/カメラはOFF状態）
+    this.updateButtonState('mic-toggle-button', this.isMicEnabled, 'media')
+    this.updateButtonState('camera-toggle-button', this.isCameraEnabled, 'media')
+    this.updateButtonState('screen-share-button', this.isScreenShareEnabled, 'screenshare')
+
     const chatInput = document.getElementById('chat-input') as HTMLInputElement | null
     const chatSendButton = document.getElementById('chat-send-button')
 
@@ -491,7 +530,9 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     this.isMicEnabled = !this.isMicEnabled
     await this.room.localParticipant.setMicrophoneEnabled(this.isMicEnabled)
-    this.updateButtonState('mic-toggle-button', this.isMicEnabled)
+    this.updateButtonState('mic-toggle-button', this.isMicEnabled, 'media')
+    // 自分のマイクアイコンも更新
+    this.updateMicIcon(this.participantId, !this.isMicEnabled)
   }
 
   private async toggleCamera(): Promise<void> {
@@ -499,7 +540,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     this.isCameraEnabled = !this.isCameraEnabled
     await this.room.localParticipant.setCameraEnabled(this.isCameraEnabled)
-    this.updateButtonState('camera-toggle-button', this.isCameraEnabled)
+    this.updateButtonState('camera-toggle-button', this.isCameraEnabled, 'media')
   }
 
   private async toggleScreenShare(): Promise<void> {
@@ -507,23 +548,158 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     this.isScreenShareEnabled = !this.isScreenShareEnabled
     try {
-      await this.room.localParticipant.setScreenShareEnabled(this.isScreenShareEnabled)
-      this.updateButtonState('screen-share-button', this.isScreenShareEnabled)
+      await this.room.localParticipant.setScreenShareEnabled(this.isScreenShareEnabled, {
+        surfaceSwitching: 'exclude',
+        selfBrowserSurface: 'exclude',
+        systemAudio: 'exclude',
+      })
+      this.updateButtonState('screen-share-button', this.isScreenShareEnabled, 'screenshare')
+      // 画面共有後にウィンドウにフォーカスを戻す（複数回試行）
+      if (this.isScreenShareEnabled) {
+        window.focus()
+        setTimeout(() => window.focus(), 100)
+        setTimeout(() => window.focus(), 500)
+        setTimeout(() => window.focus(), 1000)
+      }
     } catch (e) {
       console.error('[MeetingWebRtc] Screen share failed:', e)
       this.isScreenShareEnabled = false
-      this.updateButtonState('screen-share-button', false)
+      this.updateButtonState('screen-share-button', false, 'screenshare')
     }
   }
 
-  private updateButtonState(buttonId: string, isActive: boolean): void {
+  private updateButtonState(buttonId: string, isEnabled: boolean, type: 'media' | 'screenshare' = 'media'): void {
     const button = DomManager.getElementById(buttonId)
     if (button === undefined) return
 
-    if (isActive) {
-      button.classList.add(controlBarStyles.activeButton)
+    // クラスをリセット
+    button.classList.remove(controlBarStyles.onButton, controlBarStyles.offButton, controlBarStyles.activeButton)
+
+    // アイコンIDを決定
+    let iconOnId: string
+    let iconOffId: string
+    if (buttonId === 'mic-toggle-button') {
+      iconOnId = 'mic-icon-on'
+      iconOffId = 'mic-icon-off'
+    } else if (buttonId === 'camera-toggle-button') {
+      iconOnId = 'camera-icon-on'
+      iconOffId = 'camera-icon-off'
     } else {
-      button.classList.remove(controlBarStyles.activeButton)
+      iconOnId = 'screen-icon-on'
+      iconOffId = 'screen-icon-off'
+    }
+
+    const iconOn = document.getElementById(iconOnId)
+    const iconOff = document.getElementById(iconOffId)
+
+    if (type === 'screenshare') {
+      // 画面共有: ONの時は青、OFFの時はデフォルト
+      if (isEnabled) {
+        button.classList.add(controlBarStyles.activeButton)
+        if (iconOn !== null) iconOn.style.display = 'block'
+        if (iconOff !== null) iconOff.style.display = 'none'
+      } else {
+        if (iconOn !== null) iconOn.style.display = 'none'
+        if (iconOff !== null) iconOff.style.display = 'block'
+      }
+    } else {
+      // マイク/カメラ: ONの時はデフォルト（グレー）、OFFの時は赤
+      if (isEnabled) {
+        button.classList.add(controlBarStyles.onButton)
+        if (iconOn !== null) iconOn.style.display = 'block'
+        if (iconOff !== null) iconOff.style.display = 'none'
+      } else {
+        button.classList.add(controlBarStyles.offButton)
+        if (iconOn !== null) iconOn.style.display = 'none'
+        if (iconOff !== null) iconOff.style.display = 'block'
+      }
+    }
+  }
+
+  // Feature: マイクアイコンの表示/非表示を更新
+  private updateMicIcon(participantId: string, isMuted: boolean): void {
+    const micIcon = document.getElementById(`mic-icon-${participantId}`)
+    if (micIcon !== null) {
+      micIcon.style.display = isMuted ? 'flex' : 'none'
+    }
+  }
+
+  // Feature: 発話中の参加者をハイライト
+  private updateActiveSpeakers(speakers: Participant[]): void {
+    const grid = document.getElementById('video-grid')
+    if (grid === null) return
+
+    // すべてのタイルからspeakingクラスを削除
+    const tiles = grid.querySelectorAll(`.${videoGridStyles.participantTile}`)
+    tiles.forEach((tile) => {
+      tile.classList.remove(videoGridStyles.speaking)
+    })
+
+    // 発話中の参加者にspeakingクラスを追加
+    speakers.forEach((speaker) => {
+      const tile = document.getElementById(`tile-${speaker.identity}`)
+      if (tile !== null) {
+        tile.classList.add(videoGridStyles.speaking)
+      }
+    })
+  }
+
+  // Feature: 画面共有時のスポットライトレイアウト
+  private updateSpotlightLayout(hasScreenShare: boolean): void {
+    const grid = document.getElementById('video-grid')
+    if (grid === null) return
+
+    // 既存のサイドバーコンテナを削除
+    const existingSidebar = document.getElementById('spotlight-sidebar')
+    existingSidebar?.remove()
+
+    if (hasScreenShare) {
+      // スポットライトレイアウトに切り替え
+      grid.classList.add(videoGridStyles.spotlightLayout)
+      grid.classList.remove(videoGridStyles.grid1, videoGridStyles.grid2, videoGridStyles.grid4, videoGridStyles.grid6, videoGridStyles.grid9)
+
+      // 画面共有タイルをメインに
+      const screenShareTiles = grid.querySelectorAll('[id^="tile-screenshare-"]')
+      screenShareTiles.forEach((tile) => {
+        tile.classList.add(videoGridStyles.spotlightMain)
+        tile.classList.remove(videoGridStyles.spotlightSide)
+      })
+
+      // 参加者タイルをサイドバーコンテナに移動
+      const participantTiles = Array.from(grid.querySelectorAll(`.${videoGridStyles.participantTile}:not([id^="tile-screenshare-"])`))
+      if (participantTiles.length > 0) {
+        const sidebar = document.createElement('div')
+        sidebar.id = 'spotlight-sidebar'
+        sidebar.className = videoGridStyles.spotlightSidebar
+
+        participantTiles.forEach((tile) => {
+          tile.classList.add(videoGridStyles.spotlightSide)
+          tile.classList.remove(videoGridStyles.spotlightMain)
+          sidebar.appendChild(tile)
+        })
+
+        grid.appendChild(sidebar)
+      }
+    } else {
+      // グリッドレイアウトに戻す
+      grid.classList.remove(videoGridStyles.spotlightLayout)
+
+      // サイドバーから参加者タイルをグリッドに戻す
+      const sidebar = document.getElementById('spotlight-sidebar')
+      if (sidebar !== null) {
+        const tiles = Array.from(sidebar.children)
+        tiles.forEach((tile) => {
+          tile.classList.remove(videoGridStyles.spotlightMain, videoGridStyles.spotlightSide)
+          grid.appendChild(tile)
+        })
+        sidebar.remove()
+      }
+
+      const allTiles = grid.querySelectorAll('[id^="tile-"]')
+      allTiles.forEach((tile) => {
+        tile.classList.remove(videoGridStyles.spotlightMain, videoGridStyles.spotlightSide)
+      })
+      this.updateGridLayout()
     }
   }
 

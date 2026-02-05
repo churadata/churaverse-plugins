@@ -122,3 +122,65 @@
   font-weight: 500;
   z-index: 1;
 }
+
+// Feature: Mic status icon - 名前のすぐ横に表示
+.micIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ea4335;
+  margin-left: 6px;
+}
+
+// Feature: Active speaker highlight
+.speaking {
+  border: 3px solid #1a73e8 !important;
+  box-shadow: 0 0 12px rgba(26, 115, 232, 0.6);
+}
+
+// Feature: Spotlight mode layout for screen share
+.spotlightLayout {
+  display: flex !important;
+  flex-direction: row;
+  gap: 8px;
+  grid-template-columns: unset !important;
+  grid-template-rows: unset !important;
+}
+
+.spotlightMain {
+  flex: 1 1 auto;
+  min-height: 200px;
+  max-height: 100%;
+}
+
+.spotlightSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 180px;
+  flex-shrink: 0;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+.spotlightSide {
+  flex: 0 0 auto;
+  width: 180px !important;
+  height: 120px !important;
+  min-height: 120px;
+
+  // スポットライトサイドバーのアバターを小さくする
+  .avatar {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 18px !important;
+  }
+
+  .nameBar {
+    padding: 4px 8px;
+  }
+
+  .name {
+    font-size: 11px;
+  }
+}
