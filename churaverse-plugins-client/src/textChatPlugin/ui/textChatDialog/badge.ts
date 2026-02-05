@@ -1,14 +1,26 @@
 import { IBadge } from '../interface/IBadge'
+import { Store, IMainScene } from 'churaverse-engine-client'
 
 export class Badge implements IBadge {
   private readonly badgeElement: HTMLDivElement
 
-  public constructor() {
-    const BADGE_SIZE = '14px'
+  public constructor(
+    private readonly store: Store<IMainScene>
+  ) {
+    const BADGE_SIZE = '20px'
 
     const div = document.createElement('div')
     div.style.position = 'absolute'
-    div.style.backgroundColor = 'white'
+    div.style.backgroundColor = '#ff5252'
+
+    div.style.color = 'white'
+    div.style.fontSize = '12px'
+    div.style.fontWeight = 'bold'
+
+    div.style.display = 'flex'
+    div.style.justifyContent = 'center'
+    div.style.alignItems = 'center'
+
     div.style.borderRadius = '9999px'
     div.style.height = BADGE_SIZE
     div.style.width = BADGE_SIZE
@@ -21,6 +33,8 @@ export class Badge implements IBadge {
   }
 
   public activate(): void {
+    const count = this.store.of('textChatPlugin').unreadCount
+    this.badgeElement.textContent = count > 99 ? '99+' : count.toString()
     this.badgeElement.style.opacity = '1'
   }
 
