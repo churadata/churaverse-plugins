@@ -22,7 +22,7 @@ export class CountdownBar implements ICountdownBar {
   private readonly circumference = this.radius * 2 * Math.PI
 
   private static readonly DEFAULT_TRANSITION = 'stroke-dashoffset 1s linear, stroke 0.3s ease'
-  private static readonly JUMP_THRESHOLD_SECONDS = 2
+  private static readonly LAG_THRESHOLD_SECONDS = 2
   /** IntersectionObserverのrootMargin。画面下部40%に入ったら初期化を開始 */
   private static readonly OBSERVER_ROOT_MARGIN = '0px 0px -40% 0px'
 
@@ -136,10 +136,10 @@ export class CountdownBar implements ICountdownBar {
 
     this.updateAlertState(remainingSeconds)
 
-    // 大きなジャンプがあった場合はトランジションなしで即座に更新
-    const isLargeJump = Math.abs(remainingSeconds - lastRemainingSeconds) > CountdownBar.JUMP_THRESHOLD_SECONDS
+    // 大きなラグがあった場合はトランジションなしで即座に更新
+    const isLargeLag = Math.abs(remainingSeconds - lastRemainingSeconds) > CountdownBar.LAG_THRESHOLD_SECONDS
 
-    if (isLargeJump) {
+    if (isLargeLag) {
       const prevTransition = this.progressBarEl.style.transition
       this.progressBarEl.style.transition = 'none'
       const currentOffset = this.calculateStrokeDashoffset(remainingSeconds)
