@@ -5,6 +5,7 @@ import { TimeLimitFormContainer } from './timeLimitFormContainer/timeLimitFormCo
 import { BetCoinFormContainer } from './betCoinFormContainer/betCoinFormContainer'
 import { NyokkiButton } from './nyokkiButton/nyokkiButton'
 import { ResultScreen } from './resultScreen/resultScreen'
+import { BetTimer } from './betTimer/betTimer'
 
 /**
  * SynchroBreakのUIコンポーネントを定義する
@@ -19,6 +20,7 @@ declare module '@churaverse/game-plugin-client/gameUiManager' {
       betCoinConfirm: BetCoinFormContainer
       nyokkiButton: NyokkiButton
       resultScreen: ResultScreen
+      betTimer: BetTimer
     }
   }
 }

@@ -25,6 +25,8 @@ import { UpdatePlayersCoinMessage } from '../message/updatePlayersCoinMessage'
 import { UpdatePlayersCoinEvent } from '../event/updatePlayersCoinEvent'
 import { SynchroBreakResultMessage } from '../message/synchroBreakResultMessage'
 import { SynchroBreakResultEvent } from '../event/synchroBreakResultEvent'
+import { BetTimeRemainingMessage } from '../message/betTimeRemainingMessage'
+import { BetTimeRemainingEvent } from '../event/betTimeRemainingEvent'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private messageListenerRegister!: IMessageListenerRegister<IMainScene>
@@ -46,6 +48,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('synchroBreakTurnStart', SynchroBreakTurnStartMessage, 'queue')
     ev.messageRegister.registerMessage('updatePlayersCoin', UpdatePlayersCoinMessage, 'queue')
     ev.messageRegister.registerMessage('synchroBreakResult', SynchroBreakResultMessage, 'queue')
+    ev.messageRegister.registerMessage('betTimeRemaining', BetTimeRemainingMessage, 'queue')
   }
 
   /**
@@ -69,6 +72,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.messageListenerRegister.on('synchroBreakTurnStart', this.synchroBreakTurnStart)
     this.messageListenerRegister.on('updatePlayersCoin', this.updatePlayersCoin)
     this.messageListenerRegister.on('synchroBreakResult', this.synchroBreakResult)
+    this.messageListenerRegister.on('betTimeRemaining', this.betTimeRemaining)
   }
 
   /**
@@ -85,6 +89,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.messageListenerRegister.off('synchroBreakTurnStart', this.synchroBreakTurnStart)
     this.messageListenerRegister.off('updatePlayersCoin', this.updatePlayersCoin)
     this.messageListenerRegister.off('synchroBreakResult', this.synchroBreakResult)
+    this.messageListenerRegister.off('betTimeRemaining', this.betTimeRemaining)
   }
 
   private readonly synchroBreakTurnSelect = (msg: SynchroBreakTurnSelectMessage): void => {
@@ -127,5 +132,9 @@ export class SocketController extends BaseSocketController<IMainScene> {
 
   private readonly synchroBreakResult = (): void => {
     this.eventBus.post(new SynchroBreakResultEvent())
+  }
+
+  private readonly betTimeRemaining = (msg: BetTimeRemainingMessage): void => {
+    this.eventBus.post(new BetTimeRemainingEvent(msg.data.remainingTime))
   }
 }
