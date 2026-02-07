@@ -113,7 +113,7 @@ export class RankingBoard implements IRankingBoard {
    * プレイヤーの所持コイン数を変更する
    */
   public changePlayersCoin(playerId: string, coins: number): void {
-    const playerCoins = DomManager.getElementById(PLAYER_COINS_ID(playerId))
+    const playerCoins = DomManager.getElementByIdOrNull(PLAYER_COINS_ID(playerId))
     if (playerCoins === null) return
     playerCoins.textContent = `${coins}コイン`
   }
@@ -121,10 +121,9 @@ export class RankingBoard implements IRankingBoard {
   /**
    * プレイヤーのニョッキステータスを変更する
    */
-  public changeNyokkiStatus(playrId: string, status: NyokkiStatus): void {
-    const playerNyokkiStatus = DomManager.getElementById(NYOKKI_STATUS_ID(playrId))
+  public changeNyokkiStatus(playerId: string, status: NyokkiStatus): void {
+    const playerNyokkiStatus = DomManager.getElementByIdOrNull(NYOKKI_STATUS_ID(playerId))
     if (playerNyokkiStatus === null) return
-
     playerNyokkiStatus.textContent = status
     // ニョッキステータスのdata-status属性を変更
     playerNyokkiStatus.dataset.status = status
