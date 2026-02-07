@@ -10,8 +10,8 @@ export interface IDescriptionWindow extends IGameUiComponent {
   displayTimeLimitSelectionForGuest: (timeLimit: string, ownCoins: number) => void
   displayBetCoinSelection: (betCoin: number) => void
   displayGameStartCountdown: (countdown: number) => void
-  displaySynchroBreakStart: (timeLimit: number) => void
-  displaySynchroBreakInProgress: (countdown: number, player?: string, nyokkiSuccessMessage?: string) => void
+  displaySynchroBreakStart: () => void
+  displaySynchroBreakInProgress: (player?: string, nyokkiSuccessMessage?: string) => void
   displaySynchroBreakEnd: () => void
   displayTurnStart: (turnNumber: number, ownCoins: number) => void
   displayNyokkiAction: (text: string) => void
