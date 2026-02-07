@@ -11,7 +11,6 @@ export class CountdownBar implements ICountdownBar {
   public element!: HTMLElement
   public readonly visible: boolean = false
 
-  private observer?: IntersectionObserver
   private totalDuration: number = 1
   private lastRemainingSeconds?: number
   private readonly alertThreshold: number = 3
@@ -23,23 +22,16 @@ export class CountdownBar implements ICountdownBar {
 
   private static readonly DEFAULT_TRANSITION = 'stroke-dashoffset 1s linear, stroke 0.3s ease'
   private static readonly LAG_THRESHOLD_SECONDS = 2
-  /** IntersectionObserverのrootMargin。画面下部40%に入ったら初期化を開始 */
-  private static readonly OBSERVER_ROOT_MARGIN = '0px 0px -40% 0px'
 
   public initialize(): void {
     if (this.element !== undefined) {
       this.element.remove()
-      if (this.observer !== undefined) {
-        this.observer.disconnect()
-        this.observer = undefined
-      }
       this.progressBarEl = undefined
       this.progressValueEl = undefined
     }
 
     this.element = DomManager.addJsxDom(CountdownBarComponent())
     this.element.style.display = 'none'
-    this.setupObserver()
     this.ensureElementsCached()
     if (this.progressBarEl !== undefined) {
       this.progressBarEl.style.strokeDasharray = `${this.circumference}`
@@ -73,27 +65,6 @@ export class CountdownBar implements ICountdownBar {
       this.updateProgressBar(remainingSeconds, this.lastRemainingSeconds)
     }
     this.lastRemainingSeconds = remainingSeconds
-  }
-
-  private setupObserver(): void {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            this.ensureElementsCached()
-            observer.disconnect()
-          }
-        }
-      },
-      {
-        root: null,
-        rootMargin: CountdownBar.OBSERVER_ROOT_MARGIN,
-        threshold: 0
-      }
-    )
-
-    observer.observe(this.element)
-    this.observer = observer
   }
 
   /**
@@ -205,10 +176,6 @@ export class CountdownBar implements ICountdownBar {
   }
 
   public remove(): void {
-    if (this.observer !== undefined) {
-      this.observer.disconnect()
-      this.observer = undefined
-    }
     this.element.remove()
   }
 }

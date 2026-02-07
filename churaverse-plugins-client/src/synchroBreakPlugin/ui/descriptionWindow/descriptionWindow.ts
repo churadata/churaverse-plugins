@@ -25,7 +25,7 @@ export class DescriptionWindow implements IDescriptionWindow {
   }
 
   public initialize(): void {
-    this.element = DomManager.addJsxDom(DescriptionWindowComponent({ description: this.descriptionText }))
+    this.element = DomManager.addJsxDom(DescriptionWindowComponent({ description: '' }))
     this.descriptionTextElement = DomManager.getElementById(SYNCHRO_BREAK_DESCRIPTION_TEXT_ID)
     domLayerSetting(this.element, 'lowest')
   }
