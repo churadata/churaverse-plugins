@@ -32,7 +32,7 @@ export class GameSequence implements IGameSequence {
 
   public async processTurnSequence(): Promise<void> {
     if (!this.isActive) return
-    await this.sendBetTimeRemaining()
+    await this.startBetTimeCountdown()
     if (!this.isActive) return
     await this.startTurnCountdown()
     if (!this.isActive) return
@@ -103,17 +103,16 @@ export class GameSequence implements IGameSequence {
   }
 
   /**
-   * ベットタイムの残りを通知する処理
+   * ベットタイムのカウントダウンを実行し、残り時間を通知する処理
    */
-  private async sendBetTimeRemaining(): Promise<void> {
+  private async startBetTimeCountdown(): Promise<void> {
     let remainingTime = BET_TIMER_TIME_LIMIT
 
     // 100ミリ秒ごとに残り時間を通知
     while (remainingTime >= 0 && this.isActive) {
+      // 全プレイヤーがベットした場合は終了
       const numOfPlayers = this.gamePluginStore.games.get(this.gameId)?.participantIds.length ?? 0
       const didBetPlayers = this.synchroBreakPluginStore.betCoinRepository.getBetCoinPlayerCount()
-
-      // 全プレイヤーがベットした場合は終了
       if (numOfPlayers - didBetPlayers <= 0) {
         return
       }
