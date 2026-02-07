@@ -118,7 +118,7 @@ export class CountdownBar implements ICountdownBar {
 
     if (this.progressBarEl !== undefined) {
       this.progressBarEl.style.transition = 'none'
-      const offset = this.calculateStrokeDashoffset(remainingSeconds)
+      const offset = this.calculateStrokeDashOffset(remainingSeconds)
       this.progressBarEl.style.strokeDashoffset = `${offset}`
       this.progressBarEl.getBoundingClientRect()
       this.progressBarEl.style.transition = CountdownBar.DEFAULT_TRANSITION
@@ -138,11 +138,10 @@ export class CountdownBar implements ICountdownBar {
 
     // 大きなラグがあった場合はトランジションなしで即座に更新
     const isLargeLag = Math.abs(remainingSeconds - lastRemainingSeconds) > CountdownBar.LAG_THRESHOLD_SECONDS
-
     if (isLargeLag) {
       const prevTransition = this.progressBarEl.style.transition
       this.progressBarEl.style.transition = 'none'
-      const currentOffset = this.calculateStrokeDashoffset(remainingSeconds)
+      const currentOffset = this.calculateStrokeDashOffset(remainingSeconds)
       this.progressBarEl.style.strokeDashoffset = `${currentOffset}`
       this.progressBarEl.getBoundingClientRect()
 
@@ -155,7 +154,7 @@ export class CountdownBar implements ICountdownBar {
       if (this.progressBarEl.style.transition === '') {
         this.progressBarEl.style.transition = CountdownBar.DEFAULT_TRANSITION
       }
-      const nextOffset = this.calculateStrokeDashoffset(remainingSeconds - 1)
+      const nextOffset = this.calculateStrokeDashOffset(remainingSeconds - 1)
       this.progressBarEl.style.strokeDashoffset = `${nextOffset}`
     }
   }
@@ -163,7 +162,7 @@ export class CountdownBar implements ICountdownBar {
   /**
    * カウントダウンバーのオフセットを計算する
    */
-  private calculateStrokeDashoffset(remainingSeconds: number): number {
+  private calculateStrokeDashOffset(remainingSeconds: number): number {
     const total = this.totalDuration > 0 ? this.totalDuration : 1
     const ratio = Math.max(0, Math.min(1, remainingSeconds / total))
     const offset = this.circumference * (1 - ratio)
