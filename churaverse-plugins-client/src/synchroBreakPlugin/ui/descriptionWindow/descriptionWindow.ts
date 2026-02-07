@@ -169,8 +169,8 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param text 更新する文章
    */
   private setDescriptionText(text: string): void {
-    this.descriptionTextElement = this.descriptionTextElement ?? DomManager.getElementById(SYNCHRO_BREAK_DESCRIPTION_TEXT_ID)
-    if (this.descriptionTextElement === null) return
-    this.descriptionTextElement.innerHTML = text
+    const descriptionTextElement = this.descriptionTextElement ?? DomManager.getElementById(SYNCHRO_BREAK_DESCRIPTION_TEXT_ID)
+    descriptionTextElement.innerHTML = text
+    this.descriptionTextElement = descriptionTextElement
   }
 }
