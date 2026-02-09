@@ -39,8 +39,6 @@ export class OwnRankingBoard implements IOwnRankingBoard {
     if (playerId !== ownPlayerId) return
 
     const ownRankingStatus = DomManager.getElementById(OWN_RANKING_STATUS_ID)
-    if (ownRankingStatus === undefined) return
-
     ownRankingStatus.textContent = status
     ownRankingStatus.dataset.status = status
   }
@@ -72,8 +70,6 @@ export class OwnRankingBoard implements IOwnRankingBoard {
     const ownRankingRank = DomManager.getElementById(OWN_RANKING_RANK_ID)
     const ownRankingName = DomManager.getElementById(OWN_RANKING_NAME_ID)
     const ownRankingCoins = DomManager.getElementById(OWN_RANKING_COINS_ID)
-
-    if (ownRankingRank === undefined || ownRankingName === undefined || ownRankingCoins === undefined) return
 
     ownRankingRank.textContent = `${myRank}位`
     ownRankingRank.className = this.getRankColorClass(myRank)
