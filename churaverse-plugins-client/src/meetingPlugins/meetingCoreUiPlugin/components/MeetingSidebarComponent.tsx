@@ -16,8 +16,6 @@ const DUMMY_MESSAGES = [
   { id: 2, author: 'User 2', text: '会議を始めましょう' },
 ]
 
-type SidebarTab = 'participants' | 'chat' | null
-
 export const MeetingSidebarComponent: JSXFunc = () => {
   return (
     <div className={style.sidebar} id="meeting-sidebar" data-visible="false" data-tab="participants">
@@ -78,45 +76,4 @@ export const MeetingSidebarComponent: JSXFunc = () => {
       </div>
     </div>
   )
-}
-
-// サイドバーの初期化スクリプト
-export const initSidebarToggle = (): void => {
-  const sidebar = document.getElementById('meeting-sidebar')
-  const participantsSection = document.getElementById('participants-section')
-  const chatSection = document.getElementById('chat-section')
-  const participantsButton = document.getElementById('participants-toggle-button')
-  const chatButton = document.getElementById('chat-toggle-button')
-  const closeButton = document.getElementById('sidebar-close-button')
-  const closeButtonChat = document.getElementById('sidebar-close-button-chat')
-
-  const showSidebar = (tab: 'participants' | 'chat'): void => {
-    if (sidebar == null) return
-    const currentTab = sidebar.getAttribute('data-tab')
-    const isVisible = sidebar.getAttribute('data-visible') === 'true'
-
-    if (isVisible && currentTab === tab) {
-      // 同じタブをクリックした場合は閉じる
-      sidebar.setAttribute('data-visible', 'false')
-    } else {
-      // 開く or タブ切り替え
-      sidebar.setAttribute('data-visible', 'true')
-      sidebar.setAttribute('data-tab', tab)
-
-      if (participantsSection != null && chatSection != null) {
-        participantsSection.setAttribute('data-active', tab === 'participants' ? 'true' : 'false')
-        chatSection.setAttribute('data-active', tab === 'chat' ? 'true' : 'false')
-      }
-    }
-  }
-
-  const closeSidebar = (): void => {
-    if (sidebar == null) return
-    sidebar.setAttribute('data-visible', 'false')
-  }
-
-  participantsButton?.addEventListener('click', () => showSidebar('participants'))
-  chatButton?.addEventListener('click', () => showSidebar('chat'))
-  closeButton?.addEventListener('click', closeSidebar)
-  closeButtonChat?.addEventListener('click', closeSidebar)
 }
