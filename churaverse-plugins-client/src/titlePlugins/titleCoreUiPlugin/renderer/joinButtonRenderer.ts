@@ -1,9 +1,10 @@
-import { ITitleScene, Store, IEventBus, createUIContainer, DomManager } from 'churaverse-engine-client'
+import { ITitleScene, Store, IEventBus, createUIContainer, DomManager, SceneName } from 'churaverse-engine-client'
 import { GameObjects, Scene } from 'phaser'
 import { IJoinButtonRenderer } from '../domain/IJoinButtonRenderer'
 import { PlayerRole } from '@churaverse/player-plugin-client/types/playerRole'
 import { TitlePlayerPluginStore } from '../../titlePlayerPlugin/store/defTitlePlayerPlugin'
 import { TransitionPluginStore } from '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
+import { GameModeSelectorRenderer } from './gameModeSelectorRenderer'
 
 const BUTTON_COLOR = {
   /* eslint-disable */
@@ -19,19 +20,18 @@ const ADMIN_BUTTON_COLOR = {
   /* eslint-enable */
 }
 
-/**
- * MainSceneに遷移するためのボタン. Titleで表示される
- */
 export class JoinButtonRenderer implements IJoinButtonRenderer {
   private readonly joinButton: GameObjects.Text
   private readonly container: GameObjects.Container
   private joinButtonColor = BUTTON_COLOR
   private readonly titlePlayerPluginStore: TitlePlayerPluginStore
   private readonly transitionPluginStore: TransitionPluginStore<ITitleScene>
+  private readonly gameModeSelectorRenderer: GameModeSelectorRenderer
 
   public constructor(scene: Scene, store: Store<ITitleScene>, private readonly eventBus: IEventBus<ITitleScene>) {
     this.titlePlayerPluginStore = store.of('titlePlayerPlugin')
     this.transitionPluginStore = store.of('transitionPlugin')
+    this.gameModeSelectorRenderer = new GameModeSelectorRenderer(this.eventBus)
 
     const buttonWidth = 40
     const buttonHeight = 20
@@ -57,7 +57,6 @@ export class JoinButtonRenderer implements IJoinButtonRenderer {
     this.changeButtonColor(this.titlePlayerPluginStore.ownPlayer.role)
   }
 
-  // 管理者のときと一般ユーザのときでjoinボタンの色を変更する
   public changeButtonColor(role: PlayerRole): void {
     if (role === 'admin') {
       this.joinButtonColor = ADMIN_BUTTON_COLOR
@@ -68,29 +67,26 @@ export class JoinButtonRenderer implements IJoinButtonRenderer {
     }
   }
 
-  /** マウスオーバーした時の動作 */
   private onMouseover(): void {
-    // ボタンの色を明るくする
     this.joinButton.setStyle({ backgroundColor: this.joinButtonColor.MOUSEOVER_BUTTON_COLOR })
   }
 
-  /** マウスアウトした時の動作 */
   private onMouseout(): void {
-    // ボタンの色を元に戻す
     this.joinButton.setStyle({ backgroundColor: this.joinButtonColor.DEFAULT_COLOR })
   }
 
-  /** buttonが押されたときの動作 */
   private onClick(): void {
     const validateResult = this.titlePlayerPluginStore.titleNameFieldRenderer.validate() ?? false
 
     if (validateResult) {
-      // 処理が重複しないように処理中はボタンを押せないようにロック
       this.joinButton.disableInteractive()
 
-      // MainSceneに遷移
+      const targetScene: SceneName = this.gameModeSelectorRenderer.isGameModeEnabled()
+        ? 'MainScene'
+        : 'MeetingScene'
+
       DomManager.removeAll()
-      this.transitionPluginStore.transitionManager.transitionTo('MainScene')
+      this.transitionPluginStore.transitionManager.transitionTo(targetScene)
     } else {
       alert('名前は1文字以上15文字以内で入力してください')
     }
