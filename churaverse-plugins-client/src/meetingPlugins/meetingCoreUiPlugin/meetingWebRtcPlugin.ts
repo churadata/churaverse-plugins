@@ -26,6 +26,8 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   private isConnected: boolean = false
   private chatHistory: ChatMessage[] = []
   private participantNames: Map<string, string> = new Map()
+  private sidebarScrollIndex: number = 0
+  private readonly maxVisibleSidebarTiles: number = 5
 
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.init.bind(this))
@@ -108,7 +110,11 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
         participant.videoTracks.forEach((publication) => {
           if (publication.track !== undefined && publication.isSubscribed) {
-            this.attachTrack(publication.track, participant.identity)
+            if (publication.source === Track.Source.ScreenShare) {
+              this.attachScreenShareTrack(publication.track, participant.identity)
+            } else {
+              this.attachTrack(publication.track, participant.identity)
+            }
           }
         })
         participant.audioTracks.forEach((publication) => {
@@ -149,6 +155,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     this.room.on(RoomEvent.TrackUnsubscribed, (track, publication, participant) => {
       console.log(`[MeetingWebRtc] Track unsubscribed: ${track.kind} (source: ${publication.source}) from ${participant.identity}`)
       if (publication.source === Track.Source.ScreenShare) {
+        track.detach().forEach((el) => { el.remove() })
         this.detachScreenShareTrack(participant.identity)
       } else {
         this.detachTrack(track, participant.identity)
@@ -170,6 +177,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       console.log(`[MeetingWebRtc] Local track unpublished: ${publication.kind} (source: ${publication.source})`)
       if (publication.track !== undefined) {
         if (publication.source === Track.Source.ScreenShare) {
+          publication.track.detach().forEach((el) => { el.remove() })
           this.detachScreenShareTrack(participant.identity)
         } else {
           this.detachTrack(publication.track, participant.identity)
@@ -255,6 +263,8 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   private removeParticipantTile(participantId: string): void {
     const tile = document.getElementById(`tile-${participantId}`)
     tile?.remove()
+    const screenShareTile = document.getElementById(`tile-screenshare-${participantId}`)
+    screenShareTile?.remove()
     this.updateGridLayout()
     this.updateParticipantList()
   }
@@ -381,7 +391,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     tile.appendChild(videoArea)
     tile.appendChild(nameBar)
-    grid.appendChild(tile)
+    grid.insertBefore(tile, grid.firstChild)
 
     this.updateGridLayout()
     console.log(`[MeetingWebRtc] Screen share tile attached from ${participantId}`)
@@ -391,12 +401,17 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     const grid = document.getElementById('video-grid')
     if (grid === null) return
 
+    const removeTile = (tile: Element): void => {
+      tile.querySelectorAll('video, audio').forEach((el) => { el.remove() })
+      tile.remove()
+    }
+
     if (participantId !== undefined) {
       const tile = document.getElementById(`tile-screenshare-${participantId}`)
-      tile?.remove()
+      if (tile !== null) { removeTile(tile) }
     } else {
       const tiles = grid.querySelectorAll('[id^="tile-screenshare-"]')
-      tiles.forEach((tile) => tile.remove())
+      tiles.forEach((tile) => { removeTile(tile) })
     }
 
     this.updateGridLayout()
@@ -420,14 +435,119 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     const grid = document.getElementById('video-grid')
     if (grid === null) return
 
-    const count = grid.children.length
-    grid.className = videoGridStyles.videoGrid
+    const hasScreenShare = document.querySelector('[id^="tile-screenshare-"]') !== null
 
-    if (count <= 1) grid.classList.add(videoGridStyles.grid1)
-    else if (count <= 2) grid.classList.add(videoGridStyles.grid2)
-    else if (count <= 4) grid.classList.add(videoGridStyles.grid4)
-    else if (count <= 6) grid.classList.add(videoGridStyles.grid6)
-    else grid.classList.add(videoGridStyles.grid9)
+    if (hasScreenShare) {
+      this.applyScreenShareLayout(grid)
+    } else {
+      this.removeScreenShareSidebar(grid)
+      grid.className = videoGridStyles.videoGrid
+      grid.style.gridTemplateColumns = ''
+      const count = grid.children.length
+      if (count <= 1) grid.classList.add(videoGridStyles.grid1)
+      else if (count <= 2) grid.classList.add(videoGridStyles.grid2)
+      else if (count <= 4) grid.classList.add(videoGridStyles.grid4)
+      else if (count <= 6) grid.classList.add(videoGridStyles.grid6)
+      else grid.classList.add(videoGridStyles.grid9)
+    }
+  }
+
+  private applyScreenShareLayout(grid: HTMLElement): void {
+    grid.className = videoGridStyles.videoGrid
+    grid.classList.add(videoGridStyles.screenShareLayout)
+    grid.style.gridTemplateColumns = ''
+
+    let sidebar = document.getElementById('participant-sidebar')
+    if (sidebar === null) {
+      sidebar = document.createElement('div')
+      sidebar.id = 'participant-sidebar'
+      sidebar.className = videoGridStyles.participantSidebar
+
+      const arrowUp = document.createElement('button')
+      arrowUp.className = `defaultStyle ${videoGridStyles.sidebarArrow}`
+      arrowUp.innerHTML = '&#9650;'
+      arrowUp.id = 'sidebar-arrow-up'
+      arrowUp.addEventListener('click', () => { this.scrollSidebar(-1) })
+
+      const tilesContainer = document.createElement('div')
+      tilesContainer.id = 'sidebar-tiles-container'
+      tilesContainer.className = videoGridStyles.sidebarTilesContainer
+
+      const arrowDown = document.createElement('button')
+      arrowDown.className = `defaultStyle ${videoGridStyles.sidebarArrow}`
+      arrowDown.innerHTML = '&#9660;'
+      arrowDown.id = 'sidebar-arrow-down'
+      arrowDown.addEventListener('click', () => { this.scrollSidebar(1) })
+
+      sidebar.appendChild(arrowUp)
+      sidebar.appendChild(tilesContainer)
+      sidebar.appendChild(arrowDown)
+      grid.appendChild(sidebar)
+      this.sidebarScrollIndex = 0
+    }
+
+    const tilesContainer = document.getElementById('sidebar-tiles-container')
+    if (tilesContainer !== null) {
+      const participantTiles = Array.from(grid.querySelectorAll(':scope > [id^="tile-"]:not([id^="tile-screenshare-"])'))
+      participantTiles.forEach((tile) => {
+        tilesContainer.appendChild(tile)
+      })
+    }
+
+    this.updateSidebarVisibility()
+  }
+
+  private removeScreenShareSidebar(grid: HTMLElement): void {
+    const sidebar = document.getElementById('participant-sidebar')
+    if (sidebar === null) return
+
+    const tilesContainer = document.getElementById('sidebar-tiles-container')
+    if (tilesContainer !== null) {
+      const tiles = Array.from(tilesContainer.children)
+      tiles.forEach((tile) => {
+        const el = tile as HTMLElement
+        el.style.display = ''
+        grid.appendChild(el)
+      })
+    }
+
+    sidebar.remove()
+    this.sidebarScrollIndex = 0
+  }
+
+  private scrollSidebar(direction: number): void {
+    const tilesContainer = document.getElementById('sidebar-tiles-container')
+    if (tilesContainer === null) return
+
+    const totalTiles = tilesContainer.children.length
+    const maxIndex = Math.max(0, totalTiles - this.maxVisibleSidebarTiles)
+    this.sidebarScrollIndex = Math.max(0, Math.min(this.sidebarScrollIndex + direction, maxIndex))
+
+    this.updateSidebarVisibility()
+  }
+
+  private updateSidebarVisibility(): void {
+    const tilesContainer = document.getElementById('sidebar-tiles-container')
+    const upArrow = document.getElementById('sidebar-arrow-up') as HTMLButtonElement | null
+    const downArrow = document.getElementById('sidebar-arrow-down') as HTMLButtonElement | null
+    if (tilesContainer === null || upArrow === null || downArrow === null) return
+
+    const totalTiles = tilesContainer.children.length
+
+    Array.from(tilesContainer.children).forEach((tile, index) => {
+      const el = tile as HTMLElement
+      if (index >= this.sidebarScrollIndex && index < this.sidebarScrollIndex + this.maxVisibleSidebarTiles) {
+        el.style.display = ''
+      } else {
+        el.style.display = 'none'
+      }
+    })
+
+    const showArrows = totalTiles > this.maxVisibleSidebarTiles
+    upArrow.style.display = showArrows ? '' : 'none'
+    downArrow.style.display = showArrows ? '' : 'none'
+    upArrow.disabled = this.sidebarScrollIndex <= 0
+    downArrow.disabled = this.sidebarScrollIndex >= totalTiles - this.maxVisibleSidebarTiles
   }
 
   private getAvatarColor(id: string): string {
@@ -491,7 +611,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     this.isMicEnabled = !this.isMicEnabled
     await this.room.localParticipant.setMicrophoneEnabled(this.isMicEnabled)
-    this.updateButtonState('mic-toggle-button', this.isMicEnabled)
+    this.updateButtonState('mic-toggle-button', !this.isMicEnabled)
   }
 
   private async toggleCamera(): Promise<void> {
@@ -499,7 +619,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     this.isCameraEnabled = !this.isCameraEnabled
     await this.room.localParticipant.setCameraEnabled(this.isCameraEnabled)
-    this.updateButtonState('camera-toggle-button', this.isCameraEnabled)
+    this.updateButtonState('camera-toggle-button', !this.isCameraEnabled)
   }
 
   private async toggleScreenShare(): Promise<void> {
@@ -516,11 +636,11 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     }
   }
 
-  private updateButtonState(buttonId: string, isActive: boolean): void {
+  private updateButtonState(buttonId: string, highlighted: boolean): void {
     const button = DomManager.getElementById(buttonId)
     if (button === undefined) return
 
-    if (isActive) {
+    if (highlighted) {
       button.classList.add(controlBarStyles.activeButton)
     } else {
       button.classList.remove(controlBarStyles.activeButton)

@@ -40,6 +40,11 @@
   grid-template-rows: repeat(2, 1fr);
 }
 
+.screenShareLayout {
+  grid-template-columns: 1fr 300px;
+  grid-template-rows: 1fr;
+}
+
 .participantTile {
   position: relative;
   background-color: #3c4043;
@@ -121,4 +126,48 @@
   font-size: 11px;
   font-weight: 500;
   z-index: 1;
+}
+
+.participantSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sidebarTilesContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  overflow: hidden;
+
+  .participantTile {
+    flex: 0 0 auto;
+    aspect-ratio: 16 / 9;
+  }
+}
+
+.sidebarArrow {
+  background-color: rgba(60, 64, 67, 0.8);
+  color: #e8eaed;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  flex-shrink: 0;
+
+  &:hover {
+    background-color: rgba(74, 77, 81, 1);
+  }
+
+  &:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
 }

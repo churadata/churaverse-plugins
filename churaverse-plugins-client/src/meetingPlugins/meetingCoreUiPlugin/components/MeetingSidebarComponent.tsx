@@ -10,10 +10,12 @@ export const MeetingSidebarComponent: JSXFunc = () => {
       {/* 参加者一覧 */}
       <div className={style.section} id="participants-section" data-active="true">
         <div className={style.sectionHeader}>
-          <span className={style.sectionTitle} id="participants-count">参加者 (0)</span>
+          <span className={style.sectionTitle} id="participants-count">
+            参加者 (0)
+          </span>
           <button className={style.closeButton} id="sidebar-close-button">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
             </svg>
           </button>
         </div>
@@ -28,7 +30,7 @@ export const MeetingSidebarComponent: JSXFunc = () => {
           <span className={style.sectionTitle}>チャット</span>
           <button className={style.closeButton} id="sidebar-close-button-chat">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
             </svg>
           </button>
         </div>
@@ -36,12 +38,7 @@ export const MeetingSidebarComponent: JSXFunc = () => {
           {/* チャット機能は後回し */}
         </div>
         <div className={style.chatInputArea}>
-          <input
-            type="text"
-            className={style.chatInput}
-            id="chat-input"
-            placeholder="メッセージを入力..."
-          />
+          <input type="text" className={style.chatInput} id="chat-input" placeholder="メッセージを入力..." />
           <button className={style.chatSendButton} id="chat-send-button">
             送信
           </button>
@@ -49,45 +46,4 @@ export const MeetingSidebarComponent: JSXFunc = () => {
       </div>
     </div>
   )
-}
-
-// サイドバーの初期化スクリプト
-export const initSidebarToggle = (): void => {
-  const sidebar = document.getElementById('meeting-sidebar')
-  const participantsSection = document.getElementById('participants-section')
-  const chatSection = document.getElementById('chat-section')
-  const participantsButton = document.getElementById('participants-toggle-button')
-  const chatButton = document.getElementById('chat-toggle-button')
-  const closeButton = document.getElementById('sidebar-close-button')
-  const closeButtonChat = document.getElementById('sidebar-close-button-chat')
-
-  const showSidebar = (tab: 'participants' | 'chat'): void => {
-    if (sidebar == null) return
-    const currentTab = sidebar.getAttribute('data-tab')
-    const isVisible = sidebar.getAttribute('data-visible') === 'true'
-
-    if (isVisible && currentTab === tab) {
-      // 同じタブをクリックした場合は閉じる
-      sidebar.setAttribute('data-visible', 'false')
-    } else {
-      // 開く or タブ切り替え
-      sidebar.setAttribute('data-visible', 'true')
-      sidebar.setAttribute('data-tab', tab)
-
-      if (participantsSection != null && chatSection != null) {
-        participantsSection.setAttribute('data-active', tab === 'participants' ? 'true' : 'false')
-        chatSection.setAttribute('data-active', tab === 'chat' ? 'true' : 'false')
-      }
-    }
-  }
-
-  const closeSidebar = (): void => {
-    if (sidebar == null) return
-    sidebar.setAttribute('data-visible', 'false')
-  }
-
-  participantsButton?.addEventListener('click', () => showSidebar('participants'))
-  chatButton?.addEventListener('click', () => showSidebar('chat'))
-  closeButton?.addEventListener('click', closeSidebar)
-  closeButtonChat?.addEventListener('click', closeSidebar)
 }
