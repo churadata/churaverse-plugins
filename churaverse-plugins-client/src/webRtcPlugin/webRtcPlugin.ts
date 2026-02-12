@@ -3,11 +3,13 @@ import { ChangeLocalDeviceEvent } from './event/changeLocalDeviceEvent'
 import { WebRtcPluginStore } from './store/defWebRtcPluginStore'
 import { initWebRtcPluginStore } from './store/initWebRtcPluginStore'
 import { WebRtcUi } from './ui/webRtcUi'
+import { MeetingParticipantPanel } from './ui/meetingParticipantPanel/meetingParticipantPanel'
 import '@churaverse/transition-plugin-client/event/willSceneTransitionEvent'
 
 export class WebRtcPlugin extends BasePlugin<IMainScene> {
   private webRtcPluginStore!: WebRtcPluginStore
   private webRtcUi?: WebRtcUi
+  private meetingParticipantPanel?: MeetingParticipantPanel
 
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.init.bind(this))
@@ -23,6 +25,7 @@ export class WebRtcPlugin extends BasePlugin<IMainScene> {
 
   private start(): void {
     this.webRtcUi = new WebRtcUi(this.store, this.bus)
+    this.meetingParticipantPanel = new MeetingParticipantPanel(this.webRtcPluginStore.webRtc.room)
 
     navigator.mediaDevices.addEventListener('devicechange', () => {
       this.bus.post(new ChangeLocalDeviceEvent())

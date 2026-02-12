@@ -201,7 +201,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
           })
         } else if (message.type === 'chat' && message.text !== undefined && participant !== undefined) {
           this.chatHistory.push(message)
-          this.addChatMessage(participant.identity, message.text)
+          this.addChatMessage(participant.name ?? participant.identity, message.text)
         }
       } catch (e) {
         console.error('[MeetingWebRtc] Failed to parse chat message:', e)
@@ -239,8 +239,9 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     const avatar = document.createElement('div')
     avatar.className = videoGridStyles.avatar
-    avatar.style.backgroundColor = this.getAvatarColor(participant.identity)
-    avatar.textContent = this.getInitials(participant.identity)
+    const displayName = participant.name ?? participant.identity
+    avatar.style.backgroundColor = this.getAvatarColor(displayName)
+    avatar.textContent = this.getInitials(displayName)
     avatarContainer.appendChild(avatar)
     videoArea.appendChild(avatarContainer)
 
@@ -249,7 +250,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     const name = document.createElement('span')
     name.className = videoGridStyles.name
-    name.textContent = participant.identity === this.participantId ? `${this.participantId} (自分)` : participant.identity
+    name.textContent = participant.identity === this.participantId ? `${displayName} (自分)` : displayName
     nameBar.appendChild(name)
 
     tile.appendChild(videoArea)
@@ -289,14 +290,15 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       const item = document.createElement('div')
       item.className = sidebarStyles.participantItem
 
+      const pDisplayName = p.name ?? p.identity
       const avatar = document.createElement('div')
       avatar.className = sidebarStyles.participantAvatar
-      avatar.textContent = p.identity.slice(0, 1).toUpperCase()
+      avatar.textContent = pDisplayName.slice(0, 1).toUpperCase()
       item.appendChild(avatar)
 
       const name = document.createElement('span')
       name.className = sidebarStyles.participantName
-      name.textContent = p.identity === this.participantId ? `${this.participantId} (自分)` : p.identity
+      name.textContent = p.identity === this.participantId ? `${pDisplayName} (自分)` : pDisplayName
       item.appendChild(name)
 
       if (!p.isMicrophoneEnabled) {

@@ -1,0 +1,42 @@
+.divider {
+  margin-top: 8px;
+  padding: 4px 0;
+  font-size: 11px;
+  color: #888;
+  border-top: 1px solid #ddd;
+  text-align: left;
+}
+
+.meetingList {
+  width: 100%;
+}
+
+.listRow {
+  display: flex;
+  align-items: center;
+}
+
+.participantName {
+  margin-right: 30px;
+  width: 60%;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.micIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.micOn {
+  color: #34a853;
+}
+
+.micOff {
+  color: #bbb;
+}

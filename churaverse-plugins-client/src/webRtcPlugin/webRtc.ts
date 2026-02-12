@@ -43,9 +43,11 @@ export class WebRtc {
   }
 
   private async getAccessToken(ownPlayerId: string): Promise<string> {
-    const params = {
-      roomName: 'room1',
+    const displayName = sessionStorage.getItem('meetingPlayerName') ?? ownPlayerId
+    const params: Record<string, string> = {
+      roomName: 'meeting-room',
       userName: ownPlayerId,
+      displayName,
     }
     const query = new URLSearchParams(params).toString()
     const res = await fetch(
