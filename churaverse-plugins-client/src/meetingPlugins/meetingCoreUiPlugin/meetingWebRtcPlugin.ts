@@ -24,8 +24,8 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   private isCameraEnabled: boolean = false
   private isScreenShareEnabled: boolean = false
   private isConnected: boolean = false
-  private chatHistory: ChatMessage[] = []
-  private participantNames: Map<string, string> = new Map()
+  private readonly chatHistory: ChatMessage[] = []
+  private readonly participantNames = new Map<string, string>()
   private sidebarScrollIndex: number = 0
   private readonly maxVisibleSidebarTiles: number = 5
 
@@ -38,7 +38,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     this.displayName = sessionStorage.getItem('meetingPlayerName') ?? this.readCookie('name') ?? ''
     this.participantId = this.displayName !== '' ? this.displayName : this.generateParticipantId()
     this.participantNames.set(this.participantId, this.displayName !== '' ? this.displayName : this.participantId)
-    window.addEventListener('beforeunload', () => this.cleanup())
+    window.addEventListener('beforeunload', () => { this.cleanup() })
   }
 
   private readCookie(property: string): string | undefined {
@@ -59,7 +59,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private async waitForVideoGrid(): Promise<void> {
-    return await new Promise((resolve) => {
+    await new Promise<void>((resolve) => {
       const check = (): void => {
         if (document.getElementById('video-grid') !== null) {
           resolve()
@@ -419,7 +419,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private detachTrack(track: RemoteTrack | Track, participantId: string): void {
-    track.detach().forEach((el) => el.remove())
+    track.detach().forEach((el) => { el.remove() })
     if (track.kind === Track.Kind.Video) {
       const container = document.getElementById(`video-container-${participantId}`)
       const avatar = document.getElementById(`avatar-${participantId}`)
@@ -577,10 +577,10 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     const screenShareButton = DomManager.getElementById('screen-share-button')
     const exitButton = DomManager.getElementById('meeting-exit-button')
 
-    micButton?.addEventListener('click', () => void this.toggleMicrophone())
-    cameraButton?.addEventListener('click', () => void this.toggleCamera())
-    screenShareButton?.addEventListener('click', () => void this.toggleScreenShare())
-    exitButton?.addEventListener('click', () => this.exitMeeting())
+    micButton?.addEventListener('click', () => { void this.toggleMicrophone() })
+    cameraButton?.addEventListener('click', () => { void this.toggleCamera() })
+    screenShareButton?.addEventListener('click', () => { void this.toggleScreenShare() })
+    exitButton?.addEventListener('click', () => { this.exitMeeting() })
 
     const chatInput = document.getElementById('chat-input') as HTMLInputElement | null
     const chatSendButton = document.getElementById('chat-send-button')
