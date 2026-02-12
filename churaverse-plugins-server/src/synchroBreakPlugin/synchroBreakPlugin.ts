@@ -21,6 +21,8 @@ import { SynchroBreakTurnStartMessage } from './message/synchroBreakTurnStartMes
 import { IGameSequence } from './interface/IGameSequence'
 import { GameSequence } from './logic/gameSequence'
 
+export const SYNCHRO_BREAK_MID_RESULT_TIME_LIMIT = 3000
+
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
 
