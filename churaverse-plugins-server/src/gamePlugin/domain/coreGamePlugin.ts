@@ -106,7 +106,9 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
    * ちゅらバースから退出したプレイヤーがゲーム参加者の場合、参加者リストから削除しtrueを返す
    */
   private readonly onPlayerLeave = (ev: EntityDespawnEvent): void => {
-    if (isPlayer(ev.entity) === false) return
+    // booleanの評価をするのではなく型ガードのため部分的にeslintを無効化
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    if (!isPlayer(ev.entity)) return
     const playerId: string = ev.entity.id
     if (!this.removeParticipant(playerId)) return
     this.handlePlayerLeave(playerId)

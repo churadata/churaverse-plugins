@@ -25,13 +25,18 @@ import { SynchroBreakTurnEndEvent } from './event/synchroBreakTurnEndEvent'
 import { SynchroBreakTurnStartEvent } from './event/synchroBerakTurnStartEvent'
 import { UpdatePlayersCoinEvent } from './event/updatePlayersCoinEvent'
 import { NyokkiStatus } from './type/nyokkiStatus'
-import { IRankingBoard } from './interface/IRankingBoard'
+import { IOwnRankingBoard } from './interface/IOwnRankingBoard'
+import { SynchroBreakListItemRenderer } from './ui/startWindow/synchroBreakListItemRenderer'
+import { IGameSelectionListItemRenderer } from '@churaverse/game-plugin-client/interface/IGameSelectionListItemRenderer'
+import { RESULT_SCREEN_TYPES, ResultScreenType } from './type/resultScreenType'
+import { SynchroBreakResultEvent } from './event/synchroBreakResultEvent'
 
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
   protected readonly gameName = 'シンクロブレイク'
   private nyokkiActionMessage: string | undefined = undefined
   private ownNyokkiSatatus: NyokkiStatus = 'yet'
+  protected gameEntryRenderer!: IGameSelectionListItemRenderer
 
   private synchroBreakPluginStore!: SynchroBreakPluginStore
   private playerPluginStore!: PlayerPluginStore
@@ -69,7 +74,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.subscribeEvent('synchroBreakTurnEnd', this.synchroBreakTurnEnd)
     this.bus.subscribeEvent('synchroBreakTurnStart', this.synchroBreakTurnStart)
     this.bus.subscribeEvent('updatePlayersCoin', this.updatePlayersCoin)
-    this.bus.subscribeEvent('synchroBreakResult', this.showSynchroBreakResult)
+    this.bus.subscribeEvent('synchroBreakResult', this.handleSynchroBreakResult)
   }
 
   /**
@@ -86,7 +91,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.unsubscribeEvent('synchroBreakTurnEnd', this.synchroBreakTurnEnd)
     this.bus.unsubscribeEvent('synchroBreakTurnStart', this.synchroBreakTurnStart)
     this.bus.unsubscribeEvent('updatePlayersCoin', this.updatePlayersCoin)
-    this.bus.unsubscribeEvent('synchroBreakResult', this.showSynchroBreakResult)
+    this.bus.unsubscribeEvent('synchroBreakResult', this.handleSynchroBreakResult)
   }
 
   private phaserSceneInit(ev: PhaserSceneInit): void {
@@ -94,11 +99,16 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   }
 
   private init(): void {
-    this.synchroBreakDialogManager = new SynchroBreakDialogManager(this.store, this.bus)
+    this.synchroBreakDialogManager = new SynchroBreakDialogManager(this.store)
     this.coinViewerIconUis = new Map<string, CoinViewerIcon>()
     this.gameInfoStore = this.store.of('gameInfo')
     this.gamePluginStore = this.store.of('gamePlugin')
     this.playerPluginStore = this.store.of('playerPlugin')
+    this.gameEntryRenderer = new SynchroBreakListItemRenderer(
+      this.store,
+      this.gamePluginStore.gameDescriptionDialogManager,
+      this.gamePluginStore.gameSelectionListContainer
+    )
   }
 
   /**
@@ -122,7 +132,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   protected handleGameStart(): void {
     initSynchroBreakPluginStore(this.store)
     this.socketController.registerMessageListener()
-    this.synchroBreakDialogManager.setGameAbortButtonText()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
     this.initSynchroBreakPlayerIcons()
     this.nyokkiActionMessage = undefined
@@ -145,7 +154,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   protected handleGameTermination(): void {
     resetSynchroBreakPluginStore(this.store)
     this.socketController.unregisterMessageListener()
-    this.synchroBreakDialogManager.setGameStartButtonText()
 
     if (!this.isOwnPlayerMidwayParticipant) {
       resetSynchroBreakPluginStore(this.store)
@@ -158,7 +166,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   protected handleMidwayParticipant(): void {
     this.socketController.registerMessageListener()
-    this.synchroBreakDialogManager.setGameAbortButtonText()
   }
 
   /**
@@ -175,8 +182,8 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   protected handlePlayerQuitGame(playerId: string): void {
     this.removeSynchroBreakIcons()
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')?.remove()
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')?.close()
+    this.ownRankingBoard.remove()
+    this.descriptionWindow.close()
   }
 
   /**
@@ -199,8 +206,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   private readonly synchroBreakTurnSelect = (ev: SynchroBreakTurnSelectEvent): void => {
     if (this.isOwnPlayerMidwayParticipant) return
-
-    this.getRankingBoard.updateTurnNumber(1, ev.allTurn)
 
     this.synchroBreakPluginStore.gameTurn = ev.allTurn
 
@@ -245,7 +250,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     }
 
     this.synchroBreakPluginStore.playersCoinRepository.set(ev.playerId, ev.currentCoins)
-    this.getRankingBoard.updateRanking()
+    this.ownRankingBoard.updateRanking()
   }
 
   /**
@@ -298,7 +303,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
 
     const status: NyokkiStatus = isSuccess ? 'success' : 'nyokki'
     for (const nyokkiCollectionPlayerId of nyokkiCollectionPlayerIds) {
-      this.getRankingBoard.changeNyokkiStatus(nyokkiCollectionPlayerId, status)
+      this.ownRankingBoard.changeNyokkiStatus(nyokkiCollectionPlayerId, status)
 
       // ニョッキアクションの実行結果をプレイヤーに通知する
       if (nyokkiCollectionPlayerId === this.playerPluginStore.ownPlayerId && nyokkiLogText !== undefined) {
@@ -332,12 +337,45 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
 
     if (noNyokkiPlayerIds.length === 0) return
     for (const noNyokkiPlayerId of noNyokkiPlayerIds) {
-      this.getRankingBoard.changeNyokkiStatus(noNyokkiPlayerId, status)
+      this.ownRankingBoard.changeNyokkiStatus(noNyokkiPlayerId, status)
       this.synchroBreakPluginStore.synchroBreakIcons.get(noNyokkiPlayerId)?.handlePlayerSynchroBreakIcons(-1, status)
     }
 
     const noNyokkiLogText = this.synchroBreakPluginStore.nyokkiLogTextCreator.createNoNyokkiLogText(noNyokkiPlayerIds)
     this.gamePluginStore.gameLogRenderer.gameLog(noNyokkiLogText, 100)
+  }
+
+  /**
+   * 結果表示のハンドラー
+   */
+  private readonly handleSynchroBreakResult = (ev: SynchroBreakResultEvent): void => {
+    if (this.isOwnPlayerMidwayParticipant) return
+    this.resultHandlers[ev.resultScreenType]()
+  }
+
+  /**
+   * 結果ウィンドウタイプ別のハンドラー
+   */
+  private readonly resultHandlers: Record<ResultScreenType, () => void> = {
+    [RESULT_SCREEN_TYPES.TURN]: () => {
+      this.showResult(RESULT_SCREEN_TYPES.TURN)
+    },
+    [RESULT_SCREEN_TYPES.FINAL]: () => {
+      this.ownRankingBoard.remove()
+      this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.remove()
+      this.descriptionWindow.displayResultMessage()
+      this.showResult(RESULT_SCREEN_TYPES.FINAL)
+    },
+  }
+
+  /**
+   * 結果画面を表示
+   */
+  private showResult(type: ResultScreenType): void {
+    const resultScreen = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'resultScreen')
+    if (resultScreen === undefined) throw new SynchroBreakUiNotFoundError('resultScreen')
+
+    resultScreen.createResultRanking(type)
   }
 
   /**
@@ -347,6 +385,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     if (this.isOwnPlayerMidwayParticipant) return
     this.resetPlayerNyokkiIcon()
     this.removeBetCoinUi()
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'resultScreen')?.close()
     const ownPlayerId = this.playerPluginStore.ownPlayerId
     const ownCoins = this.synchroBreakPluginStore.playersCoinRepository.get(ownPlayerId)
 
@@ -356,8 +395,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const turnLeft = gameTurn - ev.turnNumber + 1
     this.descriptionWindow.displayTurnStart(turnLeft, ownCoins)
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betCoinConfirm')?.open()
-
-    this.getRankingBoard.updateTurnNumber(ev.turnNumber, gameTurn)
   }
 
   /**
@@ -368,18 +405,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     for (const playerCoin of ev.playersCoin) {
       this.synchroBreakPluginStore.playersCoinRepository.set(playerCoin.playerId, playerCoin.coins)
     }
-    this.getRankingBoard.updateRanking()
-  }
-
-  /**
-   * ゲーム終了後の結果ウィンドウ表示処理
-   */
-  private readonly showSynchroBreakResult = (): void => {
-    if (this.isOwnPlayerMidwayParticipant) return
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')?.remove()
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.remove()
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')?.displayResultMessage()
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'resultScreen')?.createResultRanking()
+    this.ownRankingBoard.updateRanking()
   }
 
   /**
@@ -394,10 +420,10 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   /**
    * シンクロブレイクのランキングボードを取得する
    */
-  private get getRankingBoard(): IRankingBoard {
-    const rankingBoard = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')
-    if (rankingBoard === undefined) throw new SynchroBreakUiNotFoundError('rankingBoard')
-    return rankingBoard
+  private get ownRankingBoard(): IOwnRankingBoard {
+    const ownRankingBoard = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'ownRankingBoard')
+    if (ownRankingBoard === undefined) throw new SynchroBreakUiNotFoundError('ownRankingBoard')
+    return ownRankingBoard
   }
 
   /**
