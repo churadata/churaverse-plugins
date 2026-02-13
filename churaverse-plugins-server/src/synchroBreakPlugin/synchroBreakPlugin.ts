@@ -21,6 +21,7 @@ import { SynchroBreakTurnStartMessage } from './message/synchroBreakTurnStartMes
 import { IGameSequence } from './interface/IGameSequence'
 import { GameSequence } from './logic/gameSequence'
 
+export const SYNCHRO_BREAK_MID_RESULT_TIME_LIMIT = 3000
 export const BET_TIMER_TIME_LIMIT = 20000 // 20 秒
 
 export class SynchroBreakPlugin extends CoreGamePlugin {

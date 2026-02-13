@@ -130,8 +130,8 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.eventBus.post(new UpdatePlayersCoinEvent(msg.data.playersCoin))
   }
 
-  private readonly synchroBreakResult = (): void => {
-    this.eventBus.post(new SynchroBreakResultEvent())
+  private readonly synchroBreakResult = (msg: SynchroBreakResultMessage): void => {
+    this.eventBus.post(new SynchroBreakResultEvent(msg.data.resultScreenType))
   }
 
   private readonly betTimeRemaining = (msg: BetTimeRemainingMessage): void => {

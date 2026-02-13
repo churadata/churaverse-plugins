@@ -1,5 +1,5 @@
 import { IDescriptionWindow } from '../interface/IDescriptionWindow'
-import { IRankingBoard } from '../interface/IRankingBoard'
+import { IOwnRankingBoard } from '../interface/IOwnRankingBoard'
 import { TurnSelectFormContainer } from './turnSelectFormContainer/turnSelectFormContainer'
 import { TimeLimitFormContainer } from './timeLimitFormContainer/timeLimitFormContainer'
 import { BetCoinFormContainer } from './betCoinFormContainer/betCoinFormContainer'
@@ -14,7 +14,7 @@ declare module '@churaverse/game-plugin-client/gameUiManager' {
   export interface GameUiMap {
     synchroBreak: {
       descriptionWindow: IDescriptionWindow
-      rankingBoard: IRankingBoard
+      ownRankingBoard: IOwnRankingBoard
       turnSelectConfirm: TurnSelectFormContainer
       timeLimitConfirm: TimeLimitFormContainer
       betCoinConfirm: BetCoinFormContainer
