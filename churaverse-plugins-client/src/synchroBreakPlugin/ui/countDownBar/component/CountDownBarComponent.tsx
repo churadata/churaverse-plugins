@@ -1,5 +1,5 @@
 import { JSXFunc } from 'churaverse-engine-client'
-import style from './CountdownBarComponent.module.scss'
+import style from './CountDownBarComponent.module.scss'
 
 export const CountdownBarComponent: JSXFunc = () => {
   return (

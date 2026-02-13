@@ -11,6 +11,10 @@ import { SynchroBreakStartCountMessage } from '../message/synchroBreakStartCount
 import { SynchroBreakTurnTimerMessage } from '../message/synchroBreakTurnTimerMessage'
 import { SynchroBreakResultMessage } from '../message/synchroBreakResultMessage'
 import { UpdatePlayersCoinMessage } from '../message/updatePlayersCoinMessage'
+import { SYNCHRO_BREAK_MID_RESULT_TIME_LIMIT } from '../synchroBreakPlugin'
+import { RESULT_SCREEN_TYPES } from '../type/resultScreenType'
+import { BetTimeRemainingMessage } from '../message/betTimeRemainingMessage'
+import { BET_TIMER_TIME_LIMIT } from '../synchroBreakPlugin'
 
 export class GameSequence implements IGameSequence {
   private readonly synchroBreakPluginStore!: SynchroBreakPluginStore
@@ -29,6 +33,8 @@ export class GameSequence implements IGameSequence {
   }
 
   public async processTurnSequence(): Promise<void> {
+    if (!this.isActive) return
+    await this.startBetTimeCountdown()
     if (!this.isActive) return
     await this.startTurnCountdown()
     if (!this.isActive) return
@@ -87,15 +93,52 @@ export class GameSequence implements IGameSequence {
     if (!this.isActive || turnSelect === undefined) return
     if (turnSelect <= this.turnCountNumber) {
       this.turnCountNumber = 1
-      const sortedPlayersCoin = this.synchroBreakPluginStore.playersCoinRepository.sortedPlayerCoins()
-      this.networkPluginStore.messageSender.send(new UpdatePlayersCoinMessage({ playersCoin: sortedPlayersCoin }))
-      this.networkPluginStore.messageSender.send(new SynchroBreakResultMessage())
+      this.sendSortedPlayersCoin()
+      this.networkPluginStore.messageSender.send(new SynchroBreakResultMessage({ resultScreenType: RESULT_SCREEN_TYPES.FINAL }))
     } else {
       this.turnCountNumber++
 
+      this.sendSortedPlayersCoin()
+      this.networkPluginStore.messageSender.send(new SynchroBreakResultMessage({ resultScreenType: RESULT_SCREEN_TYPES.TURN }))
+
+      await this.delay(SYNCHRO_BREAK_MID_RESULT_TIME_LIMIT)
+
+      if (!this.isActive) return
       const synchroBreakTurnStart = new SynchroBreakTurnStartEvent(this.turnCountNumber)
       this.eventBus.post(synchroBreakTurnStart)
     }
+  }
+
+  /**
+   * ソート済みのプレイヤーコイン情報を送信
+   */
+  private sendSortedPlayersCoin(): void {
+    const sortedPlayersCoin = this.synchroBreakPluginStore.playersCoinRepository.sortedPlayerCoins()
+    this.networkPluginStore.messageSender.send(new UpdatePlayersCoinMessage({ playersCoin: sortedPlayersCoin }))
+  }
+
+  /**
+   * ベットタイムのカウントダウンを実行し、残り時間を通知する処理
+   */
+  private async startBetTimeCountdown(): Promise<void> {
+    let remainingTime = BET_TIMER_TIME_LIMIT
+
+    // 100ミリ秒ごとに残り時間を通知
+    while (remainingTime >= 0 && this.isActive) {
+      // 全プレイヤーがベットした場合は終了
+      const numOfPlayers = this.gamePluginStore.games.get(this.gameId)?.participantIds.length ?? 0
+      const didBetPlayers = this.synchroBreakPluginStore.betCoinRepository.getBetCoinPlayerCount()
+      if (numOfPlayers - didBetPlayers <= 0) {
+        return
+      }
+
+      remainingTime -= 100
+      const betTimeRemainingMessage = new BetTimeRemainingMessage({ remainingTime })
+      this.networkPluginStore.messageSender.send(betTimeRemainingMessage)
+      await this.delay(100)
+    }
+
+    await this.delay(100)
   }
 
   private get isActive(): boolean {
