@@ -1,5 +1,6 @@
 import { JSXFunc } from 'churaverse-engine-client'
 import style from './DescriptionWindowComponent.module.scss'
+import { SYNCHRO_BREAK_DESCRIPTION_TEXT_ID } from '../descriptionWindow'
 
 interface DescriptionWindowProps {
   description: string
@@ -10,7 +11,7 @@ export const DescriptionWindowComponent: JSXFunc<DescriptionWindowProps> = ({
 }: DescriptionWindowProps) => {
   return (
     <div className={style.container}>
-      <p>{description}</p>
+      <p id={SYNCHRO_BREAK_DESCRIPTION_TEXT_ID}>{description}</p>
     </div>
   )
 }

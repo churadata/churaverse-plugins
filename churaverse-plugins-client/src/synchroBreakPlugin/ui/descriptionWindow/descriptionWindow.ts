@@ -3,20 +3,25 @@ import { DescriptionWindowComponent } from './component/DescriptionWindowCompone
 import '@churaverse/game-plugin-client/gameUiManager'
 import { IDescriptionWindow } from '../../interface/IDescriptionWindow'
 
+export const SYNCHRO_BREAK_DESCRIPTION_TEXT_ID = 'synchro-break-description-text'
+
 export class DescriptionWindow implements IDescriptionWindow {
   public element!: HTMLElement
   public visible: boolean = false
   private descriptionText: string = ''
+  private descriptionTextElement: HTMLElement | null = null
   private gameName: string = 'ゲーム'
   private gameOwnerName: string = 'ゲームオーナー'
 
   public initialize(): void {
     this.element = DomManager.addJsxDom(DescriptionWindowComponent({ description: this.descriptionText }))
+    this.descriptionTextElement = DomManager.getElementById(SYNCHRO_BREAK_DESCRIPTION_TEXT_ID)
     domLayerSetting(this.element, 'lowest')
   }
 
   public remove(): void {
     this.descriptionText = ''
+    this.descriptionTextElement = null
   }
 
   public close(): void {
@@ -164,6 +169,8 @@ export class DescriptionWindow implements IDescriptionWindow {
    * @param text 更新する文章
    */
   private setDescriptionText(text: string): void {
-    this.element.innerHTML = text
+    const descriptionTextElement = this.descriptionTextElement ?? DomManager.getElementById(SYNCHRO_BREAK_DESCRIPTION_TEXT_ID)
+    descriptionTextElement.innerHTML = text
+    this.descriptionTextElement = descriptionTextElement
   }
 }

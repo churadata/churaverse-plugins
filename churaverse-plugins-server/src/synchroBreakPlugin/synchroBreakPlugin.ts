@@ -22,6 +22,7 @@ import { IGameSequence } from './interface/IGameSequence'
 import { GameSequence } from './logic/gameSequence'
 
 export const SYNCHRO_BREAK_MID_RESULT_TIME_LIMIT = 3000
+export const BET_TIMER_TIME_LIMIT = 20000 // 20 秒
 
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
@@ -136,6 +137,9 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   private readonly timeLimitConfirm = (ev: TimeLimitConfirmEvent): void => {
     this.synchroBreakPluginStore.timeLimit = Number(ev.timeLimit)
+    this.gameSequence.processTurnSequence().catch((error) => {
+      console.error('ゲーム開始確認処理でエラーが発生しました:', error)
+    })
   }
 
   /**
@@ -151,21 +155,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const currentCoins = coins - betCoins
     this.synchroBreakPluginStore.playersCoinRepository.set(playerId, currentCoins)
     this.networkPluginStore.messageSender.send(new SendBetCoinResponseMessage({ playerId, betCoins, currentCoins }))
-
-    this.checkAndStartGameIfAllBet()
-  }
-
-  /**
-   * 全プレイヤーがベットしているか確認し、全プレイヤーがベットしている場合にゲームを開始する
-   */
-  private checkAndStartGameIfAllBet(): void {
-    const betCoinPlayerNumber = this.synchroBreakPluginStore.betCoinRepository.getBetCoinPlayerCount()
-    const totalPlayerNum = this.participantIds.length
-    if (betCoinPlayerNumber >= totalPlayerNum) {
-      this.gameSequence.processTurnSequence().catch((error) => {
-        console.error('ゲーム開始確認処理でエラーが発生しました:', error)
-      })
-    }
   }
 
   /**
@@ -224,6 +213,9 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const turnNumber = ev.turnNumber
     const synchroBreakTurnStartMessage = new SynchroBreakTurnStartMessage({ turnNumber })
     this.networkPluginStore.messageSender.send(synchroBreakTurnStartMessage)
+    this.gameSequence.processTurnSequence().catch((error) => {
+      console.error('ゲーム開始確認処理でエラーが発生しました:', error)
+    })
   }
 
   /**
