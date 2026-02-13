@@ -3,6 +3,9 @@ import { CountdownBarComponent } from './component/CountdownBarComponent'
 import styles from './component/CountdownBarComponent.module.scss'
 import { ICountdownBar } from '../../interface/ICountdownBar'
 
+export const COUNTDOWN_BAR_PROGRESS_VALUE_ID = 'countdown-bar-progress-value'
+export const COUNTDOWN_BAR_PROGRESS_BAR_ID = 'countdown-bar-progress-bar'
+
 /**
  * 円形カウントダウンバー
  * - 中央に残り秒数を表示（percent をそのまま数値表示）
@@ -14,8 +17,8 @@ export class CountdownBar implements ICountdownBar {
   private totalDuration: number = 1
   private lastRemainingSeconds?: number
   private readonly alertThreshold: number = 3
-  private progressBarEl?: SVGCircleElement
-  private progressValueEl?: HTMLDivElement
+  private progressBarEl!: HTMLElement
+  private progressValueEl!: HTMLElement
 
   private readonly radius = 45
   private readonly circumference = this.radius * 2 * Math.PI
@@ -24,19 +27,16 @@ export class CountdownBar implements ICountdownBar {
   private static readonly LAG_THRESHOLD_SECONDS = 2
 
   public initialize(): void {
-    if (this.element !== undefined) {
-      this.element.remove()
-      this.progressBarEl = undefined
-      this.progressValueEl = undefined
-    }
+    this.element?.remove()
 
     this.element = DomManager.addJsxDom(CountdownBarComponent())
     this.element.style.display = 'none'
-    this.ensureElementsCached()
-    if (this.progressBarEl !== undefined) {
-      this.progressBarEl.style.strokeDasharray = `${this.circumference}`
-      this.progressBarEl.style.strokeDashoffset = `${this.circumference}`
-    }
+
+    this.progressValueEl = DomManager.getElementById(COUNTDOWN_BAR_PROGRESS_VALUE_ID)
+    this.progressBarEl = DomManager.getElementById(COUNTDOWN_BAR_PROGRESS_BAR_ID)
+
+    this.progressBarEl.style.strokeDasharray = `${this.circumference}`
+    this.progressBarEl.style.strokeDashoffset = `${this.circumference}`
   }
 
   /**
@@ -50,13 +50,9 @@ export class CountdownBar implements ICountdownBar {
    * サーバ同期型の描画更新。残り秒から比率を計算して stroke-dashoffset を更新する。
    */
   public updateDashOffset(remainingSeconds: number): void {
-    this.ensureElementsCached()
-
     // 残り秒数表示を更新
-    if (this.progressValueEl !== undefined) {
-      const newText = Math.floor(remainingSeconds).toString()
-      this.progressValueEl.textContent = newText
-    }
+    const newText = Math.floor(remainingSeconds).toString()
+    this.progressValueEl.textContent = newText
 
     if (this.lastRemainingSeconds === undefined) {
       this.initializeProgress(remainingSeconds)
@@ -68,32 +64,16 @@ export class CountdownBar implements ICountdownBar {
   }
 
   /**
-   * キャッシュされていなければ取得する
-   */
-  private ensureElementsCached(): void {
-    if (this.progressValueEl === undefined) {
-      this.progressValueEl = this.element.querySelector<HTMLDivElement>(`.${styles.progressValue}`) ?? undefined
-    }
-    if (this.progressBarEl === undefined) {
-      this.progressBarEl = this.element.querySelector<SVGCircleElement>(`.${styles.progressBar}`) ?? undefined
-    }
-  }
-
-  /**
    * プログレスバーと秒数表示の初期化
    */
   private initializeProgress(remainingSeconds: number): void {
-    if (this.progressValueEl !== undefined) {
-      this.progressValueEl.textContent = Math.floor(remainingSeconds).toString()
-    }
+    this.progressValueEl.textContent = Math.floor(remainingSeconds).toString()
 
-    if (this.progressBarEl !== undefined) {
-      this.progressBarEl.style.transition = 'none'
-      const offset = this.calculateStrokeDashOffset(remainingSeconds)
-      this.progressBarEl.style.strokeDashoffset = `${offset}`
-      this.progressBarEl.getBoundingClientRect()
-      this.progressBarEl.style.transition = CountdownBar.DEFAULT_TRANSITION
-    }
+    this.progressBarEl.style.transition = 'none'
+    const offset = this.calculateStrokeDashOffset(remainingSeconds)
+    this.progressBarEl.style.strokeDashoffset = `${offset}`
+    this.progressBarEl.getBoundingClientRect()
+    this.progressBarEl.style.transition = CountdownBar.DEFAULT_TRANSITION
 
     this.updateAlertState(remainingSeconds)
   }
@@ -103,8 +83,6 @@ export class CountdownBar implements ICountdownBar {
    * 現在の秒数から次の秒へ1秒かけてトランジション
    */
   private updateProgressBar(remainingSeconds: number, lastRemainingSeconds: number): void {
-    if (this.progressBarEl === undefined) return
-
     this.updateAlertState(remainingSeconds)
 
     // 大きなラグがあった場合はトランジションなしで即座に更新
@@ -117,7 +95,6 @@ export class CountdownBar implements ICountdownBar {
       this.progressBarEl.getBoundingClientRect()
 
       requestAnimationFrame(() => {
-        if (this.progressBarEl === undefined) return
         this.progressBarEl.style.transition = prevTransition !== '' ? prevTransition : CountdownBar.DEFAULT_TRANSITION
       })
     } else {
@@ -144,8 +121,6 @@ export class CountdownBar implements ICountdownBar {
    * 警告状態の切り替え
    */
   private updateAlertState(remainingSeconds: number): void {
-    if (this.progressBarEl === undefined) return
-
     if (remainingSeconds <= this.alertThreshold) {
       this.progressBarEl.classList.add(styles.alert)
     } else {
@@ -163,16 +138,11 @@ export class CountdownBar implements ICountdownBar {
 
   public reset(): void {
     this.lastRemainingSeconds = undefined
-    this.ensureElementsCached()
 
-    if (this.progressValueEl !== undefined) {
-      this.progressValueEl.textContent = '0'
-    }
+    this.progressValueEl.textContent = '0'
 
-    if (this.progressBarEl !== undefined) {
-      this.progressBarEl.style.transition = 'none'
-      this.progressBarEl.style.strokeDashoffset = `${this.circumference}`
-    }
+    this.progressBarEl.style.transition = 'none'
+    this.progressBarEl.style.strokeDashoffset = `${this.circumference}`
   }
 
   public remove(): void {
