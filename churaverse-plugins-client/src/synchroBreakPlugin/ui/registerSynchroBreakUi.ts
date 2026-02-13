@@ -8,7 +8,7 @@ import { TimeLimitFormContainer } from './timeLimitFormContainer/timeLimitFormCo
 import { BetCoinFormContainer } from './betCoinFormContainer/betCoinFormContainer'
 import { NyokkiButton } from './nyokkiButton/nyokkiButton'
 import { ResultScreen } from './resultScreen/resultScreen'
-import { CountdownBar } from './countDownBar/countDownBar'
+import { CountdownBar } from './countdownBar/countdownBar'
 import { Scene } from 'phaser'
 import { BetTimer } from './betTimer/betTimer'
 

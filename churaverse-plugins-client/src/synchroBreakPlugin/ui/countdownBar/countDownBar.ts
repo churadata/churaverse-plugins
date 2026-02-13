@@ -1,7 +1,7 @@
 import { DomManager } from 'churaverse-engine-client'
-import { CountdownBarComponent } from './component/CountDownBarComponent'
-import styles from './component/CountDownBarComponent.module.scss'
-import { ICountdownBar } from '../../interface/ICountDownBar'
+import { CountdownBarComponent } from './component/CountdownBarComponent'
+import styles from './component/CountdownBarComponent.module.scss'
+import { ICountdownBar } from '../../interface/ICountdownBar'
 
 /**
  * 円形カウントダウンバー
