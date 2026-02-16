@@ -35,9 +35,9 @@
   "license": "MIT",
   "dependencies": {
     "phaser": "^3.80.1",
-    "@churaverse/core-ui-plugin-client": "~0.1.0",
-    "@churaverse/data-persistence-plugin-client": "~0.1.0",
-    "@churaverse/transition-plugin-client": "~0.1.0",
-    "churaverse-engine-client": "~0.1.0"
+    "@churaverse/core-ui-plugin-client": "workspace:*",
+    "@churaverse/data-persistence-plugin-client": "workspace:*",
+    "@churaverse/transition-plugin-client": "workspace:*",
+    "churaverse-engine-client": "workspace:*"
   }
 }

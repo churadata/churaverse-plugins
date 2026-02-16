@@ -1,4 +1,15 @@
 {
   "name": "churaverse-plugins",
-  "private": true
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "volta": {
+    "node": "20.20.0",
+    "pnpm": "10.28.1"
+  },
+  "scripts": {
+    "install:all": "pnpm install",
+    "build": "pnpm -r run build"
+  }
 }

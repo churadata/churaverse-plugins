@@ -6,12 +6,12 @@
   "types": "dist/types/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc",
+    "build": "tsc",
     "link:cvPackages": "sh npm_link_cvPackages.sh"
   },
   "license": "MIT",
   "dependencies": {
-    "churaverse-engine-server": "^0.1.0",
-    "@churaverse/map-plugin-server": "^0.1.0"
+    "churaverse-engine-server": "workspace:*",
+    "@churaverse/map-plugin-server": "workspace:*"
   }
 }

@@ -34,8 +34,8 @@
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "dependencies": {
-    "@churaverse/core-ui-plugin-client": "~0.1.0",
-    "@churaverse/player-plugin-client": "~0.1.0",
-    "churaverse-engine-client": "~0.1.0"
+    "@churaverse/core-ui-plugin-client": "workspace:*",
+    "@churaverse/player-plugin-client": "workspace:*",
+    "churaverse-engine-client": "workspace:*"
   }
 }

@@ -34,8 +34,8 @@
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "dependencies": {
-    "@churaverse/keyboard-plugin-client": "~0.1.0",
-    "churaverse-engine-client": "~0.1.0",
+    "@churaverse/keyboard-plugin-client": "workspace:*",
+    "churaverse-engine-client": "workspace:*",
     "phaser": "^3.80.1"
   }
 }
