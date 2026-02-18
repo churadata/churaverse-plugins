@@ -42,8 +42,8 @@ export class TitleCoreUiPlugin extends BasePlugin<ITitleScene> {
 
   private start(ev: StartEvent): void {
     this.joinButtonRenderer = new JoinButtonRenderer(this.scene, this.store, this.bus)
-    void new TitleBackgroundRenderer(this.scene)
-    void new ChuraDataLogoRenderer(this.scene, this.store, this.bus)
+    new TitleBackgroundRenderer(this.scene)
+    new ChuraDataLogoRenderer(this.scene, this.store, this.bus)
   }
 
   private changePlayerRole(ev: TitlePlayerRoleChangeEvent): void {
