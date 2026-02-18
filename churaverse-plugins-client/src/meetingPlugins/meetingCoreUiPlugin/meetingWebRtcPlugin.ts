@@ -424,7 +424,9 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       const container = document.getElementById(`video-container-${participantId}`)
       const avatar = document.getElementById(`avatar-${participantId}`)
       if (container !== null) {
-        container.innerHTML = ''
+        while (container.firstChild !== null) {
+          container.removeChild(container.firstChild)
+        }
         container.style.display = 'none'
       }
       if (avatar !== null) avatar.style.display = 'flex'
