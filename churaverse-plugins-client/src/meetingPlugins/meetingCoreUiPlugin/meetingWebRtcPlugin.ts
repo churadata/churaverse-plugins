@@ -1,8 +1,21 @@
 import { BasePlugin, DomManager, getChuraverseConfig, IMeetingScene } from 'churaverse-engine-client'
 import { Room, RoomEvent, RoomOptions, VideoPresets, Track, RemoteTrack, RemoteParticipant, Participant, DataPacket_Kind } from 'livekit-client'
-import { videoGridStyles } from './components/VideoGridComponent'
-import { controlBarStyles } from './components/MeetingControlBarComponent'
-import { sidebarStyles } from './components/MeetingSidebarComponent'
+import { VIDEO_GRID_ID, videoGridStyles } from './components/VideoGridComponent'
+import {
+  MIC_TOGGLE_BUTTON_ID,
+  CAMERA_TOGGLE_BUTTON_ID,
+  SCREEN_SHARE_BUTTON_ID,
+  MEETING_EXIT_BUTTON_ID,
+  controlBarStyles,
+} from './components/MeetingControlBarComponent'
+import {
+  PARTICIPANT_LIST_ID,
+  PARTICIPANTS_COUNT_ID,
+  CHAT_MESSAGES_ID,
+  CHAT_INPUT_ID,
+  CHAT_SEND_BUTTON_ID,
+  sidebarStyles,
+} from './components/MeetingSidebarComponent'
 
 interface AccessTokenResponse {
   token: string
@@ -61,7 +74,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   private async waitForVideoGrid(): Promise<void> {
     await new Promise<void>((resolve) => {
       const check = (): void => {
-        if (document.getElementById('video-grid') !== null) {
+        if (document.getElementById(VIDEO_GRID_ID) !== null) {
           resolve()
         } else {
           requestAnimationFrame(check)
@@ -210,7 +223,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private addParticipantTile(participant: Participant): void {
-    const grid = document.getElementById('video-grid')
+    const grid = document.getElementById(VIDEO_GRID_ID)
     if (grid === null) {
       console.error('[MeetingWebRtc] video-grid element not found!')
       return
@@ -270,8 +283,8 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private updateParticipantList(): void {
-    const list = document.getElementById('participant-list')
-    const countEl = document.getElementById('participants-count')
+    const list = document.getElementById(PARTICIPANT_LIST_ID)
+    const countEl = document.getElementById(PARTICIPANTS_COUNT_ID)
     if (list === null || this.room === undefined) return
 
     while (list.firstChild !== null) {
@@ -348,7 +361,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private attachScreenShareTrack(track: RemoteTrack | Track, participantId: string): void {
-    const grid = document.getElementById('video-grid')
+    const grid = document.getElementById(VIDEO_GRID_ID)
     if (grid === null) {
       console.error('[MeetingWebRtc] video-grid element not found!')
       return
@@ -398,7 +411,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private detachScreenShareTrack(participantId?: string): void {
-    const grid = document.getElementById('video-grid')
+    const grid = document.getElementById(VIDEO_GRID_ID)
     if (grid === null) return
 
     const removeTile = (tile: Element): void => {
@@ -434,7 +447,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private updateGridLayout(): void {
-    const grid = document.getElementById('video-grid')
+    const grid = document.getElementById(VIDEO_GRID_ID)
     if (grid === null) return
 
     const hasScreenShare = document.querySelector('[id^="tile-screenshare-"]') !== null
@@ -574,27 +587,27 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private setupUiEventHandlers(): void {
-    const micButton = DomManager.getElementById('mic-toggle-button')
-    const cameraButton = DomManager.getElementById('camera-toggle-button')
-    const screenShareButton = DomManager.getElementById('screen-share-button')
-    const exitButton = DomManager.getElementById('meeting-exit-button')
+    const micButton = DomManager.getElementById(MIC_TOGGLE_BUTTON_ID)
+    const cameraButton = DomManager.getElementById(CAMERA_TOGGLE_BUTTON_ID)
+    const screenShareButton = DomManager.getElementById(SCREEN_SHARE_BUTTON_ID)
+    const exitButton = DomManager.getElementById(MEETING_EXIT_BUTTON_ID)
 
-    micButton?.addEventListener('click', () => { void this.toggleMicrophone() })
-    cameraButton?.addEventListener('click', () => { void this.toggleCamera() })
-    screenShareButton?.addEventListener('click', () => { void this.toggleScreenShare() })
-    exitButton?.addEventListener('click', () => { this.exitMeeting() })
+    micButton.addEventListener('click', () => { void this.toggleMicrophone() })
+    cameraButton.addEventListener('click', () => { void this.toggleCamera() })
+    screenShareButton.addEventListener('click', () => { void this.toggleScreenShare() })
+    exitButton.addEventListener('click', () => { this.exitMeeting() })
 
-    const chatInput = document.getElementById('chat-input') as HTMLInputElement | null
-    const chatSendButton = document.getElementById('chat-send-button')
+    const chatInput = DomManager.getElementById<HTMLInputElement>(CHAT_INPUT_ID)
+    const chatSendButton = DomManager.getElementById(CHAT_SEND_BUTTON_ID)
 
-    chatSendButton?.addEventListener('click', () => {
-      if (chatInput !== null && chatInput.value.trim() !== '') {
+    chatSendButton.addEventListener('click', () => {
+      if (chatInput.value.trim() !== '') {
         void this.sendChatMessage(chatInput.value.trim())
         chatInput.value = ''
       }
     })
 
-    chatInput?.addEventListener('keydown', (e) => {
+    chatInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey && chatInput.value.trim() !== '') {
         e.preventDefault()
         void this.sendChatMessage(chatInput.value.trim())
@@ -613,7 +626,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     this.isMicEnabled = !this.isMicEnabled
     await this.room.localParticipant.setMicrophoneEnabled(this.isMicEnabled)
-    this.updateButtonState('mic-toggle-button', !this.isMicEnabled)
+    this.updateButtonState(MIC_TOGGLE_BUTTON_ID, !this.isMicEnabled)
   }
 
   private async toggleCamera(): Promise<void> {
@@ -621,7 +634,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     this.isCameraEnabled = !this.isCameraEnabled
     await this.room.localParticipant.setCameraEnabled(this.isCameraEnabled)
-    this.updateButtonState('camera-toggle-button', !this.isCameraEnabled)
+    this.updateButtonState(CAMERA_TOGGLE_BUTTON_ID, !this.isCameraEnabled)
   }
 
   private async toggleScreenShare(): Promise<void> {
@@ -630,18 +643,16 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     this.isScreenShareEnabled = !this.isScreenShareEnabled
     try {
       await this.room.localParticipant.setScreenShareEnabled(this.isScreenShareEnabled)
-      this.updateButtonState('screen-share-button', this.isScreenShareEnabled)
+      this.updateButtonState(SCREEN_SHARE_BUTTON_ID, this.isScreenShareEnabled)
     } catch (e) {
       console.error('[MeetingWebRtc] Screen share failed:', e)
       this.isScreenShareEnabled = false
-      this.updateButtonState('screen-share-button', false)
+      this.updateButtonState(SCREEN_SHARE_BUTTON_ID, false)
     }
   }
 
   private updateButtonState(buttonId: string, highlighted: boolean): void {
     const button = DomManager.getElementById(buttonId)
-    if (button === undefined) return
-
     if (highlighted) {
       button.classList.add(controlBarStyles.activeButton)
     } else {
@@ -692,7 +703,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private addChatMessage(senderId: string, text: string): void {
-    const chatMessages = document.getElementById('chat-messages')
+    const chatMessages = document.getElementById(CHAT_MESSAGES_ID)
     if (chatMessages === null) return
 
     const messageEl = document.createElement('div')
