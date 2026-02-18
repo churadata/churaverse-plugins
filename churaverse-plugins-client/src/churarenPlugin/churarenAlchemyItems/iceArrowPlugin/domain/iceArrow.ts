@@ -1,7 +1,6 @@
 import { GRID_SIZE, Position, Direction, Vector } from 'churaverse-engine-client'
 import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/IAlchemyItem'
-import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/AlchemyItem'
-import { AlchemyItemKind } from '@churaverse/churaren-alchemy-plugin-client/domain/AlchemyItemKind'
+import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItem'
 import iceArrowImage from '../assets/iceArrow.png'
 import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-client'
 
@@ -11,7 +10,6 @@ import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-client'
 export const ICE_ARROW_WALK_LIMIT_GRIDS = 25
 export const ICE_ARROW_WALK_LIMIT_MS = 2400
 export const ICE_ARROW_SPEED = (ICE_ARROW_WALK_LIMIT_GRIDS * GRID_SIZE) / ICE_ARROW_WALK_LIMIT_MS
-export const iceArrow: AlchemyItemKind = 'iceArrow'
 export const ICE_ARROW_ITEM: IAlchemyItem = {
   image: iceArrowImage,
   kind: 'iceArrow',
@@ -42,7 +40,7 @@ export class IceArrow extends AlchemyItem implements ChurarenWeaponEntity {
     spawnTime: number,
     attackVector: Vector
   ) {
-    super(iceArrowId, 'iceArrow')
+    super(iceArrowId, ICE_ARROW_ITEM.kind)
     this.iceArrowId = iceArrowId
     this.churarenWeaponOwnerId = ownerId
     this.spawnTime = spawnTime
@@ -65,5 +63,11 @@ export class IceArrow extends AlchemyItem implements ChurarenWeaponEntity {
    */
   public die(): void {
     this.isDead = true
+  }
+}
+
+declare module '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind' {
+  export interface AlchemyItemKindMap {
+    iceArrow: IceArrow
   }
 }

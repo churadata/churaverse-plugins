@@ -39,6 +39,7 @@
     "@churaverse/churaren-healing-potion-plugin-client": "file:../healingPotionPlugin",
     "@churaverse/churaren-revival-item-plugin-client": "file:../revivalItemPlugin",
     "@churaverse/churaren-explosion-plugin-client": "file:../explosionPlugin",
+    "@churaverse/churaren-ice-arrow-plugin-client": "file:../iceArrowPlugin",
     "@churaverse/churaren-alchemy-plugin-client": "file:../../churarenAlchemyPlugin"
   }
 }
