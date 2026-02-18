@@ -1,25 +1,24 @@
 import { IMainScene, EntitySpawnEvent, UpdateEvent, LivingDamageEvent } from 'churaverse-engine-server'
-import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
+import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-server/domain/baseAlchemyItemPlugin'
 import { IceArrowPluginStore } from './store/defIceArrowPluginStore'
 import { SocketController } from './controller/socketController'
 import { initIceArrowPluginStore } from './store/initIceArrowPluginStore'
 import { MapPluginStore } from '@churaverse/map-plugin-server/store/defMapPluginStore'
-import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
 import { IceArrowHitMessage } from './message/iceArrowHitMessage'
 import { moveIceArrows, removeDieIceArrow } from './domain/iceArrowService'
-import { IceArrow } from './domain/iceArrow'
+import { IceArrow, ICE_ARROW_ITEM } from './domain/iceArrow'
 import { Boss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
 import '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
 import { IceArrowDamageCause } from './domain/iceArrowDamageCause'
 
-export class IceArrowPlugin extends BaseGamePlugin {
-  public gameId = CHURAREN_CONSTANTS.GAME_ID
+export class IceArrowPlugin extends BaseAlchemyItemPlugin {
   private iceArrowPluginStore!: IceArrowPluginStore
   private mapPluginStore!: MapPluginStore
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private socketController?: SocketController
+  protected alchemyItem = ICE_ARROW_ITEM
 
   public listenEvent(): void {
     super.listenEvent()

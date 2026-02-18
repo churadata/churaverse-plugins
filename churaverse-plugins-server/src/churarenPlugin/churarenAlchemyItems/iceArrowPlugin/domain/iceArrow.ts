@@ -1,16 +1,25 @@
-import { Direction, Position, Entity, Vector } from 'churaverse-engine-server'
+import { Direction, Position, Vector } from 'churaverse-engine-server'
 import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/ICollidableEntity'
 import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
 import { WorldMap } from '@churaverse/map-plugin-server/domain/worldMap'
 import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-server'
+import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-server/domain/IAlchemyItem'
+import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItem'
 
 export const ICE_ARROW_WALK_LIMIT_GRIDS = 25
 export const ICE_ARROW_WALK_LIMIT_MS = 2400
+export const ICE_ARROW_ITEM: IAlchemyItem = {
+  kind: 'iceArrow',
+  recipe: {
+    pattern: 'two_same_one_diff',
+    materialKind: 'waterOre',
+  },
+}
 
 /**
  * IceArrowクラスの定義
  */
-export class IceArrow extends Entity implements ICollidableEntity, ChurarenWeaponEntity {
+export class IceArrow extends AlchemyItem implements ICollidableEntity, ChurarenWeaponEntity {
   public isCollidable = true
   public getRect(): IRectangle {
     return {
@@ -40,9 +49,11 @@ export class IceArrow extends Entity implements ICollidableEntity, ChurarenWeapo
     spawnTime: number,
     attackVector: Vector
   ) {
-    super(position, direction)
+    super(iceArrowId, ICE_ARROW_ITEM.kind)
     this.iceArrowId = iceArrowId
     this.churarenWeaponOwnerId = ownerId
+    this.position = position
+    this.direction = direction
     this.spawnTime = spawnTime
     this.attackVector = attackVector
 
@@ -82,5 +93,11 @@ export class IceArrow extends Entity implements ICollidableEntity, ChurarenWeapo
   public move(dt: number): void {
     this.position.x += this._velocity.x * dt
     this.position.y += this._velocity.y * dt
+  }
+}
+
+declare module '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItemKind' {
+  export interface AlchemyItemKindMap {
+    iceArrow: IceArrow
   }
 }
