@@ -1,6 +1,12 @@
 import { JSXFunc } from 'churaverse-engine-client'
 import style from './MeetingSidebarComponent.module.scss'
 
+export const SIDEBAR_ID = 'meeting-sidebar'
+export const PARTICIPANTS_SECTION_ID = 'participants-section'
+export const CHAT_SECTION_ID = 'chat-section'
+export const SIDEBAR_CLOSE_BUTTON_ID = 'sidebar-close-button'
+export const SIDEBAR_CLOSE_BUTTON_CHAT_ID = 'sidebar-close-button-chat'
+
 const DUMMY_PARTICIPANTS = [
   { id: 1, name: 'User 1', isMuted: false },
   { id: 2, name: 'User 2', isMuted: true },
@@ -18,12 +24,12 @@ const DUMMY_MESSAGES = [
 
 export const MeetingSidebarComponent: JSXFunc = () => {
   return (
-    <div className={style.sidebar} id="meeting-sidebar" data-visible="false" data-tab="participants">
+    <div className={style.sidebar} id={SIDEBAR_ID} data-visible="false" data-tab="participants">
       {/* 参加者一覧 */}
-      <div className={style.section} id="participants-section" data-active="true">
+      <div className={style.section} id={PARTICIPANTS_SECTION_ID} data-active="true">
         <div className={style.sectionHeader}>
           <span className={style.sectionTitle}>参加者 ({DUMMY_PARTICIPANTS.length})</span>
-          <button className={style.closeButton} id="sidebar-close-button">
+          <button className={style.closeButton} id={SIDEBAR_CLOSE_BUTTON_ID}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
             </svg>
@@ -45,10 +51,10 @@ export const MeetingSidebarComponent: JSXFunc = () => {
       </div>
 
       {/* チャット */}
-      <div className={style.section} id="chat-section" data-active="false">
+      <div className={style.section} id={CHAT_SECTION_ID} data-active="false">
         <div className={style.sectionHeader}>
           <span className={style.sectionTitle}>チャット</span>
-          <button className={style.closeButton} id="sidebar-close-button-chat">
+          <button className={style.closeButton} id={SIDEBAR_CLOSE_BUTTON_CHAT_ID}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
             </svg>

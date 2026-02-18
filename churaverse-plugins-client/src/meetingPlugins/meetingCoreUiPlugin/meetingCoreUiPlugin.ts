@@ -1,23 +1,20 @@
-import {
-  BasePlugin,
-  IMeetingScene,
-  PhaserSceneInit,
-  StartEvent,
-  DomManager,
-} from 'churaverse-engine-client'
-import { Scene } from 'phaser'
+import { BasePlugin, IMeetingScene, StartEvent, DomManager } from 'churaverse-engine-client'
 import { MeetingScreenComponent } from './components/MeetingScreenComponent'
+import {
+  SIDEBAR_ID,
+  PARTICIPANTS_SECTION_ID,
+  CHAT_SECTION_ID,
+  SIDEBAR_CLOSE_BUTTON_ID,
+  SIDEBAR_CLOSE_BUTTON_CHAT_ID,
+} from './components/MeetingSidebarComponent'
+import {
+  PARTICIPANTS_TOGGLE_BUTTON_ID,
+  CHAT_TOGGLE_BUTTON_ID,
+} from './components/MeetingControlBarComponent'
 
 export class MeetingCoreUiPlugin extends BasePlugin<IMeetingScene> {
-  private scene?: Scene
-
   public listenEvent(): void {
-    this.bus.subscribeEvent('phaserSceneInit', this.phaserSceneInit.bind(this))
     this.bus.subscribeEvent('start', this.start.bind(this))
-  }
-
-  private phaserSceneInit(ev: PhaserSceneInit): void {
-    this.scene = ev.scene
   }
 
   private start(ev: StartEvent): void {
@@ -26,16 +23,15 @@ export class MeetingCoreUiPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private initSidebarToggle(): void {
-    const sidebar = document.getElementById('meeting-sidebar')
-    const participantsSection = document.getElementById('participants-section')
-    const chatSection = document.getElementById('chat-section')
-    const participantsButton = document.getElementById('participants-toggle-button')
-    const chatButton = document.getElementById('chat-toggle-button')
-    const closeButton = document.getElementById('sidebar-close-button')
-    const closeButtonChat = document.getElementById('sidebar-close-button-chat')
+    const sidebar = DomManager.getElementById(SIDEBAR_ID)
+    const participantsSection = DomManager.getElementById(PARTICIPANTS_SECTION_ID)
+    const chatSection = DomManager.getElementById(CHAT_SECTION_ID)
+    const participantsButton = DomManager.getElementById(PARTICIPANTS_TOGGLE_BUTTON_ID)
+    const chatButton = DomManager.getElementById(CHAT_TOGGLE_BUTTON_ID)
+    const closeButton = DomManager.getElementById(SIDEBAR_CLOSE_BUTTON_ID)
+    const closeButtonChat = DomManager.getElementById(SIDEBAR_CLOSE_BUTTON_CHAT_ID)
 
     const showSidebar = (tab: 'participants' | 'chat'): void => {
-      if (sidebar == null) return
       const currentTab = sidebar.getAttribute('data-tab')
       const isVisible = sidebar.getAttribute('data-visible') === 'true'
 
@@ -44,22 +40,18 @@ export class MeetingCoreUiPlugin extends BasePlugin<IMeetingScene> {
       } else {
         sidebar.setAttribute('data-visible', 'true')
         sidebar.setAttribute('data-tab', tab)
-
-        if (participantsSection != null && chatSection != null) {
-          participantsSection.setAttribute('data-active', tab === 'participants' ? 'true' : 'false')
-          chatSection.setAttribute('data-active', tab === 'chat' ? 'true' : 'false')
-        }
+        participantsSection.setAttribute('data-active', tab === 'participants' ? 'true' : 'false')
+        chatSection.setAttribute('data-active', tab === 'chat' ? 'true' : 'false')
       }
     }
 
     const closeSidebar = (): void => {
-      if (sidebar == null) return
       sidebar.setAttribute('data-visible', 'false')
     }
 
-    participantsButton?.addEventListener('click', () => { showSidebar('participants') })
-    chatButton?.addEventListener('click', () => { showSidebar('chat') })
-    closeButton?.addEventListener('click', () => { closeSidebar() })
-    closeButtonChat?.addEventListener('click', () => { closeSidebar() })
+    participantsButton.addEventListener('click', () => { showSidebar('participants') })
+    chatButton.addEventListener('click', () => { showSidebar('chat') })
+    closeButton.addEventListener('click', () => { closeSidebar() })
+    closeButtonChat.addEventListener('click', () => { closeSidebar() })
   }
 }
