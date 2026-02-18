@@ -15,6 +15,7 @@ import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
 import { SendBetCoinResponseEvent } from './event/sendBetCoinResponseEvent'
 import { registerSynchroBreakUi } from './ui/registerSynchroBreakUi'
 import { IDescriptionWindow } from './interface/IDescriptionWindow'
+import { ICountdownBar } from './interface/ICountdownBar'
 import { PlayerNyokkiStatusIcon } from './ui/synchroBreakIcon/playerNyokkiStatusIcon'
 import { CoinViewer } from './ui/coinViewer/coinViewer'
 import { CoinViewerIcon } from './ui/coinViewer/coinViewerIcon'
@@ -278,17 +279,16 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const ownPlayerId = this.playerPluginStore.ownPlayerId
     const ownPlayerName = this.playerPluginStore.players.get(ownPlayerId)?.name
     if (ev.remainingSeconds === this.synchroBreakPluginStore.timeLimit) {
-      this.descriptionWindow.displaySynchroBreakStart(ev.remainingSeconds)
+      this.displayCountdownBar()
+      this.countdownBar.updateDashOffset(ev.remainingSeconds)
+      this.descriptionWindow.displaySynchroBreakStart()
       this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.open()
     } else {
+      this.countdownBar.updateDashOffset(ev.remainingSeconds)
       if (this.ownNyokkiSatatus === 'yet') {
-        this.descriptionWindow.displaySynchroBreakInProgress(ev.remainingSeconds)
+        this.descriptionWindow.displaySynchroBreakInProgress()
       } else {
-        this.descriptionWindow.displaySynchroBreakInProgress(
-          ev.remainingSeconds,
-          ownPlayerName,
-          this.nyokkiActionMessage
-        )
+        this.descriptionWindow.displaySynchroBreakInProgress(ownPlayerName, this.nyokkiActionMessage)
       }
     }
   }
@@ -347,12 +347,12 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.nyokkiActionMessage = undefined
     this.ownNyokkiSatatus = 'yet'
 
+    this.countdownBar.close()
     this.descriptionWindow.displaySynchroBreakEnd()
     const noNyokkiPlayerIds = ev.noNyokkiPlayerIds
     const status: NyokkiStatus = 'nyokki'
 
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.close()
-    this.descriptionWindow.displaySynchroBreakEnd()
 
     if (noNyokkiPlayerIds.length === 0) return
     for (const noNyokkiPlayerId of noNyokkiPlayerIds) {
@@ -461,6 +461,33 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   private displayBetTimer(): void {
     this.betTimer.open()
     this.descriptionWindow.element.appendChild(this.betTimer.element)
+  }
+
+  /**
+   * カウントダウンバーを表示する
+   */
+  private displayCountdownBar(): void {
+    this.countdownBar.reset()
+
+    const timeLimit = this.synchroBreakPluginStore.timeLimit
+    if (timeLimit !== undefined) {
+      this.countdownBar.setTotalDuration(timeLimit)
+    }
+
+    if (this.countdownBar.element.parentElement !== this.descriptionWindow.element) {
+      this.descriptionWindow.element.appendChild(this.countdownBar.element)
+    }
+
+    this.countdownBar.open()
+  }
+
+  /**
+   * カウントダウンバーを取得する
+   */
+  private get countdownBar(): ICountdownBar {
+    const countdownBar = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'countdownBar')
+    if (countdownBar === undefined) throw new SynchroBreakUiNotFoundError('countdownBar')
+    return countdownBar
   }
 
   /**

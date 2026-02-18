@@ -5,6 +5,7 @@ import { TimeLimitFormContainer } from './timeLimitFormContainer/timeLimitFormCo
 import { BetCoinFormContainer } from './betCoinFormContainer/betCoinFormContainer'
 import { NyokkiButton } from './nyokkiButton/nyokkiButton'
 import { ResultScreen } from './resultScreen/resultScreen'
+import { CountdownBar } from './countdownBar/countdownBar'
 import { BetTimer } from './betTimer/betTimer'
 
 /**
@@ -20,6 +21,7 @@ declare module '@churaverse/game-plugin-client/gameUiManager' {
       betCoinConfirm: BetCoinFormContainer
       nyokkiButton: NyokkiButton
       resultScreen: ResultScreen
+      countdownBar: CountdownBar
       betTimer: BetTimer
     }
   }
