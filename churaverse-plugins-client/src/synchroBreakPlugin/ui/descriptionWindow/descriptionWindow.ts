@@ -32,6 +32,7 @@ export class DescriptionWindow implements IDescriptionWindow {
 
   public remove(): void {
     this.descriptionText = ''
+    this.descriptionTextElement = undefined
   }
 
   public close(): void {

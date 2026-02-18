@@ -463,7 +463,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.descriptionWindow.element.appendChild(this.betTimer.element)
   }
 
-
   /**
    * カウントダウンバーを表示する
    */
