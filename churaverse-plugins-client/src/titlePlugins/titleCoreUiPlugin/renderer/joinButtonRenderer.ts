@@ -92,7 +92,7 @@ export class JoinButtonRenderer implements IJoinButtonRenderer {
       DomManager.removeAll()
       this.transitionPluginStore.transitionManager.transitionTo('MainScene')
     } else {
-      alert('空文字列、空白文字列のみの名前は利用できません')
+      alert('名前は1文字以上15文字以内で入力してください')
     }
   }
 }

@@ -15,7 +15,7 @@ import { BossSpawnMessage } from '../message/bossSpawnMessage'
 import { BossDespawnMessage } from '../message/bossDespawnMessage'
 import { BossWalkMessage } from '../message/bossWalkMessage'
 import { Boss } from '../domain/boss'
-import { WeaponDamageMessage } from '@churaverse/player-plugin-client/message/weaponDamageMessage'
+import { ChurarenDamageMessage } from '@churaverse/churaren-player-plugin-client/message/churarenDamageMessage'
 import { CollisionBossDamageCause } from '../domain/collisionBossDamageCause'
 import { BossWalkEvent } from '../event/bossWalkEvent'
 import { IMessageListenerRegister } from '@churaverse/network-plugin-client/interface/IMessageListenerRegister'
@@ -45,14 +45,14 @@ export class SocketController extends BaseSocketController<IMainScene> {
   public registerMessageListener(): void {
     this.messageListenerRegister.on('bossSpawn', this.bossSpawn)
     this.messageListenerRegister.on('bossDespawn', this.bossDespawn)
-    this.messageListenerRegister.on('weaponDamage', this.collisionBossDamage)
+    this.messageListenerRegister.on('churarenDamage', this.collisionBossDamage)
     this.messageListenerRegister.on('bossWalk', this.bossWalk)
   }
 
   public unregisterMessageListener(): void {
     this.messageListenerRegister.off('bossSpawn', this.bossSpawn)
     this.messageListenerRegister.off('bossDespawn', this.bossDespawn)
-    this.messageListenerRegister.off('weaponDamage', this.collisionBossDamage)
+    this.messageListenerRegister.off('churarenDamage', this.collisionBossDamage)
     this.messageListenerRegister.off('bossWalk', this.bossWalk)
   }
 
@@ -73,11 +73,11 @@ export class SocketController extends BaseSocketController<IMainScene> {
     this.eventBus.post(bossDespawnEvent)
   }
 
-  private readonly collisionBossDamage = (msg: WeaponDamageMessage): void => {
+  private readonly collisionBossDamage = (msg: ChurarenDamageMessage): void => {
     const data = msg.data
     if (data.cause !== 'collisionBoss') return
     const target = this.store.of('playerPlugin').players.get(data.targetId)
-    const boss = this.bossPluginStore.bosses.get(data.weaponId)
+    const boss = this.bossPluginStore.bosses.get(data.sourceId)
     const attacker = boss?.bossId
     if (target === undefined || boss === undefined || attacker === undefined) return
     const collisionBossDamageCause = new CollisionBossDamageCause(boss)

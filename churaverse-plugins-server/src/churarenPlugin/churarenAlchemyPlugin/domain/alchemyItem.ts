@@ -1,15 +1,12 @@
-import { Direction, Entity, Position } from 'churaverse-engine-server'
-import { AlchemyItemKind } from './alchemyItemKind'
+import { AlchemyItemKind, BaseAlchemyItem } from './alchemyItemKind'
 
-export class AlchemyItem extends Entity {
-  public itemId: string
-  public spawnTime: number
-  public kind: AlchemyItemKind
+export class AlchemyItem extends BaseAlchemyItem {
+  public readonly itemId: string
+  public readonly kind: AlchemyItemKind
 
-  public constructor(itemId: string, position: Position, spawnTime: number, kind: AlchemyItemKind) {
-    super(position, Direction.down)
+  public constructor(itemId: string, kind: AlchemyItemKind) {
+    super(itemId, kind)
     this.itemId = itemId
-    this.spawnTime = spawnTime
     this.kind = kind
   }
 }

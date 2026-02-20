@@ -15,6 +15,7 @@ import '@churaverse/churaren-core-plugin-server/event/churarenResultEvent'
 import { ChurarenItemDespawnMessage } from './message/churarenItemDespawnMessage'
 import { ChurarenItemSpawnMessage } from './message/churarenItemSpawnMessage'
 import { GetChurarenItemEvent } from '@churaverse/churaren-player-plugin-server/event/getChurarenItemEvent'
+import { AlchemyItemRegisterEvent } from './event/alchemyItemRegisterEvent'
 
 const ITEM_GENERATE_INTERVAL_MS = 10000
 
@@ -68,6 +69,7 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
 
   protected handleGameStart(): void {
     this.churarenGameInfo = this.store.of('gamePlugin').games.get(this.gameId)
+    this.bus.post(new AlchemyItemRegisterEvent(this.itemPluginStore.alchemyItemRegister))
   }
 
   protected handleGameTermination(): void {
