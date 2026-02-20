@@ -35,3 +35,9 @@ export class WaterRing extends AlchemyItem implements ChurarenWeaponEntity {
     this.direction = direction
   }
 }
+
+declare module '@churaverse/churaren-alchemy-plugin-client/domain/alchemyItemKind' {
+  export interface AlchemyItemKindMap {
+    waterRing: WaterRing
+  }
+}

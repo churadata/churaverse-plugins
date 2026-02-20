@@ -101,11 +101,10 @@ export class WaterRingPlugin extends BaseAlchemyItemPlugin {
   public useAlchemyItem = (ev: UseAlchemyItemEvent): void => {
     if (ev.alchemyItem.kind !== 'waterRing') return
 
-    const startPos = ev.ownPlayer.position.copy()
-
     const renderer = this.waterRingPluginStore.waterRingAttackRendererFactory.build()
     if (renderer === undefined) return
 
+    const startPos = ev.ownPlayer.position.copy()
     const position = new Position(startPos.x, startPos.y)
 
     const waterRing = new WaterRing(uniqueId(), ev.ownPlayer.id, position, ev.ownPlayer.direction, Date.now())
@@ -132,13 +131,15 @@ export class WaterRingPlugin extends BaseAlchemyItemPlugin {
 
   public onPlayerWalk = (ev: PlayerWalkEvent): void => {
     const gap = 40
+
     const player = this.playerPluginStore.players.get(ev.id)
     if (player === undefined) return
+
     if (this.waterRingPluginStore.waterRings.size === 0) return
     // プレイヤーのidでWaterRingを検索
     const waterRing = this.waterRingPluginStore.waterRings.getByOwnerId(player.id)
-
     if (waterRing === undefined) return
+
     const renderer = this.waterRingPluginStore.waterRingAttackRenderers.get(waterRing.waterRingId)
     if (renderer === undefined) {
       return
@@ -159,8 +160,10 @@ export class WaterRingPlugin extends BaseAlchemyItemPlugin {
   private readonly playerDie = (ev: PlayerDieEvent): void => {
     const playerId = ev.id
     if (playerId === undefined) return
+
     const waterRing = this.waterRingPluginStore.waterRings.getByOwnerId(playerId)
     if (waterRing === undefined) return
+
     const waterRingAttackRenderer = this.waterRingPluginStore.waterRingAttackRenderers.get(waterRing.waterRingId)
     waterRing?.die()
     waterRingAttackRenderer?.dead()
