@@ -5,7 +5,7 @@ import { Item } from '../domain/item'
 import { ItemPluginStore } from '../store/defItemPluginStore'
 import { IEventBus, IMainScene, Position, Store } from 'churaverse-engine-client'
 import { IMessageListenerRegister } from '@churaverse/network-plugin-client/interface/IMessageListenerRegister'
-import { ChurarenItemInfo, ChurarenItemSpawnMessage } from '../message/churarenItemSpawnMessage'
+import { ChurarenItemSpawnMessage } from '../message/churarenItemSpawnMessage'
 import { ChurarenItemDespawnMessage } from '../message/churarenItemDespawnMessage'
 import { ChurarenItemSpawnEvent } from '../event/churarenItemSpawnEvent'
 import { ChurarenItemDespawnEvent } from '../event/churarenItemDespawnEvent'
@@ -44,18 +44,14 @@ export class SocketController extends BaseSocketController<IMainScene> {
   private readonly itemSpawn = (msg: ChurarenItemSpawnMessage): void => {
     const items: Item[] = []
     for (const [itemId, itemInfo] of Object.entries(msg.data.items)) {
-      items.push(this.setItem(itemId, itemInfo))
+      const pos = new Position(itemInfo.startPos.x, itemInfo.startPos.y)
+      const item = new Item(itemId, pos, itemInfo.spawnTime, itemInfo.kind)
+      items.push(item)
     }
 
     // ChurarenItemSpawnEventでまとめてアイテムを送信
     const itemSpawnEvent = new ChurarenItemSpawnEvent(items)
     this.eventBus.post(itemSpawnEvent)
-  }
-
-  private setItem(itemId: string, itemInfo: ChurarenItemInfo): Item {
-    const pos = new Position(itemInfo.startPos.x, itemInfo.startPos.y)
-    const item = new Item(itemId, pos, itemInfo.spawnTime, itemInfo.kind)
-    return item
   }
 
   private readonly itemDespawn = (msg: ChurarenItemDespawnMessage): void => {
