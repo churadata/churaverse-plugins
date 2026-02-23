@@ -1,11 +1,20 @@
-import { Position, Direction, Entity } from 'churaverse-engine-server'
+import { Position, Direction } from 'churaverse-engine-server'
 import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/ICollidableEntity'
 import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
 import { ChurarenWeaponEntity } from '@churaverse/churaren-core-plugin-server'
+import { IAlchemyItem } from '@churaverse/churaren-alchemy-plugin-server/domain/IAlchemyItem'
+import { AlchemyItem } from '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItem'
 
 const WATER_RING_SPAWN_LIMIT_MS = 5000
+export const WATER_RING_ITEM: IAlchemyItem = {
+  kind: 'waterRing',
+  recipe: {
+    pattern: 'all_same',
+    materialKind: 'waterOre',
+  },
+}
 
-export class WaterRing extends Entity implements ICollidableEntity, ChurarenWeaponEntity {
+export class WaterRing extends AlchemyItem implements ICollidableEntity, ChurarenWeaponEntity {
   public isCollidable = true
   public getRect(): IRectangle {
     return {
@@ -38,24 +47,28 @@ export class WaterRing extends Entity implements ICollidableEntity, ChurarenWeap
     direction: Direction,
     spawnTime: number
   ) {
-    super(position, direction)
+    super(waterRingId, WATER_RING_ITEM.kind)
     this.waterRingId = waterRingId
     this.churarenWeaponOwnerId = ownerId
     this.spawnTime = spawnTime
     this.lastHitTime = 0
-    // 10秒後にisDeadをtrueにするタイマーを設定
-    setTimeout(() => {
-      this._isDead = true
-    }, WATER_RING_SPAWN_LIMIT_MS)
+    this.position = position
+    this.direction = direction
   }
 
-  public isStop(): void {
+  public startCooldown(): void {
     this.isCollidable = false
+    this.lastHitTime = Date.now()
+  }
 
-    // 1秒後に再び有効にする
-    setTimeout(() => {
+  public updateCooldown(): void {
+    if (!this.isCollidable && Date.now() - this.lastHitTime >= this.hitCooldown) {
       this.isCollidable = true
-    }, this.hitCooldown)
+    }
+  }
+
+  public set isDead(_isDead: boolean) {
+    this._isDead = _isDead
   }
 
   public get isDead(): boolean {
@@ -69,5 +82,11 @@ export class WaterRing extends Entity implements ICollidableEntity, ChurarenWeap
   public die(): void {
     this._isDead = true
     this.isCollidable = false
+  }
+}
+
+declare module '@churaverse/churaren-alchemy-plugin-server/domain/alchemyItemKind' {
+  export interface AlchemyItemKindMap {
+    waterRing: WaterRing
   }
 }

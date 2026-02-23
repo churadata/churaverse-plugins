@@ -1,5 +1,4 @@
 import { IMainScene, EntitySpawnEvent, UpdateEvent, InitEvent, LivingDamageEvent } from 'churaverse-engine-server'
-import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
 import { PlayerWalkEvent } from '@churaverse/player-plugin-server/event/playerWalkEvent'
 import { PlayerPluginStore } from '@churaverse/player-plugin-server/store/defPlayerPluginStore'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
@@ -7,20 +6,20 @@ import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-s
 import { WaterRingPluginStore } from './store/defWaterRingPluginStore'
 import { SocketController } from './controller/socketController'
 import { initWaterRingPluginStore } from './store/initWaterRingPluginStore'
-import { WaterRing } from './domain/waterRing'
+import { WATER_RING_ITEM, WaterRing } from './domain/waterRing'
 import { removeDieWaterRing } from './domain/waterRingService'
 import { WaterRingDespawnMessage } from './message/waterRingDespawnMessage'
-import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
 import { Boss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
 import '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
 import { WaterRingDamageCause } from './domain/waterRingDamageCause'
+import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-server/domain/baseAlchemyItemPlugin'
 
-export class WaterRingPlugin extends BaseGamePlugin {
-  public gameId = CHURAREN_CONSTANTS.GAME_ID
+export class WaterRingPlugin extends BaseAlchemyItemPlugin {
   private waterRingPluginStore!: WaterRingPluginStore
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private playerPluginStore!: PlayerPluginStore
   private socketController?: SocketController
+  protected alchemyItem = WATER_RING_ITEM
 
   public listenEvent(): void {
     super.listenEvent()
@@ -67,6 +66,12 @@ export class WaterRingPlugin extends BaseGamePlugin {
   }
 
   private readonly update = (ev: UpdateEvent): void => {
+    // クールダウン更新
+    this.waterRingPluginStore.waterRings.getAllId().forEach((waterRingId) => {
+      const waterRing = this.waterRingPluginStore.waterRings.get(waterRingId)
+      waterRing?.updateCooldown()
+    })
+
     removeDieWaterRing(this.waterRingPluginStore.waterRings, (waterRingId: string) => {
       const waterRingDespawnMessage = new WaterRingDespawnMessage({ waterRingId })
       this.networkPluginStore.messageSender.send(waterRingDespawnMessage)
@@ -74,9 +79,10 @@ export class WaterRingPlugin extends BaseGamePlugin {
   }
 
   private readonly onPlayerWalk = (ev: PlayerWalkEvent): void => {
-    const gap = 40
     const player = this.playerPluginStore.players.get(ev.id)
     if (player == null) return
+
+    const gap = 40
 
     // プレイヤーのIDに対応するWaterRingを取得
     const waterRing = this.waterRingPluginStore.waterRings.getByOwnerId(player.id)
@@ -94,9 +100,9 @@ export class WaterRingPlugin extends BaseGamePlugin {
   }
 
   private removeAllWaterRing(): void {
-    const waterRingIds = this.waterRingPluginStore.waterRings.getAllId()
-    waterRingIds.forEach((waterRingId) => {
-      this.waterRingPluginStore.waterRings.delete(waterRingId)
+    this.waterRingPluginStore.waterRings.getAllId().forEach((waterRingId) => {
+      const waterRing = this.waterRingPluginStore.waterRings.get(waterRingId)
+      waterRing?.die()
     })
   }
 
@@ -118,6 +124,6 @@ export class WaterRingPlugin extends BaseGamePlugin {
     this.bus.post(livingDamageEvent)
 
     // 衝突を記録し、クールダウンを開始
-    waterRing.isStop()
+    waterRing.startCooldown()
   }
 }
