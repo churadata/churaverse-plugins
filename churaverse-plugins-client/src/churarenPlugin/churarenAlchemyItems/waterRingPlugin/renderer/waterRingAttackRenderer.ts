@@ -1,4 +1,4 @@
-import { Position, GRID_SIZE } from 'churaverse-engine-client'
+import { Position, GRID_SIZE, layerSetting } from 'churaverse-engine-client'
 import { Scene } from 'phaser'
 import { IWaterRingAttackRenderer } from '../domain/IWaterRingAttackRenderer'
 import waterRingAttackImage from '../assets/waterRingAttack.png'
@@ -46,16 +46,20 @@ export class WaterRingAttackRenderer implements IWaterRingAttackRenderer {
       )
       .setDisplaySize(DISPLAY_SIZE, DISPLAY_SIZE)
 
-    // アニメーションを設定
-    scene.anims.create({
-      key: _anims[0].key,
-      frames: this.scene.anims.generateFrameNumbers(WATER_RING_ATTACK_ANIM_KEY, {
-        start: _anims[0].frameStart,
-        end: _anims[0].frameEnd,
-      }),
-      frameRate: 10, // フレームレートを調整
-      repeat: -1, // 無限に繰り返す
+    // アニメーションの設定配列から各アニメーションを生成
+    _anims.forEach((cfg) => {
+      scene.anims.create({
+        key: cfg.key,
+        frames: this.scene.anims.generateFrameNumbers(WATER_RING_ATTACK_ANIM_KEY, {
+          start: cfg.frameStart,
+          end: cfg.frameEnd,
+        }),
+        frameRate: 10, // フレームレートを調整
+        repeat: -1, // 無限に繰り返す
+      })
     })
+
+    layerSetting(this.sprite, 'player', 20)
   }
 
   // 基本アイテムのテクスチャのロード
@@ -74,7 +78,10 @@ export class WaterRingAttackRenderer implements IWaterRingAttackRenderer {
     this.sprite.setVisible(true)
 
     // スプライトが生成されたときにアニメーションを再生
-    this.sprite.play(WATER_RING_ATTACK_ANIM_KEY)
+    const animKey = _anims[0].key
+    if (animKey !== undefined) {
+      this.sprite.anims.play(animKey)
+    }
   }
 
   public chase(dest: Position, speed: number, onUpdate: (pos: Position) => void): void {

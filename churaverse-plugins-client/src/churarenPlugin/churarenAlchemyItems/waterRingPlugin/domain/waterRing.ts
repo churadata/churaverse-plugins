@@ -16,6 +16,7 @@ export const WATER_RING_ITEM: IAlchemyItem = {
  */
 export class WaterRing extends AlchemyItem implements ChurarenWeaponEntity {
   public readonly power = 25
+  public isDead = false
   public waterRingId: string
   public churarenWeaponOwnerId: string
   public spawnTime: number
@@ -33,6 +34,13 @@ export class WaterRing extends AlchemyItem implements ChurarenWeaponEntity {
     this.position = position
     this.spawnTime = spawnTime
     this.direction = direction
+  }
+
+  /**
+   * 消滅
+   */
+  public die(): void {
+    this.isDead = true
   }
 }
 

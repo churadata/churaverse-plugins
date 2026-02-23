@@ -73,7 +73,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
   private readonly waterRingDamage = (msg: ChurarenDamageMessage): void => {
     const data = msg.data
     if (data.cause !== 'waterRing') return
-    const target = this.store.of('bossPlugin').bosses.get(data.targetId)
+    const target = this.bossPluginStore.bosses.get(data.targetId)
     const waterRing = this.waterRingPluginStore.waterRings.get(data.sourceId)
     const attacker = waterRing?.churarenWeaponOwnerId
     if (target === undefined || waterRing === undefined || attacker === undefined) return
