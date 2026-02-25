@@ -17,6 +17,8 @@ import {
   DamageCauseType,
   vectorToName,
   Vector,
+  LivingHealEvent,
+  PartialWritable,
 } from 'churaverse-engine-client'
 import { PlayerSetupInfoWriter } from './interface/playerSetupInfoWriter'
 import { CookieStore } from '@churaverse/data-persistence-plugin-client/cookieStore'
@@ -69,8 +71,12 @@ import { initPlayerPluginStore } from './store/initPlayerPluginStore'
 import { DeathLog } from './ui/deathLog/deathLog'
 import { DeathLogRepository } from './ui/deathLog/deathLogRepository'
 import { JoinLeaveLogRenderer } from './ui/joinLeaveLogRenderer/joinLeaveLogRenderer'
-import { setupPlayerUi } from './ui/setupPlayerUi'
+import { PlayerUi } from './ui/setupPlayerUi'
 import { Sendable } from '@churaverse/network-plugin-client/types/sendable'
+import '@churaverse/network-plugin-client/event/networkConnectEvent'
+import '@churaverse/network-plugin-client/event/networkDisconnectEvent'
+
+type WritableOwnPlayerId = PartialWritable<PlayerPluginStore, 'ownPlayerId'>
 
 export class PlayerPlugin extends BasePlugin<IMainScene> {
   private rendererFactory?: PlayerRendererFactory
@@ -92,6 +98,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
   private playerPositionDebugScreen!: IPlayerPositionDebugScreen
   private playerPositionGridDebugScreen!: IPlayerPositionDebugScreen
   private playerRoleDebugScreen!: IPlayerRoleDebugScreen
+  private playerUi!: PlayerUi
 
   public listenEvent(): void {
     this.bus.subscribeEvent('phaserSceneInit', this.phaserSceneInit.bind(this))
@@ -122,7 +129,10 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     this.bus.subscribeEvent('playerNameChange', this.onChangePlayerName.bind(this))
     this.bus.subscribeEvent('playerColorChange', this.onChangePlayerColor.bind(this))
     this.bus.subscribeEvent('livingDamage', this.onLivingDamage.bind(this))
+    this.bus.subscribeEvent('livingHeal', this.onLivingHeal.bind(this))
     this.bus.subscribeEvent('dumpDebugData', this.dumpDebugData.bind(this))
+    this.bus.subscribeEvent('networkConnect', this.onNetworkConnect.bind(this))
+    this.bus.subscribeEvent('networkDisconnect', this.onNetworkDisconnect.bind(this))
   }
 
   private phaserSceneInit(ev: PhaserSceneInit): void {
@@ -145,8 +155,8 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
   }
 
   private start(ev: StartEvent): void {
-    const joinLeaveLogRenderer = setupPlayerUi(this.store, this.bus)
-    this.joinLeaveLogRenderer = joinLeaveLogRenderer
+    this.playerUi = new PlayerUi(this.store, this.bus)
+    this.joinLeaveLogRenderer = this.playerUi.setupJoinLeaveLogRenderer()
     this.createOwnPlayer()
     this.setupDebugScreen()
   }
@@ -238,6 +248,9 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
       player.hp
     )
     if (playerRenderer === undefined) throw new PlayerRendererNotFoundError(player.id)
+    if (player.id === this.playerPluginStore.ownPlayerId) {
+          playerRenderer.highlightNameplate()
+    }
     this.playerPluginStore.playerRenderers.set(player.id, playerRenderer)
   }
 
@@ -393,6 +406,14 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     }
   }
 
+  private onLivingHeal(ev: LivingHealEvent): void {
+    if (!(ev.target instanceof Player)) return
+    const player = this.playerPluginStore.players.get(ev.target.id)
+    if (player === undefined) return
+    player.heal(ev.amount)
+    this.playerPluginStore.playerRenderers.get(ev.target.id)?.heal(ev.amount, player.hp)
+  }
+
   private onDiePlayer(ev: PlayerDieEvent): void {
     this.stopPlayer(ev.id)
     this.playerPluginStore.playerRenderers.get(ev.id)?.dead()
@@ -522,5 +543,62 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     ev.dataDumper.dump('playerPosition', `Position: ${positionStr} ${gridStr}`)
     ev.dataDumper.dump('playerDirection', vectorToName(ownPlayer.direction))
     ev.dataDumper.dump('playerRole', ownPlayer.role)
+  }
+
+  private onNetworkConnect(): void {
+    const prevOwnPlayer = this.playerPluginStore.players.get(this.playerPluginStore.ownPlayerId)
+    if (prevOwnPlayer === undefined) return
+    this.playerPluginStore.players.delete(prevOwnPlayer.id)
+    this.playerPluginStore.playerRenderers.get(prevOwnPlayer.id)?.destroy()
+    this.playerPluginStore.playerRenderers.delete(prevOwnPlayer.id)
+
+    const playerPluginStore = this.playerPluginStore as WritableOwnPlayerId
+    playerPluginStore.ownPlayerId = this.networkStore.socketId
+    this.playerUi.updatePlayerId(this.playerPluginStore.ownPlayerId)
+
+    const data: PlayerJoinData = {
+      hp: prevOwnPlayer.hp,
+      position: prevOwnPlayer.position.toVector() as Vector & Sendable,
+      direction: prevOwnPlayer.direction,
+      playerId: this.playerPluginStore.ownPlayerId,
+      heroColor: prevOwnPlayer.color,
+      heroName: prevOwnPlayer.name,
+      role: prevOwnPlayer.role,
+      spawnTime: prevOwnPlayer.spawnTime,
+    }
+
+    this.networkStore.messageSender.send(new PlayerJoinMessage(data))
+    const player = new Player(
+      this.playerPluginStore.ownPlayerId,
+      prevOwnPlayer.position,
+      prevOwnPlayer.direction,
+      prevOwnPlayer.name,
+      prevOwnPlayer.color,
+      prevOwnPlayer.hp,
+      prevOwnPlayer.role,
+      prevOwnPlayer.spawnTime
+    )
+    this.bus.post(new EntitySpawnEvent(player))
+    const playerRenderer = this.playerPluginStore.playerRenderers.get(this.playerPluginStore.ownPlayerId)
+    if (playerRenderer === undefined) throw new PlayerRendererNotFoundError(this.playerPluginStore.ownPlayerId)
+    this.uiStore.focusTargetRepository.addFocusTarget(playerRenderer)
+    playerRenderer.focus()
+    this.utilStore.focusedRenderer = playerRenderer
+  }
+
+  private onNetworkDisconnect(): void {
+    const player = this.playerPluginStore.players.get(this.playerPluginStore.ownPlayerId)
+    if (player === undefined) return
+    const renderer = this.playerPluginStore.playerRenderers.get(this.playerPluginStore.ownPlayerId)
+    if (renderer === undefined) return
+    this.playerPluginStore.playerRenderers.forEach((renderer, id) => {
+      if (id === this.playerPluginStore.ownPlayerId) return
+      renderer.destroy()
+    })
+    this.playerPluginStore.players.getAllId().forEach((id) => {
+      if (id === this.playerPluginStore.ownPlayerId) return
+      this.playerPluginStore.players.delete(id)
+      this.playerPluginStore.playerRenderers.delete(id)
+    })
   }
 }

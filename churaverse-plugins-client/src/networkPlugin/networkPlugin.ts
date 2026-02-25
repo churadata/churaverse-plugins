@@ -1,15 +1,25 @@
-import { BasePlugin, Scenes, EVENT_PRIORITY, PhaserSceneInit, InitEvent, CVEvent } from 'churaverse-engine-client'
+import {
+  BasePlugin,
+  Scenes,
+  EVENT_PRIORITY,
+  PhaserSceneInit,
+  InitEvent,
+  CVEvent,
+  IMainScene,
+  PartialWritable,
+} from 'churaverse-engine-client'
 import { Scene } from 'phaser'
 import { initNetworkPluginStore } from './store/initNetworkPluginStore'
 import { PriorDataRequestMessage } from './message/priorDataMessage'
 import { RegisterMessageListenerEvent } from './event/registerMessageListenerEvent'
 import { RegisterMessageEvent } from './event/registerMessageEvent'
 import { MessageManager } from './messageManager'
-import { Socket } from './socket/socket'
 import { MessageManagerUndefinedError } from './errors/messageManagerUndefinedError'
 import { SocketController } from './controller/socketController'
 
 import { NetworkPluginStore } from './store/defNetworkPluginStore'
+
+type WritableSocketId = PartialWritable<NetworkPluginStore<IMainScene>, 'socketId'>
 
 export class NetworkPlugin extends BasePlugin<Scenes> {
   private scene?: Scene
@@ -25,6 +35,8 @@ export class NetworkPlugin extends BasePlugin<Scenes> {
     this.bus.subscribeEvent('registerMessage', socketController.registerMessage.bind(socketController))
 
     this.bus.subscribeEvent('update', this.update.bind(this))
+
+    this.bus.subscribeEvent('networkConnect', this.onNetworkConnect.bind(this), EVENT_PRIORITY.HIGH)
   }
 
   private phaserSceneInit(ev: PhaserSceneInit): void {
@@ -32,8 +44,8 @@ export class NetworkPlugin extends BasePlugin<Scenes> {
   }
 
   private init(ev: InitEvent): void {
-    const socket = Socket.build()
-    this.messageManager = new MessageManager(socket.socketId)
+    this.messageManager = new MessageManager()
+    this.messageManager.socketEventToBusEvent(this.bus)
     initNetworkPluginStore(this.store, this.scene, this.messageManager, this.messageManager.socketId)
   }
 
@@ -58,5 +70,12 @@ export class NetworkPlugin extends BasePlugin<Scenes> {
     if (this.messageManager.shouldSendPacket()) {
       this.messageManager.sendPacket()
     }
+  }
+
+  private onNetworkConnect(): void {
+    if (!(this.scene instanceof IMainScene)) return
+    const networkPluginStore = this.store.of('networkPlugin') as WritableSocketId
+    networkPluginStore.socketId = this.messageManager?.socketId ?? ''
+    this.requestPriorData()
   }
 }

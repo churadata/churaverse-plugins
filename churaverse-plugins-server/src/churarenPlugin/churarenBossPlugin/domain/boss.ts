@@ -1,6 +1,6 @@
-import { ICollidableEntity } from "@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/ICollidableEntity"
-import { IRectangle } from "@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle"
-import { Direction, LivingEntity, Position, Vector } from "churaverse-engine-server"
+import { ICollidableEntity } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/ICollidableEntity'
+import { IRectangle } from '@churaverse/collision-detection-plugin-server/domain/collisionDetection/collidableEntity/IRectangle'
+import { Direction, Entity, LivingEntity, Position, Vector } from 'churaverse-engine-server'
 
 export const CHURAREN_BOSS_WALK_DURATION_MS = 1000
 export const CHURAREN_BOSS_SIZE = 150
@@ -62,4 +62,14 @@ export class Boss extends LivingEntity implements ICollidableEntity {
   public stop(): void {
     this._velocity = { x: 0, y: 0 }
   }
+}
+
+/**
+ * 外部プラグインからボスかどうか判定する型ガード関数
+ */
+export function isBoss(entity: Entity): entity is Boss {
+  if (!(entity instanceof LivingEntity)) return false
+  const bossKeys = Object.keys(entity) as Array<keyof Boss>
+  const requiredKeys: Array<keyof Boss> = ['bossId', 'spawnTime', 'power', 'isCollidable']
+  return requiredKeys.every((key) => bossKeys.includes(key))
 }
