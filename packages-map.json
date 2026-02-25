@@ -35,6 +35,6 @@
   "@churaverse/textchat-plugin-server": "packages/plugins-server/src/textChatPlugin",
   "@churaverse/voicechat-plugin-server": "packages/plugins-server/src/voiceChatPlugin",
 
-  "churaverse-engine-client": "packages/plugin-client",
-  "churaverse-engine-server": "packages/plugin-server"
+  "churaverse-engine-client": "packages/engine-client",
+  "churaverse-engine-server": "packages/engine-server"
 }
