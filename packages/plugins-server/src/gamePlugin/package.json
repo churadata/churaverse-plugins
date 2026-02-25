@@ -19,7 +19,6 @@
     "@churaverse/player-plugin-server": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.4.0",
     "@types/node": "^20"
   }
 }
