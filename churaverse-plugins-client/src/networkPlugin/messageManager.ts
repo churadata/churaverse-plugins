@@ -1,4 +1,4 @@
-import { Scenes } from 'churaverse-engine-client'
+import { IEventBus, Scenes } from 'churaverse-engine-client'
 import { MessageBuffer } from './buffer'
 import { NotExistsBufferError } from './errors/notExistsBufferError'
 import { IMessageConstructor } from './interface/IMessage'
@@ -31,7 +31,6 @@ export class MessageManager<Scene extends Scenes>
   private lastSendTime = Date.now()
 
   public constructor(
-    private readonly senderId: string,
     /**
      * パケット化する時間幅(ms).
      * 最初にbufferに格納されてからpacketIntervalだけ待機し, その間にbufferに追加されたデータをまとめて送信する
@@ -85,7 +84,7 @@ export class MessageManager<Scene extends Scenes>
    * 全てのbufferのMessageをパケット化してサーバーに送信する
    */
   public sendPacket(): void {
-    this.messageManagerHelper.sendPacket(this.senderId, this.messageBuffers)
+    this.messageManagerHelper.sendPacket(this.socketId, this.messageBuffers)
     this.lastSendTime = Date.now()
     this.anyBufferHasData = false
   }
@@ -94,7 +93,7 @@ export class MessageManager<Scene extends Scenes>
    * パケットを送信する必要がある場合Trueを返す
    */
   public shouldSendPacket(now: number = Date.now()): boolean {
-    return this.anyBufferHasData && this.isTimeExceedingLastSendPacket(now)
+    return this.anyBufferHasData && this.isTimeExceedingLastSendPacket(now) && this.messageManagerHelper.connected
   }
 
   /**
@@ -108,5 +107,9 @@ export class MessageManager<Scene extends Scenes>
 
   public get socketId(): string {
     return this.messageManagerHelper.socketId
+  }
+
+  public socketEventToBusEvent(bus: IEventBus<Scenes>): void {
+    this.messageManagerHelper.socketEventToBusEvent(bus)
   }
 }

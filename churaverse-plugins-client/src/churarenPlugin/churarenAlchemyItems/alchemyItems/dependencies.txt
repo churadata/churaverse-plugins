@@ -1,1 +1,0 @@
-@churaverse/churaren-trap-plugin-client
