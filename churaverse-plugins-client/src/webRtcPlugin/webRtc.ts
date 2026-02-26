@@ -1,4 +1,4 @@
-import { Room, RoomOptions, VideoPresets } from 'livekit-client'
+import { Room, RoomEvent, RoomOptions, VideoPresets, DataPacket_Kind } from 'livekit-client'
 
 /**
  * backend_livekitが返すアクセストークンのJSON
@@ -7,10 +7,15 @@ interface AccessTokenResponse {
   token: string
 }
 
+interface NameAnnounceMessage {
+  type: 'name_announce'
+  displayName: string
+}
+
 export class WebRtc {
   public readonly room: Room
 
-  public constructor(ownPlayerId: string) {
+  public constructor(ownPlayerId: string, ownPlayerName: string) {
     const roomOptions: RoomOptions = {
       // automatically manage subscribed video quality
       // オンにしてはいけない。Phaserに映像が上手く流せなくなるため。
@@ -27,23 +32,36 @@ export class WebRtc {
     }
     this.room = new Room(roomOptions)
 
-    void this.connect(ownPlayerId)
+    void this.connect(ownPlayerId, ownPlayerName)
   }
 
-  private async connect(ownPlayerId: string): Promise<void> {
+  private async connect(ownPlayerId: string, displayName: string): Promise<void> {
     try {
-      const token = await this.getAccessToken(ownPlayerId)
+      const token = await this.getAccessToken(ownPlayerId, displayName)
       await this.room.connect(`${import.meta.env.VITE_LIVEKIT_URL ?? 'ws://localhost:8080/livekit'}`, token)
 
-      console.log(`connected to room. roomName: ${this.room.name}`)
+      await this.room.localParticipant.setName(displayName)
+
+      console.log(`connected to room. roomName: ${this.room.name}, displayName: ${displayName}`)
+
+      this.broadcastName(displayName)
+
+      this.room.on(RoomEvent.ParticipantConnected, () => {
+        this.broadcastName(displayName)
+      })
     } catch (e) {
       console.error(`Failed to connect to room.`,e)
       window.alert('chromeでの利用を推奨します')
     }
   }
 
-  private async getAccessToken(ownPlayerId: string): Promise<string> {
-    const displayName = sessionStorage.getItem('meetingPlayerName') ?? ownPlayerId
+  private broadcastName(displayName: string): void {
+    const message: NameAnnounceMessage = { type: 'name_announce', displayName }
+    const data = new TextEncoder().encode(JSON.stringify(message))
+    void this.room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE)
+  }
+
+  private async getAccessToken(ownPlayerId: string, displayName: string): Promise<string> {
     const params: Record<string, string> = {
       roomName: 'meeting-room',
       userName: ownPlayerId,

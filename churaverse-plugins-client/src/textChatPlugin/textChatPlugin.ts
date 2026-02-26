@@ -48,10 +48,12 @@ export class TextChatPlugin extends BasePlugin<IMainScene> {
   }
 
   private onAddTextChat(ev: AddTextChatEvent): void {
-    if (!(ev.textChat instanceof TextChat)) return
+    const chat = ev.textChat instanceof TextChat
+      ? ev.textChat
+      : new TextChat(ev.textChat.playerId, ev.textChat.name, ev.textChat.message)
 
-    this.textChatPluginStore.textChatService.addChat(ev.textChat)
-    this.textChatUi.textChatBoard.add(ev.textChat)
+    this.textChatPluginStore.textChatService.addChat(chat)
+    this.textChatUi.textChatBoard.add(chat)
     if (!this.textChatUi.textChatDialog.isOpen) {
       this.textChatUi.textChatIcon.badge.activate()
     }

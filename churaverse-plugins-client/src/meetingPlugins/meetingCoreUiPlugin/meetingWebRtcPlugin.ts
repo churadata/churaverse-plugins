@@ -1,19 +1,33 @@
 import { BasePlugin, DomManager, getChuraverseConfig, IMeetingScene } from 'churaverse-engine-client'
 import { Room, RoomEvent, RoomOptions, VideoPresets, Track, RemoteTrack, RemoteParticipant, Participant, DataPacket_Kind } from 'livekit-client'
-import { videoGridStyles } from './components/VideoGridComponent'
-import { controlBarStyles } from './components/MeetingControlBarComponent'
-import { sidebarStyles } from './components/MeetingSidebarComponent'
+import { VIDEO_GRID_ID, videoGridStyles } from './components/VideoGridComponent'
+import {
+  MIC_TOGGLE_BUTTON_ID,
+  CAMERA_TOGGLE_BUTTON_ID,
+  SCREEN_SHARE_BUTTON_ID,
+  MEETING_EXIT_BUTTON_ID,
+  controlBarStyles,
+} from './components/MeetingControlBarComponent'
+import {
+  PARTICIPANT_LIST_ID,
+  PARTICIPANTS_COUNT_ID,
+  CHAT_MESSAGES_ID,
+  CHAT_INPUT_ID,
+  CHAT_SEND_BUTTON_ID,
+  sidebarStyles,
+} from './components/MeetingSidebarComponent'
 
 interface AccessTokenResponse {
   token: string
 }
 
-interface ChatMessage {
-  type: 'chat' | 'chat_history'
+interface DataMessage {
+  type: 'chat' | 'chat_history' | 'name_announce'
   sender: string
   text: string
   timestamp: number
-  history?: ChatMessage[]
+  history?: DataMessage[]
+  displayName?: string
 }
 
 export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
@@ -24,7 +38,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   private isCameraEnabled: boolean = false
   private isScreenShareEnabled: boolean = false
   private isConnected: boolean = false
-  private chatHistory: ChatMessage[] = []
+  private chatHistory: DataMessage[] = []
   private participantNames: Map<string, string> = new Map()
   private sidebarScrollIndex: number = 0
   private readonly maxVisibleSidebarTiles: number = 5
@@ -61,7 +75,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   private async waitForVideoGrid(): Promise<void> {
     return await new Promise((resolve) => {
       const check = (): void => {
-        if (document.getElementById('video-grid') !== null) {
+        if (document.getElementById(VIDEO_GRID_ID) !== null) {
           resolve()
         } else {
           requestAnimationFrame(check)
@@ -99,9 +113,11 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       const livekitUrl = getChuraverseConfig().livekitUrl
       console.log(`[MeetingWebRtc] Connecting to ${livekitUrl}`)
       await this.room.connect(livekitUrl, token)
+      await this.room.localParticipant.setName(this.displayName !== '' ? this.displayName : this.participantId)
       this.isConnected = true
       console.log(`[MeetingWebRtc] Connected to room: ${this.room.name}`)
 
+      this.broadcastName()
       this.addParticipantTile(this.room.localParticipant)
 
       this.room.participants.forEach((participant: RemoteParticipant) => {
@@ -135,12 +151,18 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     this.room.on(RoomEvent.ParticipantConnected, (participant) => {
       console.log(`[MeetingWebRtc] Participant connected: ${participant.identity}`)
       this.addParticipantTile(participant)
+      this.broadcastName()
       this.sendChatHistory()
     })
 
     this.room.on(RoomEvent.ParticipantDisconnected, (participant) => {
       console.log(`[MeetingWebRtc] Participant disconnected: ${participant.identity}`)
       this.removeParticipantTile(participant.identity)
+    })
+
+    this.room.on(RoomEvent.ParticipantNameChanged, (name, participant) => {
+      console.log(`[MeetingWebRtc] Participant name changed: ${participant.identity} -> ${name}`)
+      this.updateParticipantTileName(participant)
     })
 
     this.room.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
@@ -150,6 +172,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       } else {
         this.attachTrack(track, participant.identity)
       }
+      this.updateMicIcon(participant)
     })
 
     this.room.on(RoomEvent.TrackUnsubscribed, (track, publication, participant) => {
@@ -160,6 +183,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       } else {
         this.detachTrack(track, participant.identity)
       }
+      this.updateMicIcon(participant)
     })
 
     this.room.on(RoomEvent.LocalTrackPublished, (publication, participant) => {
@@ -171,6 +195,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
           this.attachTrack(publication.track, participant.identity)
         }
       }
+      this.updateMicIcon(participant)
     })
 
     this.room.on(RoomEvent.LocalTrackUnpublished, (publication, participant) => {
@@ -183,25 +208,37 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
           this.detachTrack(publication.track, participant.identity)
         }
       }
+      this.updateMicIcon(participant)
+    })
+
+    this.room.on(RoomEvent.TrackMuted, (_publication, participant) => {
+      this.updateMicIcon(participant)
+    })
+
+    this.room.on(RoomEvent.TrackUnmuted, (_publication, participant) => {
+      this.updateMicIcon(participant)
     })
 
     this.room.on(RoomEvent.DataReceived, (payload, participant) => {
       try {
         const decoder = new TextDecoder()
         const jsonStr = decoder.decode(payload)
-        const message = JSON.parse(jsonStr) as ChatMessage
+        const message = JSON.parse(jsonStr) as DataMessage
 
-        if (message.type === 'chat_history' && message.history !== undefined) {
-          message.history.forEach((historyMsg) => {
+        if (message.type === 'name_announce' && participant !== undefined && message.displayName !== undefined) {
+          this.participantNames.set(participant.identity, message.displayName)
+          this.updateParticipantTileName(participant)
+        } else if (message.type === 'chat_history' && message.history !== undefined) {
+          message.history.forEach((historyMsg: DataMessage) => {
             const exists = this.chatHistory.some((m) => m.timestamp === historyMsg.timestamp && m.sender === historyMsg.sender)
             if (!exists) {
               this.chatHistory.push(historyMsg)
-              this.addChatMessage(historyMsg.sender, historyMsg.text)
+              this.addDataMessage(historyMsg.sender, historyMsg.text)
             }
           })
         } else if (message.type === 'chat' && message.text !== undefined && participant !== undefined) {
           this.chatHistory.push(message)
-          this.addChatMessage(participant.name ?? participant.identity, message.text)
+          this.addDataMessage(this.getDisplayName(participant), message.text)
         }
       } catch (e) {
         console.error('[MeetingWebRtc] Failed to parse chat message:', e)
@@ -210,7 +247,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private addParticipantTile(participant: Participant): void {
-    const grid = document.getElementById('video-grid')
+    const grid = document.getElementById(VIDEO_GRID_ID)
     if (grid === null) {
       console.error('[MeetingWebRtc] video-grid element not found!')
       return
@@ -239,7 +276,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     const avatar = document.createElement('div')
     avatar.className = videoGridStyles.avatar
-    const displayName = participant.name ?? participant.identity
+    const displayName = this.getDisplayName(participant)
     avatar.style.backgroundColor = this.getAvatarColor(displayName)
     avatar.textContent = this.getInitials(displayName)
     avatarContainer.appendChild(avatar)
@@ -253,11 +290,35 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     name.textContent = participant.identity === this.participantId ? `${displayName} (自分)` : displayName
     nameBar.appendChild(name)
 
+    if (!participant.isMicrophoneEnabled) {
+      const mutedIcon = this.createMutedIcon()
+      mutedIcon.classList.add(videoGridStyles.micOffIcon)
+      mutedIcon.id = `mic-icon-${participant.identity}`
+      nameBar.appendChild(mutedIcon)
+    }
+
     tile.appendChild(videoArea)
     tile.appendChild(nameBar)
     grid.appendChild(tile)
 
     this.updateGridLayout()
+    this.updateParticipantList()
+  }
+
+  private updateParticipantTileName(participant: Participant): void {
+    const displayName = this.getDisplayName(participant)
+    const tile = document.getElementById(`tile-${participant.identity}`)
+    if (tile !== null) {
+      const nameSpan = tile.querySelector(`.${videoGridStyles.name}`)
+      if (nameSpan !== null) {
+        nameSpan.textContent = participant.identity === this.participantId ? `${displayName} (自分)` : displayName
+      }
+      const avatar = tile.querySelector(`.${videoGridStyles.avatar}`)
+      if (avatar !== null) {
+        (avatar as HTMLElement).style.backgroundColor = this.getAvatarColor(displayName)
+        avatar.textContent = this.getInitials(displayName)
+      }
+    }
     this.updateParticipantList()
   }
 
@@ -271,8 +332,8 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private updateParticipantList(): void {
-    const list = document.getElementById('participant-list')
-    const countEl = document.getElementById('participants-count')
+    const list = document.getElementById(PARTICIPANT_LIST_ID)
+    const countEl = document.getElementById(PARTICIPANTS_COUNT_ID)
     if (list === null || this.room === undefined) return
 
     while (list.firstChild !== null) {
@@ -290,7 +351,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       const item = document.createElement('div')
       item.className = sidebarStyles.participantItem
 
-      const pDisplayName = p.name ?? p.identity
+      const pDisplayName = this.getDisplayName(p)
       const avatar = document.createElement('div')
       avatar.className = sidebarStyles.participantAvatar
       avatar.textContent = pDisplayName.slice(0, 1).toUpperCase()
@@ -313,6 +374,26 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     if (countEl !== null) {
       countEl.textContent = `参加者 (${participants.length})`
     }
+  }
+
+  private updateMicIcon(participant: Participant): void {
+    const iconId = `mic-icon-${participant.identity}`
+    const existing = document.getElementById(iconId)
+    const tile = document.getElementById(`tile-${participant.identity}`)
+    if (tile === null) return
+
+    if (participant.isMicrophoneEnabled) {
+      existing?.remove()
+    } else if (existing === null) {
+      const nameBar = tile.querySelector(`.${videoGridStyles.nameBar}`)
+      if (nameBar !== null) {
+        const mutedIcon = this.createMutedIcon()
+        mutedIcon.classList.add(videoGridStyles.micOffIcon)
+        mutedIcon.id = iconId
+        nameBar.appendChild(mutedIcon)
+      }
+    }
+    this.updateParticipantList()
   }
 
   private createMutedIcon(): SVGSVGElement {
@@ -350,7 +431,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private attachScreenShareTrack(track: RemoteTrack | Track, participantId: string): void {
-    const grid = document.getElementById('video-grid')
+    const grid = document.getElementById(VIDEO_GRID_ID)
     if (grid === null) {
       console.error('[MeetingWebRtc] video-grid element not found!')
       return
@@ -387,7 +468,13 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     const name = document.createElement('span')
     name.className = videoGridStyles.name
-    const displayName = participantId === this.participantId ? 'You' : participantId
+    const participant = this.room?.localParticipant.identity === participantId
+      ? this.room.localParticipant
+      : this.room?.participants.get(participantId)
+    const screenShareName = participant !== undefined
+      ? this.getDisplayName(participant)
+      : participantId
+    const displayName = participantId === this.participantId ? `${screenShareName} (自分)` : screenShareName
     name.textContent = `${displayName}の画面`
     nameBar.appendChild(name)
 
@@ -400,7 +487,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private detachScreenShareTrack(participantId?: string): void {
-    const grid = document.getElementById('video-grid')
+    const grid = document.getElementById(VIDEO_GRID_ID)
     if (grid === null) return
 
     const removeTile = (tile: Element): void => {
@@ -434,7 +521,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private updateGridLayout(): void {
-    const grid = document.getElementById('video-grid')
+    const grid = document.getElementById(VIDEO_GRID_ID)
     if (grid === null) return
 
     const hasScreenShare = document.querySelector('[id^="tile-screenshare-"]') !== null
@@ -552,6 +639,31 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     downArrow.disabled = this.sidebarScrollIndex >= totalTiles - this.maxVisibleSidebarTiles
   }
 
+  private getDisplayName(participant: Participant): string {
+    const stored = this.participantNames.get(participant.identity)
+    if (stored !== undefined) return stored
+    if (participant.name !== undefined && participant.name !== '') return participant.name
+    return participant.identity
+  }
+
+  private broadcastName(): void {
+    if (this.room === undefined || !this.isConnected) return
+    const message: DataMessage = {
+      type: 'name_announce',
+      sender: this.participantId,
+      text: '',
+      timestamp: Date.now(),
+      displayName: this.displayName !== '' ? this.displayName : this.participantId,
+    }
+    try {
+      const encoder = new TextEncoder()
+      const data = encoder.encode(JSON.stringify(message))
+      void this.room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE)
+    } catch (e) {
+      console.error('[MeetingWebRtc] Failed to broadcast name:', e)
+    }
+  }
+
   private getAvatarColor(id: string): string {
     const colors = ['#4285f4', '#ea4335', '#fbbc04', '#34a853', '#673ab7', '#e91e63', '#00bcd4']
     let hash = 0
@@ -566,7 +678,8 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private async getAccessToken(playerId: string): Promise<string> {
-    const params = { roomName: 'meeting-room', userName: playerId }
+    const displayName = this.displayName !== '' ? this.displayName : playerId
+    const params = { roomName: 'meeting-room', userName: playerId, displayName }
     const query = new URLSearchParams(params).toString()
     const res = await fetch(`${getChuraverseConfig().backendLivekitUrl}/?${query}`)
     const data = (await res.json()) as AccessTokenResponse
@@ -574,30 +687,30 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private setupUiEventHandlers(): void {
-    const micButton = DomManager.getElementById('mic-toggle-button')
-    const cameraButton = DomManager.getElementById('camera-toggle-button')
-    const screenShareButton = DomManager.getElementById('screen-share-button')
-    const exitButton = DomManager.getElementById('meeting-exit-button')
+    const micButton = DomManager.getElementById(MIC_TOGGLE_BUTTON_ID)
+    const cameraButton = DomManager.getElementById(CAMERA_TOGGLE_BUTTON_ID)
+    const screenShareButton = DomManager.getElementById(SCREEN_SHARE_BUTTON_ID)
+    const exitButton = DomManager.getElementById(MEETING_EXIT_BUTTON_ID)
 
-    micButton?.addEventListener('click', () => void this.toggleMicrophone())
-    cameraButton?.addEventListener('click', () => void this.toggleCamera())
-    screenShareButton?.addEventListener('click', () => void this.toggleScreenShare())
-    exitButton?.addEventListener('click', () => this.exitMeeting())
+    micButton.addEventListener('click', () => { void this.toggleMicrophone() })
+    cameraButton.addEventListener('click', () => { void this.toggleCamera() })
+    screenShareButton.addEventListener('click', () => { void this.toggleScreenShare() })
+    exitButton.addEventListener('click', () => { this.exitMeeting() })
 
-    const chatInput = document.getElementById('chat-input') as HTMLInputElement | null
-    const chatSendButton = document.getElementById('chat-send-button')
+    const chatInput = DomManager.getElementById<HTMLInputElement>(CHAT_INPUT_ID)
+    const chatSendButton = DomManager.getElementById(CHAT_SEND_BUTTON_ID)
 
-    chatSendButton?.addEventListener('click', () => {
-      if (chatInput !== null && chatInput.value.trim() !== '') {
-        void this.sendChatMessage(chatInput.value.trim())
+    chatSendButton.addEventListener('click', () => {
+      if (chatInput.value.trim() !== '') {
+        void this.sendDataMessage(chatInput.value.trim())
         chatInput.value = ''
       }
     })
 
-    chatInput?.addEventListener('keydown', (e) => {
+    chatInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey && chatInput.value.trim() !== '') {
         e.preventDefault()
-        void this.sendChatMessage(chatInput.value.trim())
+        void this.sendDataMessage(chatInput.value.trim())
         chatInput.value = ''
       }
     })
@@ -613,7 +726,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     this.isMicEnabled = !this.isMicEnabled
     await this.room.localParticipant.setMicrophoneEnabled(this.isMicEnabled)
-    this.updateButtonState('mic-toggle-button', !this.isMicEnabled)
+    this.updateButtonState(MIC_TOGGLE_BUTTON_ID, !this.isMicEnabled)
   }
 
   private async toggleCamera(): Promise<void> {
@@ -621,7 +734,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     this.isCameraEnabled = !this.isCameraEnabled
     await this.room.localParticipant.setCameraEnabled(this.isCameraEnabled)
-    this.updateButtonState('camera-toggle-button', !this.isCameraEnabled)
+    this.updateButtonState(CAMERA_TOGGLE_BUTTON_ID, !this.isCameraEnabled)
   }
 
   private async toggleScreenShare(): Promise<void> {
@@ -630,18 +743,16 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     this.isScreenShareEnabled = !this.isScreenShareEnabled
     try {
       await this.room.localParticipant.setScreenShareEnabled(this.isScreenShareEnabled)
-      this.updateButtonState('screen-share-button', this.isScreenShareEnabled)
+      this.updateButtonState(SCREEN_SHARE_BUTTON_ID, this.isScreenShareEnabled)
     } catch (e) {
       console.error('[MeetingWebRtc] Screen share failed:', e)
       this.isScreenShareEnabled = false
-      this.updateButtonState('screen-share-button', false)
+      this.updateButtonState(SCREEN_SHARE_BUTTON_ID, false)
     }
   }
 
   private updateButtonState(buttonId: string, highlighted: boolean): void {
     const button = DomManager.getElementById(buttonId)
-    if (button === undefined) return
-
     if (highlighted) {
       button.classList.add(controlBarStyles.activeButton)
     } else {
@@ -649,10 +760,10 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     }
   }
 
-  private async sendChatMessage(text: string): Promise<void> {
+  private async sendDataMessage(text: string): Promise<void> {
     if (this.room === undefined || !this.isConnected) return
 
-    const message: ChatMessage = {
+    const message: DataMessage = {
       type: 'chat',
       sender: this.participantId,
       text,
@@ -664,7 +775,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       const data = encoder.encode(JSON.stringify(message))
       await this.room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE)
       this.chatHistory.push(message)
-      this.addChatMessage(this.participantId, text)
+      this.addDataMessage(this.participantId, text)
     } catch (e) {
       console.error('[MeetingWebRtc] Failed to send chat message:', e)
     }
@@ -673,7 +784,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   private sendChatHistory(): void {
     if (this.room === undefined || !this.isConnected || this.chatHistory.length === 0) return
 
-    const historyMessage: ChatMessage = {
+    const historyMessage: DataMessage = {
       type: 'chat_history',
       sender: this.participantId,
       text: '',
@@ -691,8 +802,8 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     }
   }
 
-  private addChatMessage(senderId: string, text: string): void {
-    const chatMessages = document.getElementById('chat-messages')
+  private addDataMessage(senderId: string, text: string): void {
+    const chatMessages = document.getElementById(CHAT_MESSAGES_ID)
     if (chatMessages === null) return
 
     const messageEl = document.createElement('div')

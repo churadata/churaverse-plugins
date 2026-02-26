@@ -37,6 +37,7 @@
     "livekit-client": "^1.13.4",
     "@churaverse/core-ui-plugin-client": "~0.1.0",
     "@churaverse/player-plugin-client": "~0.1.0",
+    "@churaverse/text-chat-plugin-client": "~0.1.0",
     "@churaverse/transition-plugin-client": "~0.1.0",
     "churaverse-engine-client": "~0.1.0"
   }

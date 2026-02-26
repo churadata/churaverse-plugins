@@ -6,11 +6,20 @@ const MEETING_PARTICIPANT_LIST_ID = 'meeting-participant-list'
 const MEETING_PARTICIPANT_DIVIDER_ID = 'meeting-participant-divider'
 
 /**
+ * データチャネルで受信するメッセージ
+ */
+interface DataMessage {
+  type: 'name_announce' | string
+  displayName?: string
+}
+
+/**
  * 既存の参加者一覧ダイアログにLiveKitミーティング参加者セクションを注入するクラス
  */
 export class MeetingParticipantPanel {
   private listElement: HTMLElement | null = null
   private dividerElement: HTMLElement | null = null
+  private readonly participantNames: Map<string, string> = new Map()
 
   public constructor(private readonly room: Room) {
     this.setupRoomEventListeners()
@@ -67,6 +76,20 @@ export class MeetingParticipantPanel {
       .on(RoomEvent.TrackUnmuted, (_publication: TrackPublication, _participant: Participant) => {
         this.renderMeetingParticipants()
       })
+      .on(RoomEvent.ParticipantNameChanged, () => {
+        this.renderMeetingParticipants()
+      })
+      .on(RoomEvent.DataReceived, (payload, participant) => {
+        if (participant === undefined) return
+        try {
+          const decoder = new TextDecoder()
+          const message = JSON.parse(decoder.decode(payload)) as DataMessage
+          if (message.type === 'name_announce' && message.displayName !== undefined) {
+            this.participantNames.set(participant.identity, message.displayName)
+            this.renderMeetingParticipants()
+          }
+        } catch { /* ignore */ }
+      })
   }
 
   private renderMeetingParticipants(): void {
@@ -107,6 +130,13 @@ export class MeetingParticipantPanel {
     })
   }
 
+  public getDisplayName(participant: Participant): string {
+    const stored = this.participantNames.get(participant.identity)
+    if (stored !== undefined) return stored
+    if (participant.name !== undefined && participant.name !== '') return participant.name
+    return participant.identity
+  }
+
   private addParticipantItem(participant: Participant): void {
     if (this.listElement === null) return
 
@@ -115,7 +145,7 @@ export class MeetingParticipantPanel {
 
     const nameSpan = document.createElement('div')
     nameSpan.className = style.participantName
-    const displayName = participant.name ?? participant.identity
+    const displayName = this.getDisplayName(participant)
     nameSpan.textContent = displayName
     item.appendChild(nameSpan)
 
