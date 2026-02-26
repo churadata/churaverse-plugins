@@ -1,5 +1,10 @@
 import { BasePlugin, DomManager, getChuraverseConfig, IMeetingScene } from 'churaverse-engine-client'
 import { Room, RoomEvent, RoomOptions, VideoPresets, Track, RemoteTrack, RemoteParticipant, Participant, DataPacket_Kind } from 'livekit-client'
+import heroBasic from './assets/hero.png'
+import heroRed from './assets/hero_red.png'
+import heroBlue from './assets/hero_blue.png'
+import heroBlack from './assets/hero_black.png'
+import heroGray from './assets/hero_gray.png'
 import { VIDEO_GRID_ID, videoGridStyles } from './components/VideoGridComponent'
 import {
   MIC_TOGGLE_BUTTON_ID,
@@ -16,6 +21,8 @@ import {
   CHAT_SEND_BUTTON_ID,
   sidebarStyles,
 } from './components/MeetingSidebarComponent'
+
+const HERO_SPRITES = [heroBasic, heroRed, heroBlue, heroBlack, heroGray]
 
 interface AccessTokenResponse {
   token: string
@@ -277,8 +284,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     const avatar = document.createElement('div')
     avatar.className = videoGridStyles.avatar
     const displayName = this.getDisplayName(participant)
-    avatar.style.backgroundColor = this.getAvatarColor(displayName)
-    avatar.textContent = this.getInitials(displayName)
+    avatar.style.backgroundImage = `url(${this.getHeroSprite(displayName)})`
     avatarContainer.appendChild(avatar)
     videoArea.appendChild(avatarContainer)
 
@@ -315,8 +321,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       }
       const avatar = tile.querySelector(`.${videoGridStyles.avatar}`)
       if (avatar !== null) {
-        (avatar as HTMLElement).style.backgroundColor = this.getAvatarColor(displayName)
-        avatar.textContent = this.getInitials(displayName)
+        (avatar as HTMLElement).style.backgroundImage = `url(${this.getHeroSprite(displayName)})`
       }
     }
     this.updateParticipantList()
@@ -664,17 +669,12 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     }
   }
 
-  private getAvatarColor(id: string): string {
-    const colors = ['#4285f4', '#ea4335', '#fbbc04', '#34a853', '#673ab7', '#e91e63', '#00bcd4']
+  private getHeroSprite(name: string): string {
     let hash = 0
-    for (let i = 0; i < id.length; i++) {
-      hash = id.charCodeAt(i) + ((hash << 5) - hash)
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash)
     }
-    return colors[Math.abs(hash) % colors.length]
-  }
-
-  private getInitials(name: string): string {
-    return name.slice(0, 2).toUpperCase()
+    return HERO_SPRITES[Math.abs(hash) % HERO_SPRITES.length]
   }
 
   private async getAccessToken(playerId: string): Promise<string> {
