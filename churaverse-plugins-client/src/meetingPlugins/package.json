@@ -38,7 +38,7 @@
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "dependencies": {
-    "phaser": "^3.80.1",
+    "livekit-client": "^1.13.4",
     "churaverse-engine-client": "~0.1.0"
   }
 }

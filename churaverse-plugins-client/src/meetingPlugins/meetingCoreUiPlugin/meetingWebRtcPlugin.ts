@@ -17,6 +17,8 @@ import {
   sidebarStyles,
 } from './components/MeetingSidebarComponent'
 
+const MEETING_ROOM_NAME = 'meeting-room'
+
 interface AccessTokenResponse {
   token: string
 }
@@ -38,7 +40,6 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   private isScreenShareEnabled: boolean = false
   private isConnected: boolean = false
   private readonly chatHistory: ChatMessage[] = []
-  private readonly participantNames = new Map<string, string>()
   private sidebarScrollIndex: number = 0
   private readonly maxVisibleSidebarTiles: number = 5
 
@@ -50,7 +51,6 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   private init(): void {
     this.displayName = sessionStorage.getItem('meetingPlayerName') ?? this.readCookie('name') ?? ''
     this.participantId = this.displayName !== '' ? this.displayName : this.generateParticipantId()
-    this.participantNames.set(this.participantId, this.displayName !== '' ? this.displayName : this.participantId)
     window.addEventListener('beforeunload', () => { this.cleanup() })
   }
 
@@ -110,16 +110,13 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     try {
       const token = await this.getAccessToken(playerId)
       const livekitUrl = getChuraverseConfig().livekitUrl
-      console.log(`[MeetingWebRtc] Connecting to ${livekitUrl}`)
       await this.room.connect(livekitUrl, token)
       this.isConnected = true
-      console.log(`[MeetingWebRtc] Connected to room: ${this.room.name}`)
 
       this.addParticipantTile(this.room.localParticipant)
 
       this.room.participants.forEach((participant: RemoteParticipant) => {
-        console.log(`[MeetingWebRtc] Adding existing participant: ${participant.identity}`)
-        this.addParticipantTile(participant)
+          this.addParticipantTile(participant)
 
         participant.videoTracks.forEach((publication) => {
           if (publication.track !== undefined && publication.isSubscribed) {
@@ -146,18 +143,15 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     if (this.room === undefined) return
 
     this.room.on(RoomEvent.ParticipantConnected, (participant) => {
-      console.log(`[MeetingWebRtc] Participant connected: ${participant.identity}`)
       this.addParticipantTile(participant)
       this.sendChatHistory()
     })
 
     this.room.on(RoomEvent.ParticipantDisconnected, (participant) => {
-      console.log(`[MeetingWebRtc] Participant disconnected: ${participant.identity}`)
       this.removeParticipantTile(participant.identity)
     })
 
     this.room.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
-      console.log(`[MeetingWebRtc] Track subscribed: ${track.kind} (source: ${publication.source}) from ${participant.identity}`)
       if (publication.source === Track.Source.ScreenShare) {
         this.attachScreenShareTrack(track, participant.identity)
       } else {
@@ -166,7 +160,6 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     })
 
     this.room.on(RoomEvent.TrackUnsubscribed, (track, publication, participant) => {
-      console.log(`[MeetingWebRtc] Track unsubscribed: ${track.kind} (source: ${publication.source}) from ${participant.identity}`)
       if (publication.source === Track.Source.ScreenShare) {
         track.detach().forEach((el) => { el.remove() })
         this.detachScreenShareTrack(participant.identity)
@@ -176,7 +169,6 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     })
 
     this.room.on(RoomEvent.LocalTrackPublished, (publication, participant) => {
-      console.log(`[MeetingWebRtc] Local track published: ${publication.kind} (source: ${publication.source})`)
       if (publication.track !== undefined) {
         if (publication.source === Track.Source.ScreenShare) {
           this.attachScreenShareTrack(publication.track, participant.identity)
@@ -187,7 +179,6 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     })
 
     this.room.on(RoomEvent.LocalTrackUnpublished, (publication, participant) => {
-      console.log(`[MeetingWebRtc] Local track unpublished: ${publication.kind} (source: ${publication.source})`)
       if (publication.track !== undefined) {
         if (publication.source === Track.Source.ScreenShare) {
           publication.track.detach().forEach((el) => { el.remove() })
@@ -202,19 +193,27 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       try {
         const decoder = new TextDecoder()
         const jsonStr = decoder.decode(payload)
-        const message = JSON.parse(jsonStr) as ChatMessage
+        const parsed: unknown = JSON.parse(jsonStr)
+        if (typeof parsed !== 'object' || parsed === null) return
+        const message = parsed as Record<string, unknown>
+        if (typeof message.type !== 'string' || typeof message.sender !== 'string') return
 
-        if (message.type === 'chat_history' && message.history !== undefined) {
-          message.history.forEach((historyMsg) => {
+        if (message.type === 'chat_history' && Array.isArray(message.history)) {
+          for (const entry of message.history) {
+            if (typeof entry !== 'object' || entry === null) continue
+            const h = entry as Record<string, unknown>
+            if (typeof h.timestamp !== 'number' || typeof h.sender !== 'string' || typeof h.text !== 'string') continue
+            const historyMsg: ChatMessage = { type: 'chat', sender: h.sender, text: h.text, timestamp: h.timestamp }
             const exists = this.chatHistory.some((m) => m.timestamp === historyMsg.timestamp && m.sender === historyMsg.sender)
             if (!exists) {
               this.chatHistory.push(historyMsg)
               this.addChatMessage(historyMsg.sender, historyMsg.text)
             }
-          })
-        } else if (message.type === 'chat' && message.text !== undefined && participant !== undefined) {
-          this.chatHistory.push(message)
-          this.addChatMessage(participant.identity, message.text)
+          }
+        } else if (message.type === 'chat' && typeof message.text === 'string' && participant !== undefined) {
+          const chatMsg: ChatMessage = { type: 'chat', sender: message.sender as string, text: message.text, timestamp: typeof message.timestamp === 'number' ? message.timestamp : Date.now() }
+          this.chatHistory.push(chatMsg)
+          this.addChatMessage(participant.identity, chatMsg.text)
         }
       } catch (e) {
         console.error('[MeetingWebRtc] Failed to parse chat message:', e)
@@ -356,7 +355,10 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       }
     } else if (track.kind === Track.Kind.Audio) {
       const element = track.attach()
-      document.body.appendChild(element)
+      const tile = document.getElementById(`tile-${participantId}`)
+      if (tile !== null) {
+        tile.appendChild(element)
+      }
     }
   }
 
@@ -398,7 +400,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     const name = document.createElement('span')
     name.className = videoGridStyles.name
-    const displayName = participantId === this.participantId ? 'You' : participantId
+    const displayName = participantId === this.participantId ? `${this.participantId} (自分)` : participantId
     name.textContent = `${displayName}の画面`
     nameBar.appendChild(name)
 
@@ -407,7 +409,6 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     grid.insertBefore(tile, grid.firstChild)
 
     this.updateGridLayout()
-    console.log(`[MeetingWebRtc] Screen share tile attached from ${participantId}`)
   }
 
   private detachScreenShareTrack(participantId?: string): void {
@@ -428,7 +429,6 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     }
 
     this.updateGridLayout()
-    console.log('[MeetingWebRtc] Screen share tile detached')
   }
 
   private detachTrack(track: RemoteTrack | Track, participantId: string): void {
@@ -579,9 +579,12 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private async getAccessToken(playerId: string): Promise<string> {
-    const params = { roomName: 'meeting-room', userName: playerId }
+    const params = { roomName: MEETING_ROOM_NAME, userName: playerId }
     const query = new URLSearchParams(params).toString()
     const res = await fetch(`${getChuraverseConfig().backendLivekitUrl}/?${query}`)
+    if (!res.ok) {
+      throw new Error(`Failed to get access token: ${res.status} ${res.statusText}`)
+    }
     const data = (await res.json()) as AccessTokenResponse
     return data.token
   }
@@ -696,7 +699,6 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       const encoder = new TextEncoder()
       const data = encoder.encode(JSON.stringify(historyMessage))
       void this.room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE)
-      console.log(`[MeetingWebRtc] Sent chat history (${this.chatHistory.length} messages)`)
     } catch (e) {
       console.error('[MeetingWebRtc] Failed to send chat history:', e)
     }
