@@ -10,6 +10,7 @@ import {
 } from 'churaverse-engine-client'
 import { Scene } from 'phaser'
 import { ExitButton } from './exit/exitButton'
+import { MeetingButton } from './exit/meetingButton'
 import { SettingIcon } from './settingDialog/settingIcon'
 import { AdminSettingIcon } from './adminSettingDialog/adminSettingIcon'
 import { OwnPlayerUndefinedError } from '@churaverse/player-plugin-client/errors/ownPlayerUndefinedError'
@@ -85,6 +86,7 @@ export class CoreUiPlugin extends BasePlugin<IMainScene> {
     )
 
     void new ExitButton(this.bus)
+    void new MeetingButton()
 
     this.keyboardPluginStore.keySettingWindow.addKeyAction('focusNext', 'カメラフォーカス対象の切り替え', 50)
   }

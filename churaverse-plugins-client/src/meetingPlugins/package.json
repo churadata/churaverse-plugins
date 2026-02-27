@@ -38,6 +38,7 @@
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "dependencies": {
+    "@churaverse/player-plugin-client": "~0.1.0",
     "phaser": "^3.80.1",
     "churaverse-engine-client": "~0.1.0"
   }

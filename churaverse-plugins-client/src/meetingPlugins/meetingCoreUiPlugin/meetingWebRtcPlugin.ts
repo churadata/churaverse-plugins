@@ -1,16 +1,21 @@
 import { BasePlugin, DomManager, getChuraverseConfig, IMeetingScene } from 'churaverse-engine-client'
 import { Room, RoomEvent, RoomOptions, VideoPresets, Track, RemoteTrack, RemoteParticipant, Participant, DataPacket_Kind } from 'livekit-client'
-import heroBasic from './assets/hero.png'
-import heroRed from './assets/hero_red.png'
-import heroBlue from './assets/hero_blue.png'
-import heroBlack from './assets/hero_black.png'
-import heroGray from './assets/hero_gray.png'
+import heroBasic from '@churaverse/player-plugin-client/assets/hero.png'
+import heroRed from '@churaverse/player-plugin-client/assets/hero_red.png'
+import heroBlue from '@churaverse/player-plugin-client/assets/hero_blue.png'
+import heroBlack from '@churaverse/player-plugin-client/assets/hero_black.png'
+import heroGray from '@churaverse/player-plugin-client/assets/hero_gray.png'
+import sharkSprite from './assets/shark.png'
+import bombSprite from './assets/bomb_large_explosion.png'
 import { VIDEO_GRID_ID, videoGridStyles } from './components/VideoGridComponent'
 import {
   MIC_TOGGLE_BUTTON_ID,
   CAMERA_TOGGLE_BUTTON_ID,
   SCREEN_SHARE_BUTTON_ID,
   MEETING_EXIT_BUTTON_ID,
+  PORTAL_BUTTON_ID,
+  REACTION_SHARK_BUTTON_ID,
+  REACTION_BOMB_BUTTON_ID,
   controlBarStyles,
 } from './components/MeetingControlBarComponent'
 import {
@@ -29,12 +34,14 @@ interface AccessTokenResponse {
 }
 
 interface DataMessage {
-  type: 'chat' | 'chat_history' | 'name_announce'
+  type: 'chat' | 'chat_history' | 'name_announce' | 'avatar_announce' | 'reaction'
   sender: string
   text: string
   timestamp: number
   history?: DataMessage[]
   displayName?: string
+  avatarIndex?: number
+  reactionType?: 'shark' | 'bomb'
 }
 
 export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
@@ -47,6 +54,8 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   private isConnected: boolean = false
   private chatHistory: DataMessage[] = []
   private participantNames: Map<string, string> = new Map()
+  private selectedAvatarIndex: number = 0
+  private participantAvatars: Map<string, number> = new Map()
   private sidebarScrollIndex: number = 0
   private readonly maxVisibleSidebarTiles: number = 5
 
@@ -59,6 +68,12 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     this.displayName = sessionStorage.getItem('meetingPlayerName') ?? this.readCookie('name') ?? ''
     this.participantId = this.displayName !== '' ? this.displayName : this.generateParticipantId()
     this.participantNames.set(this.participantId, this.displayName !== '' ? this.displayName : this.participantId)
+
+    const storedAvatar = sessionStorage.getItem('meetingAvatarIndex')
+    if (storedAvatar !== null) {
+      this.selectedAvatarIndex = parseInt(storedAvatar, 10)
+    }
+
     window.addEventListener('beforeunload', () => this.cleanup())
   }
 
@@ -125,6 +140,8 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       console.log(`[MeetingWebRtc] Connected to room: ${this.room.name}`)
 
       this.broadcastName()
+      this.participantAvatars.set(this.participantId, this.selectedAvatarIndex)
+      this.broadcastAvatar()
       this.addParticipantTile(this.room.localParticipant)
 
       this.room.participants.forEach((participant: RemoteParticipant) => {
@@ -159,6 +176,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       console.log(`[MeetingWebRtc] Participant connected: ${participant.identity}`)
       this.addParticipantTile(participant)
       this.broadcastName()
+      this.broadcastAvatar()
       this.sendChatHistory()
     })
 
@@ -245,7 +263,12 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
           })
         } else if (message.type === 'chat' && message.text !== undefined && participant !== undefined) {
           this.chatHistory.push(message)
-          this.addDataMessage(this.getDisplayName(participant), message.text)
+          this.addDataMessage(participant.identity, message.text)
+        } else if (message.type === 'avatar_announce' && participant !== undefined && message.avatarIndex !== undefined) {
+          this.participantAvatars.set(participant.identity, message.avatarIndex)
+          this.updateParticipantTileName(participant)
+        } else if (message.type === 'reaction' && message.reactionType !== undefined) {
+          this.showReactionAnimation(message.reactionType)
         }
       } catch (e) {
         console.error('[MeetingWebRtc] Failed to parse chat message:', e)
@@ -284,7 +307,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     const avatar = document.createElement('div')
     avatar.className = videoGridStyles.avatar
     const displayName = this.getDisplayName(participant)
-    avatar.style.backgroundImage = `url(${this.getHeroSprite(displayName)})`
+    avatar.style.backgroundImage = `url(${this.getHeroSprite(displayName, participant.identity)})`
     avatarContainer.appendChild(avatar)
     videoArea.appendChild(avatarContainer)
 
@@ -321,7 +344,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       }
       const avatar = tile.querySelector(`.${videoGridStyles.avatar}`)
       if (avatar !== null) {
-        (avatar as HTMLElement).style.backgroundImage = `url(${this.getHeroSprite(displayName)})`
+        (avatar as HTMLElement).style.backgroundImage = `url(${this.getHeroSprite(displayName, participant.identity)})`
       }
     }
     this.updateParticipantList()
@@ -669,12 +692,128 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     }
   }
 
-  private getHeroSprite(name: string): string {
+  private getHeroSprite(name: string, participantIdentity?: string): string {
+    if (participantIdentity !== undefined) {
+      const avatarIdx = this.participantAvatars.get(participantIdentity)
+      if (avatarIdx !== undefined) {
+        return HERO_SPRITES[avatarIdx]
+      }
+    }
     let hash = 0
     for (let i = 0; i < name.length; i++) {
       hash = name.charCodeAt(i) + ((hash << 5) - hash)
     }
     return HERO_SPRITES[Math.abs(hash) % HERO_SPRITES.length]
+  }
+
+  private broadcastAvatar(): void {
+    if (this.room === undefined || !this.isConnected) return
+    const message: DataMessage = {
+      type: 'avatar_announce',
+      sender: this.participantId,
+      text: '',
+      timestamp: Date.now(),
+      avatarIndex: this.selectedAvatarIndex,
+    }
+    try {
+      const encoder = new TextEncoder()
+      const data = encoder.encode(JSON.stringify(message))
+      void this.room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE)
+    } catch (e) {
+      console.error('[MeetingWebRtc] Failed to broadcast avatar:', e)
+    }
+  }
+
+  private sendReaction(reactionType: 'shark' | 'bomb'): void {
+    if (this.room === undefined || !this.isConnected) return
+    const message: DataMessage = {
+      type: 'reaction',
+      sender: this.participantId,
+      text: '',
+      timestamp: Date.now(),
+      reactionType,
+    }
+    try {
+      const encoder = new TextEncoder()
+      const data = encoder.encode(JSON.stringify(message))
+      void this.room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE)
+      this.showReactionAnimation(reactionType)
+    } catch (e) {
+      console.error('[MeetingWebRtc] Failed to send reaction:', e)
+    }
+  }
+
+  private showReactionAnimation(reactionType: 'shark' | 'bomb'): void {
+    const container = document.querySelector('[class*="mainArea"]') as HTMLElement
+    if (container === null) return
+    if (reactionType === 'shark') {
+      this.showSharkAnimation(container)
+    } else {
+      this.showBombAnimation(container)
+    }
+  }
+
+  private showSharkAnimation(container: HTMLElement): void {
+    const shark = document.createElement('div')
+    const size = 120
+    const startY = Math.random() * Math.max(container.clientHeight - size - 200, 100) + 50
+    shark.style.cssText = `position:absolute;width:${size}px;height:${size}px;left:-${size}px;top:${startY}px;z-index:100;image-rendering:pixelated;background-image:url(${sharkSprite});background-size:${size * 2}px ${size * 4}px;background-repeat:no-repeat;background-position:0px -${size * 2}px;pointer-events:none;`
+    container.appendChild(shark)
+
+    let frame = 0
+    let x = -size
+    let lastFrameTime = 0
+    const animate = (timestamp: number): void => {
+      if (lastFrameTime === 0) lastFrameTime = timestamp
+      if (timestamp - lastFrameTime > 125) {
+        frame = frame === 0 ? 1 : 0
+        shark.style.backgroundPosition = `${-frame * size}px ${-size * 2}px`
+        lastFrameTime = timestamp
+      }
+      x += 5
+      shark.style.left = `${x}px`
+      if (x > container.clientWidth + size) { shark.remove(); return }
+      requestAnimationFrame(animate)
+    }
+    requestAnimationFrame(animate)
+  }
+
+  private showBombAnimation(container: HTMLElement): void {
+    const bomb = document.createElement('div')
+    const size = 100
+    const centerX = Math.random() * (container.clientWidth - size)
+    const centerY = Math.random() * (container.clientHeight - size)
+    bomb.style.cssText = `position:absolute;width:${size}px;height:${size}px;left:${centerX}px;top:${centerY}px;z-index:100;image-rendering:pixelated;background-image:url(${bombSprite});background-size:${size * 3}px ${size * 4}px;background-repeat:no-repeat;background-position:0 0;pointer-events:none;`
+    container.appendChild(bomb)
+
+    let frameIndex = 0
+    let dropCount = 0
+    let lastFrameTime = 0
+    const animate = (timestamp: number): void => {
+      if (lastFrameTime === 0) lastFrameTime = timestamp
+      if (timestamp - lastFrameTime > 125) {
+        if (dropCount < 9) {
+          const col = frameIndex % 3
+          const row = Math.floor(frameIndex / 3)
+          bomb.style.backgroundPosition = `${-col * size}px ${-row * size}px`
+          frameIndex = (frameIndex + 1) % 3
+          dropCount++
+        } else {
+          if (frameIndex < 3) frameIndex = 3
+          else frameIndex++
+          if (frameIndex >= 12) { bomb.remove(); return }
+          const col = frameIndex % 3
+          const row = Math.floor(frameIndex / 3)
+          bomb.style.backgroundPosition = `${-col * size}px ${-row * size}px`
+          const progress = (frameIndex - 3) / 8
+          bomb.style.transform = `scale(${1 + progress * 5})`
+          bomb.style.opacity = `${1 - progress * 0.6}`
+        }
+        lastFrameTime = timestamp
+      }
+      requestAnimationFrame(animate)
+    }
+    requestAnimationFrame(animate)
   }
 
   private async getAccessToken(playerId: string): Promise<string> {
@@ -714,6 +853,29 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
         chatInput.value = ''
       }
     })
+
+    const portalButton = document.getElementById(PORTAL_BUTTON_ID)
+    if (portalButton !== null) {
+      portalButton.addEventListener('click', () => { this.enterGameMode() })
+    }
+
+    const sharkButton = document.getElementById(REACTION_SHARK_BUTTON_ID)
+    if (sharkButton !== null) {
+      sharkButton.addEventListener('click', () => { this.sendReaction('shark') })
+    }
+
+    const bombButton = document.getElementById(REACTION_BOMB_BUTTON_ID)
+    if (bombButton !== null) {
+      bombButton.addEventListener('click', () => { this.sendReaction('bomb') })
+    }
+  }
+
+  private enterGameMode(): void {
+    sessionStorage.setItem('portalToGameMode', 'true')
+    sessionStorage.setItem('meetingPlayerName', this.displayName)
+    sessionStorage.setItem('meetingAvatarIndex', String(this.selectedAvatarIndex))
+    this.cleanup()
+    window.location.href = '/'
   }
 
   private exitMeeting(): void {
@@ -809,9 +971,10 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     const messageEl = document.createElement('div')
     messageEl.className = sidebarStyles.chatMessage
 
+    const displayName = this.participantNames.get(senderId) ?? senderId
     const authorEl = document.createElement('span')
     authorEl.className = sidebarStyles.chatAuthor
-    authorEl.textContent = senderId === this.participantId ? `${this.participantId} (自分)` : senderId
+    authorEl.textContent = senderId === this.participantId ? `${displayName} (自分)` : displayName
     messageEl.appendChild(authorEl)
 
     const textEl = document.createElement('span')

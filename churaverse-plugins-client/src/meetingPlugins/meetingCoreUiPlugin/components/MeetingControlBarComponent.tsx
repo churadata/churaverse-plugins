@@ -10,10 +10,23 @@ export const SCREEN_SHARE_BUTTON_ID = 'screen-share-button'
 export const MEETING_EXIT_BUTTON_ID = 'meeting-exit-button'
 export const PARTICIPANTS_TOGGLE_BUTTON_ID = 'participants-toggle-button'
 export const CHAT_TOGGLE_BUTTON_ID = 'chat-toggle-button'
+export const PORTAL_BUTTON_ID = 'portal-button'
+export const REACTION_SHARK_BUTTON_ID = 'reaction-shark-button'
+export const REACTION_BOMB_BUTTON_ID = 'reaction-bomb-button'
 
 export const MeetingControlBarComponent: JSXFunc = () => {
   return (
     <div className={style.controlBar}>
+      {/* 左セクション: リアクション */}
+      <div className={style.leftSection}>
+        <button className={`defaultStyle ${style.reactionButton}`} id={REACTION_SHARK_BUTTON_ID} title="サメ">
+          🦈
+        </button>
+        <button className={`defaultStyle ${style.reactionButton}`} id={REACTION_BOMB_BUTTON_ID} title="爆弾">
+          💣
+        </button>
+      </div>
+
       <div className={style.centerSection}>
         {/* マイクボタン */}
         <button className={`defaultStyle ${style.controlButton} ${style.activeButton}`} id={MIC_TOGGLE_BUTTON_ID} title="マイク">
@@ -46,6 +59,14 @@ export const MeetingControlBarComponent: JSXFunc = () => {
       </div>
 
       <div className={style.rightSection}>
+        {/* ゲームモードポータル */}
+        <button className={`defaultStyle ${style.portalButton}`} id={PORTAL_BUTTON_ID} title="ゲームモードON">
+          <svg className={style.icon} viewBox="0 0 24 24" fill="currentColor">
+            <path d="M15 7.5V2H9v5.5l3 3 3-3zM7.5 9H2v6h5.5l3-3-3-3zM9 16.5V22h6v-5.5l-3-3-3 3zM16.5 9l-3 3 3 3H22V9h-5.5z" />
+          </svg>
+          <span className={style.portalLabel}>ゲームモードON</span>
+        </button>
+
         {/* メンバー一覧ボタン */}
         <button className={`defaultStyle ${style.sidebarButton}`} id={PARTICIPANTS_TOGGLE_BUTTON_ID} title="参加者">
           <svg className={style.icon} viewBox="0 0 24 24" fill="currentColor">
