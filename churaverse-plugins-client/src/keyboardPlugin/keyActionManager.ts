@@ -72,8 +72,9 @@ export class KeyActionManager<Scene extends Scenes>
   }
 
   public update(dt: number): void {
+    const isTyping = document.activeElement instanceof HTMLInputElement || document.activeElement instanceof HTMLTextAreaElement
     this.keyActionObservers.forEach((observer) => {
-      observer.update(dt, this.keyActionReceiver)
+      observer.update(dt, this.keyActionReceiver, isTyping)
     })
   }
 }

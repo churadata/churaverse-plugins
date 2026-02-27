@@ -24,11 +24,13 @@ export class KeyActionObserver<Scene extends Scenes> {
    * キーの入力状態を更新し、条件が満たされている場合はlistenerを実行する
    * @param dt
    * @param keyActionReceiver
+   * @param isTyping
    */
-  public update(dt: number, keyActionReceiver: KeyActionReceiver<Scene>): void {
+  public update(dt: number, keyActionReceiver: KeyActionReceiver<Scene>, isTyping: boolean): void {
     if (
       this.myKeyAction.keyContext === 'universal' ||
-      this.myKeyAction.keyContext === this.keyContextManager.nowContext
+      this.myKeyAction.keyContext === this.keyContextManager.nowContext ||
+      this.myKeyAction.keyContext === 'inGame' && !isTyping
     ) {
       this._update(dt, keyActionReceiver)
     } else {
