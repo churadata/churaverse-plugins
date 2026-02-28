@@ -1,20 +1,10 @@
 {
+  "extends": "../../tsconfig.server.json",
   "compilerOptions": {
-    "target": "ES6",
-    "module": "CommonJS",
-    "moduleResolution": "Node",
-    "esModuleInterop": true,
-
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true,
-
-    "lib": ["ESNext"],
-    "types": ["node"],
-    "outDir": "./dist",
-    "declaration": true,
-    "declarationDir": "./dist/types"
+    "rootDir": "src",
+    "outDir": "dist",
+    "declarationDir": "dist/types"
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["dist", "node_modules"]
 }
