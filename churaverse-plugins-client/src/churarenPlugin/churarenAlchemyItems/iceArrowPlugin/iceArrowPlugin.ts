@@ -103,7 +103,7 @@ export class IceArrowPlugin extends BaseAlchemyItemPlugin {
       const startPos = ev.ownPlayer.position.copy()
 
       // 8方向に分散するための角度を計算 (ラジアン)
-      const angle = -(i * Math.PI) / 4 // 45度 (π/4) ごとに回転
+      const angle = -i * (Math.PI / 4) // 45度 (π/4) ごとに回転
 
       // x, y成分で方向ベクトルを計算
       const attackVector = {
