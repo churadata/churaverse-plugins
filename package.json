@@ -10,7 +10,8 @@
   },
   "scripts": {
     "install:all": "pnpm install",
-    "build": "pnpm -r run build"
+    "build": "pnpm -r run build",
+    "clean": "pnpm -r exec rm -rf dist"
   },
   "devDependencies": {
     "typescript": "^5.4.0",
