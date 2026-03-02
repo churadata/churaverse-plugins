@@ -8,6 +8,7 @@ import { TimeLimitFormContainer } from './timeLimitFormContainer/timeLimitFormCo
 import { BetCoinFormContainer } from './betCoinFormContainer/betCoinFormContainer'
 import { NyokkiButton } from './nyokkiButton/nyokkiButton'
 import { ResultScreen } from './resultScreen/resultScreen'
+import { CountdownBar } from './countdownBar/countdownBar'
 import { Scene } from 'phaser'
 import { BetTimer } from './betTimer/betTimer'
 
@@ -28,5 +29,6 @@ export function registerSynchroBreakUi(
   gameUiRegister.registerGameUi(gameId, 'betCoinConfirm', new BetCoinFormContainer(store))
   gameUiRegister.registerGameUi(gameId, 'nyokkiButton', new NyokkiButton(store, bus, scene))
   gameUiRegister.registerGameUi(gameId, 'resultScreen', new ResultScreen(store, bus))
+  gameUiRegister.registerGameUi(gameId, 'countdownBar', new CountdownBar())
   gameUiRegister.registerGameUi(gameId, 'betTimer', new BetTimer())
 }
