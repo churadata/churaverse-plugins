@@ -64,6 +64,26 @@
   height: 24px;
 }
 
+.iconWhenDefault {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.iconWhenActive {
+  width: 24px;
+  height: 24px;
+  display: none;
+}
+
+.controlButton.activeButton .iconWhenDefault {
+  display: none;
+}
+
+.controlButton.activeButton .iconWhenActive {
+  display: block;
+}
+
 .sidebarButton {
   width: 48px;
   height: 48px;
