@@ -6,6 +6,7 @@ export type InsertPosition = 'head' | 'tail'
  * Dialog: 一時的に開かれる画面
  */
 export interface IDialog<DialogSection extends Section = Section> {
+  readonly node: HTMLElement
   close: () => void
   open: () => void
   isOpen: boolean
