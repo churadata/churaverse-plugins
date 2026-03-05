@@ -15,21 +15,6 @@ export class DialogSwitcher implements IDialogSwitcher {
 
   public constructor(private readonly eventBus: IEventBus<IMainScene>) {}
 
-  /**
-   * dialogの外側がクリックされたときの挙動
-   * 
-   */
-  private readonly onOutsideClick = (event: MouseEvent) => {
-    if (this.target === null) return
-
-    const dialog = this.dialogs.get(this.target)
-    if (dialog === undefined) return
-
-    const node = (dialog as unknown as { node?: HTMLElement }).node
-    if (node instanceof HTMLElement && !node.contains(event.target as Node)) {
-      this.close()
-    }
-  }
 
   /**
    * ダイアログを管理対象にする
@@ -62,7 +47,7 @@ export class DialogSwitcher implements IDialogSwitcher {
     this.eventBus.post(new ActivateUiEvent(targetDialog) as CVEvent<Scenes>)
 
     /**
-     * 遅延をつけて、ダイアログが開いてから外側クリックのイベントリスナーを追加する
+     * onOutsideClickが即時発火するのを防ぐため、遅延をつけてイベントリスナーを追加
      */
     setTimeout(() => {
       if (this.target === name) {
@@ -84,6 +69,21 @@ export class DialogSwitcher implements IDialogSwitcher {
       this.postCloseCallbacks.get(this.target)?.()
       this.eventBus.post(new DeactivateUiEvent(targetDialog) as CVEvent<Scenes>)
       this.target = null
+    }
+  }
+
+  /**
+   * dialogの外側がクリックされたときの挙動
+   * 
+   */
+  private readonly onOutsideClick = (event: MouseEvent) => {
+    if (this.target === null) return
+
+    const dialog = this.dialogs.get(this.target)
+    if (dialog === undefined) return
+
+    if (!dialog.node.contains(event.target as Node)) {
+      this.close()
     }
   }
 }
