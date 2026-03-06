@@ -1,23 +1,24 @@
 import { IMainScene, EntitySpawnEvent, LivingDamageEvent } from 'churaverse-engine-server'
 import { NetworkPluginStore } from '@churaverse/network-plugin-server/store/defNetworkPluginStore'
-import { BaseGamePlugin } from '@churaverse/game-plugin-server/domain/baseGamePlugin'
 import { CHURAREN_CONSTANTS } from '@churaverse/churaren-core-plugin-server'
 import { TrapPluginStore } from './store/defTrapPluginStore'
 import { TrapHitMessage } from './message/trapHitMessage'
 import { SocketController } from './controller/socketController'
 import { initTrapPluginStore } from './store/initTrapPluginStore'
-import { Trap } from './domain/trap'
+import { Trap, TRAP_ITEM } from './domain/trap'
 import { RegisterOnOverlapEvent } from '@churaverse/collision-detection-plugin-server/event/registerOnOverlap'
 import { Boss } from '@churaverse/churaren-boss-plugin-server/domain/boss'
 import { TrapDamageCause } from './domain/trapDamageCause'
+import { BaseAlchemyItemPlugin } from '@churaverse/churaren-alchemy-plugin-server/domain/baseAlchemyItemPlugin'
 import '@churaverse/churaren-boss-plugin-server/store/defBossPluginStore'
 import '@churaverse/churaren-core-plugin-server/event/churarenResultEvent'
 
-export class TrapPlugin extends BaseGamePlugin {
+export class TrapPlugin extends BaseAlchemyItemPlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
   private trapPluginStore!: TrapPluginStore
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private socketController?: SocketController
+  protected alchemyItem = TRAP_ITEM
 
   public listenEvent(): void {
     super.listenEvent()
