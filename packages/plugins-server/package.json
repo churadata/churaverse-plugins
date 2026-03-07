@@ -1,5 +1,5 @@
 {
-  "name": "churaverse-plugins-client",
+  "name": "churaverse-plugins-server",
   "private": true,
   "description": "Lint/format root for client plugins",
   "scripts": {
