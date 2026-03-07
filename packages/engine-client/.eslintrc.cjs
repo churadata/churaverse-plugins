@@ -1,8 +1,5 @@
 module.exports = {
   extends: ['../../.eslintrc.base.cjs', 'plugin:react/recommended'],
-  parserOptions: {
-    project: './tsconfig.json',
-  },
   plugins: ['react'],
   rules: {
     'react/jsx-filename-extension': ['warn', { extensions: ['.jsx', '.tsx'] }],

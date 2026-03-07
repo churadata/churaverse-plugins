@@ -1,8 +1,5 @@
 module.exports = {
   extends: ['../../.eslintrc.base.cjs'],
-  parserOptions: {
-    project: './tsconfig.json',
-  },
   rules: {
     'import/no-restricted-paths': [
       'error',
