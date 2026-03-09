@@ -1,5 +1,5 @@
 import { BasePlugin, getChuraverseConfig, IMeetingScene } from 'churaverse-engine-client'
-import { Room, RoomEvent, RoomOptions, VideoPresets, Track, RemoteTrack, RemoteParticipant, Participant, DataPacket_Kind } from 'livekit-client'
+import { Room, RoomEvent, RoomOptions, VideoPresets, Track, RemoteParticipant, Participant, DataPacket_Kind } from 'livekit-client'
 import {
   MIC_TOGGLE_BUTTON_ID,
   CAMERA_TOGGLE_BUTTON_ID,
@@ -13,9 +13,9 @@ import { MeetingPluginStore, ChatMessage } from './store/defMeetingPluginStore'
 import { initMeetingPluginStore } from './store/initMeetingPluginStore'
 import { readCookie } from './utils/cookieUtils'
 import { fetchLivekitToken } from './utils/fetchLivekitToken'
-import { VideoGridUi } from './ui/VideoGridUi'
-import { ParticipantListUi } from './ui/ParticipantListUi'
-import { ChatUi } from './ui/ChatUi'
+import { VideoGridUi } from './ui/videoGridUi'
+import { ParticipantListUi } from './ui/participantListUi'
+import { ChatUi } from './ui/chatUi'
 
 const MEETING_ROOM_NAME = 'meeting-room'
 
@@ -207,7 +207,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       } else if (message.type === 'chat' && typeof message.text === 'string' && participant !== undefined) {
         const chatMsg: ChatMessage = {
           type: 'chat',
-          sender: message.sender as string,
+          sender: message.sender,
           text: message.text,
           timestamp: typeof message.timestamp === 'number' ? message.timestamp : Date.now(),
         }
