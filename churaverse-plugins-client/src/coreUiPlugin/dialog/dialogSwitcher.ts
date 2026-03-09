@@ -15,7 +15,6 @@ export class DialogSwitcher implements IDialogSwitcher {
 
   public constructor(private readonly eventBus: IEventBus<IMainScene>) {}
 
-
   /**
    * ダイアログを管理対象にする
    * @param name 名前
@@ -82,7 +81,7 @@ export class DialogSwitcher implements IDialogSwitcher {
     const dialog = this.dialogs.get(this.target)
     if (dialog === undefined) return
 
-    if (!dialog.node.contains(event.target as Node)) {
+    if (event.target instanceof Node && !dialog.node.contains(event.target)) {
       this.close()
     }
   }
