@@ -5,6 +5,7 @@ import { HealingPotionPlugin } from '@churaverse/churaren-healing-potion-plugin-
 import { RevivalItemPlugin } from '@churaverse/churaren-revival-item-plugin-client'
 import { ExplosionPlugin } from '@churaverse/churaren-explosion-plugin-client'
 import { WaterRingPlugin } from '@churaverse/churaren-water-ring-plugin-client'
+import { IceArrowPlugin } from '@churaverse/churaren-ice-arrow-plugin-client'
 
 export const alchemyItemPlugins: Array<typeof BaseAlchemyItemPlugin> = [
   HealingPotionPlugin,
@@ -13,4 +14,5 @@ export const alchemyItemPlugins: Array<typeof BaseAlchemyItemPlugin> = [
   TornadoPlugin,
   FlamePillarPlugin,
   WaterRingPlugin,
+  IceArrowPlugin
 ]
