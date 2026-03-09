@@ -11,10 +11,12 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@churaverse/churaren-tornado-plugin-server": "file:../tornadoPlugin",
     "@churaverse/churaren-flame-pillar-plugin-server": "file:../flamePillarPlugin",
     "@churaverse/churaren-healing-potion-plugin-server": "file:../healingPotionPlugin",
     "@churaverse/churaren-revival-item-plugin-server": "file:../revivalItemPlugin",
     "@churaverse/churaren-explosion-plugin-server": "file:../explosionPlugin",
+    "@churaverse/churaren-ice-arrow-plugin-server": "file:../iceArrowPlugin",
     "@churaverse/churaren-alchemy-plugin-server": "file:../../churarenAlchemyPlugin"
   }
 }
