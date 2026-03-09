@@ -53,7 +53,6 @@ export class Trap extends AlchemyItem implements ICollidableEntity, ChurarenWeap
   }
 
   public die(): void {
-    console.log(`Trap ${this.trapId} is triggered!`)
     this._isDead = true
     this.isCollidable = false
   }
