@@ -1,5 +1,5 @@
 import { MessageType } from './message/messages'
-import { Scenes } from 'churaverse-engine-client'
+import { IEventBus, Scenes } from 'churaverse-engine-client'
 import { MessageBuffer } from './buffer'
 import { Socket } from './socket/socket'
 import { Packet, SendMessage } from './socket/packet'
@@ -82,5 +82,13 @@ export class MessageManagerHelper<Scene extends Scenes> {
 
   public get socketId(): string {
     return this.socket.socketId
+  }
+
+  public get connected(): boolean {
+    return this.socket.connected
+  }
+
+  public socketEventToBusEvent(eventBus: IEventBus<Scenes>): void {
+    this.socket.socketEventToBusEvent(eventBus)
   }
 }

@@ -12,7 +12,7 @@ export const PLAYER_COLOR_BUTTON_ID: (colorName: PlayerColor) => string = (color
  * プレイヤーの色を変更するボタン
  */
 export class PlayerColorButtons {
-  protected readonly playerId: string
+  protected playerId: string
   protected colorButtons = new Map<PlayerColor, HTMLInputElement>()
 
   protected constructor(
@@ -56,5 +56,9 @@ export class PlayerColorButtons {
   private onClick(color: PlayerColor): void {
     const changeColorEvent = new PlayerColorChangeEvent(this.playerId, color)
     this.eventBus.post(changeColorEvent)
+  }
+
+  public updatePlayerId(playerId: string): void {
+    this.playerId = playerId
   }
 }
