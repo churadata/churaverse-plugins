@@ -37,10 +37,12 @@ export class MegaphoneIcon extends TopBarIconRenderer {
   private activateMegaphone(): void {
     this.eventBus.post(new ToggleMegaphoneEvent(this.playerId, true))
     super.activate()
+    window.alert('メガホン機能がオンになりました\nあなたの声は離れている参加者にも聞こえます')
   }
 
   private deactivateMegaphone(): void {
     this.eventBus.post(new ToggleMegaphoneEvent(this.playerId, false))
     super.deactivate()
+    window.alert('メガホン機能がオフになりました\nあなたの声は近くの参加者にのみ聞こえます')
   }
 }
