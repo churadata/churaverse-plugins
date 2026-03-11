@@ -1,4 +1,12 @@
-import { IEventBus, IMainScene, Store, EntityDespawnEvent, EntitySpawnEvent, Position, Vector } from 'churaverse-engine-server'
+import {
+  IEventBus,
+  IMainScene,
+  Store,
+  EntityDespawnEvent,
+  EntitySpawnEvent,
+  Position,
+  Vector,
+} from 'churaverse-engine-server'
 import { Player } from '../domain/player'
 import { NetworkDisconnectEvent } from '@churaverse/network-plugin-server/event/networkDisconnectEvent'
 import { RegisterMessageEvent } from '@churaverse/network-plugin-server/event/registerMessageEvent'
@@ -24,6 +32,7 @@ import { WeaponDamageMessage } from '../message/weaponDamageMessage'
 import { PlayerDieMessage } from '../message/playerDieMessage'
 import { PlayerRespawnMessage } from '../message/playerRespawnMessage'
 import { SendableObject } from '@churaverse/network-plugin-server/types/sendable'
+import { PlayerInvincibleTimeMessage } from '../message/playerInvincibleTimeMessage'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private networkPluginStore!: NetworkPluginStore<IMainScene>
@@ -48,6 +57,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('weaponDamage', WeaponDamageMessage, 'allClients')
     ev.messageRegister.registerMessage('playerDie', PlayerDieMessage, 'allClients')
     ev.messageRegister.registerMessage('playerRespawn', PlayerRespawnMessage, 'allClients')
+    ev.messageRegister.registerMessage('playerInvincibleTime', PlayerInvincibleTimeMessage, 'allClients')
   }
 
   private getStores(): void {
