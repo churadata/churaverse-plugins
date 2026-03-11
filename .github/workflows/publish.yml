@@ -1,68 +1,42 @@
 name: publish packages
-run-name: publish packages
 
 on:
-  pull_request:
+  push:
     branches:
-      - test/CV-854/test-workflow # 動作確認用のパッケージが存在するブランチ（修正予定）
-    types:
-      - closed
+      - main
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 permissions:
   contents: write
   id-token: write
 
 jobs:
-  publish:
-    if: ${{ github.event.pull_request.merged == true }}
+  release:
+    name: Release Packages
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          ref: test/CV-854/test-workflow # 動作確認用のパッケージが存在するブランチ（修正予定）
+          node-version: 20.20.0
+          registry-url: https://registry.npmjs.org
 
-      - uses: actions/setup-node@v4
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Changesets Release
+        uses: changesets/action@v1
         with:
-          node-version: 20
-          registry-url: https://registry.npmjs.org/
-
-      - name: configure git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Check publish.txt
-        run: |
-          if [ ! -f publish.txt ]; then
-            echo "publish.txt not found, skip publish"
-            exit 0
-          fi
-
-      - name: Publish packages
-        run: |
-          set -e
-
-          while read ENTRY; do
-            # ENTRY 例: @churaverse/bomb-plugin-server/v1.2.3
-
-            # ENTRY からパッケージ名を取り出す
-            PKG=$(echo "$ENTRY" | sed 's|/v[0-9].*$||')
-            PKG_PATH=$(./.github/scripts/resolve-package-path.sh "$PKG")
-
-            echo "🚀 publishing $ENTRY"
-            npm publish --access public --prefix "$PKG_PATH"
-
-            git tag "$ENTRY"
-          done < publish.txt
-
-      - name: Cleanup publish.txt
-        run: |
-          rm publish.txt
-          git add publish.txt
-          git commit -m "chore: consume publish.txt after publish"
-          git push origin main
-
-      - name: Push tags
-        run: |
-          git push origin --tags
+          version: pnpm changeset version
+          publish: pnpm changeset publish
