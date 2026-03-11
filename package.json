@@ -1,9 +1,6 @@
 {
   "name": "churaverse-plugins",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "volta": {
     "node": "20.20.0",
     "pnpm": "10.28.1"
@@ -16,7 +13,7 @@
     "format": "pnpm -r --filter ./packages/* run format"
   },
   "devDependencies": {
-    "typescript": "^5.4.0",
+    "@changesets/cli": "^2.30.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-standard-with-typescript": "^43.0.1",
@@ -28,6 +25,7 @@
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "prettier": "^3.2.5"
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.0"
   }
 }
