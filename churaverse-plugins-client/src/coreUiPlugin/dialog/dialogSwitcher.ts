@@ -52,7 +52,7 @@ export class DialogSwitcher implements IDialogSwitcher {
       if (this.target === name) {
         document.addEventListener('click', this.onOutsideClick)
       }
-    }, 0)
+    })
   }
 
   /**
