@@ -33,8 +33,18 @@ export class VoiceChatReceiver {
   /**
    * ボイスチャット開始時に実行される関数
    * LiveKit が source を Unknown と扱っても track.kind=audio なら受ける。
-  */
+   */
   private onJoin(track: RemoteTrack, publication: RemoteTrackPublication, participant: RemoteParticipant): void {
+    if (track.source !== Track.Source.Microphone) return
+
+    const remoteTrackPublication = participant.getTrackPublication(Track.Source.Microphone)
+    if (remoteTrackPublication?.audioTrack == null || remoteTrackPublication.track == null) {
+      return
+    }
+
+    const voice = remoteTrackPublication.track.attach()
+
+    this.eventBus.post(new JoinVoiceChatEvent(participant.identity, voice))
     // LiveKit が source を Unknown として扱うケースがあるため、音声トラックなら受ける
     if (track.kind !== Track.Kind.Audio) return
 
@@ -60,7 +70,7 @@ export class VoiceChatReceiver {
       this.eventBus.post(new MuteEvent(participant.identity))
     })
 
-    participant.addListener('isSpeakingChanged', (speaking) => {
+    participant.addListener('isSpeakingChanged', () => {
       const playerMicIcon = this.playerVoiceChatUis.get(participant.identity)?.playerMicIcon
       playerMicIcon?.setAlphaToMicIcon(participant.audioLevel * 5)
     })
@@ -72,6 +82,7 @@ export class VoiceChatReceiver {
   private onLeave(track: RemoteTrack, publication: RemoteTrackPublication, participant: RemoteParticipant): void {
     if (track.kind !== Track.Kind.Audio) return
 
+    participant.getTrackPublication(Track.Source.Microphone)?.track?.detach()
     this.audioService.removeRemoteTrack(participant.identity)
     this.eventBus.post(new LeaveVoiceChatEvent(participant.identity))
   }

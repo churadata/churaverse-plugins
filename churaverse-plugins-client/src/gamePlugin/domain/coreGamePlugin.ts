@@ -18,6 +18,8 @@ import { GamePolicy } from '../interface/gamePolicy'
 import { GameMidwayJoinEvent } from '../event/gameMidwayJoinEvent'
 import { SubmitGameJoinEvent } from '../event/submitGameJoinEvent'
 import { SubmitGameJoinMessage } from '../message/submitGameJoinMessage'
+import { PlayerPluginStore } from '@churaverse/player-plugin-client/store/defPlayerPluginStore'
+import { CoreUiPluginStore } from '@churaverse/core-ui-plugin-client/store/defCoreUiPluginStore'
 
 /**
  * BaseGamePluginを拡張したCoreなゲーム抽象クラス
@@ -27,13 +29,16 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   protected abstract gameEntryRenderer: IGameSelectionListItemRenderer
   protected abstract gameName: string
   public abstract gamePolicy: GamePolicy
+  protected abstract ownerExitMessage: string
   private _isActive: boolean = false
   private _gameOwnerId?: string
   private _joinedPlayerIds: string[] = []
   private _isJoined: boolean = false
   private _gameState: GameState = 'inactive'
   protected gamePluginStore!: GamePluginStore
+  protected playerPluginStore!: PlayerPluginStore
   private networkPluginStore!: NetworkPluginStore<IMainScene>
+  private coreUiPluginStore!: CoreUiPluginStore
 
   public get isActive(): boolean {
     return this._isActive
@@ -81,7 +86,9 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
 
   private init(): void {
     this.gamePluginStore = this.store.of('gamePlugin')
+    this.playerPluginStore = this.store.of('playerPlugin')
     this.networkPluginStore = this.store.of('networkPlugin')
+    this.coreUiPluginStore = this.store.of('coreUiPlugin')
   }
 
   private priorGameData(ev: PriorGameDataEvent): void {
@@ -101,10 +108,14 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._gameState = 'host'
     this._gameOwnerId = ev.ownerId
     this.gameInfoStore.games.set(this.gameId, this)
+    this.gamePluginStore.gameAbortAlertConfirm.setGameAbortMessage(this.gameName)
     this.gamePluginStore.countdownTimer.start(ev.timeoutSec)
-    if (ev.ownerId === this.store.of('playerPlugin').ownPlayerId) {
+
+    if (ev.ownerId === this.playerPluginStore.ownPlayerId) {
       this.gamePluginStore.gameDescriptionDialogManager.showDialog(this.gameId, 'viewOnly')
       this.bus.post(new SubmitGameJoinEvent(this.gameId, true))
+
+      this.coreUiPluginStore.exitButton.setExitMessage(`${this.ownerExitMessage}`)
     } else {
       this.gamePluginStore.gameDescriptionDialogManager.showDialog(this.gameId, 'joinable')
     }
@@ -136,6 +147,11 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this.gamePluginStore.countdownTimer.close()
     this.gamePluginStore.gameDescriptionDialogManager.closeDialog()
     this.gamePluginStore.gameLogRenderer.gameStartLog(this.gameName, this.gameOwnerId ?? '')
+    this.gameInfoStore.games.set(this.gameId, this)
+    this.gamePluginStore.gameAbortAlertConfirm.setGameAbortMessage(this.gameName)
+    if (this._gameOwnerId === this.playerPluginStore.ownPlayerId) {
+      this.coreUiPluginStore.exitButton.setExitMessage(`${this.ownerExitMessage}`)
+    }
   }
 
   private gameAbort(ev: GameAbortEvent): void {
@@ -158,6 +174,8 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
     this._joinedPlayerIds = []
     this.gameInfoStore.games.delete(this.gameId)
     this._gameState = 'inactive'
+
+    this.coreUiPluginStore.exitButton.setExitMessage('このミーティングから退出しますか？')
 
     if (this.isJoined) {
       this.gamePluginStore.gameUiManager.removeAllUis(this.gameId)
@@ -192,10 +210,10 @@ export abstract class CoreGamePlugin extends BaseGamePlugin implements IGameInfo
   protected abstract handlePlayerQuitGame(playerId: string): void
 
   private gameMidwayJoin(ev: GameMidwayJoinEvent): void {
-    if (!this.isActive || !ev.joinedPlayerIds.includes(this.store.of('playerPlugin').ownPlayerId)) return
+    if (!this.isActive || !ev.joinedPlayerIds.includes(this.playerPluginStore.ownPlayerId)) return
     this.gamePluginStore.gameLogRenderer.gameMidwayJoinLog(this.gameName, ev.joinPlayerId)
     this._joinedPlayerIds = ev.joinedPlayerIds
-    if (ev.joinPlayerId === this.store.of('playerPlugin').ownPlayerId) {
+    if (ev.joinPlayerId === this.playerPluginStore.ownPlayerId) {
       this.gameEntryRenderer.onGameStart(this.gameId, true)
     }
   }

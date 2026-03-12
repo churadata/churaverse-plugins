@@ -34,6 +34,7 @@
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "dependencies": {
+    "livekit-client": "^2.15.6",
     "phaser": "^3.80.1",
     "@churaverse/core-ui-plugin-client": "~0.1.0",
     "@churaverse/debug-screen-plugin-client": "~0.1.0",
