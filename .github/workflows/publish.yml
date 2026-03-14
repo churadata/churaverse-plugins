@@ -1,4 +1,5 @@
 name: publish packages
+run-name: Changesets Release
 
 on:
   push:
@@ -9,6 +10,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 permissions:
   contents: write
+  pull-requests: write
   id-token: write
 
 jobs:
@@ -20,23 +22,43 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.1
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20.20.0
           registry-url: https://registry.npmjs.org
 
-      - name: Enable Corepack
-        run: corepack enable
+      - name: Update npm
+        run: npm install -g npm@11.8.0
+
+      - name: List workspace packages
+        run: pnpm -r list --depth -1
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Build packages
         run: pnpm build
 
+      - name: Show release plan
+        run: |
+          if ls .changeset/*.md 1> /dev/null 2>&1; then
+            echo "🦋 Release plan"
+            pnpm changeset status
+          fi
+
       - name: Changesets Release
+        id: changesets
         uses: changesets/action@v1
         with:
           version: pnpm changeset version
           publish: pnpm changeset publish
+          commit: "chore: version packages"
+          title: "chore: release packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
