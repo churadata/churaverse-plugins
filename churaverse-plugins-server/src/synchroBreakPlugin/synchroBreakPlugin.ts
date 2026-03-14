@@ -22,6 +22,9 @@ import { IGameSequence } from './interface/IGameSequence'
 import { GameSequence } from './logic/gameSequence'
 import { GamePolicy } from '@churaverse/game-plugin-server/interface/gamePolicy'
 
+export const SYNCHRO_BREAK_MID_RESULT_TIME_LIMIT = 3000
+export const BET_TIMER_TIME_LIMIT = 20000 // 20 秒
+
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
   public readonly gamePolicy: GamePolicy = {
@@ -138,6 +141,9 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   private readonly timeLimitConfirm = (ev: TimeLimitConfirmEvent): void => {
     this.synchroBreakPluginStore.timeLimit = Number(ev.timeLimit)
+    this.gameSequence.processTurnSequence().catch((error) => {
+      console.error('ゲーム開始確認処理でエラーが発生しました:', error)
+    })
   }
 
   /**
@@ -226,6 +232,9 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const turnNumber = ev.turnNumber
     const synchroBreakTurnStartMessage = new SynchroBreakTurnStartMessage({ turnNumber })
     this.networkPluginStore.messageSender.send(synchroBreakTurnStartMessage)
+    this.gameSequence.processTurnSequence().catch((error) => {
+      console.error('ゲーム開始確認処理でエラーが発生しました:', error)
+    })
   }
 
   /**
