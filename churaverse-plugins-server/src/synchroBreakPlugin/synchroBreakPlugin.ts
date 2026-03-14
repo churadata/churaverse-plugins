@@ -92,7 +92,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     for (const playerId of this.joinedPlayerIds) {
       this.synchroBreakPluginStore.playersCoinRepository.set(playerId, this.initialPlayerCoins)
     }
-
     const sortedPlayersCoin = this.synchroBreakPluginStore.playersCoinRepository.sortedPlayerCoins()
     this.networkPluginStore.messageSender.send(new UpdatePlayersCoinMessage({ playersCoin: sortedPlayersCoin }))
   }
