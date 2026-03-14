@@ -213,8 +213,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * ターンが設定された時の処理
    */
   private readonly synchroBreakTurnSelect = (ev: SynchroBreakTurnSelectEvent): void => {
-    if (this.isOwnPlayerMidwayParticipant) return
-
     this.synchroBreakPluginStore.gameTurn = ev.allTurn
 
     if (this.gameOwnerId === this.playerPluginStore.ownPlayerId) {
@@ -289,8 +287,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   }
 
   private readonly updateBetTimer = (ev: BetTimeRemainingEvent): void => {
-    if (this.isOwnPlayerMidwayParticipant) return
-
     this.betTimer.updateTimer(ev.remainingTime)
 
     if (ev.remainingTime <= 0) {
@@ -361,7 +357,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * 結果表示のハンドラー
    */
   private readonly handleSynchroBreakResult = (ev: SynchroBreakResultEvent): void => {
-    if (this.isOwnPlayerMidwayParticipant) return
     this.resultHandlers[ev.resultScreenType]()
   }
 
