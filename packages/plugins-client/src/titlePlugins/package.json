@@ -1,6 +1,11 @@
 {
   "name": "@churaverse/title-plugin-client",
   "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/churadata/churaverse-plugins.git",
+    "directory": "packages/plugins-client/src/titlePlugins"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc && bash copyAssetsToDist.sh",
@@ -28,5 +33,9 @@
     "@churaverse/player-plugin-client": "workspace:*",
     "@churaverse/transition-plugin-client": "workspace:*",
     "churaverse-engine-client": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

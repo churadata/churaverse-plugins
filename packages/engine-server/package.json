@@ -1,6 +1,11 @@
 {
   "name": "churaverse-engine-server",
   "version": "0.1.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/churadata/churaverse-plugins.git",
+    "directory": "packages/engine-server"
+  },
   "description": "",
   "type": "commonjs",
   "module": "dist/index.js",
@@ -22,5 +27,9 @@
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.11.23"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

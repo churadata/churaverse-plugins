@@ -1,6 +1,11 @@
 {
   "name": "@churaverse/ground-screen-plugin-client",
   "version": "0.1.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/churadata/churaverse-plugins.git",
+    "directory": "packages/plugins-client/src/groundScreenPlugin"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc",
@@ -25,5 +30,9 @@
     "@churaverse/core-ui-plugin-client": "workspace:*",
     "@churaverse/map-plugin-client": "workspace:*",
     "churaverse-engine-client": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

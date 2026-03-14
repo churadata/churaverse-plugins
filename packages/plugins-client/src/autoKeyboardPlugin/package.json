@@ -1,6 +1,11 @@
 {
   "name": "@churaverse/auto-keyboard-plugin-client",
   "version": "0.1.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/churadata/churaverse-plugins.git",
+    "directory": "packages/plugins-client/src/autoKeyboardPlugin"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc",
@@ -24,5 +29,9 @@
     "@churaverse/keyboard-plugin-client": "workspace:*",
     "churaverse-engine-client": "workspace:*",
     "phaser": "^3.80.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

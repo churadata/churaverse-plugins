@@ -1,6 +1,11 @@
 {
   "name": "@churaverse/kick-plugin-server",
   "version": "0.1.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/churadata/churaverse-plugins.git",
+    "directory": "packages/plugins-server/src/kickPlugin"
+  },
   "description": "",
   "main": "dist/index.js",
   "types": "dist/types/index.d.ts",
@@ -15,5 +20,9 @@
     "@churaverse/collision-detection-plugin-server": "workspace:*",
     "@churaverse/network-plugin-server": "workspace:*",
     "@churaverse/player-plugin-server": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

@@ -1,6 +1,11 @@
 {
   "name": "@churaverse/popup-screen-list-plugin-client",
   "version": "0.1.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/churadata/churaverse-plugins.git",
+    "directory": "packages/plugins-client/src/popUpScreenListPlugin"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc && bash copyAssetsToDist.sh",
@@ -24,5 +29,9 @@
     "phaser": "^3.80.1",
     "@churaverse/web-rtc-plugin-client": "workspace:*",
     "churaverse-engine-client": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

@@ -1,6 +1,11 @@
 {
   "name": "@churaverse/debug-screen-plugin-client",
   "version": "0.1.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/churadata/churaverse-plugins.git",
+    "directory": "packages/plugins-client/src/debugScreenPlugin"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc && bash copyAssetsToDist.sh",
@@ -24,5 +29,9 @@
     "@churaverse/core-ui-plugin-client": "workspace:*",
     "@churaverse/keyboard-plugin-client": "workspace:*",
     "churaverse-engine-client": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

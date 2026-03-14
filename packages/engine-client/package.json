@@ -1,6 +1,11 @@
 {
   "name": "churaverse-engine-client",
   "version": "0.1.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/churadata/churaverse-plugins.git",
+    "directory": "packages/engine-client"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -36,5 +41,9 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

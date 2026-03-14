@@ -1,6 +1,11 @@
 {
   "name": "@churaverse/shark-plugin-client",
   "version": "0.1.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/churadata/churaverse-plugins.git",
+    "directory": "packages/plugins-client/src/sharkPlugin"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc && bash copyAssetsToDist.sh",
@@ -27,5 +32,9 @@
     "@churaverse/network-plugin-client": "workspace:*",
     "@churaverse/player-plugin-client": "workspace:*",
     "churaverse-engine-client": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

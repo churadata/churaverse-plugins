@@ -1,6 +1,11 @@
 {
   "name": "@churaverse/camera-video-chat-plugin-client",
   "version": "0.1.6",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/churadata/churaverse-plugins.git",
+    "directory": "packages/plugins-client/src/cameraVideoChatPlugin"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc && bash copyAssetsToDist.sh",
@@ -30,5 +35,9 @@
     "@livekit/track-processors": "^0.5.8",
     "churaverse-engine-client": "workspace:*",
     "livekit-client": "^2.15.6"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

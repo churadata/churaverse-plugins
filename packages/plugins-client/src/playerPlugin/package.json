@@ -1,6 +1,11 @@
 {
   "name": "@churaverse/player-plugin-client",
   "version": "0.1.4",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/churadata/churaverse-plugins.git",
+    "directory": "packages/plugins-client/src/playerPlugin"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc && bash copyAssetsToDist.sh",
@@ -32,5 +37,9 @@
     "@churaverse/voice-chat-plugin-client": "workspace:*",
     "churaverse-engine-client": "workspace:*",
     "phaser": "^3.80.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

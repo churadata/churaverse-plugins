@@ -1,6 +1,11 @@
 {
   "name": "@churaverse/bomb-plugin-client",
   "version": "0.1.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/churadata/churaverse-plugins.git",
+    "directory": "packages/plugins-client/src/bombPlugin"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc && bash copyAssetsToDist.sh",
@@ -27,5 +32,9 @@
     "@churaverse/player-plugin-client": "workspace:*",
     "churaverse-engine-client": "workspace:*",
     "phaser": "^3.80.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }
