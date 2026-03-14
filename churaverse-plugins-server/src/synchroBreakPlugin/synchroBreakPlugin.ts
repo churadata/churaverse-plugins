@@ -158,21 +158,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const currentCoins = coins - betCoins
     this.synchroBreakPluginStore.playersCoinRepository.set(playerId, currentCoins)
     this.networkPluginStore.messageSender.send(new SendBetCoinResponseMessage({ playerId, betCoins, currentCoins }))
-
-    this.checkAndStartGameIfAllBet()
-  }
-
-  /**
-   * 全プレイヤーがベットしているか確認し、全プレイヤーがベットしている場合にゲームを開始する
-   */
-  private checkAndStartGameIfAllBet(): void {
-    const betCoinPlayerNumber = this.synchroBreakPluginStore.betCoinRepository.getBetCoinPlayerCount()
-    const totalPlayerNum = this.joinedPlayerIds.length
-    if (betCoinPlayerNumber >= totalPlayerNum) {
-      this.gameSequence.processTurnSequence().catch((error) => {
-        console.error('ゲーム開始確認処理でエラーが発生しました:', error)
-      })
-    }
   }
 
   /**
