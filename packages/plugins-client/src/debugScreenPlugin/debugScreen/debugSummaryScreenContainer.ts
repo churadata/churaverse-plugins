@@ -13,15 +13,15 @@ export const PRIMARY_COLOR = 'lightsteelblue'
 export class DebugSummaryScreenContainer implements IDebugSummaryScreenContainer {
   private readonly sections = new Map<DebugScreenSectionId, DebugSummaryScreenSection>()
 
-  private readonly container: HTMLElement
+  public readonly node: HTMLElement
   private readonly visibleDisplayStyle = 'flex'
   private _isOpen = false
 
   public constructor(eventBus: IEventBus<IMainScene>) {
     const dialogPanelElement = DomManager.addJsxDom(DebugScreenBoardComponent())
-    this.container = dialogPanelElement
+    this.node = dialogPanelElement
     const dumpButton = new DebugScreenDumpButton(eventBus)
-    this.container.appendChild(dumpButton.buttonElement)
+    this.node.appendChild(dumpButton.buttonElement)
     this.close()
   }
 
@@ -31,7 +31,7 @@ export class DebugSummaryScreenContainer implements IDebugSummaryScreenContainer
    */
   public addSection(section: DebugSummaryScreenSection): void {
     this.sections.set(section.sectionId, section)
-    this.container.appendChild(section.node)
+    this.node.appendChild(section.node)
   }
 
   /**
@@ -51,12 +51,12 @@ export class DebugSummaryScreenContainer implements IDebugSummaryScreenContainer
 
   public open(): void {
     this._isOpen = true
-    this.container.style.display = this.visibleDisplayStyle
+    this.node.style.display = this.visibleDisplayStyle
   }
 
   public close(): void {
     this._isOpen = false
-    this.container.style.display = 'none'
+    this.node.style.display = 'none'
   }
 
   public get isOpen(): boolean {

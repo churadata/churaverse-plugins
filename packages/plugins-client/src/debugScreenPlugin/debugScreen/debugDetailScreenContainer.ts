@@ -9,13 +9,13 @@ import { DebugDetailScreenSection } from './debugDetailScreenSection'
 export class DebugDetailScreenContainer implements IDebugDetailScreenContainer {
   private readonly sections = new Map<DebugDetailScreenSectionId, DebugDetailScreenSection>()
 
-  private readonly container: HTMLElement
+  public readonly node: HTMLElement
   private readonly visibleDisplayStyle = 'flex'
   private _isOpen = false
 
   public constructor() {
     const dialogPanelElement = DomManager.addJsxDom(DebugDetailScreenBoardComponent())
-    this.container = dialogPanelElement
+    this.node = dialogPanelElement
     this.close()
   }
 
@@ -25,7 +25,7 @@ export class DebugDetailScreenContainer implements IDebugDetailScreenContainer {
    */
   public addSection(section: DebugDetailScreenSection): void {
     this.sections.set(section.sectionId, section)
-    this.container.appendChild(section.node)
+    this.node.appendChild(section.node)
   }
 
   /**
@@ -45,12 +45,12 @@ export class DebugDetailScreenContainer implements IDebugDetailScreenContainer {
 
   public open(): void {
     this._isOpen = true
-    this.container.style.display = this.visibleDisplayStyle
+    this.node.style.display = this.visibleDisplayStyle
   }
 
   public close(): void {
     this._isOpen = false
-    this.container.style.display = 'none'
+    this.node.style.display = 'none'
   }
 
   public get isOpen(): boolean {
