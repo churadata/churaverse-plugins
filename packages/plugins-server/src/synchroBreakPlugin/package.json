@@ -23,9 +23,6 @@
     "@churaverse/network-plugin-server": "workspace:*",
     "@churaverse/game-plugin-server": "workspace:*"
   },
-  "devDependencies": {
-    "@types/node": "^20"
-  },
   "publishConfig": {
     "access": "public",
     "provenance": true
