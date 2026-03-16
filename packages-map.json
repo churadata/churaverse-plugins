@@ -1,0 +1,4 @@
+{
+  "@churaverse-ci-test/test-plugin-server": "churaverse-plugins-server/src/testPlugin",
+  "@churaverse-ci-test/test-plugin-client": "churaverse-plugins-client/src/testPlugin"
+}

@@ -1,5 +1,5 @@
 import { IMainScene, Store, DomManager, makeLayerHigherTemporary, domLayerSetting } from 'churaverse-engine-client'
-import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
+import { IBetCoinFormContainer } from '../../interface/IBetCoinFormContainer'
 import { SendBetCoinMessage } from '../../message/sendBetCoinMessage'
 import { BetCoinForm } from './component/BetCoinForm'
 
@@ -19,10 +19,11 @@ export const BET_COIN_SEND_BUTTON_ID = 'bet-coin-send-button'
 export const SYNCHRO_BREAK_MIN_BET_COIN: number = 0
 export const SYNCHRO_BREAK_MAX_BET_COIN: number = 999
 
-export class BetCoinFormContainer implements IGameUiComponent {
+export class BetCoinFormContainer implements IBetCoinFormContainer {
   public element!: HTMLElement
   public readonly visible: boolean = false
   private betCoinInputField!: HTMLInputElement
+  private isSend: boolean = false
 
   public constructor(private readonly store: Store<IMainScene>) {}
 
@@ -39,6 +40,20 @@ export class BetCoinFormContainer implements IGameUiComponent {
     this.setBetCoinFormContainer()
     const ownPlayerId = this.store.of('playerPlugin').ownPlayerId
     this.setupInputFields(ownPlayerId)
+    this.isSend = false
+  }
+
+  /**
+   * タイムアウト時に、フォームに入力されているベットコインの枚数をポストする
+   */
+  public postBetCoinOnTimeout(ownPlayerId: string): void {
+    if (this.isSend) return
+
+    const betCoins = this.isValidBetAmount(ownPlayerId) ? this.inputFieldValue : SYNCHRO_BREAK_MIN_BET_COIN
+    this.store.of('networkPlugin').messageSender.send(new SendBetCoinMessage({ playerId: ownPlayerId, betCoins }))
+    this.inputFieldValue = SYNCHRO_BREAK_MIN_BET_COIN
+    this.isSend = true
+    this.close()
   }
 
   /**
@@ -48,12 +63,13 @@ export class BetCoinFormContainer implements IGameUiComponent {
     this.betCoinInputField = DomManager.getElementById<HTMLInputElement>(BET_COIN_INPUT_FIELD_ID)
     const sendButton = DomManager.getElementById(BET_COIN_SEND_BUTTON_ID)
     sendButton.onclick = () => {
-      const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
-      const betCoins = this.inputFieldValue
+      const isBetAmountValid = this.isValidBetAmount(ownPlayerId)
+      const betCoins = isBetAmountValid ? this.inputFieldValue : SYNCHRO_BREAK_MIN_BET_COIN
 
-      if (SYNCHRO_BREAK_MIN_BET_COIN <= betCoins && betCoins <= ownPlayerCoins) {
+      if (isBetAmountValid) {
         this.store.of('networkPlugin').messageSender.send(new SendBetCoinMessage({ playerId: ownPlayerId, betCoins }))
         this.inputFieldValue = SYNCHRO_BREAK_MIN_BET_COIN
+        this.isSend = true
         this.close()
       } else {
         this.inputFieldValue = SYNCHRO_BREAK_MIN_BET_COIN
@@ -61,21 +77,79 @@ export class BetCoinFormContainer implements IGameUiComponent {
     }
 
     const plusButton = DomManager.getElementById(BET_COIN_INCREMENT_BUTTON_ID)
-    plusButton.onclick = () => {
-      const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
-      const betCoins = this.inputFieldValue
 
-      if (betCoins >= ownPlayerCoins || betCoins >= SYNCHRO_BREAK_MAX_BET_COIN) return
-      this.inputFieldValue = betCoins + 1
+    plusButton.onclick = () => {
+      this.incrementBetCoin(ownPlayerId)
     }
+
+    this.setupLongPress(plusButton, () => {
+      this.incrementBetCoin(ownPlayerId)
+    })
 
     const minusButton = DomManager.getElementById(BET_COIN_DECREMENT_BUTTON_ID)
-    minusButton.onclick = () => {
-      const betCoins = this.inputFieldValue
 
-      if (betCoins <= SYNCHRO_BREAK_MIN_BET_COIN) return
-      this.inputFieldValue = betCoins - 1
+    minusButton.onclick = () => {
+      this.decrementBetCoin()
     }
+
+    this.setupLongPress(minusButton, () => {
+      this.decrementBetCoin()
+    })
+  }
+
+  /**
+   * ベットコイン枚数が有効な範囲内かチェックする
+   */
+  private isValidBetAmount(ownPlayerId: string): boolean {
+    const betCoins = this.inputFieldValue
+    const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
+    return SYNCHRO_BREAK_MIN_BET_COIN <= betCoins && betCoins <= ownPlayerCoins
+  }
+
+  /**
+   * ベットコインをインクリメントする
+   */
+  private incrementBetCoin(ownPlayerId: string): void {
+    const ownPlayerCoins = this.store.of('synchroBreakPlugin').playersCoinRepository.get(ownPlayerId)
+    const betCoins = this.inputFieldValue
+
+    if (betCoins >= ownPlayerCoins || betCoins >= SYNCHRO_BREAK_MAX_BET_COIN) return
+    this.inputFieldValue = betCoins + 1
+  }
+
+  /**
+   * ベットコインをデクリメントする
+   */
+  private decrementBetCoin(): void {
+    const betCoins = this.inputFieldValue
+
+    if (betCoins <= SYNCHRO_BREAK_MIN_BET_COIN) return
+    this.inputFieldValue = betCoins - 1
+  }
+
+  /**
+   * ボタンの長押し機能を設定する
+   */
+  private setupLongPress(button: HTMLElement, action: () => void): void {
+    let longPressTimerId: number
+    let longPressIntervalId: number
+
+    const startLongPress = (): void => {
+      longPressTimerId = window.setTimeout(() => {
+        longPressIntervalId = window.setInterval(() => {
+          action()
+        }, 100)
+      }, 500)
+    }
+
+    const stopLongPress = (): void => {
+      clearTimeout(longPressTimerId)
+      clearInterval(longPressIntervalId)
+    }
+
+    button.addEventListener('mousedown', startLongPress)
+    button.addEventListener('mouseup', stopLongPress)
+    button.addEventListener('mouseleave', stopLongPress)
   }
 
   private setBetCoinFormContainer(): void {
@@ -89,6 +163,7 @@ export class BetCoinFormContainer implements IGameUiComponent {
 
   public open(): void {
     this.element.style.display = 'flex'
+    this.isSend = false
   }
 
   public close(): void {

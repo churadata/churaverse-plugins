@@ -30,6 +30,8 @@ import { PlayerRespawnMessage } from '../message/playerRespawnMessage'
 import { PlayerRespawnEvent } from '../event/playerRespawnEvent'
 import { WeaponDamageMessage } from '../message/weaponDamageMessage'
 import { PlayerHealMessage } from '../message/playerHealMessage'
+import { PlayerInvincibleTimeMessage } from '../message/playerInvincibleTimeMessage'
+import { PlayerInvincibleTimeEvent } from '../event/playerInvincibleTimeEvent'
 
 export class SocketController extends BaseSocketController<IMainScene> {
   private playerPluginStore!: PlayerPluginStore
@@ -56,6 +58,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageRegister.registerMessage('playerRespawn', PlayerRespawnMessage, 'queue')
     ev.messageRegister.registerMessage('weaponDamage', WeaponDamageMessage, 'queue')
     ev.messageRegister.registerMessage('playerHeal', PlayerHealMessage, 'dest=onlySelf')
+    ev.messageRegister.registerMessage('playerInvincibleTime', PlayerInvincibleTimeMessage, 'queue')
 
     // this.socket.listenEvent('disconnected', this.playerLeave.bind(this))
     // this.socket.listenAction('profile', this.playerProfileUpdate.bind(this))
@@ -72,6 +75,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     ev.messageListenerRegister.on('playerDie', this.playerDie.bind(this))
     ev.messageListenerRegister.on('playerRespawn', this.playerRespawn.bind(this))
     ev.messageListenerRegister.on('playerHeal', this.playerHeal.bind(this))
+    ev.messageListenerRegister.on('playerInvincibleTime', this.playerInvincibleTime.bind(this))
   }
 
   private receivePriorData(msg: PriorPlayerDataMessage): void {
@@ -159,5 +163,11 @@ export class SocketController extends BaseSocketController<IMainScene> {
     if (player === undefined) return
     const playerHealEvent = new LivingHealEvent(player, data.healAmount)
     this.eventBus.post(playerHealEvent)
+  }
+
+  private playerInvincibleTime(msg: PlayerInvincibleTimeMessage): void {
+    const data = msg.data
+    const invincibleTimeEvent = new PlayerInvincibleTimeEvent(data.playerId, data.invincibleTime)
+    this.eventBus.post(invincibleTimeEvent)
   }
 }

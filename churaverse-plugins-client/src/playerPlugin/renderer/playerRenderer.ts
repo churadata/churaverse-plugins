@@ -76,7 +76,7 @@ const _relativePositionToNameplate = { x: 0, y: -40 }
  */
 export class PlayerRenderer implements IPlayerRenderer {
   private readonly scene
-  private sprite
+  private readonly sprite
 
   private tween?: Phaser.Tweens.Tween
   private readonly _playerNameplateTween?: Phaser.Tweens.Tween
@@ -395,19 +395,7 @@ export class PlayerRenderer implements IPlayerRenderer {
     })
     this.hpBar.update(hp)
     this.damagetween?.stop() // 処理の途中で新たにダメージを食らった際に処理をリセットする
-    this.damagetween = this.scene.add.tween({
-      targets: this.sprite,
-      duration: 40,
-      repeat: 8, // 8回繰り返す
-      yoyo: true,
-      alpha: { start: 0, to: 1 },
-      onComplete: () => {
-        this.sprite.alpha = 1
-      },
-      onStop: () => {
-        this.sprite.alpha = 1
-      },
-    })
+    this.damagetween = this.blinkTarget(40, 8)
   }
 
   /**
@@ -537,21 +525,22 @@ export class PlayerRenderer implements IPlayerRenderer {
   }
 
   /**
-   * プレイヤーを点滅させる。一回の点滅は200ms
-   * @param blinkTime 点滅の時間
+   * 指定されたターゲットを点滅させる
+   * @param duration 1回の点滅の片道時間（ミリ秒）
+   * @param repeat 点滅の繰り返し回数
    */
-  public blinkPlayer(blinkTime: number): void {
-    this.scene.tweens.add({
-      targets: this.playerContainer,
+  public blinkTarget(duration: number, repeat: number): Phaser.Tweens.Tween {
+    return this.scene.tweens.add({
+      targets: this.sprite,
       alpha: { start: 0, to: 1 },
-      duration: 100,
-      repeat: blinkTime / 200,
+      duration,
+      repeat,
       yoyo: true,
       onComplete: () => {
-        this.playerContainer.alpha = 1
+        this.sprite.alpha = 1
       },
       onStop: () => {
-        this.playerContainer.alpha = 1
+        this.sprite.alpha = 1
       },
     })
   }

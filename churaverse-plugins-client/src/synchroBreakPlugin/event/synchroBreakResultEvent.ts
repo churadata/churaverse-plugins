@@ -1,10 +1,11 @@
 import { CVEvent, IMainScene } from 'churaverse-engine-client'
+import { ResultScreenType } from '../type/resultScreenType'
 
 /**
- * ゲーム終了後の結果ウィンドウ表示イベント
+ * ゲーム結果ウィンドウ表示イベント
  */
 export class SynchroBreakResultEvent extends CVEvent<IMainScene> {
-  public constructor() {
+  public constructor(public readonly resultScreenType: ResultScreenType) {
     super('synchroBreakResult', true)
   }
 }
