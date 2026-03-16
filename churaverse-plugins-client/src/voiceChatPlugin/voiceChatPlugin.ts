@@ -29,6 +29,7 @@ import {
   IMicrophoneMyStatusDebugDetailScreen,
 } from './debugScreen/IDebugScreen/IVoiceChatInfoDebugDetailScreen'
 import { DumpDebugDataEvent } from '@churaverse/debug-screen-plugin-client/event/dumpDebugDataEvent'
+import type { Room } from 'livekit-client'
 
 export class VoiceChatPlugin extends BasePlugin<IMainScene> {
   private voiceChatPluginStore!: VoiceChatPluginStore
@@ -71,12 +72,12 @@ export class VoiceChatPlugin extends BasePlugin<IMainScene> {
     this.getStores()
 
     void new VoiceChatReceiver(
-      this.webRtcPluginStore.webRtc.room,
+      this.webRtcPluginStore.webRtc.room as unknown as Room,
       this.bus,
       this.voiceChatPluginStore.playerVoiceChatUis
     )
     this.voiceChatSender = new VoiceChatSender(
-      this.webRtcPluginStore.webRtc.room,
+      this.webRtcPluginStore.webRtc.room as unknown as Room,
       this.bus,
       this.store,
       this.playerPluginStore.ownPlayerId
