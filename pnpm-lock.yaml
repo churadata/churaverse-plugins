@@ -1139,7 +1139,7 @@ importers:
         version: link:../../../engine-server
     devDependencies:
       '@types/node':
-        specifier: ^20
+        specifier: ^20.11.23
         version: 20.19.30
 
   packages/plugins-server/src/kickPlugin:
@@ -1235,7 +1235,7 @@ importers:
         version: link:../../../engine-server
     devDependencies:
       '@types/node':
-        specifier: ^20
+        specifier: ^20.11.23
         version: 20.19.30
 
   packages/plugins-server/src/textChatPlugin:
