@@ -22,6 +22,8 @@ export class MegaphoneIcon extends TopBarIconRenderer {
       order: 250,
     })
 
+    this.imgElement.title ='Megaphone:\nこの機能をオンにすると、あなたの声はこの場にいるすべての人に聞こえるようになります'
+    
     iconContainer.addIcon(this)
   }
 
