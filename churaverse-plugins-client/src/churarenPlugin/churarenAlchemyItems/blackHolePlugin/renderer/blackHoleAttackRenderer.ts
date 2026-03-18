@@ -87,7 +87,7 @@ export class BlackHoleAttackRenderer implements IBlackHoleAttackRenderer {
         this.sprite.destroy()
       },
       repeat: -1,
-      ease: 'Sine.easeInOut',
+      ease: 'Linear',
       yoyo: true,
     })
 
