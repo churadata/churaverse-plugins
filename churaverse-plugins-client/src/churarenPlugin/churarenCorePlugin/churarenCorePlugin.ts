@@ -13,16 +13,24 @@ import '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { setupChurarenDialog } from './ui/startWindow/setupChurarenDialog'
 import { isWeaponEntity } from './util/isWeaponEntity'
 import { EntitySpawnEvent } from 'churaverse-engine-client'
+import { GamePolicy } from '@churaverse/game-plugin-client/interface/gamePolicy'
 
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
   protected gameName = CHURAREN_CONSTANTS.GAME_NAME
+  public readonly gamePolicy: GamePolicy = {
+    allowMidwayJoin: false,
+  }
+
+  protected readonly ownerExitMessage =
+    'あなたはゲームオーナーです。あなたが退出すると' + this.gameName + 'が終了します'
+
   private socketController?: SocketController
   protected gameEntryRenderer!: IGameSelectionListItemRenderer
 
   public listenEvent(): void {
     super.listenEvent()
-    this.bus.subscribeEvent('init', this.init.bind(this))
+    this.bus.subscribeEvent('start', this.start.bind(this))
 
     this.socketController = new SocketController(this.bus, this.store)
     this.bus.subscribeEvent('registerMessage', this.socketController.registerMessage.bind(this.socketController))
@@ -56,11 +64,11 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
     this.bus.unsubscribeEvent('entitySpawn', this.cancelChruaverseAction)
   }
 
-  protected init(): void {
-    setupChurarenDialog(this.store)
+  private start(): void {
+    setupChurarenDialog(this.bus, this.store)
     this.gameEntryRenderer = new ChurarenListItemRenderer(
       this.store,
-      this.gamePluginStore.gameDescriptionDialogManager,
+      this.gamePolicy,
       this.gamePluginStore.gameSelectionListContainer
     )
   }
@@ -86,7 +94,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   /**
    * 途中参加時の処理
    */
-  protected handleMidwayParticipant(): void {
+  protected handleMidwayJoin(): void {
     this.unsubscribeGameEvent()
     // `gameAbort` や `gameEnd` イベントを受け取るために `CoreGamePlugin` のイベントのみsubscribeする
     super.subscribeGameEvent()
@@ -125,7 +133,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    */
   private readonly cancelChruaverseAction = (ev: EntitySpawnEvent): void => {
     if (!isWeaponEntity(ev.entity)) return
-    if (this.participantIds.includes(ev.entity.ownerId)) {
+    if (this.joinedPlayerIds.includes(ev.entity.ownerId)) {
       ev.cancel()
     }
   }

@@ -96,7 +96,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   private readonly generateBoss = (): void => {
     if (this.churarenGameInfo === undefined) return
     const worldMap = this.mapPluginStore.mapManager.currentMap
-    const bossHp = this.churarenGameInfo.participantIds.length * 120
+    const bossHp = this.churarenGameInfo.joinedPlayerIds.length * 120
     let startPos = worldMap.getRandomSpawnPoint()
 
     if (!this.isBossWalkInMap(startPos, worldMap)) {
@@ -218,7 +218,7 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   private onCollisionPlayer(boss: Boss, player: Player): void {
     if (player.isDead) return
     if (!boss.isCollidable) return
-    if (this.churarenGameInfo === undefined || !this.churarenGameInfo.participantIds.includes(player.id)) return
+    if (this.churarenGameInfo === undefined || !this.churarenGameInfo.joinedPlayerIds.includes(player.id)) return
     const collisionBossDamageCause = new CollisionBossDamageCause(boss)
     const livingDamageEvent = new LivingDamageEvent(player, collisionBossDamageCause, boss.power)
     this.bus.post(livingDamageEvent)

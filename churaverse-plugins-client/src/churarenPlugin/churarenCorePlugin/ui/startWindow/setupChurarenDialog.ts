@@ -1,4 +1,4 @@
-import { IMainScene, Store, DomManager } from 'churaverse-engine-client'
+import { IEventBus, IMainScene, Store, DomManager } from 'churaverse-engine-client'
 import { RuleExplanationWindowComponent } from './component/RuleExplanationWindowComponent'
 import { CHURAREN_CONSTANTS } from '../../constants/churarenConstants'
 import { ChurarenDescriptionDialog } from './churarenDescriptionDialog'
@@ -6,9 +6,9 @@ import { ChurarenDescriptionDialog } from './churarenDescriptionDialog'
 /**
  * ゲームリストにちゅられんを追加する関数
  */
-export function setupChurarenDialog(store: Store<IMainScene>): void {
-  const popupChurarenRule = new ChurarenDescriptionDialog(store)
+export function setupChurarenDialog(bus: IEventBus<IMainScene>, store: Store<IMainScene>): void {
   const explanation = DomManager.addJsxDom(RuleExplanationWindowComponent())
+  const popupChurarenRule = new ChurarenDescriptionDialog(bus, store)
   popupChurarenRule.createGameDescription(explanation)
   store.of('gamePlugin').gameDescriptionDialogManager.add(CHURAREN_CONSTANTS.GAME_ID, popupChurarenRule)
 }

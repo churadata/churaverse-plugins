@@ -172,7 +172,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.deleteItems(player.id)
     if (
       this.churarenPlayerStore.ghostModePlayers.size ===
-      this.gamePluginStore.games.get(this.gameId)?.participantIds.length
+      this.gamePluginStore.games.get(this.gameId)?.joinedPlayerIds.length
     ) {
       const updateChurarenUi = new ChurarenResultEvent('gameOver')
       this.bus.post(updateChurarenUi)

@@ -35,7 +35,7 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
   }
 
   private async refillPlayersHp(): Promise<void> {
-    this.gamePluginStore.games.get(this.gameId)?.participantIds.forEach((id) => {
+    this.gamePluginStore.games.get(this.gameId)?.joinedPlayerIds.forEach((id) => {
       const player = this.store.of('playerPlugin').players.get(id)
       if (player === undefined) return
       player.hp = DEFAULT_HP
@@ -50,7 +50,7 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
 
   private async waitPlayerReady(): Promise<void> {
     let timeOutRemaining: number = TIME_OUT_SECONDS
-    const churarenParticipants = this.gamePluginStore.games.get(this.gameId)?.participantIds.length
+    const churarenParticipants = this.gamePluginStore.games.get(this.gameId)?.joinedPlayerIds.length
     if (churarenParticipants === undefined) return
     await new Promise<void>((resolve) => {
       const checkReady: () => void = () => {
