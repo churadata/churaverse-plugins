@@ -8,7 +8,6 @@ import { ChurarenResultEvent } from '../event/churarenResultEvent'
 import { DEFAULT_HP } from '@churaverse/player-plugin-server/domain/player'
 import { PlayerHealData, PlayerHealMessage } from '@churaverse/player-plugin-server/message/playerHealMessage'
 
-const TIME_OUT_SECONDS = 30 // プレイヤーの準備確認のタイムアウト時間(秒)
 const COUNTDOWN_TIME_SECONDS = 3 // カウントダウン時間(秒)
 export const TIME_LIMIT_MINUTES = 3 * 60 // 制限時間(分)
 
@@ -25,7 +24,6 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
 
   public async runSequence(): Promise<void> {
     await this.refillPlayersHp()
-    await this.waitPlayerReady()
     if (!this.isActive) return
     await this.startCountdown()
     if (!this.isActive) return
@@ -45,27 +43,6 @@ export class ChurarenGameSequence implements IChurarenGameSequence {
       }
       const playerHealMessage = new PlayerHealMessage(playerHealData)
       this.store.of('networkPlugin').messageSender.send(playerHealMessage)
-    })
-  }
-
-  private async waitPlayerReady(): Promise<void> {
-    let timeOutRemaining: number = TIME_OUT_SECONDS
-    const churarenParticipants = this.gamePluginStore.games.get(this.gameId)?.joinedPlayerIds.length
-    if (churarenParticipants === undefined) return
-    await new Promise<void>((resolve) => {
-      const checkReady: () => void = () => {
-        if (!this.isActive) return
-        const readyPlayerSize = this.store.of('churarenPlugin').readyPlayers.size
-        if (readyPlayerSize === churarenParticipants || timeOutRemaining <= 0) {
-          resolve()
-        } else {
-          setTimeout(() => {
-            timeOutRemaining -= 1
-            checkReady()
-          }, 1000)
-        }
-      }
-      checkReady()
     })
   }
 

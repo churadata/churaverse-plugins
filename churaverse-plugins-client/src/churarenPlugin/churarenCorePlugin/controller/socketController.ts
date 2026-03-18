@@ -3,7 +3,6 @@ import { IMessageListenerRegister } from '@churaverse/network-plugin-client/inte
 import { RegisterMessageEvent } from '@churaverse/network-plugin-client/event/registerMessageEvent'
 import { RegisterMessageListenerEvent } from '@churaverse/network-plugin-client/event/registerMessageListenerEvent'
 import { BaseSocketController } from '@churaverse/network-plugin-client/interface/baseSocketController'
-import { ChurarenPlayerReadyMessage } from '../message/churarenPlayerReadyMessage'
 import { ChurarenStartTimerMessage } from '../message/churarenStartTimerMessage'
 import { ChurarenStartCountdownMessage } from '../message/churarenStartCountdownMessage'
 import { ChurarenResultMessage } from '../message/churarenResultMessage'
@@ -19,7 +18,6 @@ export class SocketController extends BaseSocketController<IMainScene> {
   }
 
   public registerMessage(ev: RegisterMessageEvent<IMainScene>): void {
-    ev.messageRegister.registerMessage('churarenPlayerReady', ChurarenPlayerReadyMessage, 'queue')
     ev.messageRegister.registerMessage('churarenStartCountdown', ChurarenStartCountdownMessage, 'queue')
     ev.messageRegister.registerMessage('churarenStartTimer', ChurarenStartTimerMessage, 'queue')
     ev.messageRegister.registerMessage('churarenResult', ChurarenResultMessage, 'queue')

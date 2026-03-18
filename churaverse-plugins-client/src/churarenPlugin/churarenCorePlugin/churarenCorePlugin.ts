@@ -107,7 +107,6 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   protected handlePlayerQuitGame(playerId: string): void {}
 
   private readonly startCountdown = (): void => {
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.DESCRIPTION_WINDOW)?.hideDescription()
     const countdownWindow = this.gamePluginStore.gameUiManager.getUi(this.gameId, CHURAREN_UI_KEYS.COUNTDOWN_WINDOW)
     countdownWindow?.startCountdown()
   }

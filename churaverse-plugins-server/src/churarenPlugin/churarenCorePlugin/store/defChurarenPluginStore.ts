@@ -1,8 +1,6 @@
-import { IReadyPlayerRepository } from '../interface/IReadyPlayerRepository'
 import { ChurarenGameSequence } from '../logic/churarenGameSequence'
 
 export interface ChurarenPluginStore {
-  readyPlayers: IReadyPlayerRepository
   churarenGameSequence: ChurarenGameSequence
 }
 

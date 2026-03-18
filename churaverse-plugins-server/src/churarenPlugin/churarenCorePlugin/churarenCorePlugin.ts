@@ -30,10 +30,6 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
 
     this.socketController = new SocketController(this.bus, this.store)
     this.bus.subscribeEvent('registerMessage', this.socketController.registerMessage.bind(this.socketController))
-    this.bus.subscribeEvent(
-      'registerMessageListener',
-      this.socketController.setupMessageListenerRegister.bind(this.socketController)
-    )
   }
 
   /**
@@ -67,7 +63,6 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    */
   protected handleGameStart(): void {
     initChurarenPluginStore(this.gameId, this.store, this.bus)
-    this.socketController?.registerMessageListener()
     this.sequence().catch((err) => {
       console.error(err)
       this.bus.post(new GameEndEvent(this.gameId))
@@ -79,7 +74,6 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    */
   protected handleGameTermination(): void {
     this.store.deleteStoreOf('churarenPlugin')
-    this.socketController?.unregisterMessageListener()
   }
 
   protected handlePlayerLeave(playerId: string): void {

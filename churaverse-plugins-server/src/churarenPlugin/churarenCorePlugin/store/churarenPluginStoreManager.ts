@@ -1,7 +1,6 @@
 import { Store, IMainScene, IEventBus } from 'churaverse-engine-server'
 import { ChurarenPluginStore } from './defChurarenPluginStore'
 import { ChurarenGameSequence } from '../logic/churarenGameSequence'
-import { ReadyPlayerRepository } from '../repository/readyPlayerRepository'
 import { GameIds } from '@churaverse/game-plugin-server/interface/gameIds'
 
 /**
@@ -13,7 +12,6 @@ export function initChurarenPluginStore(
   eventBus: IEventBus<IMainScene>
 ): void {
   const churarenPluginStore: ChurarenPluginStore = {
-    readyPlayers: new ReadyPlayerRepository(),
     churarenGameSequence: new ChurarenGameSequence(gameId, store, eventBus),
   }
 

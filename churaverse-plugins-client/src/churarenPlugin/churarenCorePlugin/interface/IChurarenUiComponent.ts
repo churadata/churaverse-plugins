@@ -1,10 +1,6 @@
 import { IGameUiComponent } from '@churaverse/game-plugin-client/interface/IGameUiComponent'
 import { ChurarenGameResultType } from '../types/uiTypes'
 
-export interface IDescriptionWindow extends IGameUiComponent {
-  hideDescription: () => void
-}
-
 export interface ICountdownWindow extends IGameUiComponent {
   countdownTime: number
   startCountdown: () => void
