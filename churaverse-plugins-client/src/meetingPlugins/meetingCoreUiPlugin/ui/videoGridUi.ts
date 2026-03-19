@@ -29,9 +29,9 @@ export class VideoGridUi {
     const tile = DomManager.jsxToDom(
       ParticipantTileComponent({
         participantId: participant.identity,
-        displayName: participant.identity,
-        avatarColor: getAvatarColor(participant.identity),
-        initials: getInitials(participant.identity),
+        displayName: participant.name ?? participant.identity,
+        avatarColor: getAvatarColor(participant.name ?? participant.identity),
+        initials: getInitials(participant.name ?? participant.identity),
         isSelf: participant.identity === this.ownParticipantId,
       })
     )
@@ -79,7 +79,7 @@ export class VideoGridUi {
     }
   }
 
-  public attachScreenShareTrack(track: RemoteTrack | Track, participantId: string): void {
+  public attachScreenShareTrack(track: RemoteTrack | Track, participantId: string, displayName: string): void {
     const grid = document.getElementById(VIDEO_GRID_ID)
     if (grid === null) {
       console.error('[VideoGridUi] video-grid element not found!')
@@ -114,10 +114,10 @@ export class VideoGridUi {
 
     const name = document.createElement('span')
     name.className = videoGridStyles.name
-    const displayName = participantId === this.ownParticipantId
-      ? `${participantId} (自分)`
-      : participantId
-    name.textContent = `${displayName}の画面`
+    const displayLabel = participantId === this.ownParticipantId
+      ? `${displayName} (自分)`
+      : displayName
+    name.textContent = `${displayLabel}の画面`
     nameBar.appendChild(name)
 
     tile.appendChild(videoArea)

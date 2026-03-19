@@ -5,13 +5,13 @@ import { ChatMessageComponent } from '../components/ChatMessageComponent'
 export class ChatUi {
   public constructor(private readonly ownParticipantId: string) {}
 
-  public addMessage(senderId: string, text: string): void {
+  public addMessage(senderId: string, senderLabel: string, text: string): void {
     const chatMessages = document.getElementById(CHAT_MESSAGES_ID)
     if (chatMessages === null) return
 
     const messageEl = DomManager.jsxToDom(
       ChatMessageComponent({
-        senderId,
+        senderLabel,
         text,
         isSelf: senderId === this.ownParticipantId,
       })

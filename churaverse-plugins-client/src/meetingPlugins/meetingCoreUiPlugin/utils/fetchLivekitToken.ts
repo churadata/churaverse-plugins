@@ -5,10 +5,14 @@ interface AccessTokenResponse {
 export async function fetchLivekitToken(
   backendUrl: string,
   roomName: string,
-  userName: string
+  userName: string,
+  displayName?: string
 ): Promise<string> {
-  const params = { roomName, userName }
-  const query = new URLSearchParams(params).toString()
+  const queryParams = new URLSearchParams({ roomName, userName })
+  if (displayName !== undefined) {
+    queryParams.set('displayName', displayName)
+  }
+  const query = queryParams.toString()
   const res = await fetch(`${backendUrl}/?${query}`)
   if (!res.ok) {
     throw new Error(`Failed to get access token: ${res.status} ${res.statusText}`)

@@ -18,7 +18,7 @@ export class ParticipantListUi {
     participants.forEach((p) => {
       const item = DomManager.jsxToDom(
         ParticipantItemComponent({
-          participantId: p.identity,
+          displayName: p.name ?? p.identity,
           isSelf: p.identity === this.ownParticipantId,
           isMuted: !p.isMicrophoneEnabled,
         })

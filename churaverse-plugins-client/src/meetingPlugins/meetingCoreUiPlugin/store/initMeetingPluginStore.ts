@@ -10,7 +10,7 @@ export function initMeetingPluginStore(
     participantId,
     displayName,
     chatHistory: [],
-    room: undefined,
+    meetingRoom: undefined,
     isConnected: false,
   }
   store.setInit('meetingPlugin', meetingPluginStore)

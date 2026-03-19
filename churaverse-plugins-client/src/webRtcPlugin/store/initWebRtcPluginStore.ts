@@ -7,9 +7,11 @@ import { WebRtcPluginStore } from './defWebRtcPluginStore'
 import '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 
 export function initWebRtcPluginStore(store: Store<IMainScene>): void {
-  const ownPlayerId = store.of('playerPlugin').ownPlayerId
+  const playerPluginStore = store.of('playerPlugin')
+  const ownPlayerId = playerPluginStore.ownPlayerId
+  const ownPlayerName = playerPluginStore.players.get(ownPlayerId)?.name ?? ownPlayerId
 
-  const webRtc = new WebRtc(ownPlayerId)
+  const webRtc = new WebRtc(ownPlayerId, ownPlayerName)
 
   const webRtcPluginStore: WebRtcPluginStore = {
     webRtc,
