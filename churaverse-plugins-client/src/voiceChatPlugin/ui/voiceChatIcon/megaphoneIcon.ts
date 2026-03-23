@@ -6,6 +6,32 @@ import { ToggleMegaphoneEvent } from '../../event/toggleMegaphoneEvent'
 import MEGAPHONE_ICON from '../../assets/megaphone.png'
 export const MEGAPHONE_ICON_PATH = MEGAPHONE_ICON
 
+// メガホンの状態を数秒間表示するためのクラス
+const MEGAPHONE_DIALOG_CLASS = 'megaphone-dialog'
+
+// スタイルを定義
+const styleEl = document.createElement('style')
+styleEl.textContent = `
+  .${MEGAPHONE_DIALOG_CLASS} {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: center;
+    z-index: 10000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+`
+document.head.appendChild(styleEl)
+
 export class MegaphoneIcon extends TopBarIconRenderer {
   public constructor(
     private readonly eventBus: IEventBus<IMainScene>,
@@ -30,39 +56,15 @@ export class MegaphoneIcon extends TopBarIconRenderer {
   /** メガホン状態を画面に数秒だけ表示する */
   private showMegaphoneDialog(message: string): void {
     const dialog = document.createElement('div')
-    dialog.innerHTML = message.replace(/\n/g, '<br>')
+    dialog.className = MEGAPHONE_DIALOG_CLASS
+    dialog.innerText = message
 
-    Object.assign(dialog.style, {
-      position: 'fixed',
-      top: '80px',
-      left: '50%',
-      transform: 'translateX(-50%)',
-      padding: '10px 20px',
-      borderRadius: '8px',
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-      color: '#fff',
-      fontSize: '14px',
-      lineHeight: '1.6',
-      textAlign: 'center',
-      zIndex: '10000',
-      pointerEvents: 'none',
-      opacity: '0',
-      transition: 'opacity 0.3s ease',
-    } as Partial<CSSStyleDeclaration>)
+    dialog.style.opacity = '1'
 
     document.body.appendChild(dialog)
 
-    // 次のフレームでフェードイン
-    requestAnimationFrame(() => {
-      dialog.style.opacity = '1'
-    })
-
-    // 1.5秒後にフェードアウト → 削除
     setTimeout(() => {
-      dialog.style.opacity = '0'
-      setTimeout(() => {
-        dialog.remove()
-      }, 300)
+      dialog.remove()
     }, 1500)
   }
 
