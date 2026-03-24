@@ -1,5 +1,13 @@
 import { BasePlugin, DomManager, IMeetingScene } from 'churaverse-engine-client'
-import { Room, RoomEvent, Track, RemoteParticipant, Participant, DataPacket_Kind, TrackPublication } from 'livekit-client'
+import {
+  Room,
+  RoomEvent,
+  Track,
+  RemoteParticipant,
+  Participant,
+  DataPacket_Kind,
+  TrackPublication,
+} from 'livekit-client'
 import {
   MIC_TOGGLE_BUTTON_ID,
   CAMERA_TOGGLE_BUTTON_ID,
@@ -37,7 +45,9 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     const displayName = storedDisplayName !== '' ? storedDisplayName : participantId
     initMeetingPluginStore(this.store, participantId, displayName)
     this.meetingPluginStore = this.store.of('meetingPlugin')
-    window.addEventListener('beforeunload', () => { this.cleanup() })
+    window.addEventListener('beforeunload', () => {
+      this.cleanup()
+    })
   }
 
   private async start(): Promise<void> {
@@ -143,7 +153,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     })
 
     room.on(RoomEvent.LocalTrackPublished, (publication, participant) => {
-      if (publication.track !== undefined) {
+      if (publication.track !== undefined && publication.source !== Track.Source.Microphone) {
         this.handleTrackAttachment(publication.track, publication, participant)
       }
       this.updateParticipantList(meetingRoom)
@@ -152,6 +162,10 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     room.on(RoomEvent.LocalTrackUnpublished, (publication, participant) => {
       if (publication.track !== undefined) {
         this.handleTrackDetachment(publication.track, publication, participant.identity)
+      }
+      if (publication.source === Track.Source.ScreenShare) {
+        this.isScreenShareEnabled = false
+        this.updateButtonState(SCREEN_SHARE_BUTTON_ID, false)
       }
       this.updateParticipantList(meetingRoom)
     })
@@ -171,7 +185,9 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
   private handleTrackDetachment(track: Track, publication: TrackPublication, participantIdentity: string): void {
     if (publication.source === Track.Source.ScreenShare) {
-      track.detach().forEach((el) => { el.remove() })
+      track.detach().forEach((el) => {
+        el.remove()
+      })
       this.videoGridUi.detachScreenShareTrack(participantIdentity)
     } else {
       this.videoGridUi.detachTrack(track, participantIdentity)
@@ -219,11 +235,12 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
         text: h.text,
         timestamp: h.timestamp,
       }
-      const exists = messageId !== undefined
-        ? this.meetingPluginStore.chatHistory.some((m) => m.messageId === messageId)
-        : this.meetingPluginStore.chatHistory.some(
-          (m) => m.timestamp === historyMsg.timestamp && (m.senderId ?? m.sender) === senderId
-        )
+      const exists =
+        messageId !== undefined
+          ? this.meetingPluginStore.chatHistory.some((m) => m.messageId === messageId)
+          : this.meetingPluginStore.chatHistory.some(
+              (m) => m.timestamp === historyMsg.timestamp && (m.senderId ?? m.sender) === senderId
+            )
       if (!exists) {
         this.meetingPluginStore.chatHistory.push(historyMsg)
         this.chatUi.addMessage(senderId, historyMsg.sender, historyMsg.text)
@@ -232,9 +249,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private handleChatMessage(message: Record<string, unknown>, participant: RemoteParticipant): void {
-    const messageId = typeof message.messageId === 'string'
-      ? message.messageId
-      : this.buildLegacyMessageId(message)
+    const messageId = typeof message.messageId === 'string' ? message.messageId : this.buildLegacyMessageId(message)
     const chatMsg: ChatMessage = {
       type: 'chat',
       messageId,
@@ -243,7 +258,10 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       text: message.text as string,
       timestamp: typeof message.timestamp === 'number' ? message.timestamp : Date.now(),
     }
-    if (chatMsg.messageId !== undefined && this.meetingPluginStore.chatHistory.some((m) => m.messageId === chatMsg.messageId)) {
+    if (
+      chatMsg.messageId !== undefined &&
+      this.meetingPluginStore.chatHistory.some((m) => m.messageId === chatMsg.messageId)
+    ) {
       return
     }
     this.meetingPluginStore.chatHistory.push(chatMsg)
@@ -269,10 +287,18 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     const screenShareButton = DomManager.getElementById(SCREEN_SHARE_BUTTON_ID)
     const exitButton = DomManager.getElementById(MEETING_EXIT_BUTTON_ID)
 
-    micButton.addEventListener('click', () => { void this.toggleMicrophone(room) })
-    cameraButton.addEventListener('click', () => { void this.toggleCamera(room) })
-    screenShareButton.addEventListener('click', () => { void this.toggleScreenShare(room) })
-    exitButton.addEventListener('click', () => { this.exitMeeting() })
+    micButton.addEventListener('click', () => {
+      void this.toggleMicrophone(room)
+    })
+    cameraButton.addEventListener('click', () => {
+      void this.toggleCamera(room)
+    })
+    screenShareButton.addEventListener('click', () => {
+      void this.toggleScreenShare(room)
+    })
+    exitButton.addEventListener('click', () => {
+      this.exitMeeting()
+    })
 
     const chatInput = DomManager.getElementById<HTMLInputElement>(CHAT_INPUT_ID)
     const chatSendButton = DomManager.getElementById(CHAT_SEND_BUTTON_ID)
