@@ -7,9 +7,6 @@
     "skipLibCheck": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
-    "paths": {
-      "livekit-client": ["./node_modules/livekit-client"]
-    },
 
     /* Bundler mode */
     "moduleResolution": "Bundler",
