@@ -1,4 +1,4 @@
-import { IMainScene, ITitleScene, Scenes } from 'churaverse-engine-client'
+import { IMainScene, IMeetingScene, ITitleScene, Scenes } from 'churaverse-engine-client'
 import { ITransitionManager } from '../interface/ITransitionManager'
 
 declare module 'churaverse-engine-client' {
@@ -8,6 +8,10 @@ declare module 'churaverse-engine-client' {
 
   export interface StoreInTitle {
     transitionPlugin: TransitionPluginStore<ITitleScene>
+  }
+
+  export interface StoreInMeeting {
+    transitionPlugin: TransitionPluginStore<IMeetingScene>
   }
 }
 

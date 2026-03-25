@@ -1,29 +1,16 @@
 import { Room, RoomOptions, VideoPresets } from 'livekit-client'
 
+/**
+ * backend_livekitが返すアクセストークンのJSON
+ */
 interface AccessTokenResponse {
   token: string
-}
-
-export async function fetchLivekitToken(
-  backendUrl: string,
-  roomName: string,
-  userName: string,
-  displayName?: string
-): Promise<string> {
-  const queryParams = new URLSearchParams({ roomName, userName })
-  if (displayName !== undefined) {
-    queryParams.set('displayName', displayName)
-  }
-  const query = queryParams.toString()
-  const res = await fetch(`${backendUrl}/?${query}`)
-  const data = (await res.json()) as AccessTokenResponse
-  return data.token
 }
 
 export class WebRtc {
   public readonly room: Room
 
-  public constructor(ownPlayerId: string, ownPlayerName: string) {
+  public constructor(ownPlayerId: string) {
     const roomOptions: RoomOptions = {
       // automatically manage subscribed video quality
       // オンにしてはいけない。Phaserに映像が上手く流せなくなるため。
@@ -40,20 +27,32 @@ export class WebRtc {
     }
     this.room = new Room(roomOptions)
 
-    void this.connect(ownPlayerId, ownPlayerName)
+    void this.connect(ownPlayerId)
   }
 
-  private async connect(ownPlayerId: string, ownPlayerName: string): Promise<void> {
+  private async connect(ownPlayerId: string): Promise<void> {
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_LIVEKIT_URL ?? 'http://localhost:8080/backend_livekit'
-      const token = await fetchLivekitToken(backendUrl, 'meeting-room', ownPlayerId, ownPlayerName)
+      const token = await this.getAccessToken(ownPlayerId)
       await this.room.connect(`${import.meta.env.VITE_LIVEKIT_URL ?? 'ws://localhost:8080/livekit'}`, token)
 
       console.log(`connected to room. roomName: ${this.room.name}`)
     } catch (e) {
-      console.error(`Failed to connect to room.`, e)
+      console.error(`Failed to connect to room.`,e)
       window.alert('chromeでの利用を推奨します')
     }
+  }
+
+  private async getAccessToken(ownPlayerId: string): Promise<string> {
+    const params = {
+      roomName: 'room1',
+      userName: ownPlayerId,
+    }
+    const query = new URLSearchParams(params).toString()
+    const res = await fetch(
+      `${import.meta.env.VITE_BACKEND_LIVEKIT_URL ?? 'http://localhost:8080/backend_livekit'}/?${query}`
+    )
+    const data = (await res.json()) as AccessTokenResponse
+    return data.token
   }
 
   public async disconnect(): Promise<void> {
