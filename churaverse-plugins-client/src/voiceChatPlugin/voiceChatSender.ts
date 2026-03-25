@@ -100,6 +100,7 @@ export class VoiceChatSender implements IVoiceChatSender {
       // パイプラインの立ち上げに失敗した場合でも、
       // 完全にマイクが使えなくなると困るため LiveKit のデフォルト実装にフォールバックする。
       await this.room.localParticipant.setMicrophoneEnabled(true)
+      this.micPublication = this.room.localParticipant.getTrack(Track.Source.Microphone)
       return this.room.localParticipant.isMicrophoneEnabled
     } finally {
       this.isStarting = false
