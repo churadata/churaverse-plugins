@@ -1,8 +1,11 @@
 import { Room, RoomOptions, VideoPresets } from 'livekit-client'
 import { getChuraverseConfig } from 'churaverse-engine-client'
-import { fetchLivekitToken } from './utils/fetchLivekitToken'
 
 const MEETING_ROOM_NAME = 'meeting-room'
+
+interface AccessTokenResponse {
+  token: string
+}
 
 export class MeetingRoom {
   public readonly room: Room
@@ -19,17 +22,25 @@ export class MeetingRoom {
   }
 
   public async connect(participantId: string, displayName: string): Promise<void> {
-    const token = await fetchLivekitToken(
-      getChuraverseConfig().backendLivekitUrl,
-      MEETING_ROOM_NAME,
-      participantId,
-      displayName
-    )
+    const token = await this.getAccessToken(participantId, displayName)
     const livekitUrl = getChuraverseConfig().livekitUrl
     await this.room.connect(livekitUrl, token)
   }
 
   public async disconnect(): Promise<void> {
     await this.room.disconnect()
+  }
+
+  private async getAccessToken(participantId: string, displayName: string): Promise<string> {
+    const backendUrl = getChuraverseConfig().backendLivekitUrl
+    const queryParams = new URLSearchParams({ roomName: MEETING_ROOM_NAME, userName: participantId })
+    queryParams.set('displayName', displayName)
+    const query = queryParams.toString()
+    const res = await fetch(`${backendUrl}/?${query}`)
+    if (!res.ok) {
+      throw new Error(`Failed to get access token: ${res.status} ${res.statusText}`)
+    }
+    const data = (await res.json()) as AccessTokenResponse
+    return data.token
   }
 }

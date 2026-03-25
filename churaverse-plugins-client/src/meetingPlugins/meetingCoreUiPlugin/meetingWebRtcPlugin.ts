@@ -24,11 +24,10 @@ import { VideoGridUi } from './ui/videoGridUi'
 import { ParticipantListUi } from './ui/participantListUi'
 import { ChatUi } from './ui/chatUi'
 import { MeetingRoom } from './meetingRoom'
-import type { TransitionPluginStore } from '../../transitionPlugin/store/defTransitionPluginStore'
+import '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
 
 export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   private meetingPluginStore!: MeetingPluginStore
-  private transitionPluginStore!: TransitionPluginStore<IMeetingScene>
   private videoGridUi!: VideoGridUi
   private participantListUi!: ParticipantListUi
   private chatUi!: ChatUi
@@ -47,7 +46,6 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     const displayName = storedDisplayName !== '' ? storedDisplayName : participantId
     initMeetingPluginStore(this.store, participantId, displayName)
     this.meetingPluginStore = this.store.of('meetingPlugin')
-    this.transitionPluginStore = this.store.of('transitionPlugin')
     window.addEventListener('beforeunload', () => {
       this.cleanup()
     })
@@ -324,7 +322,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
   private exitMeeting(): void {
     this.cleanup()
-    this.transitionPluginStore.transitionManager.transitionTo('TitleScene')
+    this.store.of('transitionPlugin').transitionManager.transitionTo('TitleScene')
   }
 
   private async toggleMicrophone(room: Room): Promise<void> {

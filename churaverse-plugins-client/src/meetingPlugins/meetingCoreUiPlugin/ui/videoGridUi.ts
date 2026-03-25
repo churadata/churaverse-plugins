@@ -10,6 +10,10 @@ import {
 import { getAvatarColor, getInitials } from '../utils/avatarUtils'
 
 const MAX_VISIBLE_SIDEBAR_TILES = 5
+const PARTICIPANT_SIDEBAR_ID = 'participant-sidebar'
+const SIDEBAR_TILES_CONTAINER_ID = 'sidebar-tiles-container'
+const SIDEBAR_ARROW_UP_ID = 'sidebar-arrow-up'
+const SIDEBAR_ARROW_DOWN_ID = 'sidebar-arrow-down'
 
 export class VideoGridUi {
   private sidebarScrollIndex: number = 0
@@ -17,11 +21,8 @@ export class VideoGridUi {
   public constructor(private readonly ownParticipantId: string) {}
 
   public addParticipantTile(participant: Participant): void {
-    const grid = document.getElementById(VIDEO_GRID_ID)
-    if (grid === null) {
-      console.error('[VideoGridUi] video-grid element not found!')
-      return
-    }
+    const grid = this.getGrid()
+    if (grid === null) return
 
     const tileId = `${PARTICIPANT_TILE_ID_PREFIX}${participant.identity}`
     if (document.getElementById(tileId) !== null) return
@@ -65,7 +66,9 @@ export class VideoGridUi {
   }
 
   public detachTrack(track: RemoteTrack | Track, participantId: string): void {
-    track.detach().forEach((el) => { el.remove() })
+    track.detach().forEach((el) => {
+      el.remove()
+    })
     if (track.kind === Track.Kind.Video) {
       const container = document.getElementById(`${VIDEO_CONTAINER_ID_PREFIX}${participantId}`)
       const avatarContainer = document.getElementById(`${AVATAR_CONTAINER_ID_PREFIX}${participantId}`)
@@ -80,11 +83,8 @@ export class VideoGridUi {
   }
 
   public attachScreenShareTrack(track: RemoteTrack | Track, participantId: string, displayName: string): void {
-    const grid = document.getElementById(VIDEO_GRID_ID)
-    if (grid === null) {
-      console.error('[VideoGridUi] video-grid element not found!')
-      return
-    }
+    const grid = this.getGrid()
+    if (grid === null) return
 
     const tileId = `tile-screenshare-${participantId}`
     if (document.getElementById(tileId) !== null) return
@@ -114,9 +114,7 @@ export class VideoGridUi {
 
     const name = document.createElement('span')
     name.className = videoGridStyles.name
-    const displayLabel = participantId === this.ownParticipantId
-      ? `${displayName} (自分)`
-      : displayName
+    const displayLabel = participantId === this.ownParticipantId ? `${displayName} (自分)` : displayName
     name.textContent = `${displayLabel}の画面`
     nameBar.appendChild(name)
 
@@ -128,26 +126,32 @@ export class VideoGridUi {
   }
 
   public detachScreenShareTrack(participantId?: string): void {
-    const grid = document.getElementById(VIDEO_GRID_ID)
+    const grid = this.getGrid()
     if (grid === null) return
 
     const removeTile = (tile: Element): void => {
-      tile.querySelectorAll('video, audio').forEach((el) => { el.remove() })
+      tile.querySelectorAll('video, audio').forEach((el) => {
+        el.remove()
+      })
       tile.remove()
     }
 
     if (participantId !== undefined) {
       const tile = document.getElementById(`tile-screenshare-${participantId}`)
-      if (tile !== null) { removeTile(tile) }
+      if (tile !== null) {
+        removeTile(tile)
+      }
     } else {
-      grid.querySelectorAll('[id^="tile-screenshare-"]').forEach((tile) => { removeTile(tile) })
+      grid.querySelectorAll('[id^="tile-screenshare-"]').forEach((tile) => {
+        removeTile(tile)
+      })
     }
 
     this.updateGridLayout()
   }
 
   public updateGridLayout(): void {
-    const grid = document.getElementById(VIDEO_GRID_ID)
+    const grid = this.getGrid()
     if (grid === null) return
 
     const hasScreenShare = document.querySelector('[id^="tile-screenshare-"]') !== null
@@ -168,7 +172,7 @@ export class VideoGridUi {
   }
 
   public scrollSidebar(direction: number): void {
-    const tilesContainer = document.getElementById('sidebar-tiles-container')
+    const tilesContainer = this.getSidebarTilesContainer()
     if (tilesContainer === null) return
 
     const totalTiles = tilesContainer.children.length
@@ -182,27 +186,31 @@ export class VideoGridUi {
     grid.classList.add(videoGridStyles.screenShareLayout)
     grid.style.gridTemplateColumns = ''
 
-    let sidebar = document.getElementById('participant-sidebar')
+    let sidebar = document.getElementById(PARTICIPANT_SIDEBAR_ID)
     if (sidebar === null) {
       sidebar = document.createElement('div')
-      sidebar.id = 'participant-sidebar'
+      sidebar.id = PARTICIPANT_SIDEBAR_ID
       sidebar.className = videoGridStyles.participantSidebar
 
       const arrowUp = document.createElement('button')
       arrowUp.className = `defaultStyle ${videoGridStyles.sidebarArrow}`
       arrowUp.textContent = '\u25B2'
-      arrowUp.id = 'sidebar-arrow-up'
-      arrowUp.addEventListener('click', () => { this.scrollSidebar(-1) })
+      arrowUp.id = SIDEBAR_ARROW_UP_ID
+      arrowUp.addEventListener('click', () => {
+        this.scrollSidebar(-1)
+      })
 
       const tilesContainer = document.createElement('div')
-      tilesContainer.id = 'sidebar-tiles-container'
+      tilesContainer.id = SIDEBAR_TILES_CONTAINER_ID
       tilesContainer.className = videoGridStyles.sidebarTilesContainer
 
       const arrowDown = document.createElement('button')
       arrowDown.className = `defaultStyle ${videoGridStyles.sidebarArrow}`
       arrowDown.textContent = '\u25BC'
-      arrowDown.id = 'sidebar-arrow-down'
-      arrowDown.addEventListener('click', () => { this.scrollSidebar(1) })
+      arrowDown.id = SIDEBAR_ARROW_DOWN_ID
+      arrowDown.addEventListener('click', () => {
+        this.scrollSidebar(1)
+      })
 
       sidebar.appendChild(arrowUp)
       sidebar.appendChild(tilesContainer)
@@ -211,21 +219,21 @@ export class VideoGridUi {
       this.sidebarScrollIndex = 0
     }
 
-    const tilesContainer = document.getElementById('sidebar-tiles-container')
-    if (tilesContainer !== null) {
-      grid
-        .querySelectorAll(':scope > [id^="tile-"]:not([id^="tile-screenshare-"])')
-        .forEach((tile) => { tilesContainer.appendChild(tile) })
-    }
+    const tilesContainer = this.getSidebarTilesContainer()
+    if (tilesContainer === null) return
+
+    grid.querySelectorAll(':scope > [id^="tile-"]:not([id^="tile-screenshare-"])').forEach((tile) => {
+      tilesContainer.appendChild(tile)
+    })
 
     this.updateSidebarVisibility()
   }
 
   private removeScreenShareSidebar(grid: HTMLElement): void {
-    const sidebar = document.getElementById('participant-sidebar')
+    const sidebar = document.getElementById(PARTICIPANT_SIDEBAR_ID)
     if (sidebar === null) return
 
-    const tilesContainer = document.getElementById('sidebar-tiles-container')
+    const tilesContainer = this.getSidebarTilesContainer()
     if (tilesContainer !== null) {
       Array.from(tilesContainer.children).forEach((tile) => {
         const el = tile as HTMLElement
@@ -239,19 +247,23 @@ export class VideoGridUi {
   }
 
   private updateSidebarVisibility(): void {
-    const tilesContainer = document.getElementById('sidebar-tiles-container')
-    const upArrow = document.getElementById('sidebar-arrow-up') as HTMLButtonElement | null
-    const downArrow = document.getElementById('sidebar-arrow-down') as HTMLButtonElement | null
-    if (tilesContainer === null || upArrow === null || downArrow === null) return
+    const tilesContainer = this.getSidebarTilesContainer()
+    const upArrow = document.getElementById(SIDEBAR_ARROW_UP_ID)
+    const downArrow = document.getElementById(SIDEBAR_ARROW_DOWN_ID)
+    if (
+      tilesContainer === null ||
+      !(upArrow instanceof HTMLButtonElement) ||
+      !(downArrow instanceof HTMLButtonElement)
+    ) {
+      return
+    }
 
     const totalTiles = tilesContainer.children.length
 
     Array.from(tilesContainer.children).forEach((tile, index) => {
       const el = tile as HTMLElement
       el.style.display =
-        index >= this.sidebarScrollIndex && index < this.sidebarScrollIndex + MAX_VISIBLE_SIDEBAR_TILES
-          ? ''
-          : 'none'
+        index >= this.sidebarScrollIndex && index < this.sidebarScrollIndex + MAX_VISIBLE_SIDEBAR_TILES ? '' : 'none'
     })
 
     const showArrows = totalTiles > MAX_VISIBLE_SIDEBAR_TILES
@@ -259,5 +271,17 @@ export class VideoGridUi {
     downArrow.style.display = showArrows ? '' : 'none'
     upArrow.disabled = this.sidebarScrollIndex <= 0
     downArrow.disabled = this.sidebarScrollIndex >= totalTiles - MAX_VISIBLE_SIDEBAR_TILES
+  }
+
+  private getGrid(): HTMLElement | null {
+    const grid = document.getElementById(VIDEO_GRID_ID)
+    if (grid === null) {
+      console.error('[VideoGridUi] video-grid element not found!')
+    }
+    return grid
+  }
+
+  private getSidebarTilesContainer(): HTMLElement | null {
+    return document.getElementById(SIDEBAR_TILES_CONTAINER_ID)
   }
 }
