@@ -5,34 +5,11 @@ import { ToggleMegaphoneEvent } from '../../event/toggleMegaphoneEvent'
 
 import MEGAPHONE_ICON from '../../assets/megaphone.png'
 export const MEGAPHONE_ICON_PATH = MEGAPHONE_ICON
-
-// メガホンの状態を数秒間表示するためのクラス
-const MEGAPHONE_DIALOG_CLASS = 'megaphone-dialog'
-
-// スタイルを定義
-const styleEl = document.createElement('style')
-styleEl.textContent = `
-  .${MEGAPHONE_DIALOG_CLASS} {
-    position: fixed;
-    top: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 10px 20px;
-    border-radius: 8px;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: #fff;
-    font-size: 14px;
-    line-height: 1.6;
-    text-align: center;
-    z-index: 10000;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-`
-document.head.appendChild(styleEl)
+const DISPLAY_DURATION = 1500
 
 export class MegaphoneIcon extends TopBarIconRenderer {
+  private readonly megaphoneDialogElement: HTMLDivElement
+  private hideTimeoutId: ReturnType<typeof setTimeout> | null = null
   public constructor(
     private readonly eventBus: IEventBus<IMainScene>,
     iconContainer: ITopBarIconContainer,
@@ -47,28 +24,42 @@ export class MegaphoneIcon extends TopBarIconRenderer {
       isActive: true,
       order: 250,
     })
-
-    this.imgElement.title ='Megaphone:\nこの機能をオンにすると、あなたの声はこの場にいるすべての人に聞こえるようになります'
-    
+    this.imgElement.title =
+      'Megaphone:\nこの機能をオンにすると、あなたの声はこの場にいるすべての人に聞こえるようになります'
+    this.megaphoneDialogElement = this.createMegaphoneDialogElement()
+    document.body.appendChild(this.megaphoneDialogElement)
     iconContainer.addIcon(this)
   }
-
-  /** メガホン状態を画面に数秒だけ表示する */
-  private showMegaphoneDialog(message: string): void {
-    const dialog = document.createElement('div')
-    dialog.className = MEGAPHONE_DIALOG_CLASS
-    dialog.innerText = message
-
-    dialog.style.opacity = '1'
-
-    document.body.appendChild(dialog)
-
-    setTimeout(() => {
-      dialog.remove()
-    }, 1500)
+  private createMegaphoneDialogElement(): HTMLDivElement {
+    const element = document.createElement('div')
+    element.style.position = 'fixed'
+    element.style.top = '80px'
+    element.style.left = '50%'
+    element.style.transform = 'translateX(-50%)'
+    element.style.padding = '10px 20px'
+    element.style.borderRadius = '8px'
+    element.style.backgroundColor = 'rgba(0, 0, 0, 0.8)'
+    element.style.color = '#fff'
+    element.style.fontSize = '14px'
+    element.style.lineHeight = '1.6'
+    element.style.textAlign = 'center'
+    element.style.zIndex = '10000'
+    element.style.pointerEvents = 'none'
+    element.style.opacity = '0'
+    element.style.transition = 'opacity 0.3s ease'
+    return element
   }
-
-  /** buttonが押されたときの動作 */
+  private showMegaphoneDialog(message: string): void {
+    if (this.hideTimeoutId !== null) {
+      clearTimeout(this.hideTimeoutId)
+    }
+    this.megaphoneDialogElement.innerText = message
+    this.megaphoneDialogElement.style.opacity = '1'
+    this.hideTimeoutId = setTimeout(() => {
+      this.megaphoneDialogElement.style.opacity = '0'
+      this.hideTimeoutId = null
+    }, DISPLAY_DURATION)
+  }
   private onClick(isActive: boolean): void {
     if (isActive) {
       this.deactivateMegaphone()
@@ -76,13 +67,11 @@ export class MegaphoneIcon extends TopBarIconRenderer {
       this.activateMegaphone()
     }
   }
-
   private activateMegaphone(): void {
     this.eventBus.post(new ToggleMegaphoneEvent(this.playerId, true))
     super.activate()
     this.showMegaphoneDialog('メガホン機能がオンになりました\nあなたの声は離れている参加者にも聞こえます')
   }
-
   private deactivateMegaphone(): void {
     this.eventBus.post(new ToggleMegaphoneEvent(this.playerId, false))
     super.deactivate()
