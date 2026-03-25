@@ -93,10 +93,6 @@ export class VoiceChatSender implements IVoiceChatSender {
         source: Track.Source.Microphone,
         name: 'microphone-processed',
       })
-      // デバッグ用: publish したトラックと Room をグローバルに公開しておき、
-      // ブラウザコンソールから getSettings などを確認できるようにする
-      ;(window as unknown as { __micPub?: LocalTrackPublication }).__micPub = this.micPublication
-      ;(window as unknown as { __lkRoom?: Room }).__lkRoom = this.room
       console.info('[MicPipeline] published track', this.micPublication?.track?.mediaStreamTrack?.getSettings())
       return this.micPublication.track !== undefined
     } catch (error) {

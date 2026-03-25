@@ -53,8 +53,6 @@ export class RnnoiseMicPipeline {
 
     // LiveKit 側で publish する MediaStreamTrack を保持
     this.processedTrack = track
-    // デバッグ用: ブラウザ上で getSettings() を確認できるようにグローバルに公開
-    ;(window as unknown as { __processedMicTrack?: MediaStreamTrack }).__processedMicTrack = track
 
     return track
   }
