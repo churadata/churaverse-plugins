@@ -322,6 +322,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
   private exitMeeting(): void {
     this.cleanup()
+    DomManager.removeAll()
     this.store.of('transitionPlugin').transitionManager.transitionTo('TitleScene')
   }
 
