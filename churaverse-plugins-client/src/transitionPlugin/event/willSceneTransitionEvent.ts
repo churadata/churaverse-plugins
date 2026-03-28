@@ -1,4 +1,4 @@
-import { CVEvent, IMainScene, ITitleScene, Scenes } from 'churaverse-engine-client'
+import { CVEvent, IMainScene, IMeetingScene, ITitleScene, Scenes } from 'churaverse-engine-client'
 import { ISceneTransitionDataTransporter } from '../interface/ISceneTransitionDataTransporter'
 
 export class WillSceneTransitionEvent<CurrentScene extends Scenes, DestScene extends Scenes> extends CVEvent<Scenes> {
@@ -17,5 +17,8 @@ declare module 'churaverse-engine-client' {
   }
   export interface CVMainEventMap {
     willSceneTransition: WillSceneTransitionEvent<IMainScene, Scenes>
+  }
+  export interface CVMeetingEventMap {
+    willSceneTransition: WillSceneTransitionEvent<IMeetingScene, Scenes>
   }
 }

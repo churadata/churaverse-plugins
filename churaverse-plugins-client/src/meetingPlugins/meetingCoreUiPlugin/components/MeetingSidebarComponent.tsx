@@ -1,7 +1,6 @@
 import { JSXFunc } from 'churaverse-engine-client'
 import style from './MeetingSidebarComponent.module.scss'
 
-// スタイルのエクスポート（MeetingWebRtcPluginで使用）
 export { style as sidebarStyles }
 
 export const SIDEBAR_ID = 'meeting-sidebar'
@@ -18,7 +17,6 @@ export const CHAT_SEND_BUTTON_ID = 'chat-send-button'
 export const MeetingSidebarComponent: JSXFunc = () => {
   return (
     <div className={style.sidebar} id={SIDEBAR_ID} data-visible="false" data-tab="participants">
-      {/* 参加者一覧 */}
       <div className={style.section} id={PARTICIPANTS_SECTION_ID} data-active="true">
         <div className={style.sectionHeader}>
           <span className={style.sectionTitle} id={PARTICIPANTS_COUNT_ID}>
@@ -30,12 +28,9 @@ export const MeetingSidebarComponent: JSXFunc = () => {
             </svg>
           </button>
         </div>
-        <div className={style.participantList} id={PARTICIPANT_LIST_ID}>
-          {/* MeetingWebRtcPluginが動的に参加者を追加 */}
-        </div>
+        <div className={style.participantList} id={PARTICIPANT_LIST_ID}></div>
       </div>
 
-      {/* チャット */}
       <div className={style.section} id={CHAT_SECTION_ID} data-active="false">
         <div className={style.sectionHeader}>
           <span className={style.sectionTitle}>チャット</span>
@@ -45,9 +40,7 @@ export const MeetingSidebarComponent: JSXFunc = () => {
             </svg>
           </button>
         </div>
-        <div className={style.chatMessages} id={CHAT_MESSAGES_ID}>
-          {/* チャット機能は後回し */}
-        </div>
+        <div className={style.chatMessages} id={CHAT_MESSAGES_ID}></div>
         <div className={style.chatInputArea}>
           <input type="text" className={style.chatInput} id={CHAT_INPUT_ID} placeholder="メッセージを入力..." />
           <button className={style.chatSendButton} id={CHAT_SEND_BUTTON_ID}>

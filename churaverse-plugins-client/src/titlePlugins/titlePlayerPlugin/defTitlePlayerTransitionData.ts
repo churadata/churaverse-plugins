@@ -4,4 +4,8 @@ declare module '@churaverse/transition-plugin-client/sceneTransitionData/defScen
   export interface TitleToMainData {
     ownPlayer: Player
   }
+
+  export interface TitleToMeetingData {
+    ownPlayer: Player
+  }
 }
