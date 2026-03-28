@@ -1,0 +1,30 @@
+{
+  "name": "@churaverse/network-plugin-server",
+  "version": "0.1.5",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/churadata/churaverse-plugins.git",
+    "directory": "packages/plugins-server/src/networkPlugin"
+  },
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/types/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "link:cvPackages": "sh npm_link_cvPackages.sh"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/async-lock": "^1.4.2"
+  },
+  "dependencies": {
+    "churaverse-engine-server": "workspace:*",
+    "async-lock": "^1.4.1",
+    "socket.io": "^4.7.4"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "churaverse-plugins-client",
+  "private": true,
+  "description": "Lint/format root for client plugins",
+  "scripts": {
+    "lint": "eslint src",
+    "format": "prettier --write src"
+  }
+}

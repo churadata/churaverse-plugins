@@ -1,68 +1,64 @@
 name: publish packages
-run-name: publish packages
+run-name: Changesets Release
 
 on:
-  pull_request:
+  push:
     branches:
-      - test/CV-854/test-workflow # 動作確認用のパッケージが存在するブランチ（修正予定）
-    types:
-      - closed
+      - main
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 permissions:
   contents: write
+  pull-requests: write
   id-token: write
 
 jobs:
-  publish:
-    if: ${{ github.event.pull_request.merged == true }}
+  release:
+    name: Release Packages
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          ref: test/CV-854/test-workflow # 動作確認用のパッケージが存在するブランチ（修正予定）
+          version: 10.28.1
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
-          registry-url: https://registry.npmjs.org/
+          node-version: 20.20.0
+          registry-url: https://registry.npmjs.org
 
-      - name: configure git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      - name: Update npm
+        run: npm install -g npm@11.8.0
 
-      - name: Check publish.txt
+      - name: List workspace packages
+        run: pnpm -r list --depth -1
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Show release plan
         run: |
-          if [ ! -f publish.txt ]; then
-            echo "publish.txt not found, skip publish"
-            exit 0
+          if ls .changeset/*.md 1> /dev/null 2>&1; then
+            echo "🦋 Release plan"
+            pnpm changeset status
           fi
 
-      - name: Publish packages
-        run: |
-          set -e
-
-          while read ENTRY; do
-            # ENTRY 例: @churaverse/bomb-plugin-server/v1.2.3
-
-            # ENTRY からパッケージ名を取り出す
-            PKG=$(echo "$ENTRY" | sed 's|/v[0-9].*$||')
-            PKG_PATH=$(./.github/scripts/resolve-package-path.sh "$PKG")
-
-            echo "🚀 publishing $ENTRY"
-            npm publish --access public --prefix "$PKG_PATH"
-
-            git tag "$ENTRY"
-          done < publish.txt
-
-      - name: Cleanup publish.txt
-        run: |
-          rm publish.txt
-          git add publish.txt
-          git commit -m "chore: consume publish.txt after publish"
-          git push origin main
-
-      - name: Push tags
-        run: |
-          git push origin --tags
+      - name: Changesets Release
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          version: pnpm changeset version
+          publish: pnpm changeset publish
+          commit: "chore: version packages"
+          title: "chore: release packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

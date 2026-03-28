@@ -1,0 +1,7 @@
+packages:
+  - packages/engine-client
+  - packages/engine-server
+  - packages/plugins-client
+  - packages/plugins-server
+  - packages/plugins-client/src/*
+  - packages/plugins-server/src/*
