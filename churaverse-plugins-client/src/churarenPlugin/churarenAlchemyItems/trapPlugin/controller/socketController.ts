@@ -75,8 +75,7 @@ export class SocketController extends BaseSocketController<IMainScene> {
     if (data.cause !== 'trap') return
     const target = this.bossPluginStore.bosses.get(data.targetId)
     const trap = this.trapPluginStore.traps.get(data.sourceId)
-    const attacker = trap?.churarenWeaponOwnerId
-    if (target === undefined || trap === undefined || attacker === undefined) return
+    if (target === undefined || trap === undefined) return
     const trapDamageCause = new TrapDamageCause(trap)
     const livingDamageEvent = new LivingDamageEvent(target, trapDamageCause, data.amount)
     this.eventBus.post(livingDamageEvent)
