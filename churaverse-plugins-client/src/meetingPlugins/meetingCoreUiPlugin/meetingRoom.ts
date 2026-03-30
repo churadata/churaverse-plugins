@@ -1,4 +1,4 @@
-import { LiveKitSession } from '../../webRtcPlugin/livekit'
+import { LiveKitSession } from '@churaverse/web-rtc-plugin-client/livekit'
 
 /**
  * MeetingScene用のLiveKitセッション。

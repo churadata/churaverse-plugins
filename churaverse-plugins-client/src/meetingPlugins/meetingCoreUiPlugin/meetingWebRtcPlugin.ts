@@ -15,7 +15,7 @@ import { VideoGridUi } from './ui/videoGridUi'
 import { ParticipantListUi } from './ui/participantListUi'
 import { ChatUi } from './ui/chatUi'
 import { MeetingRoom } from './meetingRoom'
-import { LiveKitChatService } from '../../webRtcPlugin/livekit'
+import { LiveKitChatService } from '@churaverse/web-rtc-plugin-client/livekit'
 import '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
 
 export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
