@@ -2,7 +2,6 @@ import { IMainScene, Store } from 'churaverse-engine-client'
 import { IGameSelectionListContainer } from '@churaverse/game-plugin-client/interface/IGameSelectionListContainer'
 import { GameSelectionListItemRenderer } from '@churaverse/game-plugin-client/ui/gameList/gameSelectionListItemRenderer'
 import { CHURAREN_CONSTANTS } from '../../constants/churarenConstants'
-
 import CHURAREN_ICON_PATH from '../../assets/churarenIcon.png'
 import { GamePolicy } from '@churaverse/game-plugin-client/interface/gamePolicy'
 
