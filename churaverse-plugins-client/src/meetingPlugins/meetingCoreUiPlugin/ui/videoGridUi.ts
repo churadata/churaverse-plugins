@@ -41,6 +41,21 @@ export class VideoGridUi {
     this.updateGridLayout()
   }
 
+  public updateParticipantName(participantId: string, displayName: string): void {
+    const tile = document.getElementById(`${PARTICIPANT_TILE_ID_PREFIX}${participantId}`)
+    if (tile === null) return
+    const nameSpan = tile.querySelector(`.${videoGridStyles.name}`)
+    if (nameSpan !== null) {
+      const label = participantId === this.ownParticipantId ? `${displayName} (自分)` : displayName
+      nameSpan.textContent = label
+    }
+    const avatarEl = tile.querySelector(`.${videoGridStyles.avatar}`)
+    if (avatarEl !== null) {
+      avatarEl.textContent = getInitials(displayName)
+      ;(avatarEl as HTMLElement).style.backgroundColor = getAvatarColor(displayName)
+    }
+  }
+
   public removeParticipantTile(participantId: string): void {
     document.getElementById(`${PARTICIPANT_TILE_ID_PREFIX}${participantId}`)?.remove()
     document.getElementById(`tile-screenshare-${participantId}`)?.remove()

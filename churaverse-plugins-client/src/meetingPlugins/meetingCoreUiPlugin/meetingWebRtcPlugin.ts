@@ -19,7 +19,6 @@ import { VIDEO_GRID_ID } from './components/VideoGridComponent'
 import { CHAT_INPUT_ID, CHAT_SEND_BUTTON_ID } from './components/MeetingSidebarComponent'
 import { MeetingPluginStore, ChatMessage } from './store/defMeetingPluginStore'
 import { initMeetingPluginStore } from './store/initMeetingPluginStore'
-import { readCookie } from './utils/cookieUtils'
 import { VideoGridUi } from './ui/videoGridUi'
 import { ParticipantListUi } from './ui/participantListUi'
 import { ChatUi } from './ui/chatUi'
@@ -41,10 +40,12 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private init(): void {
-    const storedDisplayName = (sessionStorage.getItem('meetingPlayerName') ?? readCookie('name') ?? '').trim()
+    const receivedData = this.store.of('transitionPlugin').transitionManager.getReceivedData() as unknown as
+      | { ownPlayer?: { name?: string } }
+      | undefined
+    const displayName = (receivedData?.ownPlayer?.name ?? '').trim()
     const participantId = this.generateParticipantId()
-    const displayName = storedDisplayName !== '' ? storedDisplayName : participantId
-    initMeetingPluginStore(this.store, participantId, displayName)
+    initMeetingPluginStore(this.store, participantId, displayName !== '' ? displayName : participantId)
     this.meetingPluginStore = this.store.of('meetingPlugin')
     window.addEventListener('beforeunload', () => {
       this.cleanup()
@@ -130,6 +131,11 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       this.videoGridUi.addParticipantTile(participant)
       this.updateParticipantList(meetingRoom)
       this.sendChatHistory(meetingRoom, participant)
+    })
+
+    room.on(RoomEvent.ParticipantNameChanged, (_name, participant) => {
+      this.videoGridUi.updateParticipantName(participant.identity, participant.name ?? participant.identity)
+      this.updateParticipantList(meetingRoom)
     })
 
     room.on(RoomEvent.ParticipantDisconnected, (participant) => {
