@@ -1,13 +1,5 @@
 import { BasePlugin, DomManager, IMeetingScene } from 'churaverse-engine-client'
-import {
-  Room,
-  RoomEvent,
-  Track,
-  RemoteParticipant,
-  Participant,
-  DataPacket_Kind,
-  TrackPublication,
-} from 'livekit-client'
+import { Room, RoomEvent, Track, RemoteParticipant, Participant, TrackPublication } from 'livekit-client'
 import {
   MIC_TOGGLE_BUTTON_ID,
   CAMERA_TOGGLE_BUTTON_ID,
@@ -17,19 +9,21 @@ import {
 } from './components/MeetingControlBarComponent'
 import { VIDEO_GRID_ID } from './components/VideoGridComponent'
 import { CHAT_INPUT_ID, CHAT_SEND_BUTTON_ID } from './components/MeetingSidebarComponent'
-import { MeetingPluginStore, ChatMessage } from './store/defMeetingPluginStore'
+import { MeetingPluginStore } from './store/defMeetingPluginStore'
 import { initMeetingPluginStore } from './store/initMeetingPluginStore'
 import { VideoGridUi } from './ui/videoGridUi'
 import { ParticipantListUi } from './ui/participantListUi'
 import { ChatUi } from './ui/chatUi'
 import { MeetingRoom } from './meetingRoom'
+import { LiveKitChatService } from '../../webRtcPlugin/livekit'
 import '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
 
-export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
+export class MeetingSessionPlugin extends BasePlugin<IMeetingScene> {
   private meetingPluginStore!: MeetingPluginStore
   private videoGridUi!: VideoGridUi
   private participantListUi!: ParticipantListUi
   private chatUi!: ChatUi
+  private chatService!: LiveKitChatService
   private isMicEnabled: boolean = false
   private isCameraEnabled: boolean = false
   private isScreenShareEnabled: boolean = false
@@ -40,7 +34,9 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private init(): void {
-    const receivedData = this.store.of('transitionPlugin').transitionManager.getReceivedData() as unknown as { ownPlayer?: { name?: string } } | undefined
+    const receivedData = this.store.of('transitionPlugin').transitionManager.getReceivedData() as unknown as
+      | { ownPlayer?: { name?: string } }
+      | undefined
     const displayName = (receivedData?.ownPlayer?.name ?? '').trim()
     const participantId = this.generateParticipantId()
     initMeetingPluginStore(this.store, participantId, displayName !== '' ? displayName : participantId)
@@ -94,15 +90,20 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     const { room } = meetingRoom
     this.setupRoomEventHandlers(meetingRoom)
 
+    this.chatService = new LiveKitChatService(room, this.meetingPluginStore.participantId, this.meetingPluginStore.displayName)
+    this.chatService.setHandler({
+      onChatMessage: (senderId, senderName, text) => {
+        this.chatUi.addMessage(senderId, senderName, text)
+      },
+    })
+
     try {
       await meetingRoom.connect(this.meetingPluginStore.participantId, this.meetingPluginStore.displayName)
       this.meetingPluginStore.isConnected = true
 
-      console.log('[DEBUG] localParticipant:', { identity: room.localParticipant.identity, name: room.localParticipant.name })
       this.videoGridUi.addParticipantTile(room.localParticipant)
 
       room.participants.forEach((participant: RemoteParticipant) => {
-        console.log('[DEBUG] remoteParticipant:', { identity: participant.identity, name: participant.name })
         this.videoGridUi.addParticipantTile(participant)
 
         participant.videoTracks.forEach((publication) => {
@@ -128,14 +129,11 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     const { room } = meetingRoom
 
     room.on(RoomEvent.ParticipantConnected, (participant) => {
-      console.log('[DEBUG] ParticipantConnected:', { identity: participant.identity, name: participant.name })
       this.videoGridUi.addParticipantTile(participant)
       this.updateParticipantList(meetingRoom)
-      this.sendChatHistory(meetingRoom, participant)
     })
 
     room.on(RoomEvent.ParticipantNameChanged, (_name, participant) => {
-      console.log('[DEBUG] ParticipantNameChanged:', { identity: participant.identity, name: participant.name })
       this.videoGridUi.updateParticipantName(participant.identity, participant.name ?? participant.identity)
       this.updateParticipantList(meetingRoom)
     })
@@ -178,10 +176,6 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       }
       this.updateParticipantList(meetingRoom)
     })
-
-    room.on(RoomEvent.DataReceived, (payload, participant) => {
-      this.handleDataReceived(payload, participant)
-    })
   }
 
   private handleTrackAttachment(track: Track, publication: TrackPublication, participant: Participant): void {
@@ -201,80 +195,6 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     } else {
       this.videoGridUi.detachTrack(track, participantIdentity)
     }
-  }
-
-  private handleDataReceived(payload: Uint8Array, participant: RemoteParticipant | undefined): void {
-    const message = this.parseDataPayload(payload)
-    if (message === undefined) return
-
-    if (message.type === 'chat_history' && Array.isArray(message.history)) {
-      this.handleChatHistory(message.history)
-    } else if (message.type === 'chat' && typeof message.text === 'string' && participant !== undefined) {
-      this.handleChatMessage(message, participant)
-    }
-  }
-
-  private parseDataPayload(payload: Uint8Array): Record<string, unknown> | undefined {
-    try {
-      const decoder = new TextDecoder()
-      const jsonStr = decoder.decode(payload)
-      const parsed: unknown = JSON.parse(jsonStr)
-      if (typeof parsed !== 'object' || parsed === null) return undefined
-      const message = parsed as Record<string, unknown>
-      if (typeof message.type !== 'string' || typeof message.sender !== 'string') return undefined
-      return message
-    } catch (e) {
-      console.error('[MeetingWebRtc] Failed to parse data payload:', e)
-      return undefined
-    }
-  }
-
-  private handleChatHistory(history: unknown[]): void {
-    for (const entry of history) {
-      if (typeof entry !== 'object' || entry === null) continue
-      const h = entry as Record<string, unknown>
-      if (typeof h.timestamp !== 'number' || typeof h.sender !== 'string' || typeof h.text !== 'string') continue
-      const messageId = typeof h.messageId === 'string' ? h.messageId : this.buildLegacyMessageId(h)
-      const senderId = typeof h.senderId === 'string' ? h.senderId : h.sender
-      const historyMsg: ChatMessage = {
-        type: 'chat',
-        messageId,
-        sender: h.sender,
-        senderId,
-        text: h.text,
-        timestamp: h.timestamp,
-      }
-      const exists =
-        messageId !== undefined
-          ? this.meetingPluginStore.chatHistory.some((m) => m.messageId === messageId)
-          : this.meetingPluginStore.chatHistory.some(
-              (m) => m.timestamp === historyMsg.timestamp && (m.senderId ?? m.sender) === senderId
-            )
-      if (!exists) {
-        this.meetingPluginStore.chatHistory.push(historyMsg)
-        this.chatUi.addMessage(senderId, historyMsg.sender, historyMsg.text)
-      }
-    }
-  }
-
-  private handleChatMessage(message: Record<string, unknown>, participant: RemoteParticipant): void {
-    const messageId = typeof message.messageId === 'string' ? message.messageId : this.buildLegacyMessageId(message)
-    const chatMsg: ChatMessage = {
-      type: 'chat',
-      messageId,
-      sender: message.sender as string,
-      senderId: typeof message.senderId === 'string' ? message.senderId : participant.identity,
-      text: message.text as string,
-      timestamp: typeof message.timestamp === 'number' ? message.timestamp : Date.now(),
-    }
-    if (
-      chatMsg.messageId !== undefined &&
-      this.meetingPluginStore.chatHistory.some((m) => m.messageId === chatMsg.messageId)
-    ) {
-      return
-    }
-    this.meetingPluginStore.chatHistory.push(chatMsg)
-    this.chatUi.addMessage(chatMsg.senderId ?? participant.identity, chatMsg.sender, chatMsg.text)
   }
 
   private updateParticipantList(meetingRoom: MeetingRoom): void {
@@ -314,7 +234,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     chatSendButton.addEventListener('click', () => {
       if (chatInput.value.trim() !== '') {
-        void this.sendChatMessage(room, chatInput.value.trim())
+        void this.chatService.sendChat(chatInput.value.trim())
         chatInput.value = ''
       }
     })
@@ -322,7 +242,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     chatInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' && !e.shiftKey && chatInput.value.trim() !== '') {
         e.preventDefault()
-        void this.sendChatMessage(room, chatInput.value.trim())
+        void this.chatService.sendChat(chatInput.value.trim())
         chatInput.value = ''
       }
     })
@@ -368,69 +288,5 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     } else {
       button.classList.remove(controlBarStyles.activeButton)
     }
-  }
-
-  private async sendChatMessage(room: Room, text: string): Promise<void> {
-    if (!this.meetingPluginStore.isConnected) return
-
-    const message: ChatMessage = {
-      type: 'chat',
-      messageId: this.generateMessageId(),
-      sender: this.meetingPluginStore.displayName,
-      senderId: this.meetingPluginStore.participantId,
-      text,
-      timestamp: Date.now(),
-    }
-
-    try {
-      const encoder = new TextEncoder()
-      const data = encoder.encode(JSON.stringify(message))
-      await room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE)
-      this.meetingPluginStore.chatHistory.push(message)
-      this.chatUi.addMessage(this.meetingPluginStore.participantId, this.meetingPluginStore.displayName, text)
-    } catch (e) {
-      console.error('[MeetingWebRtc] Failed to send chat message:', e)
-    }
-  }
-
-  private sendChatHistory(meetingRoom: MeetingRoom, destination: RemoteParticipant): void {
-    if (!this.meetingPluginStore.isConnected || this.meetingPluginStore.chatHistory.length === 0) return
-
-    const historyMessage: ChatMessage = {
-      type: 'chat_history',
-      messageId: this.generateMessageId(),
-      sender: this.meetingPluginStore.displayName,
-      senderId: this.meetingPluginStore.participantId,
-      text: '',
-      timestamp: Date.now(),
-      history: this.meetingPluginStore.chatHistory,
-    }
-
-    try {
-      const encoder = new TextEncoder()
-      const data = encoder.encode(JSON.stringify(historyMessage))
-      void meetingRoom.room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE, [destination])
-    } catch (e) {
-      console.error('[MeetingWebRtc] Failed to send chat history:', e)
-    }
-  }
-
-  private generateMessageId(): string {
-    if (globalThis.crypto?.randomUUID !== undefined) {
-      return globalThis.crypto.randomUUID()
-    }
-    return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`
-  }
-
-  private buildLegacyMessageId(message: Record<string, unknown>): string | undefined {
-    if (
-      typeof message.timestamp !== 'number' ||
-      typeof message.sender !== 'string' ||
-      typeof message.text !== 'string'
-    ) {
-      return undefined
-    }
-    const senderId = typeof message.senderId === 'string' ? message.senderId : message.sender
-    return `${senderId}:${message.timestamp}:${message.text}`
   }
 }

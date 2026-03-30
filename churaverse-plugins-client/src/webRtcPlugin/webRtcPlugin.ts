@@ -1,19 +1,20 @@
-import { BasePlugin, IMainScene } from 'churaverse-engine-client'
-import { RoomEvent, DataPacket_Kind } from 'livekit-client'
+import { BasePlugin, IMainScene, ITitleScene } from 'churaverse-engine-client'
 import { ChangeLocalDeviceEvent } from './event/changeLocalDeviceEvent'
 import { WebRtcPluginStore } from './store/defWebRtcPluginStore'
 import { initWebRtcPluginStore } from './store/initWebRtcPluginStore'
 import { WebRtcUi } from './ui/webRtcUi'
-import { MeetingParticipantPanel } from './ui/meetingParticipantPanel/meetingParticipantPanel'
+import { LiveKitChatService } from './livekit'
 import { TextChat } from '@churaverse/text-chat-plugin-client/model/textChat'
 import { AddTextChatEvent } from '@churaverse/text-chat-plugin-client/event/addTextChatEvent'
 import { SendTextChatEvent } from '@churaverse/text-chat-plugin-client/event/sendTextChatEvent'
 import '@churaverse/transition-plugin-client/event/willSceneTransitionEvent'
+import '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
+import '@churaverse/title-plugin-client/titlePlayerPlugin/defTitlePlayerTransitionData'
 
 export class WebRtcPlugin extends BasePlugin<IMainScene> {
   private webRtcPluginStore!: WebRtcPluginStore
   private webRtcUi?: WebRtcUi
-  private meetingParticipantPanel?: MeetingParticipantPanel
+  private chatService?: LiveKitChatService
 
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.init.bind(this))
@@ -30,7 +31,6 @@ export class WebRtcPlugin extends BasePlugin<IMainScene> {
 
   private start(): void {
     this.webRtcUi = new WebRtcUi(this.store, this.bus)
-    this.meetingParticipantPanel = new MeetingParticipantPanel(this.webRtcPluginStore.webRtc.room)
     this.setupChatBridge()
 
     navigator.mediaDevices.addEventListener('devicechange', () => {
@@ -38,51 +38,29 @@ export class WebRtcPlugin extends BasePlugin<IMainScene> {
     })
   }
 
-  /**
-   * LiveKit data channelとTextChatの双方向ブリッジ
-   */
   private setupChatBridge(): void {
     const room = this.webRtcPluginStore.webRtc.room
-    console.log('[ChatBridge] setupChatBridge called, room state:', room.state)
-    room.on(RoomEvent.DataReceived, (payload, participant) => {
-      console.log('[ChatBridge] DataReceived, participant:', participant?.identity)
-      if (participant === undefined) return
-      try {
-        const message = JSON.parse(new TextDecoder().decode(payload)) as { type: string; text?: string }
-        console.log('[ChatBridge] message type:', message.type, 'text:', message.text)
-        if (message.type !== 'chat' || typeof message.text !== 'string') return
+    const transitionStore = this.store.of('transitionPlugin')
+    const receivedData = transitionStore.transitionManager.getReceivedData<ITitleScene>()
+    const ownPlayerName = receivedData?.ownPlayer?.name ?? room.localParticipant.identity
 
+    this.chatService = new LiveKitChatService(room, room.localParticipant.identity, ownPlayerName)
+    this.chatService.setHandler({
+      onChatMessage: (senderId, senderName, text) => {
         // ゲームプレイヤーからのチャットはsocket.io経由で受信するためスキップ
-        const isGamePlayer = document.getElementById(`player-${participant.identity}`) !== null
-        console.log('[ChatBridge] isGamePlayer:', isGamePlayer, 'identity:', participant.identity)
+        const isGamePlayer = document.getElementById(`player-${senderId}`) !== null
         if (isGamePlayer) return
 
-        const displayName = this.meetingParticipantPanel?.getDisplayName(participant) ?? participant.identity
-        console.log('[ChatBridge] posting AddTextChatEvent, displayName:', displayName)
-        const textChat = new TextChat(participant.identity, displayName, message.text)
+        const textChat = new TextChat(senderId, senderName, text)
         this.bus.post(new AddTextChatEvent(textChat))
-      } catch (e) {
-        console.error('[ChatBridge] error:', e)
-      }
+      },
     })
   }
 
-  /**
-   * TextChatの送信をLiveKit data channelにも転送
-   */
   private onSendTextChat(ev: SendTextChatEvent): void {
     const room = this.webRtcPluginStore.webRtc.room
-    console.log('[ChatBridge] onSendTextChat, room state:', room.state, 'message:', ev.textChat.message)
     if (room.state !== 'connected') return
-
-    const message = {
-      type: 'chat',
-      sender: room.localParticipant.identity,
-      text: ev.textChat.message,
-      timestamp: Date.now(),
-    }
-    const data = new TextEncoder().encode(JSON.stringify(message))
-    void room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE)
+    void this.chatService?.sendChat(ev.textChat.message)
   }
 
   private willSceneTransition(): void {

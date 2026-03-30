@@ -9,7 +9,6 @@ export function initMeetingPluginStore(
   const meetingPluginStore: MeetingPluginStore = {
     participantId,
     displayName,
-    chatHistory: [],
     meetingRoom: undefined,
     isConnected: false,
   }
