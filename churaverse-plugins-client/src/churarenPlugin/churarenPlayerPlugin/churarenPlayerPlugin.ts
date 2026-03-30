@@ -41,6 +41,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   private socketController?: SocketController
   private keyboardController?: KeyboardController
 
+  private readonly INVINCIBLE_BLINK_DURATION_MS = 100
   private readonly INVINCIBLE_BLINK_CYCLE_MS = 200
 
   public listenEvent(): void {
@@ -169,10 +170,12 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
 
   private readonly onInvicibleTime = (ev: InvicibleTimeEvent): void => {
     const playerId = ev.id
-    const invicibleTime = ev.invicibleTime
-    this.playerPluginStore.playerRenderers.get(playerId)?.blinkTarget(
-      invicibleTime,
-      this.INVINCIBLE_BLINK_CYCLE_MS / this.INVINCIBLE_BLINK_CYCLE_MS)
+    this.playerPluginStore.playerRenderers
+      .get(playerId)
+      ?.blinkTarget(
+        this.INVINCIBLE_BLINK_DURATION_MS,
+        ev.invicibleTime / this.INVINCIBLE_BLINK_CYCLE_MS
+      )
   }
 
   private readonly getItem = (ev: GetChurarenItemEvent): void => {
