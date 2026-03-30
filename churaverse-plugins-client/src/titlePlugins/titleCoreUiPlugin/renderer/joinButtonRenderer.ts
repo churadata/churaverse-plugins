@@ -81,12 +81,14 @@ export class JoinButtonRenderer implements IJoinButtonRenderer {
     if (validateResult) {
       this.joinButton.disableInteractive()
 
-      const player = this.titlePlayerPluginStore.ownPlayer
-      sessionStorage.setItem('meetingPlayerName', player.name)
-
       const targetScene: SceneName = this.gameModeSelectorRenderer.isGameModeEnabled()
         ? 'MainScene'
         : 'MeetingScene'
+
+      if (targetScene === 'MeetingScene') {
+        const player = this.titlePlayerPluginStore.ownPlayer
+        sessionStorage.setItem('meetingPlayerName', player.name)
+      }
 
       DomManager.removeAll()
       this.transitionPluginStore.transitionManager.transitionTo(targetScene)

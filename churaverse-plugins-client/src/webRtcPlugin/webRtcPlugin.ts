@@ -43,13 +43,13 @@ export class WebRtcPlugin extends BasePlugin<IMainScene> {
     const transitionStore = this.store.of('transitionPlugin')
     const receivedData = transitionStore.transitionManager.getReceivedData<ITitleScene>()
     const ownPlayerName = receivedData?.ownPlayer?.name ?? room.localParticipant.identity
+    const playerPluginStore = this.store.of('playerPlugin')
 
     this.chatService = new LiveKitChatService(room, room.localParticipant.identity, ownPlayerName)
     this.chatService.setHandler({
       onChatMessage: (senderId, senderName, text) => {
-        // ゲームプレイヤーからのチャットはsocket.io経由で受信するためスキップ
-        const isGamePlayer = document.getElementById(`player-${senderId}`) !== null
-        if (isGamePlayer) return
+        // ゲーム内プレイヤー（PlayersRepository にいる ID）のチャットは Socket 経由で既に扱うためスキップ
+        if (playerPluginStore.players.get(senderId) !== undefined) return
 
         const textChat = new TextChat(senderId, senderName, text)
         this.bus.post(new AddTextChatEvent(textChat))

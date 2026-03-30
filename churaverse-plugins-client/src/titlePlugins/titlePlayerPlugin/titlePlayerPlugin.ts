@@ -9,6 +9,7 @@ import {
   Direction,
   Scenes,
   IMainScene,
+  IMeetingScene,
 } from 'churaverse-engine-client'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { PlayerSetupInfoReader } from '@churaverse/player-plugin-client/interface/playerSetupInfoReader'
@@ -132,6 +133,10 @@ export class TitlePlayerPlugin extends BasePlugin<ITitleScene> {
       this.ownPlayer.role,
       this.ownPlayer.spawnTime
     )
-    ev.sceneDataTransporter.push<IMainScene, 'ownPlayer'>('ownPlayer', player)
+    if (ev.to === 'MainScene') {
+      ev.sceneDataTransporter.push<IMainScene, 'ownPlayer'>('ownPlayer', player)
+    } else {
+      ev.sceneDataTransporter.push<IMeetingScene, 'ownPlayer'>('ownPlayer', player)
+    }
   }
 }

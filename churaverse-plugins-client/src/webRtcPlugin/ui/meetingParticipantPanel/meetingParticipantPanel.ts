@@ -159,8 +159,8 @@ export class MeetingParticipantPanel {
 
   private setMicIcon(container: HTMLElement, isMicEnabled: boolean): void {
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-    svg.setAttribute('width', '14')
-    svg.setAttribute('height', '14')
+    svg.setAttribute('width', '16')
+    svg.setAttribute('height', '16')
     svg.setAttribute('viewBox', '0 0 24 24')
     svg.setAttribute('fill', 'currentColor')
 

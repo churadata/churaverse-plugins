@@ -1,4 +1,4 @@
-import { BasePlugin, DomManager, IMeetingScene } from 'churaverse-engine-client'
+import { BasePlugin, DomManager, IMeetingScene, ITitleScene } from 'churaverse-engine-client'
 import { Room, RoomEvent, Track, RemoteParticipant, Participant, TrackPublication } from 'livekit-client'
 import {
   MIC_TOGGLE_BUTTON_ID,
@@ -15,6 +15,7 @@ import { VideoGridUi } from './ui/videoGridUi'
 import { ParticipantListUi } from './ui/participantListUi'
 import { ChatUi } from './ui/chatUi'
 import { MeetingRoom } from './meetingRoom'
+import { getParticipantDisplayName } from './utils/participantDisplayName'
 import { LiveKitChatService } from '@churaverse/web-rtc-plugin-client/livekit'
 import '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
 
@@ -34,7 +35,8 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private init(): void {
-    const receivedData = this.store.of('transitionPlugin').transitionManager.getReceivedData() as unknown as
+    // Title→Meeting の遷移データは title 側の module augmentation で ownPlayer 付き。パッケージ境界で型が合わない場合があるため最小限アサートする。
+    const receivedData = this.store.of('transitionPlugin').transitionManager.getReceivedData<ITitleScene>() as
       | { ownPlayer?: { name?: string } }
       | undefined
     const displayName = (receivedData?.ownPlayer?.name ?? '').trim()
@@ -134,7 +136,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     })
 
     room.on(RoomEvent.ParticipantNameChanged, (_name, participant) => {
-      this.videoGridUi.updateParticipantName(participant.identity, participant.name ?? participant.identity)
+      this.videoGridUi.updateParticipantName(participant.identity, getParticipantDisplayName(participant))
       this.updateParticipantList(meetingRoom)
     })
 
@@ -180,7 +182,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
   private handleTrackAttachment(track: Track, publication: TrackPublication, participant: Participant): void {
     if (publication.source === Track.Source.ScreenShare) {
-      this.videoGridUi.attachScreenShareTrack(track, participant.identity, participant.name ?? participant.identity)
+      this.videoGridUi.attachScreenShareTrack(track, participant.identity, getParticipantDisplayName(participant))
     } else {
       this.videoGridUi.attachTrack(track, participant.identity)
     }
