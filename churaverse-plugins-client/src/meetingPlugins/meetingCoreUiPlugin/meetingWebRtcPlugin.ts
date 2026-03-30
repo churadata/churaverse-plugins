@@ -18,7 +18,7 @@ import { MeetingRoom } from './meetingRoom'
 import { LiveKitChatService } from '../../webRtcPlugin/livekit'
 import '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
 
-export class MeetingSessionPlugin extends BasePlugin<IMeetingScene> {
+export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   private meetingPluginStore!: MeetingPluginStore
   private videoGridUi!: VideoGridUi
   private participantListUi!: ParticipantListUi
