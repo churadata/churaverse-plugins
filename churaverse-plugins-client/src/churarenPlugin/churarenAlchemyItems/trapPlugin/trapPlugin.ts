@@ -80,9 +80,9 @@ export class TrapPlugin extends BaseAlchemyItemPlugin {
   }
 
   protected handleGameTermination(): void {
-    resetTrapPluginStore(this.store)
     this.socketController?.unregisterMessageListener()
     this.clearTrap()
+    resetTrapPluginStore(this.store)
   }
 
   protected handleMidwayParticipant(): void {
