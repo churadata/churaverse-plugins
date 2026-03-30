@@ -24,7 +24,6 @@ import { PlayerItemsStore } from './store/defPlayerItemsStore'
 import { initPlayerItemStore, resetPlayerItemStore } from './store/initPlayerItemsStore'
 import { DropChurarenItemEvent } from './event/dropChurarenItemEvent'
 import { DropChurarenItemData, DropChurarenItemMessage } from './message/dropChurarenItemMessage'
-import { GamePluginStore } from '@churaverse/game-plugin-client/store/defGamePluginStore'
 import { DeathLog } from '@churaverse/player-plugin-client/ui/deathLog/deathLog'
 
 export class ChurarenPlayerPlugin extends BaseGamePlugin {
@@ -34,7 +33,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private playerPluginStore!: PlayerPluginStore
   private churarenPlayerStore!: ChurarenPlayersStore
-  private gamePluginStore!: GamePluginStore
   private keyboardStore!: KeyboardPluginStore<IMainScene>
   private ghostModeIndicatorUi?: GhostModeIndicatorUi
   private readonly deathLog: DeathLogRepository = new DeathLogRepository()
@@ -70,7 +68,6 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.networkPluginStore = this.store.of('networkPlugin')
     this.playerPluginStore = this.store.of('playerPlugin')
     this.keyboardStore = this.store.of('keyboardPlugin')
-    this.gamePluginStore = this.store.of('gamePlugin')
   }
 
   private setupKeyAction(): void {
