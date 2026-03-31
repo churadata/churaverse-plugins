@@ -1,25 +1,15 @@
-import { Room, RoomEvent, Participant, RemoteParticipant, TrackPublication } from 'livekit-client'
+import { Room, RoomEvent, Participant, RemoteParticipant } from 'livekit-client'
 import style from './MeetingParticipantPanelComponent.module.scss'
+import micOnIcon from './assets/microphone.png'
+import micOffIcon from './assets/microphone_off.png'
 
 const PLAYER_LIST_ID = 'player-list'
 const MEETING_PARTICIPANT_LIST_ID = 'meeting-participant-list'
 const MEETING_PARTICIPANT_DIVIDER_ID = 'meeting-participant-divider'
 
-/**
- * データチャネルで受信するメッセージ
- */
-interface DataMessage {
-  type: 'name_announce' | string
-  displayName?: string
-}
-
-/**
- * 既存の参加者一覧ダイアログにLiveKitミーティング参加者セクションを注入するクラス
- */
 export class MeetingParticipantPanel {
   private listElement: HTMLElement | null = null
   private dividerElement: HTMLElement | null = null
-  private readonly participantNames: Map<string, string> = new Map()
 
   public constructor(private readonly room: Room) {
     this.setupRoomEventListeners()
@@ -35,14 +25,12 @@ export class MeetingParticipantPanel {
     const parent = playerList.parentElement
     if (parent === null) return false
 
-    // 区切り線
     this.dividerElement = document.createElement('div')
     this.dividerElement.id = MEETING_PARTICIPANT_DIVIDER_ID
     this.dividerElement.className = style.divider
-    this.dividerElement.textContent = '会議のみ参加者'
+    this.dividerElement.textContent = '音声のみ参加'
     parent.appendChild(this.dividerElement)
 
-    // 会議参加者リスト
     this.listElement = document.createElement('div')
     this.listElement.id = MEETING_PARTICIPANT_LIST_ID
     this.listElement.className = style.meetingList
@@ -56,7 +44,6 @@ export class MeetingParticipantPanel {
       this.renderMeetingParticipants()
       return
     }
-
     this.room.once(RoomEvent.Connected, () => {
       this.renderMeetingParticipants()
     })
@@ -64,32 +51,11 @@ export class MeetingParticipantPanel {
 
   private setupRoomEventListeners(): void {
     this.room
-      .on(RoomEvent.ParticipantConnected, (_participant: RemoteParticipant) => {
-        this.renderMeetingParticipants()
-      })
-      .on(RoomEvent.ParticipantDisconnected, (_participant: RemoteParticipant) => {
-        this.renderMeetingParticipants()
-      })
-      .on(RoomEvent.TrackMuted, (_publication: TrackPublication, _participant: Participant) => {
-        this.renderMeetingParticipants()
-      })
-      .on(RoomEvent.TrackUnmuted, (_publication: TrackPublication, _participant: Participant) => {
-        this.renderMeetingParticipants()
-      })
-      .on(RoomEvent.ParticipantNameChanged, () => {
-        this.renderMeetingParticipants()
-      })
-      .on(RoomEvent.DataReceived, (payload, participant) => {
-        if (participant === undefined) return
-        try {
-          const decoder = new TextDecoder()
-          const message = JSON.parse(decoder.decode(payload)) as DataMessage
-          if (message.type === 'name_announce' && message.displayName !== undefined) {
-            this.participantNames.set(participant.identity, message.displayName)
-            this.renderMeetingParticipants()
-          }
-        } catch { /* ignore */ }
-      })
+      .on(RoomEvent.ParticipantConnected, () => { this.renderMeetingParticipants() })
+      .on(RoomEvent.ParticipantDisconnected, () => { this.renderMeetingParticipants() })
+      .on(RoomEvent.TrackMuted, () => { this.renderMeetingParticipants() })
+      .on(RoomEvent.TrackUnmuted, () => { this.renderMeetingParticipants() })
+      .on(RoomEvent.ParticipantNameChanged, () => { this.renderMeetingParticipants() })
   }
 
   private renderMeetingParticipants(): void {
@@ -100,22 +66,14 @@ export class MeetingParticipantPanel {
       this.listElement.removeChild(this.listElement.firstChild)
     }
 
-    // ゲームプレイヤー以外の会議参加者を収集
     const meetingOnlyParticipants: Participant[] = []
-
-    // ローカル参加者は常にゲームプレイヤーなのでスキップ
     this.room.participants.forEach((participant: RemoteParticipant) => {
-      // ゲームプレイヤーはPlayerPluginが管理するのでスキップ
-      // ゲームプレイヤーのidentityはsocket IDの形式（ランダムな英数字20文字）
-      // MeetingScene参加者のidentityはプレイヤー名（日本語など）
-      // ゲームのプレイヤーDOMが存在するかで判定
-      const isGamePlayer = document.getElementById(`player-${participant.identity}`) !== null
-      if (!isGamePlayer) {
+      const isMeetingOnlyUser = participant.identity.startsWith('meeting-')
+      if (isMeetingOnlyUser) {
         meetingOnlyParticipants.push(participant)
       }
     })
 
-    // 会議のみ参加者がいない場合はセクションを非表示
     if (meetingOnlyParticipants.length === 0) {
       this.dividerElement.style.display = 'none'
       this.listElement.style.display = 'none'
@@ -130,11 +88,10 @@ export class MeetingParticipantPanel {
     })
   }
 
+  /** participant.name が空文字の場合 identity にフォールバック */
   public getDisplayName(participant: Participant): string {
-    const stored = this.participantNames.get(participant.identity)
-    if (stored !== undefined) return stored
-    if (participant.name !== undefined && participant.name !== '') return participant.name
-    return participant.identity
+    const name = participant.name?.trim()
+    return name !== undefined && name !== '' ? name : participant.identity
   }
 
   private addParticipantItem(participant: Participant): void {
@@ -145,42 +102,15 @@ export class MeetingParticipantPanel {
 
     const nameSpan = document.createElement('div')
     nameSpan.className = style.participantName
-    const displayName = this.getDisplayName(participant)
-    nameSpan.textContent = displayName
+    nameSpan.textContent = this.getDisplayName(participant)
     item.appendChild(nameSpan)
 
-    const micIcon = document.createElement('div')
+    const micIcon = document.createElement('img')
     micIcon.className = style.micIcon
-    this.setMicIcon(micIcon, participant.isMicrophoneEnabled)
+    micIcon.src = participant.isMicrophoneEnabled ? micOnIcon : micOffIcon
+    micIcon.alt = participant.isMicrophoneEnabled ? 'マイクON' : 'マイクOFF'
     item.appendChild(micIcon)
 
     this.listElement.appendChild(item)
-  }
-
-  private setMicIcon(container: HTMLElement, isMicEnabled: boolean): void {
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
-    svg.setAttribute('width', '14')
-    svg.setAttribute('height', '14')
-    svg.setAttribute('viewBox', '0 0 24 24')
-    svg.setAttribute('fill', 'currentColor')
-
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-
-    if (isMicEnabled) {
-      path.setAttribute(
-        'd',
-        'M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z'
-      )
-      container.className = `${style.micIcon} ${style.micOn}`
-    } else {
-      path.setAttribute(
-        'd',
-        'M19 11h-1.7c0 .74-.16 1.43-.43 2.05l1.23 1.23c.56-.98.9-2.09.9-3.28zm-4.02.17c0-.06.02-.11.02-.17V5c0-1.66-1.34-3-3-3S9 3.34 9 5v.18l5.98 5.99zM4.27 3L3 4.27l6.01 6.01V11c0 1.66 1.33 3 2.99 3 .22 0 .44-.03.65-.08l1.66 1.66c-.71.33-1.5.52-2.31.52-2.76 0-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c.91-.13 1.77-.45 2.54-.9L19.73 21 21 19.73 4.27 3z'
-      )
-      container.className = `${style.micIcon} ${style.micOff}`
-    }
-
-    svg.appendChild(path)
-    container.appendChild(svg)
   }
 }

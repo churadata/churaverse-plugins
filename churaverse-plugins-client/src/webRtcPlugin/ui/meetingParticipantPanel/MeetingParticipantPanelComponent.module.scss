@@ -1,25 +1,32 @@
 .divider {
   margin-top: 8px;
-  padding: 4px 0;
-  font-size: 11px;
-  color: #888;
-  border-top: 1px solid #ddd;
+  padding: 6px 0 4px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #3c4043;
+  border-top: 1px solid #dadce0;
   text-align: left;
 }
 
 .meetingList {
   width: 100%;
+  margin-top: 4px;
 }
 
 .listRow {
   display: flex;
   align-items: center;
+  min-height: 28px;
+  padding: 2px 0;
 }
 
 .participantName {
   margin-right: 30px;
   width: 60%;
   text-align: left;
+  font-size: 16px;
+  font-weight: 500;
+  color: #202124;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -29,14 +36,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
 .micOn {
-  color: #34a853;
+  color: #137333;
 }
 
 .micOff {
-  color: #bbb;
+  color: #5f6368;
 }

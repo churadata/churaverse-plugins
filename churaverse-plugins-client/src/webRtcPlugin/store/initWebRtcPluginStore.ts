@@ -13,7 +13,9 @@ export function initWebRtcPluginStore(store: Store<IMainScene>): void {
   const ownPlayerId = playerPluginStore.ownPlayerId
 
   const transitionPluginStore = store.of('transitionPlugin')
-  const ownPlayerName = transitionPluginStore.transitionManager.getReceivedData<ITitleScene>().ownPlayer.name
+  const received = transitionPluginStore.transitionManager.getReceivedData<ITitleScene>()
+  const nameFromTitle = received?.ownPlayer?.name?.trim()
+  const ownPlayerName = nameFromTitle !== undefined && nameFromTitle !== '' ? nameFromTitle : ownPlayerId
 
   const webRtc = new WebRtc(ownPlayerId, ownPlayerName)
 

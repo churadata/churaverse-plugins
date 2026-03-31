@@ -35,7 +35,6 @@ export class MeetingButton {
     DomManager.addDom(btn)
   }
 
-  /** buttonが押されたときの動作 */
   private onClick(): void {
     sessionStorage.setItem('portalToMeeting', 'true')
     window.location.href = '/'
