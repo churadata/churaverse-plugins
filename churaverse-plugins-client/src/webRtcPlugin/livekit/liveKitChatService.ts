@@ -1,5 +1,10 @@
 import { Room, RoomEvent, RemoteParticipant, DataPacket_Kind } from 'livekit-client'
 
+const CHAT_MESSAGE_TYPE = {
+  CHAT: 'chat',
+  CHAT_HISTORY: 'chat_history',
+} as const
+
 export interface ChatMessage {
   type: 'chat' | 'chat_history'
   messageId?: string
@@ -14,8 +19,19 @@ export interface ChatMessageHandler {
   onChatMessage: (senderId: string, senderName: string, text: string) => void
 }
 
+type ParsedDataPacket = Record<string, unknown> & { type: string }
+
+interface NormalizedIncomingChat {
+  messageId: string | undefined
+  senderId: string
+  sender: string
+  timestamp: number
+  text: string
+}
+
 export class LiveKitChatService {
   private readonly chatHistory: ChatMessage[] = []
+  private handler?: ChatMessageHandler
 
   public constructor(
     private readonly room: Room,
@@ -31,8 +47,6 @@ export class LiveKitChatService {
     })
   }
 
-  private handler?: ChatMessageHandler
-
   public setHandler(handler: ChatMessageHandler): void {
     this.handler = handler
   }
@@ -43,7 +57,7 @@ export class LiveKitChatService {
 
   public async sendChat(text: string): Promise<void> {
     const message: ChatMessage = {
-      type: 'chat',
+      type: CHAT_MESSAGE_TYPE.CHAT,
       messageId: this.generateMessageId(),
       sender: this.ownDisplayName,
       senderId: this.ownParticipantId,
@@ -51,8 +65,7 @@ export class LiveKitChatService {
       timestamp: Date.now(),
     }
 
-    const data = new TextEncoder().encode(JSON.stringify(message))
-    await this.room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE)
+    await this.publishReliableData(message)
     this.chatHistory.push(message)
     this.handler?.onChatMessage(this.ownParticipantId, this.ownDisplayName, text)
   }
@@ -61,20 +74,24 @@ export class LiveKitChatService {
     const message = this.parsePayload(payload)
     if (message === undefined) return
 
-    if (message.type === 'chat_history' && Array.isArray(message.history)) {
+    if (message.type === CHAT_MESSAGE_TYPE.CHAT_HISTORY && Array.isArray(message.history)) {
       this.handleChatHistory(message.history)
-    } else if (message.type === 'chat' && typeof message.text === 'string' && participant !== undefined) {
+    } else if (
+      message.type === CHAT_MESSAGE_TYPE.CHAT &&
+      typeof message.text === 'string' &&
+      participant !== undefined
+    ) {
       this.handleChatMessage(message, participant)
     }
   }
 
-  private parsePayload(payload: Uint8Array): Record<string, unknown> | undefined {
+  private parsePayload(payload: Uint8Array): ParsedDataPacket | undefined {
     try {
       const parsed: unknown = JSON.parse(new TextDecoder().decode(payload))
       if (typeof parsed !== 'object' || parsed === null) return undefined
       const message = parsed as Record<string, unknown>
       if (typeof message.type !== 'string') return undefined
-      return message
+      return message as ParsedDataPacket
     } catch {
       return undefined
     }
@@ -84,53 +101,85 @@ export class LiveKitChatService {
     for (const entry of history) {
       if (typeof entry !== 'object' || entry === null) continue
       const h = entry as Record<string, unknown>
-      if (typeof h.timestamp !== 'number' || typeof h.sender !== 'string' || typeof h.text !== 'string') continue
-      const messageId = typeof h.messageId === 'string' ? h.messageId : this.buildLegacyMessageId(h)
-      const senderId = typeof h.senderId === 'string' ? h.senderId : h.sender
+      const normalized = this.normalizeIncomingChat(h, 'history')
+      if (normalized === undefined) continue
+      if (this.isDuplicate(normalized.messageId, normalized.senderId, normalized.timestamp)) continue
 
-      if (this.isDuplicate(messageId, senderId, h.timestamp as number)) continue
-
-      const msg: ChatMessage = {
-        type: 'chat',
-        messageId,
-        sender: h.sender,
-        senderId,
-        text: h.text,
-        timestamp: h.timestamp as number,
-      }
-      this.chatHistory.push(msg)
-      this.handler?.onChatMessage(senderId, msg.sender, msg.text)
+      this.appendChatFromNormalized(normalized)
     }
   }
 
-  private handleChatMessage(message: Record<string, unknown>, participant: RemoteParticipant): void {
-    const messageId = typeof message.messageId === 'string' ? message.messageId : this.buildLegacyMessageId(message)
-    const senderId = typeof message.senderId === 'string' ? message.senderId : participant.identity
-    const sender = typeof message.sender === 'string' ? message.sender : participant.identity
-    const timestamp = typeof message.timestamp === 'number' ? message.timestamp : Date.now()
+  private handleChatMessage(message: ParsedDataPacket, participant: RemoteParticipant): void {
+    const normalized = this.normalizeIncomingChat(message, 'live', participant)
+    if (normalized === undefined) return
+    if (this.isDuplicate(normalized.messageId, normalized.senderId, normalized.timestamp)) return
 
-    if (this.isDuplicate(messageId, senderId, timestamp)) return
+    this.appendChatFromNormalized(normalized)
+  }
 
-    const msg: ChatMessage = { type: 'chat', messageId, sender, senderId, text: message.text as string, timestamp }
+  private appendChatFromNormalized(normalized: NormalizedIncomingChat): void {
+    const msg: ChatMessage = {
+      type: CHAT_MESSAGE_TYPE.CHAT,
+      messageId: normalized.messageId,
+      sender: normalized.sender,
+      senderId: normalized.senderId,
+      text: normalized.text,
+      timestamp: normalized.timestamp,
+    }
     this.chatHistory.push(msg)
-    this.handler?.onChatMessage(senderId, sender, msg.text)
+    this.handler?.onChatMessage(normalized.senderId, normalized.sender, normalized.text)
+  }
+
+  private normalizeIncomingChat(
+    raw: Record<string, unknown>,
+    mode: 'history' | 'live',
+    participant?: RemoteParticipant
+  ): NormalizedIncomingChat | undefined {
+    if (typeof raw.text !== 'string') return undefined
+
+    let timestamp: number
+    if (typeof raw.timestamp === 'number') {
+      timestamp = raw.timestamp
+    } else if (mode === 'live') {
+      timestamp = Date.now()
+    } else {
+      return undefined
+    }
+
+    const messageId =
+      typeof raw.messageId === 'string' ? raw.messageId : this.buildLegacyMessageId(raw)
+
+    if (mode === 'history') {
+      if (typeof raw.sender !== 'string') return undefined
+      const senderId = typeof raw.senderId === 'string' ? raw.senderId : raw.sender
+      return { messageId, senderId, sender: raw.sender, timestamp, text: raw.text }
+    }
+
+    if (participant === undefined) return undefined
+    const senderId = typeof raw.senderId === 'string' ? raw.senderId : participant.identity
+    const sender = typeof raw.sender === 'string' ? raw.sender : participant.identity
+    return { messageId, senderId, sender, timestamp, text: raw.text }
   }
 
   private sendChatHistory(destination: RemoteParticipant): void {
     if (this.chatHistory.length === 0) return
 
     const historyMessage: ChatMessage = {
-      type: 'chat_history',
+      type: CHAT_MESSAGE_TYPE.CHAT_HISTORY,
       messageId: this.generateMessageId(),
       sender: this.ownDisplayName,
       senderId: this.ownParticipantId,
-      text: '',
+      text: '', // 本文は history 配列側。型を chat と揃えるため空
       timestamp: Date.now(),
       history: this.chatHistory,
     }
 
-    const data = new TextEncoder().encode(JSON.stringify(historyMessage))
-    void this.room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE, [destination])
+    void this.publishReliableData(historyMessage, [destination])
+  }
+
+  private publishReliableData(message: ChatMessage, destinations?: RemoteParticipant[]): Promise<void> {
+    const data = new TextEncoder().encode(JSON.stringify(message))
+    return this.room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE, destinations)
   }
 
   private isDuplicate(messageId: string | undefined, senderId: string, timestamp: number): boolean {

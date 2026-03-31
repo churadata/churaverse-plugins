@@ -18,6 +18,7 @@ import { MeetingRoom } from './meetingRoom'
 import { getParticipantDisplayName } from './utils/participantDisplayName'
 import { LiveKitChatService } from '@churaverse/web-rtc-plugin-client/livekit'
 import '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
+import '@churaverse/title-plugin-client/titlePlayerPlugin/defTitlePlayerTransitionData'
 
 export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   private meetingPluginStore!: MeetingPluginStore
@@ -35,10 +36,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private init(): void {
-    // Title→Meeting の遷移データは title 側の module augmentation で ownPlayer 付き。パッケージ境界で型が合わない場合があるため最小限アサートする。
-    const receivedData = this.store.of('transitionPlugin').transitionManager.getReceivedData<ITitleScene>() as
-      | { ownPlayer?: { name?: string } }
-      | undefined
+    const receivedData = this.store.of('transitionPlugin').transitionManager.getReceivedData<ITitleScene>()
     const displayName = (receivedData?.ownPlayer?.name ?? '').trim()
     const participantId = this.generateParticipantId()
     initMeetingPluginStore(this.store, participantId, displayName !== '' ? displayName : participantId)
