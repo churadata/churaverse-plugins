@@ -1,22 +1,7 @@
 import { RemoteAudioTrack, Room, RoomEvent, Track } from 'livekit-client'
 import { IAudioService } from '../domain/IAudioService'
-
-type RemoteChain = {
-  audioEl?: HTMLAudioElement
-  track: RemoteAudioTrack
-  inputTrack: MediaStreamTrack
-  source: MediaElementAudioSourceNode | MediaStreamAudioSourceNode
-  gain: GainNode
-}
-
-type LocalChain = {
-  stream: MediaStream
-  inputTrack: MediaStreamTrack
-  processedTrack: MediaStreamTrack
-  source?: MediaStreamAudioSourceNode
-  gain?: GainNode
-  destination?: MediaStreamAudioDestinationNode
-}
+import { LocalChain } from '../interface/ILocalChain'
+import { RemoteChain } from '../interface/IRemoteChain'
 
 /**
  * Web Audio を用いた音声パイプラインの実装。
@@ -44,7 +29,7 @@ export class AudioPipelineService implements IAudioService {
    */
   private isDebugEnabled(): boolean {
     if (typeof window === 'undefined') return false
-    const w = window as Window & { __CV_DEBUG_AUDIO__?: boolean }
+    const w = window as unknown as Record<string, unknown>
     if (w.__CV_DEBUG_AUDIO__ === true) return true
     try {
       return (
@@ -73,10 +58,10 @@ export class AudioPipelineService implements IAudioService {
 
       // 生成直後に現在の出力デバイス設定を同期
       if (this.room !== undefined) {
-        const currentDevice =
-          this.room.getActiveDevice('audiooutput') ?? this.room.getActiveAudioOutputDevice()
-        if (currentDevice && currentDevice.length > 0) {
-          void this.applyOutputDevice(currentDevice)
+        const currentDeviceId = this.room.getActiveDevice('audiooutput') ?? 'default'
+        void this.applyOutputDevice(currentDeviceId)
+        if (currentDeviceId === 'default') {
+          void this.room.switchActiveDevice('audiooutput', 'default')
         }
       }
     }
@@ -125,10 +110,9 @@ export class AudioPipelineService implements IAudioService {
     const ctx = this.getOrCreateContext()
     await this.ensureRunning(ctx)
 
-    const anyRoom = this.room as Room & { startAudio?: () => Promise<void> }
-    if (anyRoom && typeof anyRoom.startAudio === 'function') {
+    if (this.room !== undefined) {
       try {
-        await anyRoom.startAudio()
+        await this.room.startAudio()
         this.debug('room.startAudio done')
       } catch (error) {
         this.debug('room.startAudio failed', { error: String(error) })
@@ -178,7 +162,9 @@ export class AudioPipelineService implements IAudioService {
     const inputTrack = stream.getAudioTracks()[0]
     if (inputTrack === undefined) {
       this.debug('startLocalMic aborted: no audio track')
-      stream.getTracks().forEach((t) => t.stop())
+      stream.getTracks().forEach((t) => {
+        t.stop()
+      })
       return false
     }
 
@@ -195,25 +181,25 @@ export class AudioPipelineService implements IAudioService {
       }
 
       const processedTrack =
-        destination?.stream.getAudioTracks()[0] !== undefined
-          ? destination.stream.getAudioTracks()[0]
-          : inputTrack
+        destination?.stream.getAudioTracks()[0] !== undefined ? destination.stream.getAudioTracks()[0] : inputTrack
       if (processedTrack === undefined) {
         this.debug('startLocalMic aborted: destination track missing')
         source?.disconnect()
         gain?.disconnect()
         destination?.disconnect()
-        stream.getTracks().forEach((t) => t.stop())
+        stream.getTracks().forEach((t) => {
+          t.stop()
+        })
         return false
       }
 
       const participant = this.room.localParticipant
 
       // 既存のマイクトラックを一旦外してから publish する
-      const currentMic = participant.getTrack(Track.Source.Microphone)
-      if (currentMic?.track !== undefined) {
+      const currentMicPub = participant.getTrackPublication(Track.Source.Microphone)
+      if (currentMicPub?.track !== undefined) {
         try {
-          await participant.unpublishTrack(currentMic.track)
+          await participant.unpublishTrack(currentMicPub.track)
         } catch (error) {
           this.debug('unpublish existing mic failed', { error: String(error) })
         }
@@ -230,7 +216,9 @@ export class AudioPipelineService implements IAudioService {
       return true
     } catch (error) {
       this.debug('startLocalMic failed', { error: String(error) })
-      stream.getTracks().forEach((t) => t.stop())
+      stream.getTracks().forEach((t) => {
+        t.stop()
+      })
       return false
     }
   }
@@ -242,10 +230,10 @@ export class AudioPipelineService implements IAudioService {
     if (this.room === undefined) return false
 
     const participant = this.room.localParticipant
-    const currentMic = participant.getTrack(Track.Source.Microphone)
-    if (currentMic?.track !== undefined) {
+    const currentMicPub = participant.getTrackPublication(Track.Source.Microphone)
+    if (currentMicPub?.track !== undefined) {
       try {
-        await participant.unpublishTrack(currentMic.track)
+        await participant.unpublishTrack(currentMicPub.track)
       } catch (error) {
         this.debug('unpublish mic failed', { error: String(error) })
       }
@@ -279,7 +267,9 @@ export class AudioPipelineService implements IAudioService {
         /* ignore */
       }
       try {
-        chain.stream.getTracks().forEach((t) => t.stop())
+        chain.stream.getTracks().forEach((t) => {
+          t.stop()
+        })
       } catch {
         /* ignore */
       }
@@ -338,7 +328,7 @@ export class AudioPipelineService implements IAudioService {
       return
     }
 
-    if (mediaStreamTrack.enabled === false) {
+    if (!mediaStreamTrack.enabled) {
       mediaStreamTrack.enabled = true
     }
 
@@ -397,7 +387,7 @@ export class AudioPipelineService implements IAudioService {
     }
 
     try {
-      if (chain.track && chain.audioEl) {
+      if (chain.audioEl !== undefined) {
         chain.track.detach(chain.audioEl)
       }
     } catch {
@@ -405,7 +395,7 @@ export class AudioPipelineService implements IAudioService {
     }
 
     try {
-      if (chain.audioEl) {
+      if (chain.audioEl !== undefined) {
         chain.audioEl.srcObject = null
         chain.audioEl.remove()
       }
