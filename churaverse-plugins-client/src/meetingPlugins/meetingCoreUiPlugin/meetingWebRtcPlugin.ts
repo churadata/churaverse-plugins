@@ -1,5 +1,5 @@
 import { BasePlugin, DomManager, IMeetingScene, ITitleScene } from 'churaverse-engine-client'
-import { Room, RoomEvent, Track, RemoteParticipant, Participant, TrackPublication } from 'livekit-client'
+import { Room, RoomEvent, Track, RemoteParticipant, Participant, TrackPublication, DataPacket_Kind } from 'livekit-client'
 import {
   MIC_TOGGLE_BUTTON_ID,
   CAMERA_TOGGLE_BUTTON_ID,
@@ -188,6 +188,17 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       }
       this.updateParticipantList(meetingRoom)
     })
+
+    room.on(RoomEvent.DataReceived, (payload) => {
+      try {
+        const message = JSON.parse(new TextDecoder().decode(payload)) as { type?: string; reactionType?: string }
+        if (message.type === 'reaction' && typeof message.reactionType === 'string') {
+          this.showReactionAnimation(message.reactionType as 'shark' | 'bomb')
+        }
+      } catch {
+        // chat等の他メッセージは無視
+      }
+    })
   }
 
   private handleTrackAttachment(track: Track, publication: TrackPublication, participant: Participant): void {
@@ -248,12 +259,12 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
     const sharkButton = DomManager.getElementById(REACTION_SHARK_BUTTON_ID)
     sharkButton.addEventListener('click', () => {
-      this.showReactionAnimation('shark')
+      void this.sendReaction(room, 'shark')
     })
 
     const bombButton = DomManager.getElementById(REACTION_BOMB_BUTTON_ID)
     bombButton.addEventListener('click', () => {
-      this.showReactionAnimation('bomb')
+      void this.sendReaction(room, 'bomb')
     })
 
     const chatInput = DomManager.getElementById<HTMLInputElement>(CHAT_INPUT_ID)
@@ -273,6 +284,14 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
         chatInput.value = ''
       }
     })
+  }
+
+  private async sendReaction(room: Room, reactionType: 'shark' | 'bomb'): Promise<void> {
+    if (!this.meetingPluginStore.isConnected) return
+    const message = { type: 'reaction', reactionType }
+    const data = new TextEncoder().encode(JSON.stringify(message))
+    await room.localParticipant.publishData(data, DataPacket_Kind.RELIABLE)
+    this.showReactionAnimation(reactionType)
   }
 
   private async enterGameMode(): Promise<void> {
