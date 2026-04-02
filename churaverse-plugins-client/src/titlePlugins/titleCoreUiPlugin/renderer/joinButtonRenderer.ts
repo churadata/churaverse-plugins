@@ -82,17 +82,18 @@ export class JoinButtonRenderer implements IJoinButtonRenderer {
 
   /** buttonが押されたときの動作 */
   private onClick(): void {
-    const validateResult = this.titlePlayerPluginStore.titleNameFieldRenderer.validate() ?? false
+    const errors = this.titlePlayerPluginStore.titleNameFieldRenderer.validate()
 
-    if (validateResult) {
+    if (errors.length > 0) {
+      alert(errors.join('\n'))
+      return
+    }else {
       // 処理が重複しないように処理中はボタンを押せないようにロック
       this.joinButton.disableInteractive()
 
       // MainSceneに遷移
       DomManager.removeAll()
       this.transitionPluginStore.transitionManager.transitionTo('MainScene')
-    } else {
-      alert('名前は1文字以上15文字以内で入力してください')
     }
   }
 }

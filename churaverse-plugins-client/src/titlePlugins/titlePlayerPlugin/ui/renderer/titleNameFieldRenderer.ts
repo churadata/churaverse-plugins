@@ -22,6 +22,20 @@ export class TitleNameFieldRenderer implements ITitleNameFieldRenderer {
     this.textField.oninput = () => {
       const changeNameEvent = new TitlePlayerNameChangeEvent(this.getName())
       this.eventBus.post(changeNameEvent)
+
+      //インジケーター更新
+      const count = (this.textField?.value ?? '').length
+      const MAX_COUNT = 15
+      const meter = document.getElementById('title-name-meter')
+      const countText = document.getElementById('title-name-count')
+      if (meter !== null) {
+        const offset = Math.max(0, 100 - (count / MAX_COUNT) * 100)
+        meter.style.strokeDashoffset = String(offset)
+        meter.style.stroke = count > MAX_COUNT ? '#f44336' : '#4caf50' 
+      }
+      if (countText !== null) {
+        countText.textContent = String(count)
+      }
     }
   }
 
@@ -29,13 +43,17 @@ export class TitleNameFieldRenderer implements ITitleNameFieldRenderer {
     return this.textField?.value ?? ''
   }
 
-  public validate(): boolean {
+  public validate(): string[] {
     const name = this.getName()?.trim()
-    // 名前の文字列が空白文字のみまたは空文字のみでないかを判定
+    const errors: string[] = []
     //名前の長さが15文字以下かを判定（全角・半角問わず）
     if (name.length === 0 || name.length > 15) {
-      return false
+      errors.push('名前は1文字以上15文字以下で入力してください')
     }
-    return true
+    //名前の途中で2つ以上の連続したスペースがあるかを判定
+    if (/\s{2,}/.test(name)) {
+      errors.push('名前に連続したスペースを含めないでください')
+    }
+    return errors
   }
 }
