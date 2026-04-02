@@ -35,16 +35,6 @@ export class VoiceChatReceiver {
    * LiveKit が source を Unknown と扱っても track.kind=audio なら受ける。
    */
   private onJoin(track: RemoteTrack, publication: RemoteTrackPublication, participant: RemoteParticipant): void {
-    if (track.source !== Track.Source.Microphone) return
-
-    const remoteTrackPublication = participant.getTrackPublication(Track.Source.Microphone)
-    if (remoteTrackPublication?.audioTrack == null || remoteTrackPublication.track == null) {
-      return
-    }
-
-    const voice = remoteTrackPublication.track.attach()
-
-    this.eventBus.post(new JoinVoiceChatEvent(participant.identity, voice))
     // LiveKit が source を Unknown として扱うケースがあるため、音声トラックなら受ける
     if (track.kind !== Track.Kind.Audio) return
 
