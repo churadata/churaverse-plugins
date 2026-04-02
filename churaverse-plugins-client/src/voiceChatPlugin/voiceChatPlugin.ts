@@ -29,6 +29,7 @@ import {
 import { DumpDebugDataEvent } from '@churaverse/debug-screen-plugin-client/event/dumpDebugDataEvent'
 import { AudioPipelineService } from './service/audioPipelineService'
 import { IAudioService } from './domain/IAudioService'
+import '@churaverse/transition-plugin-client/event/willSceneTransitionEvent'
 
 export class VoiceChatPlugin extends BasePlugin<IMainScene> {
   private voiceChatPluginStore!: VoiceChatPluginStore
@@ -50,6 +51,7 @@ export class VoiceChatPlugin extends BasePlugin<IMainScene> {
     this.bus.subscribeEvent('init', this.init.bind(this))
     this.bus.subscribeEvent('start', this.startVoiceChatVolumeControl.bind(this))
     this.bus.subscribeEvent('phaserLoadAssets', this.loadAssets.bind(this))
+    this.bus.subscribeEvent('willSceneTransition', this.willSceneTransition.bind(this), 'HIGH')
 
     const socketController = new SocketController(this.bus, this.store)
     this.bus.subscribeEvent('registerMessage', socketController.registerMessage.bind(socketController))
@@ -126,6 +128,10 @@ export class VoiceChatPlugin extends BasePlugin<IMainScene> {
       this.volumeUpdateTimer = undefined
     }
     await this.audioService?.dispose()
+  }
+
+  private willSceneTransition(): void {
+  void this.disposeAudio()
   }
 
   private setupDebugScreen(): void {
