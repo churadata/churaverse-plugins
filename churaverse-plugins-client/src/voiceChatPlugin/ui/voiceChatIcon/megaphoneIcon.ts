@@ -5,7 +5,7 @@ import { ToggleMegaphoneEvent } from '../../event/toggleMegaphoneEvent'
 
 import MEGAPHONE_ICON from '../../assets/megaphone.png'
 export const MEGAPHONE_ICON_PATH = MEGAPHONE_ICON
-const DISPLAY_DURATION = 1500
+const DISPLAY_DURATION = 1500 // ポップアップ通知を表示する時間（ミリ秒）
 
 export class MegaphoneIcon extends TopBarIconRenderer {
   private readonly megaphoneDialogElement: HTMLDivElement
