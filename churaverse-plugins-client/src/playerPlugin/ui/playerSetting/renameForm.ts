@@ -45,12 +45,12 @@ export class RenameForm {
 
   private setupTextField(): HTMLInputElement {
     const textField = DomManager.getElementById<HTMLInputElement>(TEXT_FIELD_ID)
+    const meter = document.getElementById('rename-meter')
+    const countEl = document.getElementById('rename-count')
     const MAX_COUNT = 15
 
     textField.oninput = () => {
       const count = textField.value.length
-      const meter = document.getElementById('rename-meter')
-      const countEl = document.getElementById('rename-count')
       if (meter !== null) {
         const offset = Math.max(0, 100 - (count / MAX_COUNT) * 100)
         meter.style.strokeDashoffset = String(offset)
@@ -60,6 +60,7 @@ export class RenameForm {
         countEl.textContent = String(count)
       }
     }
+
     textField.dispatchEvent(new Event('input')) // 初期値に対してもインジケーターが正しく表示されるようにするため、inputイベントを発火させる
 
     return textField
