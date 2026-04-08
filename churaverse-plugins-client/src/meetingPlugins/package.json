@@ -42,6 +42,6 @@
     "churaverse-engine-client": "~0.1.0",
     "@churaverse/transition-plugin-client": "~0.1.0",
     "@churaverse/title-plugin-client": "~0.1.0",
-    "@churaverse/web-rtc-plugin-client": "~0.1.0"
+    "@churaverse/livekit-client": "~0.1.0"
   }
 }
