@@ -11,7 +11,6 @@ import { IEventBus, IMainScene } from 'churaverse-engine-client'
 import { JoinVoiceChatEvent } from './event/joinVoiceChatEvent'
 import { UnmuteEvent } from './event/unmuteEvent'
 import { MuteEvent } from './event/muteEvent'
-import { LeaveVoiceChatEvent } from './event/leaveVoiceChatEvent'
 import { PlayerVoiceChatIcons } from './ui/playerVoiceChatIcons'
 import { IAudioService } from './domain/IAudioService'
 
@@ -74,6 +73,5 @@ export class VoiceChatReceiver {
 
     participant.getTrackPublication(Track.Source.Microphone)?.track?.detach()
     this.audioService.removeRemoteTrack(participant.identity)
-    this.eventBus.post(new LeaveVoiceChatEvent(participant.identity))
   }
 }

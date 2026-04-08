@@ -26,20 +26,16 @@ export class AudioPipelineService implements IAudioService {
 
   /**
    * デバッグログの有効判定。localStorage にフラグを置く簡易トグル。
-   */
+  */
+
   private isDebugEnabled(): boolean {
-    if (typeof window === 'undefined') return false
-    const w = window as unknown as Record<string, unknown>
-    if (w.__CV_DEBUG_AUDIO__ === true) return true
-    try {
-      return (
-        window.localStorage.getItem('__CV_DEBUG_AUDIO__') === 'true' ||
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (window.localStorage as any).__CV_DEBUG_AUDIO__ === 'true'
-      )
-    } catch {
-      return false
-    }
+  if (typeof window === 'undefined') return false
+  if ('__CV_DEBUG_AUDIO__' in window && window.__CV_DEBUG_AUDIO__ === true) return true
+  try {
+        return window.localStorage.getItem('__CV_DEBUG_AUDIO__') === 'true'
+      } catch {
+        return false
+      }
   }
 
   private debug(...args: unknown[]): void {
@@ -240,44 +236,40 @@ export class AudioPipelineService implements IAudioService {
     }
 
     const chain = this.localChain
-    if (chain !== undefined) {
+    if (chain !== undefined)  {
       try {
-        chain.source?.disconnect()
-      } catch {
-        /* ignore */
+          chain.source?.disconnect()
+      } catch (error) {
+        this.debug('disconnect source failed', { error: String(error) })
       }
       try {
         chain.gain?.disconnect()
-      } catch {
-        /* ignore */
+      } catch (error) {
+        this.debug('disconnect gain failed', { error: String(error) })
       }
       try {
         chain.destination?.disconnect()
-      } catch {
-        /* ignore */
+      } catch (error) {
+        this.debug('disconnect destination failed', { error: String(error) })
       }
       try {
         chain.processedTrack.stop()
-      } catch {
-        /* ignore */
+      } catch (error) {
+        this.debug('stop processedTrack failed', { error: String(error) })
       }
       try {
         chain.inputTrack.stop()
-      } catch {
-        /* ignore */
+      } catch (error) {
+        this.debug('stop inputTrack failed', { error: String(error) })
       }
       try {
         chain.stream.getTracks().forEach((t) => {
-          t.stop()
+            t.stop()
         })
-      } catch {
-        /* ignore */
+      } catch (error) {
+        this.debug('stop stream tracks failed', { error: String(error) })
       }
     }
-
-    this.localChain = undefined
-    this.debug('local chain removed')
-    return true
   }
 
   /**
@@ -295,13 +287,13 @@ export class AudioPipelineService implements IAudioService {
 
     // AudioContext を閉じる（再利用する場合は再生成される前提）
     if (this.context !== undefined) {
-      try {
+    try {
         await this.context.close()
         this.debug('AudioContext closed')
-      } catch {
-        /* ignore */
-      }
-      this.context = undefined
+    } catch (error) {
+        this.debug('AudioContext close failed', { error: String(error) })
+    }
+    this.context = undefined
     }
   }
 
@@ -376,22 +368,22 @@ export class AudioPipelineService implements IAudioService {
 
     try {
       chain.source.disconnect()
-    } catch {
-      // ignore
+    } catch (error) {
+      this.debug('disconnect remote source failed', { playerId, error: String(error) })
     }
 
     try {
       chain.gain.disconnect()
-    } catch {
-      // ignore
+    } catch (error) {
+      this.debug('disconnect remote gain failed', { playerId, error: String(error) })
     }
 
     try {
       if (chain.audioEl !== undefined) {
         chain.track.detach(chain.audioEl)
       }
-    } catch {
-      // ignore
+    } catch (error) {
+      this.debug('detach audioEl failed', { playerId, error: String(error) })
     }
 
     try {
@@ -399,8 +391,8 @@ export class AudioPipelineService implements IAudioService {
         chain.audioEl.srcObject = null
         chain.audioEl.remove()
       }
-    } catch {
-      // ignore
+    } catch (error) {
+      this.debug('remove audioEl failed', { playerId, error: String(error) })
     }
 
     // MediaStreamTrack の stop は LiveKit 側のライフサイクルに任せる
