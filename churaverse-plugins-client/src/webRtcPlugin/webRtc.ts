@@ -1,4 +1,4 @@
-import { LiveKitSession } from './livekit'
+import { LiveKitSession } from '@churaverse/livekit-client'
 
 /**
  * MainScene用のLiveKitセッション。

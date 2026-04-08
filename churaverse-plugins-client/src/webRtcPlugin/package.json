@@ -32,11 +32,6 @@
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
-  "exports": {
-    ".": "./dist/index.js",
-    "./*": "./*",
-    "./livekit": "./dist/livekit/index.js"
-  },
   "license": "MIT",
   "dependencies": {
     "livekit-client": "^1.13.4",
@@ -44,6 +39,7 @@
     "@churaverse/player-plugin-client": "~0.1.0",
     "@churaverse/text-chat-plugin-client": "~0.1.0",
     "@churaverse/transition-plugin-client": "~0.1.0",
+    "@churaverse/livekit-client": "~0.1.0",
     "churaverse-engine-client": "~0.1.0"
   }
 }

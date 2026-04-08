@@ -21,7 +21,7 @@ import { ParticipantListUi } from './ui/participantListUi'
 import { ChatUi } from './ui/chatUi'
 import { MeetingRoom } from './meetingRoom'
 import { getParticipantDisplayName } from './utils/participantDisplayName'
-import { LiveKitChatService } from '@churaverse/web-rtc-plugin-client/livekit'
+import { LiveKitChatService } from '@churaverse/livekit-client'
 import '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
 import '@churaverse/title-plugin-client/titlePlayerPlugin/defTitlePlayerTransitionData'
 
