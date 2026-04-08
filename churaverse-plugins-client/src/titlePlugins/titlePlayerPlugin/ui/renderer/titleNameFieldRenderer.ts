@@ -14,11 +14,11 @@ export class TitleNameFieldRenderer implements ITitleNameFieldRenderer {
    */
   private readonly textField?: HTMLInputElement
 
-  public constructor(private readonly eventBus: IEventBus<ITitleScene>, initName: string) {
+  public constructor(private readonly eventBus: IEventBus<ITitleScene>, initPlayerName: string) {
     // 名前入力欄の生成
     DomManager.addJsxDom(TitleNameFieldComponent())
     this.textField = DomManager.getElementById<HTMLInputElement>(TITLE_FIELD_NAME)
-    this.textField.value = initName
+    this.textField.value = initPlayerName
     // 入力時の動作
     this.textField.oninput = () => {
       const changeNameEvent = new TitlePlayerNameChangeEvent(this.getName())
