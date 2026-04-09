@@ -90,6 +90,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
   private debugScreenStore!: DebugScreenPluginStore
   private readonly deathLog: DeathLogRepository = new DeathLogRepository()
   private joinLeaveLogRenderer?: JoinLeaveLogRenderer
+  private readonly boundOnGameShutdown = this.onGameShutdown.bind(this)
   private playerColorDebugScreen!: IPlayerColorDebugScreen
   private playerDirectionDebugScreen!: IPlayerDirectionDebugScreen
   private playerHpDebugScreen!: IPlayerHpDebugScreen
@@ -157,6 +158,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     this.transitionPluginStore = this.store.of('transitionPlugin')
     this.mapPluginStore = this.store.of('mapPlugin')
     this.debugScreenStore = this.store.of('debugScreenPlugin')
+    window.addEventListener('beforeunload', this.boundOnGameShutdown)
   }
 
   private start(ev: StartEvent): void {
@@ -232,6 +234,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     // this.bus.post(new SavePlayerInfoEvent(ownPlayer))
     // PlayerSetupInfoPluginを実装するまでは以下で代用
     this.savePlayerInfo(ownPlayer)
+    window.removeEventListener('beforeunload', this.boundOnGameShutdown)
   }
 
   private onPlayerJoin(ev: EntitySpawnEvent): void {
@@ -462,6 +465,12 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
       }
       this.networkStore.messageSender.send(new PlayerColorChangeMessage({ color: ev.color }))
     }
+  }
+
+  private onGameShutdown(): void {
+    const ownPlayer = this.playerPluginStore.players.get(this.playerPluginStore.ownPlayerId)
+    if (ownPlayer === undefined) return
+    this.savePlayerInfo(ownPlayer)
   }
 
   private savePlayerInfo(ownPlayer: Player): void {
