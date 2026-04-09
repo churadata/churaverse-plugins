@@ -270,6 +270,10 @@ export class AudioPipelineService implements IAudioService {
         this.debug('stop stream tracks failed', { error: String(error) })
       }
     }
+
+    this.localChain = undefined
+    this.debug('local chain removed')
+    return true
   }
 
   /**
