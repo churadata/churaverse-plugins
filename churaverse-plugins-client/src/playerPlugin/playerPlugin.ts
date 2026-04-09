@@ -448,7 +448,6 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
       }
       this.updateDebugScreenPlayerName()
       this.networkStore.messageSender.send(new PlayerNameChangeMessage({ name: ev.name }))
-      this.savePlayerInfo(player)
     }
     this.updatePlayerList()
   }

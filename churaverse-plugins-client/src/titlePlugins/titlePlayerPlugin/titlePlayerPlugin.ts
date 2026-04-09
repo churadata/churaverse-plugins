@@ -12,7 +12,6 @@ import {
 } from 'churaverse-engine-client'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { PlayerSetupInfoReader } from '@churaverse/player-plugin-client/interface/playerSetupInfoReader'
-import { PlayerSetupInfoWriter } from '@churaverse/player-plugin-client/interface/playerSetupInfoWriter'
 import { CookieStore } from '@churaverse/data-persistence-plugin-client/cookieStore'
 import { PlayerRenderer } from '@churaverse/player-plugin-client/renderer/playerRenderer'
 import { Player, DEFAULT_HP } from '@churaverse/player-plugin-client/domain/player'
@@ -119,7 +118,6 @@ export class TitlePlayerPlugin extends BasePlugin<ITitleScene> {
 
   private willSceneTransition(ev: WillSceneTransitionEvent<ITitleScene, Scenes>): void {
     if (ev.to !== 'MainScene') return
-    new PlayerSetupInfoWriter(new CookieStore()).save(this.ownPlayer.name, this.ownPlayer.color, this.ownPlayer.role)
     // 遷移先にplayerのインスタンスをownPlayerをキーとして渡す
     // ev.sceneDataTransporter.push<IMainScene, 'ownPlayer'>('ownPlayer', this.ownPlayer)
 
