@@ -37,40 +37,11 @@
   display: block;
 }
 
-.indicator {
+.count {
   position: absolute;
   left: calc(100% + 8px);
   top: 50%;
   transform: translateY(-50%);
-  width: 40px;
-  height: 40px;
-}
-
-.svg {
-  width: 100%;
-  height: 100%;
-  transform: rotate(-90deg);
-}
-
-.track {
-  fill: none;
-  stroke: #ddd;
-  stroke-width: 3;
-}
-
-.meter {
-  fill: none;
-  stroke: #4caf50;
-  stroke-width: 3;
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  transition: stroke-dashoffset 0.2s;
-}
-
-.count {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 11px;
+  font-size: 15px;
+  white-space: nowrap;
 }

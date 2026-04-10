@@ -50,19 +50,12 @@ export class RenameForm {
 
   private setupTextField(): HTMLInputElement {
     const textField = DomManager.getElementById<HTMLInputElement>(TEXT_FIELD_ID)
-    const meter = document.getElementById('rename-meter')
-    const countEl = document.getElementById('rename-count')
-    const MAX_COUNT = 15
+    const countEl = document.getElementById(RENAME_COUNT_ID)
 
     textField.oninput = () => {
       const count = textField.value.length
-      if (meter !== null) {
-        const offset = Math.max(0, 100 - (count / MAX_COUNT) * 100)
-        meter.style.strokeDashoffset = String(offset)
-        meter.style.stroke = count > MAX_COUNT ? '#f44336' : '#4caf50'
-      }
       if (countEl !== null) {
-        countEl.textContent = String(count)
+        countEl.textContent = `${count}/15`
       }
     }
 

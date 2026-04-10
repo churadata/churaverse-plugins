@@ -12,13 +12,7 @@ export const TitleNameFieldComponent: JSXFunc = () => {
             <li>連続するスペースは使用不可</li>
           </ul>
         </div>
-      </div>
-      <div className={style.indicator}>
-        <svg viewBox="0 0 36 36" className={style.svg}>
-          <circle className={style.track} cx="18" cy="18" r="15.9" />
-          <circle className={style.meter} cx="18" cy="18" r="15.9" id="title-name-meter" />
-        </svg>
-        <span className={style.count} id="title-name-count">0</span>
+        <span className={style.count} id="title-name-count">0/15</span>
       </div>
     </div>
   )

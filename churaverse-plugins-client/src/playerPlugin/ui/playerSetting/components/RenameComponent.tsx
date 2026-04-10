@@ -27,13 +27,7 @@ export const RenameFormComponent: JSXFunc<Props> = ({ defaultName }: Props) => {
             </ul>
           </div>
         </div>
-        <div className={style.indicator}>
-          <svg viewBox="0 0 36 36" className={style.svg}>
-            <circle className={style.track} cx="18" cy="18" r="15.9" />
-            <circle className={style.meter} cx="18" cy="18" r="15.9" id="rename-meter" />
-          </svg>
-          <span className={style.count} id="rename-count">0</span>
-        </div>
+        <span className={style.count} id="rename-count">0/15</span>
         <button className={style.sendButton} id={SEND_BUTTON_ID}>
           OK
         </button>

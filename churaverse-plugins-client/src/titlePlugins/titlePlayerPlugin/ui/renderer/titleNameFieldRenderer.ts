@@ -8,39 +8,35 @@ import { TitleNameFieldComponent } from '../components/TitleNameFieldComponent'
  */
 const TITLE_FIELD_NAME = 'title-name-field'
 
+/**
+ * 名前入力フォーム内にある文字数カウント要素のid
+ */
+const TITLE_NAME_COUNT_ID = 'title-name-count'
+
 export class TitleNameFieldRenderer implements ITitleNameFieldRenderer {
   /**
    * 名前入力欄
    */
   private readonly textField?: HTMLInputElement
-  private readonly meter: HTMLElement | null
   private readonly countText: HTMLElement | null
 
   public constructor(private readonly eventBus: IEventBus<ITitleScene>) {
     // 名前入力欄の生成
     DomManager.addJsxDom(TitleNameFieldComponent())
     this.textField = DomManager.getElementById<HTMLInputElement>(TITLE_FIELD_NAME)
-    this.meter = document.getElementById('title-name-meter')
-    this.countText = document.getElementById('title-name-count')
+    this.countText = document.getElementById(TITLE_NAME_COUNT_ID)
 
     // 入力時の動作
     this.textField.oninput = () => {
       const changeNameEvent = new TitlePlayerNameChangeEvent(this.getName())
       this.eventBus.post(changeNameEvent)
 
-      //インジケーター更新
       const count = (this.textField?.value ?? '').length
-      const MAX_COUNT = 15
-      if (this.meter !== null) {
-        const offset = Math.max(0, 100 - (count / MAX_COUNT) * 100)
-        this.meter.style.strokeDashoffset = String(offset)
-        this.meter.style.stroke = count > MAX_COUNT ? '#f44336' : '#4caf50' 
-      }
       if (this.countText !== null) {
-        this.countText.textContent = String(count)
+        this.countText.textContent = `${count}/15`
       }
     }
-    this.textField.dispatchEvent(new Event('input')) // 初期値に対してもインジケーターが正しく表示されるようにするため、inputイベントを発火させる
+    this.textField.dispatchEvent(new Event('input')) // 初期値に対してもカウントが正しく表示されるようにするため、inputイベントを発火させる
   }
 
   public getName(): string {
