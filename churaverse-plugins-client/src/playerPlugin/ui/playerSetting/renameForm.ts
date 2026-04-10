@@ -14,6 +14,11 @@ export const TEXT_FIELD_ID = 'name-field'
 export const SEND_BUTTON_ID = 'name-send-button'
 
 /**
+ * 名前入力フォーム内にある文字数カウント要素のid
+ */
+export const RENAME_COUNT_ID = 'rename-count'
+
+/**
  * プレイヤー名変更欄
  */
 export class RenameForm {
