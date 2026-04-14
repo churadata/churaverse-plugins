@@ -41,10 +41,15 @@ export abstract class TopBarIconRenderer implements ITopBarIconRenderer {
     this.inactiveIconImgPath = inactiveIconImgPath
     this.isActive = isActive
 
-    const img = document.createElement('img')
+     const img = document.createElement('img')
     img.style.width = width
     img.style.height = height
     img.style.order = order.toString()
+    img.style.backgroundColor = 'rgba(255, 255, 255, 0.95)'
+    img.style.borderRadius = '12px'
+    img.style.padding = '4px'
+    img.style.boxSizing = 'border-box'
+    img.style.cursor = 'pointer'
 
     img.addEventListener('click', () => {
       onClick(this.isActive)
@@ -85,7 +90,7 @@ export abstract class TopBarIconRenderer implements ITopBarIconRenderer {
    */
   public deactivate(): void {
     this.isActive = false
-    this.imgElement.style.opacity = '0.5'
+    this.imgElement.style.opacity = '0.55'
     this.imgElement.src = this.inactiveIconImgPath
   }
 }
