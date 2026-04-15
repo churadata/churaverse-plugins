@@ -34,10 +34,10 @@
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "dependencies": {
-    "@churaverse/core-ui-plugin-client": "~0.1.0",
+    "@churaverse/core-ui-plugin-client": "file:../coreUiPlugin",
     "@churaverse/data-persistence-plugin-client": "~0.1.0",
     "@churaverse/debug-screen-plugin-client": "~0.1.0",
-    "@churaverse/game-plugin-client": "~0.1.0",
+    "@churaverse/game-plugin-client": "file:../gamePlugin",
     "@churaverse/keyboard-plugin-client": "~0.1.0",
     "@churaverse/map-plugin-client": "~0.1.0",
     "@churaverse/network-plugin-client": "~0.1.2",

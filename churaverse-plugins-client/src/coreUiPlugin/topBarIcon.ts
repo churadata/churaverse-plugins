@@ -45,11 +45,6 @@ export abstract class TopBarIconRenderer implements ITopBarIconRenderer {
     img.style.width = width
     img.style.height = height
     img.style.order = order.toString()
-    img.style.backgroundColor = 'rgba(255, 255, 255, 0.95)'
-    img.style.borderRadius = '12px'
-    img.style.padding = '4px'
-    img.style.boxSizing = 'border-box'
-    img.style.cursor = 'pointer'
 
     img.addEventListener('click', () => {
       onClick(this.isActive)

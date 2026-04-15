@@ -22,6 +22,12 @@ export class SettingIcon extends TopBarIconRenderer {
       order: -50,
     })
 
+    this.imgElement.style.backgroundColor = 'rgba(255, 255, 255, 0.95)'
+    this.imgElement.style.borderRadius = '2px'
+    this.imgElement.style.padding = '2.5px'
+    this.imgElement.style.boxSizing = 'border-box'
+    this.imgElement.style.cursor = 'pointer'
+
     iconContainer.addIcon(this)
     switcher.add('setting', dialog, () => {
       super.deactivate()
