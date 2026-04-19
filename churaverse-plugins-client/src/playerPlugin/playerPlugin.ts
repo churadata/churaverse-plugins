@@ -90,7 +90,6 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
   private debugScreenStore!: DebugScreenPluginStore
   private readonly deathLog: DeathLogRepository = new DeathLogRepository()
   private joinLeaveLogRenderer?: JoinLeaveLogRenderer
-  private readonly boundOnGameShutdown = this.onGameShutdown.bind(this)
   private playerColorDebugScreen!: IPlayerColorDebugScreen
   private playerDirectionDebugScreen!: IPlayerDirectionDebugScreen
   private playerHpDebugScreen!: IPlayerHpDebugScreen
@@ -139,6 +138,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     this.bus.subscribeEvent('dumpDebugData', this.dumpDebugData.bind(this))
     this.bus.subscribeEvent('networkConnect', this.onNetworkConnect.bind(this))
     this.bus.subscribeEvent('networkDisconnect', this.onNetworkDisconnect.bind(this))
+    this.bus.subscribeEvent('onGameShutdown', this.saveOwnPlayerInfo.bind(this))
   }
 
   private phaserSceneInit(ev: PhaserSceneInit): void {
@@ -158,7 +158,6 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     this.transitionPluginStore = this.store.of('transitionPlugin')
     this.mapPluginStore = this.store.of('mapPlugin')
     this.debugScreenStore = this.store.of('debugScreenPlugin')
-    window.addEventListener('beforeunload', this.boundOnGameShutdown)
   }
 
   private start(ev: StartEvent): void {
@@ -234,7 +233,6 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     // this.bus.post(new SavePlayerInfoEvent(ownPlayer))
     // PlayerSetupInfoPluginを実装するまでは以下で代用
     this.savePlayerInfo(ownPlayer)
-    window.removeEventListener('beforeunload', this.boundOnGameShutdown)
   }
 
   private onPlayerJoin(ev: EntitySpawnEvent): void {
@@ -466,7 +464,7 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     }
   }
 
-  private onGameShutdown(): void {
+  private saveOwnPlayerInfo(): void {
     const ownPlayer = this.playerPluginStore.players.get(this.playerPluginStore.ownPlayerId)
     if (ownPlayer === undefined) return
     this.savePlayerInfo(ownPlayer)
