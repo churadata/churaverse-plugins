@@ -13,6 +13,11 @@ const TITLE_FIELD_NAME = 'title-name-field'
  */
 const TITLE_NAME_COUNT_ID = 'title-name-count'
 
+/**
+ * プレイヤー名の最大文字数
+ */
+const MAX_PLAYER_NAME_LENGTH = 15
+
 export class TitleNameFieldRenderer implements ITitleNameFieldRenderer {
   /**
    * 名前入力欄
@@ -33,7 +38,7 @@ export class TitleNameFieldRenderer implements ITitleNameFieldRenderer {
 
       const count = (this.textField?.value ?? '').length
       if (this.countText !== null) {
-        this.countText.textContent = `${count}/15`
+        this.countText.textContent = `${count}/${MAX_PLAYER_NAME_LENGTH}`
       }
     }
     this.textField.dispatchEvent(new Event('input')) // 初期値に対してもカウントが正しく表示されるようにするため、inputイベントを発火させる
@@ -46,9 +51,9 @@ export class TitleNameFieldRenderer implements ITitleNameFieldRenderer {
   public validate(): string[] {
     const name = this.getName()?.trim()
     const errors: string[] = []
-    //名前の長さが15文字以下かを判定（全角・半角問わず）
-    if (name.length === 0 || name.length > 15) {
-      errors.push('名前は1文字以上15文字以下で入力してください')
+    //名前の長さがMAX_PLAYER_NAME_LENGTH文字以下かを判定（全角・半角問わず）
+    if (name.length === 0 || name.length > MAX_PLAYER_NAME_LENGTH) {
+      errors.push(`名前は1文字以上${MAX_PLAYER_NAME_LENGTH}文字以下で入力してください`)
     }
     //名前の途中で2つ以上の連続したスペースがあるかを判定
     if (/\s{2,}/.test(name)) {

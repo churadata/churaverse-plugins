@@ -87,7 +87,7 @@ export class JoinButtonRenderer implements IJoinButtonRenderer {
     if (errors.length > 0) {
       alert(errors.join('\n'))
       return
-    }else {
+    } else {
       // 処理が重複しないように処理中はボタンを押せないようにロック
       this.joinButton.disableInteractive()
 

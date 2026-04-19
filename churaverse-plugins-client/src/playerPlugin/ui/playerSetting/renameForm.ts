@@ -19,6 +19,11 @@ export const SEND_BUTTON_ID = 'name-send-button'
 export const RENAME_COUNT_ID = 'rename-count'
 
 /**
+ * プレイヤー名の最大文字数
+ */
+const MAX_PLAYER_NAME_LENGTH = 15
+
+/**
  * プレイヤー名変更欄
  */
 export class RenameForm {
@@ -55,7 +60,7 @@ export class RenameForm {
     textField.oninput = () => {
       const count = textField.value.length
       if (countEl !== null) {
-        countEl.textContent = `${count}/15`
+        countEl.textContent = `${count}/${MAX_PLAYER_NAME_LENGTH}`
       }
     }
 
@@ -89,9 +94,9 @@ export class RenameForm {
   private validate(name: string): string[] {
     const errors: string[] = []
 
-    //名前の長さが15文字以下かを判定（全角・半角問わず）
-    if (name.length === 0 || name.length > 15) {
-      errors.push('名前は1文字以上15文字以下で入力してください')
+    //名前の長さがMAX_PLAYER_NAME_LENGTH文字以下かを判定（全角・半角問わず）
+    if (name.length === 0 || name.length > MAX_PLAYER_NAME_LENGTH) {
+      errors.push(`名前は1文字以上${MAX_PLAYER_NAME_LENGTH}文字以下で入力してください`)
     }
 
     //名前の途中で2つ以上の連続したスペースがあるかを判定
