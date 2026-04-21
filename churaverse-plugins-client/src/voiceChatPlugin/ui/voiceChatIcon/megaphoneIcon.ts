@@ -22,6 +22,12 @@ export class MegaphoneIcon extends TopBarIconRenderer {
       order: 250,
     })
 
+    this.imgElement.style.backgroundColor = 'rgba(255, 255, 255, 0.95)'
+    this.imgElement.style.borderRadius = '1.8px'
+    this.imgElement.style.padding = '2.5px'
+    this.imgElement.style.boxSizing = 'border-box'
+    this.imgElement.style.cursor = 'pointer'
+
     iconContainer.addIcon(this)
   }
 

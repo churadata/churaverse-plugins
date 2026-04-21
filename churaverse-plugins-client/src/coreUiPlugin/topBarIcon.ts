@@ -85,7 +85,7 @@ export abstract class TopBarIconRenderer implements ITopBarIconRenderer {
    */
   public deactivate(): void {
     this.isActive = false
-    this.imgElement.style.opacity = '0.55'
+    this.imgElement.style.opacity = '0.70'
     this.imgElement.src = this.inactiveIconImgPath
   }
 }

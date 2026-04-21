@@ -76,6 +76,7 @@ export class ScreenShareSender implements IScreenShareSender {
   private alreadyOthersScreenShared(): boolean {
     const participants = Array.from(this.room.remoteParticipants.values() as Iterable<LocalParticipant>)
 
+
     return participants.some((participant) => {
       return participant.isScreenShareEnabled
     })
