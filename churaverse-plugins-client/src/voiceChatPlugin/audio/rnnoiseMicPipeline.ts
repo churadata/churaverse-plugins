@@ -23,38 +23,61 @@ export class RnnoiseMicPipeline {
   private static wasmBinaryPromise: Promise<ArrayBuffer> | undefined
 
   public async start(): Promise<MediaStreamTrack> {
-    // 既に有効なトラックがある場合は再利用する
-    if (this.processedTrack?.readyState === 'live') return this.processedTrack
+    if (this.processedTrack?.readyState === 'live') {
+      return this.processedTrack
+    }
 
     await this.stop()
 
+    try {
+      await this.initializePipeline()
+      const track = this.getProcessedTrack()
+      this.processedTrack = track
+      return track
+      // 例外が発生した場合は途中まで作成されたリソースを解放する
+    } catch (error) {
+      await this.stop()
+      throw error
+    }
+  }
+
+  private async initializePipeline(): Promise<void> {
     // なるべく緩い制約でマイク取得。
     // 一部環境で厳しすぎる制約を指定すると OverconstrainedError が発生するため、
     // 基本は { audio: true } とし、失敗時は上位の呼び出し側でフォールバックする。
     this.sourceStream = await navigator.mediaDevices.getUserMedia({ audio: true })
-
     this.audioContext = new AudioContext({ sampleRate: 48_000 })
     this.destination = this.audioContext.createMediaStreamDestination()
 
     // RNNoise の AudioWorklet をロードして処理ノードを生成
     await this.audioContext.audioWorklet.addModule(rnnoiseWorkletUrl)
+
     const wasmBinary = await RnnoiseMicPipeline.loadWasmBinary()
-    this.workletNode = new RnnoiseWorkletNode(this.audioContext, { maxChannels: 1, wasmBinary })
+    this.workletNode = new RnnoiseWorkletNode(this.audioContext, {
+      maxChannels: 1,
+      wasmBinary
+    })
 
     // getUserMedia のストリームを AudioContext に接続し、RNNoise 経由で destination へ流す
     const sourceNode = this.audioContext.createMediaStreamSource(this.sourceStream)
-    sourceNode.connect(this.workletNode).connect(this.destination)
 
-    const [track] = this.destination.stream.getAudioTracks()
-    if (track === undefined) {
-      // AudioWorklet 経由のストリームが取得できなかった場合は上位でフォールバックさせる
+    // 型確定してから接続
+    const workletAudioNode = this.workletNode as unknown as AudioNode
+    sourceNode.connect(workletAudioNode).connect(this.destination)
+  }
+
+  private getProcessedTrack(): MediaStreamTrack {
+    if (this.destination === undefined) {
+      throw new Error('Destination node is not initialized')
+    }
+
+    const [tracks] = this.destination.stream.getAudioTracks()
+
+    if (tracks === undefined) {
       throw new Error('Failed to create RNNoise processed microphone track')
     }
 
-    // LiveKit 側で publish する MediaStreamTrack を保持
-    this.processedTrack = track
-
-    return track
+    return tracks
   }
 
   public async stop(): Promise<void> {
@@ -63,7 +86,9 @@ export class RnnoiseMicPipeline {
     this.processedTrack = undefined
 
     // getUserMedia で取得した元のストリームも全て停止
-    this.sourceStream?.getTracks().forEach((t) => t.stop())
+    this.sourceStream?.getTracks().forEach((track) => {
+      track.stop()
+    })
     this.sourceStream = undefined
 
     try {
