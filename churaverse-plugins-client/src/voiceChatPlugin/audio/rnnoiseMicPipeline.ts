@@ -88,6 +88,10 @@ export class RnnoiseMicPipeline {
     // wasm バイナリは static にキャッシュし、複数回の start() 呼び出しで再利用する
     if (this.wasmBinaryPromise === undefined) {
       this.wasmBinaryPromise = loadRnnoise({ url: rnnoiseWasmUrl, simdUrl: rnnoiseSimdWasmUrl })
+      this.wasmBinaryPromise.catch(() => {
+        // 失敗した場合は次回以降に再度ロードを試みるため、キャッシュをクリアする
+        this.wasmBinaryPromise = undefined
+      })
     }
     return await this.wasmBinaryPromise
   }
