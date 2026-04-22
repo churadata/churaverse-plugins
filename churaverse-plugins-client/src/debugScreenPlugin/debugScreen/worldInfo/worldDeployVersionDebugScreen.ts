@@ -8,7 +8,7 @@ export class WorldDeployVersionDebugScreen implements IWorldDeployVersionDebugSc
 
   public constructor(debugSummaryScreenContainer: DebugSummaryScreenContainer) {
     const element =
-      `Deploy Version: ${import.meta.env.VITE_DEPLOY_VERSION}` ?? 'Deploy Version: Versionの取得ができませんでした。'
+      `Deploy Version: ${import.meta.env.VITE_DEPLOY_VERSION ?? 'Deploy Version: Versionの取得ができませんでした。'}`
     this.content = DomManager.jsxToDom(
       ElementDebugScreenComponent({
         element,
@@ -19,7 +19,7 @@ export class WorldDeployVersionDebugScreen implements IWorldDeployVersionDebugSc
 
   public update(): void {
     const worldElement =
-      `Deploy Version: ${import.meta.env.VITE_DEPLOY_VERSION}` ?? 'Deploy Version: Versionの取得ができませんでした。'
+      `Deploy Version: ${import.meta.env.VITE_DEPLOY_VERSION ?? 'Deploy Version: Versionの取得ができませんでした。'}`
     this.content.textContent = `${worldElement}`
   }
 

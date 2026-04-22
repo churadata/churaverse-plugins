@@ -8,7 +8,7 @@ export class WorldFrontendVersionDebugScreen implements IWorldFrontendVersionDeb
 
   public constructor(debugSummaryScreenContainer: DebugSummaryScreenContainer) {
     const element =
-      `Frontend Version: ${import.meta.env.VITE_FRONT_VERSION}` ?? 'Frontend Version: Versionの取得ができませんでした。'
+      `Frontend Version: ${import.meta.env.VITE_FRONT_VERSION ?? 'Frontend Version: Versionの取得ができませんでした。'}`
     this.content = DomManager.jsxToDom(
       ElementDebugScreenComponent({
         element,
@@ -19,7 +19,7 @@ export class WorldFrontendVersionDebugScreen implements IWorldFrontendVersionDeb
 
   public update(): void {
     const worldElement =
-      `Frontend Version: ${import.meta.env.VITE_FRONT_VERSION}` ?? 'Frontend Version: Versionの取得ができませんでした。'
+      `Frontend Version: ${import.meta.env.VITE_FRONT_VERSION ?? 'Frontend Version: Versionの取得ができませんでした。'}`
     this.content.textContent = `${worldElement}`
   }
 
