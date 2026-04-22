@@ -36,8 +36,8 @@
   "dependencies": {
     "livekit-client": "^2.15.6",
     "phaser": "^3.80.1",
-    "@churaverse/core-ui-plugin-client": "~0.1.0",
-    "@churaverse/debug-screen-plugin-client": "~0.1.0",
+    "@churaverse/core-ui-plugin-client": "file:../coreUiPlugin",
+    "@churaverse/debug-screen-plugin-client": "file:../debugScreenPlugin",
     "@churaverse/network-plugin-client": "~0.1.0",
     "@churaverse/player-plugin-client": "~0.1.0",
     "@churaverse/web-rtc-plugin-client": "file:../webRtcPlugin",

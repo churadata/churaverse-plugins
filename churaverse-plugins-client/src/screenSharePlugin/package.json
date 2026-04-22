@@ -35,7 +35,7 @@
   "license": "MIT",
   "dependencies": {
     "livekit-client": "^2.15.6",
-    "@churaverse/debug-screen-plugin-client": "~0.1.0",
+    "@churaverse/debug-screen-plugin-client": "file:../debugScreenPlugin",
     "@churaverse/ground-screen-plugin-client": "~0.1.0",
     "@churaverse/player-plugin-client": "~0.1.0",
     "@churaverse/web-rtc-plugin-client": "file:../webRtcPlugin",
