@@ -29,11 +29,7 @@ export class VideoChatIcon extends TopBarIconRenderer {
     this.iconDivContainer.style.position = 'relative'
     this.iconDivContainer.appendChild(super.node)
 
-    this.imgElement.style.backgroundColor = 'rgba(255, 255, 255, 0.95)'
-    this.imgElement.style.borderRadius = '1.8px'
-    this.imgElement.style.padding = '2.5px'
-    this.imgElement.style.boxSizing = 'border-box'
-    this.imgElement.style.cursor = 'pointer'
+    this.applyDefaultIconStyle()
 
     iconContainer.addIcon(this)
     super.deactivate()
