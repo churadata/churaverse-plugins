@@ -29,13 +29,13 @@ export class AudioPipelineService implements IAudioService {
   */
 
   private isDebugEnabled(): boolean {
-  if (typeof window === 'undefined') return false
-  if ('__CV_DEBUG_AUDIO__' in window && window.__CV_DEBUG_AUDIO__ === true) return true
-  try {
-        return window.localStorage.getItem('__CV_DEBUG_AUDIO__') === 'true'
-      } catch {
-        return false
-      }
+    if (typeof window === 'undefined') return false
+    if ('__CV_DEBUG_AUDIO__' in window && window.__CV_DEBUG_AUDIO__ === true) return true
+    try {
+          return window.localStorage.getItem('__CV_DEBUG_AUDIO__') === 'true'
+        } catch {
+          return false
+        }
   }
 
   private debug(...args: unknown[]): void {
