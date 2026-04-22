@@ -67,7 +67,7 @@ export class TitlePlayerPlugin extends BasePlugin<ITitleScene> {
     initTitlePlayerPluginStore(
       this.store,
       this.ownPlayer,
-      this.createPreviewPlayer(),
+      this.createPreviewPlayer(this.ownPlayer),
       new TitleNameFieldRenderer(this.bus),
       new TitlePlayerRoleRenderer(this.scene, this.playerSetupInfoReader)
     )
@@ -86,22 +86,22 @@ export class TitlePlayerPlugin extends BasePlugin<ITitleScene> {
       pos,
       direction,
       this.playerSetupInfoReader.read().name ?? '',
-      this.playerSetupInfoReader.read().color ?? PLAYER_COLOR_NAMES[4],
+      this.playerSetupInfoReader.read().color ??
+        PLAYER_COLOR_NAMES[Math.floor(Math.random() * PLAYER_COLOR_NAMES.length)],
       DEFAULT_HP,
       this.playerSetupInfoReader.read().role ?? 'user'
     )
     return ownPlayer
   }
 
-  private createPreviewPlayer(): IPlayerRenderer {
+  private createPreviewPlayer(ownPlayer: Player): IPlayerRenderer {
     const pos = new Position(0, 0)
-    const direction = Direction.down
     const previewPlayer = this.playerRendererFactory.build(
       pos,
-      direction,
-      this.playerSetupInfoReader.read().name ?? '',
-      this.playerSetupInfoReader.read().color ?? PLAYER_COLOR_NAMES[4],
-      DEFAULT_HP
+      ownPlayer.direction,
+      ownPlayer.name,
+      ownPlayer.color,
+      ownPlayer.hp
     )
     return previewPlayer
   }

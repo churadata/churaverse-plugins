@@ -35,7 +35,7 @@ export class NyokkiLogTextCreator implements INyokkiLogTextCreator {
    * @param playerIds ニョッキアクションを実行したplayerIdの配列
    * @param isSuccess ニョッキアクションの成功可否
    */
-  public createNyokkiLogText(playerIds: string[], isSuccess: boolean, nyokkiTime: number): string {
+  public createNyokkiLogText(playerIds: string[], isSuccess: boolean, nyokkiTime: number): string | undefined {
     if (isSuccess) {
       return this.createSuccessLog(playerIds, nyokkiTime)
     } else {
@@ -46,9 +46,9 @@ export class NyokkiLogTextCreator implements INyokkiLogTextCreator {
   /**
    * ニョッキ成功時のログを生成する
    */
-  private createSuccessLog(playerIds: string[], seed: number): string {
+  private createSuccessLog(playerIds: string[], seed: number): string | undefined {
     const playerName = this.store.of('playerPlugin').players.get(playerIds[0])?.name
-    if (playerName === undefined) return `ニョッキ成功！！！`
+    if (playerName === undefined) return undefined
 
     // 成功したメッセージをseedを基に選択する
     const i = Math.floor(seed / 100) % successLog.length
