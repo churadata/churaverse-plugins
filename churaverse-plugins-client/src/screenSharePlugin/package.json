@@ -39,7 +39,7 @@
     "@churaverse/ground-screen-plugin-client": "~0.1.0",
     "@churaverse/player-plugin-client": "~0.1.0",
     "@churaverse/web-rtc-plugin-client": "file:../webRtcPlugin",
-    "@churaverse/core-ui-plugin-client": "~0.1.0",
+    "@churaverse/core-ui-plugin-client": "file:../coreUiPlugin",
     "churaverse-engine-client": "~0.1.0"
   }
 }
