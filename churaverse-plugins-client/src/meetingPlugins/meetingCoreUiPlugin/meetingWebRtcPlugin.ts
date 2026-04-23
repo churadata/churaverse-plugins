@@ -90,7 +90,11 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
     const { room } = meetingRoom
     this.setupRoomEventHandlers(meetingRoom)
 
-    this.chatService = new LiveKitChatService(room, this.meetingPluginStore.participantId, this.meetingPluginStore.displayName)
+    this.chatService = new LiveKitChatService(
+      room,
+      this.meetingPluginStore.participantId,
+      this.meetingPluginStore.displayName
+    )
     this.chatService.setHandler({
       onChatMessage: (senderId, senderName, text) => {
         this.chatUi.addMessage(senderId, senderName, text)

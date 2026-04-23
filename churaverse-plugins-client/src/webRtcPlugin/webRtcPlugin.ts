@@ -4,6 +4,7 @@ import { WebRtcPluginStore } from './store/defWebRtcPluginStore'
 import { initWebRtcPluginStore } from './store/initWebRtcPluginStore'
 import { WebRtcUi } from './ui/webRtcUi'
 import { LiveKitChatService } from '@churaverse/livekit-client'
+import { MeetingParticipantPanel } from './ui/meetingParticipantPanel/meetingParticipantPanel'
 import { TextChat } from '@churaverse/text-chat-plugin-client/model/textChat'
 import { AddTextChatEvent } from '@churaverse/text-chat-plugin-client/event/addTextChatEvent'
 import { SendTextChatEvent } from '@churaverse/text-chat-plugin-client/event/sendTextChatEvent'
@@ -32,6 +33,7 @@ export class WebRtcPlugin extends BasePlugin<IMainScene> {
   private start(): void {
     this.webRtcUi = new WebRtcUi(this.store, this.bus)
     this.setupChatBridge()
+    void new MeetingParticipantPanel(this.webRtcPluginStore.webRtc.room)
 
     navigator.mediaDevices.addEventListener('devicechange', () => {
       this.bus.post(new ChangeLocalDeviceEvent())
@@ -43,13 +45,12 @@ export class WebRtcPlugin extends BasePlugin<IMainScene> {
     const transitionStore = this.store.of('transitionPlugin')
     const receivedData = transitionStore.transitionManager.getReceivedData<ITitleScene>()
     const ownPlayerName = receivedData?.ownPlayer?.name ?? room.localParticipant.identity
-    const playerPluginStore = this.store.of('playerPlugin')
 
     this.chatService = new LiveKitChatService(room, room.localParticipant.identity, ownPlayerName)
     this.chatService.setHandler({
       onChatMessage: (senderId, senderName, text) => {
-        // ゲーム内プレイヤー（PlayersRepository にいる ID）のチャットは Socket 経由で既に扱うためスキップ
-        if (playerPluginStore.players.get(senderId) !== undefined) return
+        // MeetingScene参加者（meeting-プレフィックス）以外はSocket経由で既に扱うためスキップ
+        if (!senderId.startsWith('meeting-')) return
 
         const textChat = new TextChat(senderId, senderName, text)
         this.bus.post(new AddTextChatEvent(textChat))
