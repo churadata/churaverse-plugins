@@ -8,7 +8,7 @@ import {
   AVATAR_CONTAINER_ID_PREFIX,
 } from '../components/ParticipantTileComponent'
 import { getAvatarColor, getInitials } from '../utils/avatarUtils'
-import { getParticipantDisplayName } from '../utils/participantDisplayName'
+import { getParticipantDisplayName } from '@churaverse/livekit-client'
 
 const MAX_VISIBLE_SIDEBAR_TILES = 5
 const PARTICIPANT_SIDEBAR_ID = 'participant-sidebar'
