@@ -27,7 +27,6 @@ export class AudioPipelineService implements IAudioService {
   /**
    * デバッグログの有効判定。localStorage にフラグを置く簡易トグル。
   */
-
   private isDebugEnabled(): boolean {
     if (typeof window === 'undefined') return false
     if ('__CV_DEBUG_AUDIO__' in window && window.__CV_DEBUG_AUDIO__ === true) return true
