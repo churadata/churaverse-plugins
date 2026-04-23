@@ -133,6 +133,7 @@ export class AudioPipelineService implements IAudioService {
    * - 既存マイクがあれば先に unpublish して差し替える
    */
   public async startLocalMic(): Promise<boolean> {
+    this.debug('startLocalMic called', {haslocalChain: this.localChain !== undefined})
     if (this.room === undefined) {
       this.debug('startLocalMic aborted: room not provided')
       return false
@@ -200,6 +201,14 @@ export class AudioPipelineService implements IAudioService {
         }
       }
 
+      try {
+        if (this.room.localParticipant.isMicrophoneEnabled) {
+          await this.room.localParticipant.setMicrophoneEnabled(false)
+        }
+      } catch (error) {
+        this.debug('pre-publish microphone failed', { error: String(error) })
+      }
+      
       await participant.publishTrack(processedTrack, { source: Track.Source.Microphone, name: 'microphone' })
 
       this.localChain = { stream, inputTrack, processedTrack, source, gain, destination }
@@ -222,6 +231,7 @@ export class AudioPipelineService implements IAudioService {
    * ローカルマイクの送信チェーンを停止し、LiveKit から unpublish する。
    */
   public async stopLocalMic(): Promise<boolean> {
+    this.debug('stopLocalMic called', { hasLocalChain: this.localChain !== undefined })
     if (this.room === undefined) return false
 
     const participant = this.room.localParticipant
