@@ -1,4 +1,4 @@
-import { ITitleScene, Store, IEventBus, createUIContainer, DomManager } from 'churaverse-engine-client'
+import { ITitleScene, Store, createUIContainer, DomManager, SceneName } from 'churaverse-engine-client'
 import { GameObjects, Scene } from 'phaser'
 import { IJoinButtonRenderer } from '../domain/IJoinButtonRenderer'
 import { PlayerRole } from '@churaverse/player-plugin-client/types/playerRole'
@@ -34,7 +34,6 @@ export class JoinButtonRenderer implements IJoinButtonRenderer {
   public constructor(
     scene: Scene,
     store: Store<ITitleScene>,
-    private readonly eventBus: IEventBus<ITitleScene>,
     gameModeSelectorRenderer: GameModeSelectorRenderer
   ) {
     this.titlePlayerPluginStore = store.of('titlePlayerPlugin')
@@ -101,11 +100,7 @@ export class JoinButtonRenderer implements IJoinButtonRenderer {
       // 処理が重複しないように処理中はボタンを押せないようにロック
       this.joinButton.disableInteractive()
 
-      const player = this.titlePlayerPluginStore.ownPlayer
-      sessionStorage.setItem('meetingPlayerName', player.name)
-
-      // モードに応じて遷移先を決定
-      const targetScene = this.gameModeSelectorRenderer.isGameModeEnabled() ? 'MainScene' : 'MeetingScene'
+      const targetScene: SceneName = this.gameModeSelectorRenderer.isGameModeEnabled() ? 'MainScene' : 'MeetingScene'
 
       DomManager.removeAll()
       this.transitionPluginStore.transitionManager.transitionTo(targetScene)

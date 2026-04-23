@@ -20,8 +20,9 @@ import { VideoGridUi } from './ui/videoGridUi'
 import { ParticipantListUi } from './ui/participantListUi'
 import { ChatUi } from './ui/chatUi'
 import { MeetingRoom } from './meetingRoom'
-import { getParticipantDisplayName } from './utils/participantDisplayName'
+import { getParticipantDisplayName } from '@churaverse/livekit-client'
 import { LiveKitChatService } from '@churaverse/livekit-client'
+import { PORTAL_STORAGE_KEYS } from '@churaverse/transition-plugin-client'
 import '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
 import '@churaverse/title-plugin-client/titlePlayerPlugin/defTitlePlayerTransitionData'
 
@@ -295,8 +296,8 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private async enterGameMode(): Promise<void> {
-    sessionStorage.setItem('portalToGameMode', 'true')
-    sessionStorage.setItem('meetingPlayerName', this.meetingPluginStore.displayName)
+    sessionStorage.setItem(PORTAL_STORAGE_KEYS.TO_GAME_MODE, 'true')
+    sessionStorage.setItem(PORTAL_STORAGE_KEYS.PLAYER_NAME, this.meetingPluginStore.displayName)
     await this.meetingPluginStore.meetingRoom?.disconnect()
     this.meetingPluginStore.isConnected = false
     window.location.href = '/'

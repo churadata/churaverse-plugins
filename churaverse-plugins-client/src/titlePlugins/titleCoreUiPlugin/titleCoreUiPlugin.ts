@@ -7,6 +7,7 @@ import {
   StartEvent,
 } from 'churaverse-engine-client'
 import { Scene } from 'phaser'
+import { PORTAL_STORAGE_KEYS } from '@churaverse/transition-plugin-client'
 import { JoinButtonRenderer } from './renderer/joinButtonRenderer'
 import { TitleBackgroundRenderer } from './renderer/titleBackgroundRenderer'
 import { ChuraDataLogoRenderer } from './renderer/churaDataLogoRenderer'
@@ -44,21 +45,21 @@ export class TitleCoreUiPlugin extends BasePlugin<ITitleScene> {
 
   private start(ev: StartEvent): void {
     this.gameModeSelectorRenderer = new GameModeSelectorRenderer()
-    this.joinButtonRenderer = new JoinButtonRenderer(this.scene, this.store, this.bus, this.gameModeSelectorRenderer)
+    this.joinButtonRenderer = new JoinButtonRenderer(this.scene, this.store, this.gameModeSelectorRenderer)
     void new TitleBackgroundRenderer(this.scene)
     void new ChuraDataLogoRenderer(this.scene, this.store, this.bus)
     this.checkPortalAutoStart()
   }
 
   private checkPortalAutoStart(): void {
-    const toGame = sessionStorage.getItem('portalToGameMode') === 'true'
-    const toMeeting = sessionStorage.getItem('portalToMeeting') === 'true'
+    const toGame = sessionStorage.getItem(PORTAL_STORAGE_KEYS.TO_GAME_MODE) === 'true'
+    const toMeeting = sessionStorage.getItem(PORTAL_STORAGE_KEYS.TO_MEETING) === 'true'
     if (!toGame && !toMeeting) return
 
-    sessionStorage.removeItem('portalToGameMode')
-    sessionStorage.removeItem('portalToMeeting')
+    sessionStorage.removeItem(PORTAL_STORAGE_KEYS.TO_GAME_MODE)
+    sessionStorage.removeItem(PORTAL_STORAGE_KEYS.TO_MEETING)
 
-    const name = sessionStorage.getItem('meetingPlayerName')
+    const name = sessionStorage.getItem(PORTAL_STORAGE_KEYS.PLAYER_NAME)
     if (name !== null && name !== '') {
       const nameInput = document.getElementById('title-name-field') as HTMLInputElement | null
       if (nameInput !== null) {

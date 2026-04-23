@@ -1,7 +1,6 @@
 import { domLayerSetting, DomManager } from 'churaverse-engine-client'
+import { PORTAL_STORAGE_KEYS } from '@churaverse/transition-plugin-client'
 import style from './MeetingButtonComponent.module.scss'
-
-const PORTAL_TO_MEETING_KEY = 'portalToMeeting'
 
 export class MeetingButton {
   public constructor() {
@@ -10,7 +9,7 @@ export class MeetingButton {
     btn.className = style.meetingButton
 
     btn.addEventListener('click', () => {
-      sessionStorage.setItem(PORTAL_TO_MEETING_KEY, 'true')
+      sessionStorage.setItem(PORTAL_STORAGE_KEYS.TO_MEETING, 'true')
       window.location.href = '/'
     })
 

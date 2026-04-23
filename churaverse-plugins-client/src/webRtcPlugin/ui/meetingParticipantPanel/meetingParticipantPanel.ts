@@ -1,7 +1,6 @@
 import { Room, RoomEvent, Participant, RemoteParticipant } from 'livekit-client'
+import { getParticipantDisplayName } from '@churaverse/livekit-client'
 import style from './MeetingParticipantPanelComponent.module.scss'
-import micOnIcon from './assets/microphone.png'
-import micOffIcon from './assets/microphone_off.png'
 
 const PLAYER_LIST_ID = 'player-list'
 const MEETING_PARTICIPANT_LIST_ID = 'meeting-participant-list'
@@ -28,7 +27,7 @@ export class MeetingParticipantPanel {
     this.dividerElement = document.createElement('div')
     this.dividerElement.id = MEETING_PARTICIPANT_DIVIDER_ID
     this.dividerElement.className = style.divider
-    this.dividerElement.textContent = '音声のみ参加'
+    this.dividerElement.textContent = 'ゲームモードOFFの参加者'
     parent.appendChild(this.dividerElement)
 
     this.listElement = document.createElement('div')
@@ -51,11 +50,21 @@ export class MeetingParticipantPanel {
 
   private setupRoomEventListeners(): void {
     this.room
-      .on(RoomEvent.ParticipantConnected, () => { this.renderMeetingParticipants() })
-      .on(RoomEvent.ParticipantDisconnected, () => { this.renderMeetingParticipants() })
-      .on(RoomEvent.TrackMuted, () => { this.renderMeetingParticipants() })
-      .on(RoomEvent.TrackUnmuted, () => { this.renderMeetingParticipants() })
-      .on(RoomEvent.ParticipantNameChanged, () => { this.renderMeetingParticipants() })
+      .on(RoomEvent.ParticipantConnected, () => {
+        this.renderMeetingParticipants()
+      })
+      .on(RoomEvent.ParticipantDisconnected, () => {
+        this.renderMeetingParticipants()
+      })
+      .on(RoomEvent.TrackMuted, () => {
+        this.renderMeetingParticipants()
+      })
+      .on(RoomEvent.TrackUnmuted, () => {
+        this.renderMeetingParticipants()
+      })
+      .on(RoomEvent.ParticipantNameChanged, () => {
+        this.renderMeetingParticipants()
+      })
   }
 
   private renderMeetingParticipants(): void {
@@ -88,12 +97,6 @@ export class MeetingParticipantPanel {
     })
   }
 
-  /** participant.name が空文字の場合 identity にフォールバック */
-  public getDisplayName(participant: Participant): string {
-    const name = participant.name?.trim()
-    return name !== undefined && name !== '' ? name : participant.identity
-  }
-
   private addParticipantItem(participant: Participant): void {
     if (this.listElement === null) return
 
@@ -102,13 +105,12 @@ export class MeetingParticipantPanel {
 
     const nameSpan = document.createElement('div')
     nameSpan.className = style.participantName
-    nameSpan.textContent = this.getDisplayName(participant)
+    nameSpan.textContent = getParticipantDisplayName(participant)
     item.appendChild(nameSpan)
 
-    const micIcon = document.createElement('img')
-    micIcon.className = style.micIcon
-    micIcon.src = participant.isMicrophoneEnabled ? micOnIcon : micOffIcon
-    micIcon.alt = participant.isMicrophoneEnabled ? 'マイクON' : 'マイクOFF'
+    const micIcon = document.createElement('span')
+    micIcon.className = `${style.micIcon} ${participant.isMicrophoneEnabled ? style.micOn : style.micOff}`
+    micIcon.textContent = participant.isMicrophoneEnabled ? 'Mic' : 'Mute'
     item.appendChild(micIcon)
 
     this.listElement.appendChild(item)

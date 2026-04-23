@@ -2,7 +2,7 @@ import { DomManager } from 'churaverse-engine-client'
 import { Participant } from 'livekit-client'
 import { PARTICIPANT_LIST_ID, PARTICIPANTS_COUNT_ID } from '../components/MeetingSidebarComponent'
 import { ParticipantItemComponent } from '../components/ParticipantItemComponent'
-import { getParticipantDisplayName } from '../utils/participantDisplayName'
+import { getParticipantDisplayName } from '@churaverse/livekit-client'
 
 export class ParticipantListUi {
   public constructor(private readonly ownParticipantId: string) {}
