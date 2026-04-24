@@ -8,7 +8,7 @@ export const MEGAPHONE_ICON_PATH = MEGAPHONE_ICON
 const DISPLAY_DURATION = 1500 // toast通知を表示する時間（ミリ秒）
 
 export class MegaphoneIcon extends TopBarIconRenderer {
-  private readonly megaphoneDialogElement: HTMLDivElement
+  private readonly megaphoneToastElement: HTMLDivElement
   private hideTimeoutId: ReturnType<typeof setTimeout> | null = null
   public constructor(
     private readonly eventBus: IEventBus<IMainScene>,
@@ -26,11 +26,11 @@ export class MegaphoneIcon extends TopBarIconRenderer {
     })
     this.imgElement.title =
       'Megaphone:\nこの機能をオンにすると、あなたの声はこの場にいるすべての人に聞こえるようになります'
-    this.megaphoneDialogElement = this.createMegaphoneDialogElement()
-    document.body.appendChild(this.megaphoneDialogElement)
+    this.megaphoneToastElement = this.createMegaphoneToastElement()
+    document.body.appendChild(this.megaphoneToastElement)
     iconContainer.addIcon(this)
   }
-  private createMegaphoneDialogElement(): HTMLDivElement {
+  private createMegaphoneToastElement(): HTMLDivElement {
     const element = document.createElement('div')
     element.style.position = 'fixed'
     element.style.top = '80px'
@@ -49,14 +49,14 @@ export class MegaphoneIcon extends TopBarIconRenderer {
     element.style.transition = 'opacity 0.3s ease'
     return element
   }
-  private showMegaphoneDialog(message: string): void {
+  private showMegaphoneToast(message: string): void {
     if (this.hideTimeoutId !== null) {
       clearTimeout(this.hideTimeoutId)
     }
-    this.megaphoneDialogElement.innerText = message
-    this.megaphoneDialogElement.style.opacity = '1'
+    this.megaphoneToastElement.innerText = message
+    this.megaphoneToastElement.style.opacity = '1'
     this.hideTimeoutId = setTimeout(() => {
-      this.megaphoneDialogElement.style.opacity = '0'
+      this.megaphoneToastElement.style.opacity = '0'
       this.hideTimeoutId = null
     }, DISPLAY_DURATION)
   }
@@ -70,11 +70,11 @@ export class MegaphoneIcon extends TopBarIconRenderer {
   private activateMegaphone(): void {
     this.eventBus.post(new ToggleMegaphoneEvent(this.playerId, true))
     super.activate()
-    this.showMegaphoneDialog('メガホン機能がオンになりました\nあなたの声は離れている参加者にも聞こえます')
+    this.showMegaphoneToast('メガホン機能がオンになりました\nあなたの声は離れている参加者にも聞こえます')
   }
   private deactivateMegaphone(): void {
     this.eventBus.post(new ToggleMegaphoneEvent(this.playerId, false))
     super.deactivate()
-    this.showMegaphoneDialog('メガホン機能がオフになりました\nあなたの声は近くの参加者にのみ聞こえます')
+    this.showMegaphoneToast('メガホン機能がオフになりました\nあなたの声は近くの参加者にのみ聞こえます')
   }
 }
