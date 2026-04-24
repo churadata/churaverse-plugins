@@ -48,10 +48,6 @@ export class DebugDetailScreenContainer implements IDebugDetailScreenContainer {
     this.container.style.display = this.visibleDisplayStyle
   }
 
-  public get node(): HTMLElement {
-    return this.container
-  }
-  
   public close(): void {
     this._isOpen = false
     this.container.style.display = 'none'
