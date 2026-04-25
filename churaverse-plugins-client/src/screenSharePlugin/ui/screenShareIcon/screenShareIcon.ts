@@ -17,7 +17,7 @@ export class ScreenShareIcon extends TopBarIconRenderer {
       order: 100,
     })
 
-    this.applyDefaultIconStyle()
+    this.applyIconStyle()
 
     iconContainer.addIcon(this)
   }

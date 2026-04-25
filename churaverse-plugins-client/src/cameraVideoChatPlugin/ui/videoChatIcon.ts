@@ -29,7 +29,7 @@ export class VideoChatIcon extends TopBarIconRenderer {
     this.iconDivContainer.style.position = 'relative'
     this.iconDivContainer.appendChild(super.node)
 
-    this.applyDefaultIconStyle()
+    this.applyIconStyle()
 
     iconContainer.addIcon(this)
     super.deactivate()

@@ -21,7 +21,7 @@ export class PlayerListIcon extends TopBarIconRenderer implements ITopBarIconRen
       isActive: false,
     })
 
-    this.applyDefaultIconStyle()
+    this.applyIconStyle()
 
     iconContainer.addIcon(this)
 

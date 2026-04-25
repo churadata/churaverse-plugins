@@ -22,7 +22,7 @@ export class MegaphoneIcon extends TopBarIconRenderer {
       order: 250,
     })
 
-    this.applyDefaultIconStyle()
+    this.applyIconStyle()
 
     iconContainer.addIcon(this)
   }

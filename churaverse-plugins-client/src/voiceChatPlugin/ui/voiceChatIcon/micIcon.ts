@@ -23,7 +23,7 @@ export class MicIcon extends TopBarIconRenderer {
       order: 200,
     })
 
-    this.applyDefaultIconStyle()
+    this.applyIconStyle()
 
     iconContainer.addIcon(this)
   }

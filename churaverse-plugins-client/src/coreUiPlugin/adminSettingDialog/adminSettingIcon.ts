@@ -26,7 +26,7 @@ export class AdminSettingIcon extends TopBarIconRenderer {
       return
     }
 
-    this.applyDefaultIconStyle()
+    this.applyIconStyle()
 
     iconContainer.addIcon(this)
     switcher.add('adminSetting', dialog, () => {

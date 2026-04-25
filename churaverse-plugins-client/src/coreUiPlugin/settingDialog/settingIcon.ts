@@ -22,7 +22,7 @@ export class SettingIcon extends TopBarIconRenderer {
       order: -50,
     })
 
-    this.applyDefaultIconStyle()
+    this.applyIconStyle()
 
     iconContainer.addIcon(this)
     switcher.add('setting', dialog, () => {

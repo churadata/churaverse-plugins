@@ -92,7 +92,7 @@ export abstract class TopBarIconRenderer implements ITopBarIconRenderer {
     this.imgElement.src = this.inactiveIconImgPath
   }
 
-  public applyDefaultIconStyle(): void {
+  protected applyIconStyle(): void {
     this.imgElement.style.backgroundColor = DEFAULT_ICON_BACKGROUND_COLOR
     this.imgElement.style.borderRadius = DEFAULT_ICON_BORDER_RADIUS
     this.imgElement.style.padding = DEFAULT_ICON_PADDING
