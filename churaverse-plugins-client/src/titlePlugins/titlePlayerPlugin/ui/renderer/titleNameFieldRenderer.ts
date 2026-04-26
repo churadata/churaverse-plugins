@@ -27,7 +27,7 @@ export class TitleNameFieldRenderer implements ITitleNameFieldRenderer {
 
   public constructor(private readonly eventBus: IEventBus<ITitleScene>) {
     // 名前入力欄の生成
-    DomManager.addJsxDom(TitleNameFieldComponent())
+    DomManager.addJsxDom(TitleNameFieldComponent({ maxLength: MAX_PLAYER_NAME_LENGTH }))
     this.textField = DomManager.getElementById<HTMLInputElement>(TITLE_FIELD_NAME)
     this.countText = document.getElementById(TITLE_NAME_COUNT_ID)
 

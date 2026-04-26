@@ -37,7 +37,7 @@ export class RenameForm {
   ) {
     this.playerId = playerId
 
-    const content = DomManager.jsxToDom(RenameFormComponent({ defaultName: name }))
+    const content = DomManager.jsxToDom(RenameFormComponent({ defaultName: name, maxLength: MAX_PLAYER_NAME_LENGTH }))
     settingDialog.addContent('playerSetting', content)
 
     const textField = this.setupTextField()
