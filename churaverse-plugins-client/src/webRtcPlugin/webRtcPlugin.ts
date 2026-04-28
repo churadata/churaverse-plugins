@@ -3,7 +3,7 @@ import { ChangeLocalDeviceEvent } from './event/changeLocalDeviceEvent'
 import { WebRtcPluginStore } from './store/defWebRtcPluginStore'
 import { initWebRtcPluginStore } from './store/initWebRtcPluginStore'
 import { WebRtcUi } from './ui/webRtcUi'
-import { LiveKitChatService } from '@churaverse/livekit-client'
+import { LiveKitChatService, MEETING_PARTICIPANT_ID_PREFIX } from '@churaverse/livekit-client'
 import { MeetingParticipantPanel } from './ui/meetingParticipantPanel/meetingParticipantPanel'
 import { TextChat } from '@churaverse/text-chat-plugin-client/model/textChat'
 import { AddTextChatEvent } from '@churaverse/text-chat-plugin-client/event/addTextChatEvent'
@@ -49,8 +49,8 @@ export class WebRtcPlugin extends BasePlugin<IMainScene> {
     this.chatService = new LiveKitChatService(room, room.localParticipant.identity, ownPlayerName)
     this.chatService.setHandler({
       onChatMessage: (senderId, senderName, text) => {
-        // MeetingScene参加者（meeting-プレフィックス）以外はSocket経由で既に扱うためスキップ
-        if (!senderId.startsWith('meeting-')) return
+        // MeetingScene 参加者以外は Socket 経由で既に扱うためスキップ（identity は MEETING_PARTICIPANT_ID_PREFIX）
+        if (!senderId.startsWith(MEETING_PARTICIPANT_ID_PREFIX)) return
 
         const textChat = new TextChat(senderId, senderName, text)
         this.bus.post(new AddTextChatEvent(textChat))

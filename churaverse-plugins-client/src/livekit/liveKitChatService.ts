@@ -51,10 +51,6 @@ export class LiveKitChatService {
     this.handler = handler
   }
 
-  public getHistory(): readonly ChatMessage[] {
-    return this.chatHistory
-  }
-
   public async sendChat(text: string): Promise<void> {
     const message: ChatMessage = {
       type: CHAT_MESSAGE_TYPE.CHAT,

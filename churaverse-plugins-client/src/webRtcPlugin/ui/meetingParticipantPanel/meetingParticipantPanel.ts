@@ -1,4 +1,5 @@
 import { Room, RoomEvent, Participant, RemoteParticipant } from 'livekit-client'
+import { getParticipantDisplayName, MEETING_PARTICIPANT_ID_PREFIX } from '@churaverse/livekit-client'
 import style from './MeetingParticipantPanelComponent.module.scss'
 
 const PLAYER_LIST_ID = 'player-list'
@@ -76,8 +77,7 @@ export class MeetingParticipantPanel {
 
     const meetingOnlyParticipants: Participant[] = []
     this.room.participants.forEach((participant: RemoteParticipant) => {
-      const isGamePlayer = document.getElementById(`player-${participant.identity}`) !== null
-      if (!isGamePlayer) {
+      if (participant.identity.startsWith(MEETING_PARTICIPANT_ID_PREFIX)) {
         meetingOnlyParticipants.push(participant)
       }
     })
@@ -96,11 +96,6 @@ export class MeetingParticipantPanel {
     })
   }
 
-  public getDisplayName(participant: Participant): string {
-    if (participant.name !== undefined && participant.name !== '') return participant.name
-    return participant.identity
-  }
-
   private addParticipantItem(participant: Participant): void {
     if (this.listElement === null) return
 
@@ -109,7 +104,7 @@ export class MeetingParticipantPanel {
 
     const nameSpan = document.createElement('div')
     nameSpan.className = style.participantName
-    nameSpan.textContent = this.getDisplayName(participant)
+    nameSpan.textContent = getParticipantDisplayName(participant)
     item.appendChild(nameSpan)
 
     const micIcon = document.createElement('span')
