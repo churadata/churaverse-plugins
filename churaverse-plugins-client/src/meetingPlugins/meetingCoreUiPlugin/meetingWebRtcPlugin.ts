@@ -20,8 +20,7 @@ import { VideoGridUi } from './ui/videoGridUi'
 import { ParticipantListUi } from './ui/participantListUi'
 import { ChatUi } from './ui/chatUi'
 import { MeetingRoom } from './meetingRoom'
-import { getParticipantDisplayName } from '@churaverse/livekit-client'
-import { LiveKitChatService } from '@churaverse/livekit-client'
+import { getParticipantDisplayName, LiveKitChatService, MEETING_PARTICIPANT_ID_PREFIX } from '@churaverse/livekit-client'
 import { PORTAL_STORAGE_KEYS } from '@churaverse/transition-plugin-client'
 import '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
 import '@churaverse/title-plugin-client/titlePlayerPlugin/defTitlePlayerTransitionData'
@@ -80,9 +79,9 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
   private generateParticipantId(): string {
     if (globalThis.crypto?.randomUUID !== undefined) {
-      return `meeting-${globalThis.crypto.randomUUID()}`
+      return `${MEETING_PARTICIPANT_ID_PREFIX}${globalThis.crypto.randomUUID()}`
     }
-    return `meeting-${Math.random().toString(36).slice(2, 10)}`
+    return `${MEETING_PARTICIPANT_ID_PREFIX}${Math.random().toString(36).slice(2, 10)}`
   }
 
   private cleanup(): void {

@@ -48,9 +48,9 @@ export class TextChatPlugin extends BasePlugin<IMainScene> {
   }
 
   private onAddTextChat(ev: AddTextChatEvent): void {
-    const chat = ev.textChat instanceof TextChat
-      ? ev.textChat
-      : new TextChat(ev.textChat.playerId, ev.textChat.name, ev.textChat.message)
+    // AddTextChatEvent の型は TextChat のみだが、実行時にプレーンオブジェクトが来る場合の保険
+    const duck = ev.textChat as unknown as { playerId: string; name: string; message: string }
+    const chat = ev.textChat instanceof TextChat ? ev.textChat : new TextChat(duck.playerId, duck.name, duck.message)
 
     this.textChatPluginStore.textChatService.addChat(chat)
     this.textChatUi.textChatBoard.add(chat)

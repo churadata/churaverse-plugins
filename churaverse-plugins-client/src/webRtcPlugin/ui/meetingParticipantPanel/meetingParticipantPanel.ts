@@ -1,5 +1,5 @@
 import { Room, RoomEvent, Participant, RemoteParticipant } from 'livekit-client'
-import { getParticipantDisplayName } from '@churaverse/livekit-client'
+import { getParticipantDisplayName, MEETING_PARTICIPANT_ID_PREFIX } from '@churaverse/livekit-client'
 import style from './MeetingParticipantPanelComponent.module.scss'
 
 const PLAYER_LIST_ID = 'player-list'
@@ -77,8 +77,7 @@ export class MeetingParticipantPanel {
 
     const meetingOnlyParticipants: Participant[] = []
     this.room.participants.forEach((participant: RemoteParticipant) => {
-      const isMeetingOnlyUser = participant.identity.startsWith('meeting-')
-      if (isMeetingOnlyUser) {
+      if (participant.identity.startsWith(MEETING_PARTICIPANT_ID_PREFIX)) {
         meetingOnlyParticipants.push(participant)
       }
     })
