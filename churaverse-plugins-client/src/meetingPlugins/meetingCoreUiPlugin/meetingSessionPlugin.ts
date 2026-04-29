@@ -19,7 +19,7 @@ import { getParticipantDisplayName, LiveKitChatService, MEETING_PARTICIPANT_ID_P
 import '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
 import '@churaverse/title-plugin-client/titlePlayerPlugin/defTitlePlayerTransitionData'
 
-export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
+export class MeetingSessionPlugin extends BasePlugin<IMeetingScene> {
   private meetingPluginStore!: MeetingPluginStore
   private videoGridUi!: VideoGridUi
   private participantListUi!: ParticipantListUi
@@ -123,7 +123,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
 
       this.updateParticipantList(meetingRoom)
     } catch (e) {
-      console.error('[MeetingWebRtc] Failed to connect:', e)
+      console.error('[MeetingSession] Failed to connect:', e)
       this.meetingPluginStore.isConnected = false
     }
   }
@@ -278,7 +278,7 @@ export class MeetingWebRtcPlugin extends BasePlugin<IMeetingScene> {
       await room.localParticipant.setScreenShareEnabled(this.isScreenShareEnabled)
       this.updateButtonState(SCREEN_SHARE_BUTTON_ID, this.isScreenShareEnabled)
     } catch (e) {
-      console.error('[MeetingWebRtc] Screen share failed:', e)
+      console.error('[MeetingSession] Screen share failed:', e)
       this.isScreenShareEnabled = false
       this.updateButtonState(SCREEN_SHARE_BUTTON_ID, false)
     }
