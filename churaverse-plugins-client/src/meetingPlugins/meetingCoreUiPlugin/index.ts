@@ -1,2 +1,2 @@
 export { MeetingCoreUiPlugin } from './meetingCoreUiPlugin'
-export { MeetingWebRtcPlugin } from './meetingWebRtcPlugin'
+export { MeetingSessionPlugin } from './meetingSessionPlugin'
