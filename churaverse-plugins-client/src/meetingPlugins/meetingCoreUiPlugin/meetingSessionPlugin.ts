@@ -1,5 +1,13 @@
 import { BasePlugin, DomManager, IMeetingScene, ITitleScene } from 'churaverse-engine-client'
-import { Room, RoomEvent, Track, RemoteParticipant, Participant, TrackPublication, DataPacket_Kind } from 'livekit-client'
+import {
+  Room,
+  RoomEvent,
+  Track,
+  RemoteParticipant,
+  Participant,
+  TrackPublication,
+  DataPacket_Kind,
+} from 'livekit-client'
 import {
   MIC_TOGGLE_BUTTON_ID,
   CAMERA_TOGGLE_BUTTON_ID,
@@ -20,7 +28,11 @@ import { VideoGridUi } from './ui/videoGridUi'
 import { ParticipantListUi } from './ui/participantListUi'
 import { ChatUi } from './ui/chatUi'
 import { MeetingRoom } from './meetingRoom'
-import { getParticipantDisplayName, LiveKitChatService, MEETING_PARTICIPANT_ID_PREFIX } from '@churaverse/livekit-client'
+import {
+  getParticipantDisplayName,
+  LiveKitChatService,
+  MEETING_PARTICIPANT_ID_PREFIX,
+} from '@churaverse/livekit-client'
 import { PORTAL_STORAGE_KEYS } from '@churaverse/transition-plugin-client'
 import '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
 import '@churaverse/title-plugin-client/titlePlayerPlugin/defTitlePlayerTransitionData'
@@ -254,7 +266,7 @@ export class MeetingSessionPlugin extends BasePlugin<IMeetingScene> {
 
     const portalButton = DomManager.getElementById(PORTAL_BUTTON_ID)
     portalButton.addEventListener('click', () => {
-      this.enterGameMode()
+      void this.enterGameMode()
     })
 
     const sharkButton = DomManager.getElementById(REACTION_SHARK_BUTTON_ID)
@@ -346,25 +358,50 @@ export class MeetingSessionPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private showSharkAnimation(container: HTMLElement): void {
+    const SHARK_SIZE = 120
+    const SHARK_SPEED = 5
+    const FRAME_INTERVAL_MS = 125
+    const START_Y_OFFSET = 50
+    const MIN_VERTICAL_MARGIN = 100
+    const EXTRA_TOP_SPACE = 200
+    const BACKGROUND_COLUMNS = 2
+    const BACKGROUND_ROWS = 4
+
     const shark = document.createElement('div')
-    const size = 120
-    const startY = Math.random() * Math.max(container.clientHeight - size - 200, 100) + 50
-    shark.style.cssText = `position:absolute;width:${size}px;height:${size}px;left:-${size}px;top:${startY}px;z-index:100;image-rendering:pixelated;background-image:url(${sharkSprite});background-size:${size * 2}px ${size * 4}px;background-repeat:no-repeat;background-position:0px -${size * 2}px;pointer-events:none;`
+    const startY =
+      Math.random() * Math.max(container.clientHeight - SHARK_SIZE - EXTRA_TOP_SPACE, MIN_VERTICAL_MARGIN) +
+      START_Y_OFFSET
+    shark.style.cssText = `position:absolute;width:${SHARK_SIZE}px;height:${SHARK_SIZE}px;left:-${SHARK_SIZE}px;top:${startY}px;z-index:100;image-rendering:pixelated;background-image:url(${sharkSprite});background-size:${SHARK_SIZE * BACKGROUND_COLUMNS}px ${SHARK_SIZE * BACKGROUND_ROWS}px;background-repeat:no-repeat;background-position:0px -${SHARK_SIZE * BACKGROUND_COLUMNS}px;pointer-events:none;`
     container.appendChild(shark)
 
     let frame = 0
-    let x = -size
+    let x = -SHARK_SIZE
     let lastFrameTime = 0
+
+    const updateFrame = (): void => {
+      frame = frame === 0 ? 1 : 0
+      shark.style.backgroundPosition = `${-frame * SHARK_SIZE}px -${SHARK_SIZE * BACKGROUND_COLUMNS}px`
+    }
+
+    const moveShark = (): void => {
+      x += SHARK_SPEED
+      shark.style.left = `${x}px`
+    }
+
+    const isOutOfScreen = (): boolean => {
+      return x > container.clientWidth + SHARK_SIZE
+    }
+
     const animate = (timestamp: number): void => {
       if (lastFrameTime === 0) lastFrameTime = timestamp
-      if (timestamp - lastFrameTime > 125) {
-        frame = frame === 0 ? 1 : 0
-        shark.style.backgroundPosition = `${-frame * size}px ${-size * 2}px`
+      if (timestamp - lastFrameTime > FRAME_INTERVAL_MS) {
+        updateFrame()
         lastFrameTime = timestamp
       }
-      x += 5
-      shark.style.left = `${x}px`
-      if (x > container.clientWidth + size) {
+
+      moveShark()
+
+      if (isOutOfScreen()) {
         shark.remove()
         return
       }
