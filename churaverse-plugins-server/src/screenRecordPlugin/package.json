@@ -12,9 +12,11 @@
   "license": "MIT",
   "dependencies": {
     "@churaverse/network-plugin-server": "^0.1.0",
-    "churaverse-engine-server": "^0.1.0"
+    "churaverse-engine-server": "^0.1.0",
+    "livekit-server-sdk": "^2.15.2"
   },
   "devDependencies": {
+    "@types/node": "^25.6.0",
     "typescript": "^6.0.3"
   }
 }
