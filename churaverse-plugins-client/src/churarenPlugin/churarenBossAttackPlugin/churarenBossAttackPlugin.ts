@@ -78,7 +78,7 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
     this.socketController?.unregisterMessageListener()
   }
 
-  public handleMidwayParticipant(): void {
+  public handleMidwayJoin(): void {
     this.unsubscribeGameEvent()
   }
 

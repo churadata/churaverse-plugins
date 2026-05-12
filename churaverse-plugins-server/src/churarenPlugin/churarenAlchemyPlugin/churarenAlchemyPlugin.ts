@@ -91,7 +91,7 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
     const game = this.gamePluginStore.games.get(this.gameId)
     if (
       game === undefined ||
-      !game.participantIds.includes(player.id) ||
+      !game.joinedPlayerIds.includes(player.id) ||
       this.playerItemStore.alchemyItem.get(player.id) !== undefined
     )
       return
