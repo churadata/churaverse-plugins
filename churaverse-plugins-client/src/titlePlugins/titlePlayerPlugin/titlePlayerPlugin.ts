@@ -117,7 +117,7 @@ export class TitlePlayerPlugin extends BasePlugin<ITitleScene> {
   }
 
   private willSceneTransition(ev: WillSceneTransitionEvent<ITitleScene, Scenes>): void {
-    if (ev.to !== 'MainScene') return
+    if (ev.to !== 'MainScene' && ev.to !== 'MeetingScene') return
     // 遷移先にplayerのインスタンスをownPlayerをキーとして渡す
     // ev.sceneDataTransporter.push<IMainScene, 'ownPlayer'>('ownPlayer', this.ownPlayer)
 
