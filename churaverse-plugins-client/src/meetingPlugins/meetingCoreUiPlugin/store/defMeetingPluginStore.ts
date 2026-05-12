@@ -1,14 +1,5 @@
 import { MeetingRoom } from '../meetingRoom'
-
-export interface ChatMessage {
-  type: 'chat' | 'chat_history'
-  messageId?: string
-  sender: string
-  senderId?: string
-  text: string
-  timestamp: number
-  history?: ChatMessage[]
-}
+import { ChatMessage } from '../domain/chatMessage'
 
 declare module 'churaverse-engine-client' {
   export interface StoreInMeeting {
