@@ -1,6 +1,9 @@
 import { loadRnnoise, RnnoiseWorkletNode } from '@sapphi-red/web-noise-suppressor'
+// eslint-disable-next-line import/no-unresolved -- Vite resolves `?url` imports at build time
 import rnnoiseWorkletUrl from '@sapphi-red/web-noise-suppressor/rnnoiseWorklet.js?url'
+// eslint-disable-next-line import/no-unresolved -- Vite resolves `?url` imports at build time
 import rnnoiseWasmUrl from '@sapphi-red/web-noise-suppressor/rnnoise.wasm?url'
+// eslint-disable-next-line import/no-unresolved -- Vite resolves `?url` imports at build time
 import rnnoiseSimdWasmUrl from '@sapphi-red/web-noise-suppressor/rnnoise_simd.wasm?url'
 
 /**
@@ -71,13 +74,13 @@ export class RnnoiseMicPipeline {
       throw new Error('Destination node is not initialized')
     }
 
-    const [tracks] = this.destination.stream.getAudioTracks()
+    const [track] = this.destination.stream.getAudioTracks()
 
-    if (tracks === undefined) {
+    if (track === undefined) {
       throw new Error('Failed to create RNNoise processed microphone track')
     }
 
-    return tracks
+    return track
   }
 
   public async stop(): Promise<void> {
