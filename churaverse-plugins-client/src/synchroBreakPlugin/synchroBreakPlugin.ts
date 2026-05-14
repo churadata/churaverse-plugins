@@ -14,6 +14,7 @@ import { TimeLimitConfirmEvent } from './event/timeLimitConfirmEvent'
 import { SendBetCoinResponseEvent } from './event/sendBetCoinResponseEvent'
 import { registerSynchroBreakUi } from './ui/registerSynchroBreakUi'
 import { IDescriptionWindow } from './interface/IDescriptionWindow'
+import { ICountdownBar } from './interface/ICountdownBar'
 import { PlayerNyokkiStatusIcon } from './ui/synchroBreakIcon/playerNyokkiStatusIcon'
 import { CoinViewer } from './ui/coinViewer/coinViewer'
 import { CoinViewerIcon } from './ui/coinViewer/coinViewerIcon'
@@ -24,10 +25,17 @@ import { SynchroBreakTurnEndEvent } from './event/synchroBreakTurnEndEvent'
 import { SynchroBreakTurnStartEvent } from './event/synchroBerakTurnStartEvent'
 import { UpdatePlayersCoinEvent } from './event/updatePlayersCoinEvent'
 import { NyokkiStatus } from './type/nyokkiStatus'
-import { IRankingBoard } from './interface/IRankingBoard'
+import { IOwnRankingBoard } from './interface/IOwnRankingBoard'
+import { BetTimeRemainingEvent } from './event/betTimeRemainingEvent'
+import { IBetCoinFormContainer } from './interface/IBetCoinFormContainer'
+import { IBetTimer } from './interface/IBetTimer'
 import { SynchroBreakListItemRenderer } from './ui/startWindow/synchroBreakListItemRenderer'
 import { IGameSelectionListItemRenderer } from '@churaverse/game-plugin-client/interface/IGameSelectionListItemRenderer'
 import { GamePolicy } from '@churaverse/game-plugin-client/interface/gamePolicy'
+import { RESULT_SCREEN_TYPES, ResultScreenType } from './type/resultScreenType'
+import { SynchroBreakResultEvent } from './event/synchroBreakResultEvent'
+
+export const BET_TIMER_TIME_LIMIT = 20000
 
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
@@ -76,7 +84,8 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.subscribeEvent('synchroBreakTurnEnd', this.synchroBreakTurnEnd)
     this.bus.subscribeEvent('synchroBreakTurnStart', this.synchroBreakTurnStart)
     this.bus.subscribeEvent('updatePlayersCoin', this.updatePlayersCoin)
-    this.bus.subscribeEvent('synchroBreakResult', this.showSynchroBreakResult)
+    this.bus.subscribeEvent('synchroBreakResult', this.handleSynchroBreakResult)
+    this.bus.subscribeEvent('betTimeRemaining', this.updateBetTimer)
   }
 
   /**
@@ -93,7 +102,8 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.unsubscribeEvent('synchroBreakTurnEnd', this.synchroBreakTurnEnd)
     this.bus.unsubscribeEvent('synchroBreakTurnStart', this.synchroBreakTurnStart)
     this.bus.unsubscribeEvent('updatePlayersCoin', this.updatePlayersCoin)
-    this.bus.unsubscribeEvent('synchroBreakResult', this.showSynchroBreakResult)
+    this.bus.unsubscribeEvent('synchroBreakResult', this.handleSynchroBreakResult)
+    this.bus.unsubscribeEvent('betTimeRemaining', this.updateBetTimer)
   }
 
   private phaserSceneInit(ev: PhaserSceneInit): void {
@@ -180,8 +190,8 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   protected handlePlayerQuitGame(playerId: string): void {
     this.removeSynchroBreakIcons()
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')?.remove()
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')?.close()
+    this.ownRankingBoard.remove()
+    this.descriptionWindow.close()
   }
 
   /**
@@ -203,8 +213,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * ターンが設定された時の処理
    */
   private readonly synchroBreakTurnSelect = (ev: SynchroBreakTurnSelectEvent): void => {
-    this.getRankingBoard.updateTurnNumber(1, ev.allTurn)
-
     this.synchroBreakPluginStore.gameTurn = ev.allTurn
 
     if (this.gameOwnerId === this.playerPluginStore.ownPlayerId) {
@@ -224,13 +232,14 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const ownPlayerId = this.playerPluginStore.ownPlayerId
     const ownCoins = this.synchroBreakPluginStore.playersCoinRepository.get(ownPlayerId)
 
+    this.displayBetTimer()
     if (this.gameOwnerId === this.playerPluginStore.ownPlayerId) {
       this.descriptionWindow.displayTimeLimitSelectionForOwner(ev.timeLimit, ownCoins)
     } else {
       this.descriptionWindow.displayTimeLimitSelectionForGuest(ev.timeLimit, ownCoins)
     }
 
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betCoinConfirm')?.open()
+    this.betCoinFormContainer.open()
   }
 
   /**
@@ -242,10 +251,11 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
 
     if (ev.playerId === this.playerPluginStore.ownPlayerId) {
       this.descriptionWindow.displayBetCoinSelection(ev.betCoins)
+      this.betTimer.close()
     }
 
     this.synchroBreakPluginStore.playersCoinRepository.set(ev.playerId, ev.currentCoins)
-    this.getRankingBoard.updateRanking()
+    this.ownRankingBoard.updateRanking()
   }
 
   /**
@@ -262,18 +272,25 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const ownPlayerId = this.playerPluginStore.ownPlayerId
     const ownPlayerName = this.playerPluginStore.players.get(ownPlayerId)?.name
     if (ev.remainingSeconds === this.synchroBreakPluginStore.timeLimit) {
-      this.descriptionWindow.displaySynchroBreakStart(ev.remainingSeconds)
+      this.displayCountdownBar()
+      this.countdownBar.updateDashOffset(ev.remainingSeconds)
+      this.descriptionWindow.displaySynchroBreakStart()
       this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.open()
     } else {
+      this.countdownBar.updateDashOffset(ev.remainingSeconds)
       if (this.ownNyokkiSatatus === 'yet') {
-        this.descriptionWindow.displaySynchroBreakInProgress(ev.remainingSeconds)
+        this.descriptionWindow.displaySynchroBreakInProgress()
       } else {
-        this.descriptionWindow.displaySynchroBreakInProgress(
-          ev.remainingSeconds,
-          ownPlayerName,
-          this.nyokkiActionMessage
-        )
+        this.descriptionWindow.displaySynchroBreakInProgress(ownPlayerName, this.nyokkiActionMessage)
       }
+    }
+  }
+
+  private readonly updateBetTimer = (ev: BetTimeRemainingEvent): void => {
+    this.betTimer.updateTimer(ev.remainingTime)
+
+    if (ev.remainingTime <= 0) {
+      this.betCoinFormContainer.postBetCoinOnTimeout(this.playerPluginStore.ownPlayerId)
     }
   }
 
@@ -289,14 +306,16 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
       isSuccess,
       ev.nyokkiTime
     )
-    this.gamePluginStore.gameLogRenderer.gameLog(nyokkiLogText, 0)
+    if (nyokkiLogText !== undefined) {
+      this.gamePluginStore.gameLogRenderer.gameLog(nyokkiLogText, 0)
+    }
 
     const status: NyokkiStatus = isSuccess ? 'success' : 'nyokki'
     for (const nyokkiCollectionPlayerId of nyokkiCollectionPlayerIds) {
-      this.getRankingBoard.changeNyokkiStatus(nyokkiCollectionPlayerId, status)
+      this.ownRankingBoard.changeNyokkiStatus(nyokkiCollectionPlayerId, status)
 
       // ニョッキアクションの実行結果をプレイヤーに通知する
-      if (nyokkiCollectionPlayerId === this.playerPluginStore.ownPlayerId) {
+      if (nyokkiCollectionPlayerId === this.playerPluginStore.ownPlayerId && nyokkiLogText !== undefined) {
         this.ownNyokkiSatatus = status
         this.nyokkiActionMessage = nyokkiLogText
         this.descriptionWindow.displayNyokkiAction(nyokkiLogText)
@@ -317,16 +336,16 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.nyokkiActionMessage = undefined
     this.ownNyokkiSatatus = 'yet'
 
+    this.countdownBar.close()
     this.descriptionWindow.displaySynchroBreakEnd()
     const noNyokkiPlayerIds = ev.noNyokkiPlayerIds
     const status: NyokkiStatus = 'nyokki'
 
     this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.close()
-    this.descriptionWindow.displaySynchroBreakEnd()
 
     if (noNyokkiPlayerIds.length === 0) return
     for (const noNyokkiPlayerId of noNyokkiPlayerIds) {
-      this.getRankingBoard.changeNyokkiStatus(noNyokkiPlayerId, status)
+      this.ownRankingBoard.changeNyokkiStatus(noNyokkiPlayerId, status)
       this.synchroBreakPluginStore.synchroBreakIcons.get(noNyokkiPlayerId)?.handlePlayerSynchroBreakIcons(-1, status)
     }
 
@@ -335,11 +354,44 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   }
 
   /**
+   * 結果表示のハンドラー
+   */
+  private readonly handleSynchroBreakResult = (ev: SynchroBreakResultEvent): void => {
+    this.resultHandlers[ev.resultScreenType]()
+  }
+
+  /**
+   * 結果ウィンドウタイプ別のハンドラー
+   */
+  private readonly resultHandlers: Record<ResultScreenType, () => void> = {
+    [RESULT_SCREEN_TYPES.TURN]: () => {
+      this.showResult(RESULT_SCREEN_TYPES.TURN)
+    },
+    [RESULT_SCREEN_TYPES.FINAL]: () => {
+      this.ownRankingBoard.remove()
+      this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.remove()
+      this.descriptionWindow.displayResultMessage()
+      this.showResult(RESULT_SCREEN_TYPES.FINAL)
+    },
+  }
+
+  /**
+   * 結果画面を表示
+   */
+  private showResult(type: ResultScreenType): void {
+    const resultScreen = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'resultScreen')
+    if (resultScreen === undefined) throw new SynchroBreakUiNotFoundError('resultScreen')
+
+    resultScreen.createResultRanking(type)
+  }
+
+  /**
    * ターンが開始した際の処理
    */
   private readonly synchroBreakTurnStart = (ev: SynchroBreakTurnStartEvent): void => {
     this.resetPlayerNyokkiIcon()
     this.removeBetCoinUi()
+    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'resultScreen')?.close()
     const ownPlayerId = this.playerPluginStore.ownPlayerId
     const ownCoins = this.synchroBreakPluginStore.playersCoinRepository.get(ownPlayerId)
 
@@ -347,10 +399,9 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     if (gameTurn === undefined) throw new SynchroBreakPluginError('ターン情報が存在しません')
 
     const turnLeft = gameTurn - ev.turnNumber + 1
+    this.displayBetTimer()
     this.descriptionWindow.displayTurnStart(turnLeft, ownCoins)
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betCoinConfirm')?.open()
-
-    this.getRankingBoard.updateTurnNumber(ev.turnNumber, gameTurn)
+    this.betCoinFormContainer.open()
   }
 
   /**
@@ -360,17 +411,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     for (const playerCoin of ev.playersCoin) {
       this.synchroBreakPluginStore.playersCoinRepository.set(playerCoin.playerId, playerCoin.coins)
     }
-    this.getRankingBoard.updateRanking()
-  }
-
-  /**
-   * ゲーム終了後の結果ウィンドウ表示処理
-   */
-  private readonly showSynchroBreakResult = (): void => {
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')?.remove()
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'nyokkiButton')?.remove()
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'descriptionWindow')?.displayResultMessage()
-    this.gamePluginStore.gameUiManager.getUi(this.gameId, 'resultScreen')?.createResultRanking()
+    this.ownRankingBoard.updateRanking()
   }
 
   /**
@@ -385,10 +426,54 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
   /**
    * シンクロブレイクのランキングボードを取得する
    */
-  private get getRankingBoard(): IRankingBoard {
-    const rankingBoard = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'rankingBoard')
-    if (rankingBoard === undefined) throw new SynchroBreakUiNotFoundError('rankingBoard')
-    return rankingBoard
+  private get ownRankingBoard(): IOwnRankingBoard {
+    const ownRankingBoard = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'ownRankingBoard')
+    if (ownRankingBoard === undefined) throw new SynchroBreakUiNotFoundError('ownRankingBoard')
+    return ownRankingBoard
+  }
+
+  private get betCoinFormContainer(): IBetCoinFormContainer {
+    const betCoinFormContainer = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betCoinConfirm')
+    if (betCoinFormContainer === undefined) throw new SynchroBreakUiNotFoundError('betCoinFormContainer')
+    return betCoinFormContainer
+  }
+
+  private get betTimer(): IBetTimer {
+    const betTimer = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'betTimer')
+    if (betTimer === undefined) throw new SynchroBreakUiNotFoundError('betTimer')
+    return betTimer
+  }
+
+  private displayBetTimer(): void {
+    this.betTimer.open()
+    this.descriptionWindow.element.appendChild(this.betTimer.element)
+  }
+
+  /**
+   * カウントダウンバーを表示する
+   */
+  private displayCountdownBar(): void {
+    this.countdownBar.reset()
+
+    const timeLimit = this.synchroBreakPluginStore.timeLimit
+    if (timeLimit !== undefined) {
+      this.countdownBar.setTotalDuration(timeLimit)
+    }
+
+    if (this.countdownBar.element.parentElement !== this.descriptionWindow.element) {
+      this.descriptionWindow.element.appendChild(this.countdownBar.element)
+    }
+
+    this.countdownBar.open()
+  }
+
+  /**
+   * カウントダウンバーを取得する
+   */
+  private get countdownBar(): ICountdownBar {
+    const countdownBar = this.gamePluginStore.gameUiManager.getUi(this.gameId, 'countdownBar')
+    if (countdownBar === undefined) throw new SynchroBreakUiNotFoundError('countdownBar')
+    return countdownBar
   }
 
   /**
