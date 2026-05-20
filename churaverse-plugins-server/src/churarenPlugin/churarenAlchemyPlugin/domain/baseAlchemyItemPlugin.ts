@@ -14,12 +14,12 @@ export abstract class BaseAlchemyItemPlugin extends BaseGamePlugin {
 
   protected subscribeGameEvent(): void {
     super.subscribeGameEvent()
-    this.bus.subscribeEvent('alchemyItemRegister', this.onAlchemyItemRegister.bind(this))
+    this.bus.subscribeEvent('alchemyItemRegister', this.onAlchemyItemRegister)
   }
 
   protected unsubscribeGameEvent(): void {
     super.unsubscribeGameEvent()
-    this.bus.unsubscribeEvent('alchemyItemRegister', this.onAlchemyItemRegister.bind(this))
+    this.bus.unsubscribeEvent('alchemyItemRegister', this.onAlchemyItemRegister)
   }
 
   private readonly onAlchemyItemRegister = (ev: AlchemyItemRegisterEvent): void => {
