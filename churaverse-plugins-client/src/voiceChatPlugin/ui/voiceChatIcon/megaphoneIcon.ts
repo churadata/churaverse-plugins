@@ -54,9 +54,9 @@ export class MegaphoneIcon extends TopBarIconRenderer {
       clearTimeout(this.hideTimeoutId)
     }
     this.megaphoneToastElement.innerText = message
-    this.megaphoneToastElement.style.opacity = '1'
+    this.megaphoneToastElement.style.visibility = '1'
     this.hideTimeoutId = setTimeout(() => {
-      this.megaphoneToastElement.style.opacity = '0'
+      this.megaphoneToastElement.style.visibility = '0'
       this.hideTimeoutId = null
     }, DISPLAY_DURATION)
   }
