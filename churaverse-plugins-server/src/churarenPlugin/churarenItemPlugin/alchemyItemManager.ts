@@ -15,6 +15,11 @@ export class AlchemyItemManager implements IAlchemyItemRegister, IAlchemyItemMan
   }
 
   public register(recipe: AlchemyItemRecipe, kind: AlchemyItemKind): void {
+    if (recipe.pattern === 'all_diff') {
+      this.alchemyItemRegistry.registerAllDiff(kind)
+      return
+    }
+
     const pendingRecipe = this.pendingRecipes.get(recipe.materialKind) ?? {}
 
     if (recipe.pattern === 'all_same') {
@@ -66,7 +71,7 @@ export class AlchemyItemManager implements IAlchemyItemRegister, IAlchemyItemMan
       const sortedKinds = [...countKinds.entries()].sort((a, b) => b[1] - a[1])
       return this.get({ pattern: 'two_same_one_diff', materialKind: sortedKinds[0][0] as ItemKind })
     } else if (itemCount === 3) {
-      return 'blackHole'
+      return this.get({ pattern: 'all_diff', materialKind: materialItems[0] })
     }
 
     return 'blackHole'

@@ -9,6 +9,7 @@ export interface AlchemyItemRecipeRecord {
 
 export class AlchemyItemRegistry {
   private readonly alchemyItemRecipes = new Map<string, AlchemyItemRecipeRecord>()
+  private allDiffItem: AlchemyItemKind | undefined
 
   public register(materialItem: ItemKind, recipeRecord: AlchemyItemRecipeRecord): void {
     if (this.alchemyItemRecipes.has(materialItem)) {
@@ -17,7 +18,14 @@ export class AlchemyItemRegistry {
     this.alchemyItemRecipes.set(materialItem, recipeRecord)
   }
 
+  public registerAllDiff(kind: AlchemyItemKind): void {
+    this.allDiffItem = kind
+  }
+
   public get(recipe: AlchemyItemRecipe): AlchemyItemKind | undefined {
+    if (recipe.pattern === 'all_diff') {
+      return this.allDiffItem
+    }
     const record = this.alchemyItemRecipes.get(recipe.materialKind)
 
     switch (recipe.pattern) {

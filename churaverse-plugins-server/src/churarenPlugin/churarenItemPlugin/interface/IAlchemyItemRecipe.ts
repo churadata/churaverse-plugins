@@ -16,6 +16,6 @@ export type AlchemyItemGenerateType = 'all_same' | 'two_same_one_diff' | 'all_di
  * @param materialKind 錬金アイテムを生成するための素材アイテムの種類 (`pattern`が`all_diff`の場合はこの種類は影響しない)
  */
 export interface AlchemyItemRecipe {
-  readonly pattern: Omit<AlchemyItemGenerateType, 'all_diff'>
+  readonly pattern: AlchemyItemGenerateType
   readonly materialKind: ItemKind
 }
