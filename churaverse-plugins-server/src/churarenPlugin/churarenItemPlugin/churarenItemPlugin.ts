@@ -59,6 +59,7 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
     initItemPluginStore(this.store)
     this.itemPluginStore = this.store.of('churarenItemPlugin')
     this.networkPluginStore = this.store.of('networkPlugin')
+    this.bus.post(new AlchemyItemRegisterEvent(this.itemPluginStore.alchemyItemRegister))
   }
 
   private readonly update = (): void => {
@@ -69,7 +70,6 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
 
   protected handleGameStart(): void {
     this.churarenGameInfo = this.store.of('gamePlugin').games.get(this.gameId)
-    this.bus.post(new AlchemyItemRegisterEvent(this.itemPluginStore.alchemyItemRegister))
   }
 
   protected handleGameTermination(): void {
