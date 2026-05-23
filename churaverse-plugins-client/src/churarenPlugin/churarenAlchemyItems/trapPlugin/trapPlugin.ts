@@ -103,7 +103,7 @@ export class TrapPlugin extends BaseAlchemyItemPlugin {
     this.trapPluginStore.traps.set(trap.trapId, trap)
     this.trapPluginStore.trapAttackRenderers.set(trap.trapId, renderer)
 
-    // 他のプレイヤーに爆発の出現を送信する
+    // 他のプレイヤーにトラップの出現を送信する
     if (trap.churarenWeaponOwnerId === this.playerPluginStore.ownPlayerId) {
       this.networkStore.messageSender.send(
         new TrapSpawnMessage({
