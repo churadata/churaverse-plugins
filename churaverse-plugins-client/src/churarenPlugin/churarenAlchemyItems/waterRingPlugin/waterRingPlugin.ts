@@ -129,9 +129,7 @@ export class WaterRingPlugin extends BaseAlchemyItemPlugin {
     this.bus.post(clearAlchemyItemBoxEvent)
   }
 
-  public onPlayerWalk = (ev: PlayerWalkEvent): void => {
-    const gap = 40
-
+  private readonly onPlayerWalk = (ev: PlayerWalkEvent): void => {
     const player = this.playerPluginStore.players.get(ev.id)
     if (player === undefined) return
 
@@ -146,6 +144,7 @@ export class WaterRingPlugin extends BaseAlchemyItemPlugin {
     }
 
     const dest = player.position.copy()
+    const gap = 40
     dest.x = player.position.x + player.direction.x * gap
     dest.y = player.position.y + player.direction.y * gap
     const speed = ev.speed ?? GRID_SIZE / GRID_WALK_DURATION_MS
