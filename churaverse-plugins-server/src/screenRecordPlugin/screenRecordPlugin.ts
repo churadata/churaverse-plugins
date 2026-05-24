@@ -8,7 +8,7 @@ import { ScreenRecordStopMessage } from './message/screenRecordStopMessage'
 import { ScreenRecordEgressClient, createDefaultConfig } from './domain/egressClient'
 import { IEgressClient } from './domain/IEgressClient'
 
-// 録画の対象に鳴るルーム名
+// 録画の対象になるルーム名
 const RECORDING_ROOM_NAME = 'room1'
 
 export class ScreenRecordPlugin extends BasePlugin<IMainScene> {
