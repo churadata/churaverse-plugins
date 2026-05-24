@@ -5,11 +5,13 @@ import { ToggleMegaphoneEvent } from '../../event/toggleMegaphoneEvent'
 
 import MEGAPHONE_ICON from '../../assets/megaphone.png'
 export const MEGAPHONE_ICON_PATH = MEGAPHONE_ICON
-const DISPLAY_DURATION = 1500 // toast通知を表示する時間（ミリ秒）
+const DISPLAY_DURATION_MS = 1500 // toast通知を表示する時間（ミリ秒）
+const FADE_DURATION_MS = 300 // フェードイン・フェードアウトの時間（ミリ秒）
 
 export class MegaphoneIcon extends TopBarIconRenderer {
   private readonly megaphoneToastElement: HTMLDivElement
   private hideTimeoutId: ReturnType<typeof setTimeout> | null = null
+  private fadeTimeoutId: ReturnType<typeof setTimeout> | null = null
   public constructor(
     private readonly eventBus: IEventBus<IMainScene>,
     iconContainer: ITopBarIconContainer,
@@ -30,6 +32,7 @@ export class MegaphoneIcon extends TopBarIconRenderer {
     document.body.appendChild(this.megaphoneToastElement)
     iconContainer.addIcon(this)
   }
+
   private createMegaphoneToastElement(): HTMLDivElement {
     const element = document.createElement('div')
     element.style.position = 'fixed'
@@ -43,23 +46,54 @@ export class MegaphoneIcon extends TopBarIconRenderer {
     element.style.fontSize = '14px'
     element.style.lineHeight = '1.6'
     element.style.textAlign = 'center'
+    element.style.whiteSpace = 'pre-line' // \n 改行用
     element.style.zIndex = '10000'
     element.style.pointerEvents = 'none'
+    element.style.visibility = 'hidden'
     element.style.opacity = '0'
     element.style.transition = 'opacity 0.3s ease'
+    element.setAttribute('role', 'status')
+    element.setAttribute('aria-live', 'polite')
+    element.setAttribute('aria-hidden', 'true')
     return element
   }
-  private showMegaphoneToast(message: string): void {
+
+  private clearToastTimers(): void {
     if (this.hideTimeoutId !== null) {
       clearTimeout(this.hideTimeoutId)
-    }
-    this.megaphoneToastElement.innerText = message
-    this.megaphoneToastElement.style.visibility = '1'
-    this.hideTimeoutId = setTimeout(() => {
-      this.megaphoneToastElement.style.visibility = '0'
       this.hideTimeoutId = null
-    }, DISPLAY_DURATION)
+    }
+    if (this.fadeTimeoutId !== null) {
+      clearTimeout(this.fadeTimeoutId)
+      this.fadeTimeoutId = null
+    }
   }
+
+  private showMegaphoneToast(message: string): void {
+    this.clearToastTimers()
+    this.megaphoneToastElement.innerText = message
+    this.megaphoneToastElement.style.visibility = 'visible'
+    this.megaphoneToastElement.setAttribute('aria-hidden', 'false')
+    // visibility を先に visible にしてから opacity を変え、transition を効かせる
+    requestAnimationFrame(() => {
+      this.megaphoneToastElement.style.opacity = '1'
+    })
+    this.hideTimeoutId = setTimeout(() => {
+      this.hideMegaphoneToast()
+    }, DISPLAY_DURATION_MS)
+  }
+
+  private hideMegaphoneToast(): void {
+    this.megaphoneToastElement.style.opacity = '0'
+    this.hideTimeoutId = null
+    this.fadeTimeoutId = setTimeout(() => {
+      this.megaphoneToastElement.style.visibility = 'hidden'
+      this.megaphoneToastElement.setAttribute('aria-hidden', 'true')
+      this.fadeTimeoutId = null
+    }, FADE_DURATION_MS)
+  }
+
+
   private onClick(isActive: boolean): void {
     if (isActive) {
       this.deactivateMegaphone()
@@ -67,11 +101,13 @@ export class MegaphoneIcon extends TopBarIconRenderer {
       this.activateMegaphone()
     }
   }
+
   private activateMegaphone(): void {
     this.eventBus.post(new ToggleMegaphoneEvent(this.playerId, true))
     super.activate()
     this.showMegaphoneToast('メガホン機能がオンになりました\nあなたの声は離れている参加者にも聞こえます')
   }
+
   private deactivateMegaphone(): void {
     this.eventBus.post(new ToggleMegaphoneEvent(this.playerId, false))
     super.deactivate()
