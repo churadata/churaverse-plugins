@@ -25,9 +25,6 @@ export class AdminSettingIcon extends TopBarIconRenderer {
     if (playerRole !== 'admin') {
       return
     }
-
-    this.applyIconStyle()
-
     iconContainer.addIcon(this)
     switcher.add('adminSetting', dialog, () => {
       super.deactivate()

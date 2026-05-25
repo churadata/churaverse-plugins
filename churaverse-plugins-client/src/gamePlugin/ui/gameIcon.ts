@@ -26,6 +26,15 @@ export class GameIcon extends TopBarIconRenderer {
     switcher.add('game', dialog, () => {
       super.deactivate()
     })
+
+  }
+
+  /**
+   * ポインタ以外の背景設定を適用しない
+   * @Override
+   */
+  protected applyIconStyle(): void {
+    this.imgElement.style.cursor = 'pointer'
   }
 
   public onClick(isActive: boolean): void {

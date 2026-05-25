@@ -21,9 +21,6 @@ export class SettingIcon extends TopBarIconRenderer {
       isActive: false,
       order: -50,
     })
-
-    this.applyIconStyle()
-
     iconContainer.addIcon(this)
     switcher.add('setting', dialog, () => {
       super.deactivate()

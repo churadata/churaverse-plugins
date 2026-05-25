@@ -22,9 +22,6 @@ export class MicIcon extends TopBarIconRenderer {
       isActive: false,
       order: 200,
     })
-
-    this.applyIconStyle()
-
     iconContainer.addIcon(this)
   }
 

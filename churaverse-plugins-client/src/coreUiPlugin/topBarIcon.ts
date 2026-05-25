@@ -56,6 +56,8 @@ export abstract class TopBarIconRenderer implements ITopBarIconRenderer {
     this.imgElement = img
     domLayerSetting(this.imgElement, 'higher')
 
+    this.applyIconStyle()
+
     this.isActive ? this.activate() : this.deactivate()
   }
 

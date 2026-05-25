@@ -32,8 +32,6 @@ export class TextChatIcon extends TopBarIconRenderer {
     badge.setBadgeOn(this.iconContainer)
     badge.moveTo(0, 0)
 
-    this.applyIconStyle()
-
     iconContainer.addIcon(this)
     switcher.add('chat', dialog, () => {
       super.deactivate()
