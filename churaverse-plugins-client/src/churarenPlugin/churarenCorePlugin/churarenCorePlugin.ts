@@ -1,4 +1,5 @@
 import { CoreGamePlugin } from '@churaverse/game-plugin-client/domain/coreGamePlugin'
+import { GamePolicy } from '@churaverse/game-plugin-client/interface/gamePolicy'
 import { CHURAREN_CONSTANTS } from './constants/churarenConstants'
 import { SocketController } from './controller/socketController'
 import { RegisterGameUiEvent } from '@churaverse/game-plugin-client/event/registerGameUiEvent'

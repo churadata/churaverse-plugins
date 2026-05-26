@@ -1,4 +1,5 @@
 import { CoreGamePlugin } from '@churaverse/game-plugin-server/domain/coreGamePlugin'
+import { GamePolicy } from '@churaverse/game-plugin-server/interface/gamePolicy'
 import { SocketController } from './controller/socketController'
 import { initChurarenPluginStore } from './store/churarenPluginStoreManager'
 import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
@@ -18,6 +19,7 @@ const RESULT_DISPLAY_TIME_SECONDS = 15 // 結果表示時間(sec)
 
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
+  public readonly gamePolicy: GamePolicy = { allowMidwayJoin: false }
   private socketController?: SocketController
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   public readonly gamePolicy: GamePolicy = {

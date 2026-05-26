@@ -38,6 +38,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   private readonly deathLog: DeathLogRepository = new DeathLogRepository()
   private socketController?: SocketController
   private keyboardController?: KeyboardController
+  private readonly INVINCIBLE_BLINK_DURATION_MS = 200
 
   private readonly INVINCIBLE_BLINK_DURATION_MS = 100
   private readonly INVINCIBLE_BLINK_CYCLE_MS = 200

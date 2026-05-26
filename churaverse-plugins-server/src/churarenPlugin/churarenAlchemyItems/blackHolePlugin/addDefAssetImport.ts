@@ -10,10 +10,6 @@ declare module '*.webp' {
     const value: string;
     export = value;
 }
-declare module '*.gif' {
-  const value: string
-  export = value
-}
 declare module '*.module.css' {
     const classes: Record<string, string>;
     export default classes;
