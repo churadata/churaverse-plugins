@@ -38,11 +38,7 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
   private readonly deathLog: DeathLogRepository = new DeathLogRepository()
   private socketController?: SocketController
   private keyboardController?: KeyboardController
-  private readonly INVINCIBLE_BLINK_DURATION_MS = 200
-
-  private readonly INVINCIBLE_BLINK_DURATION_MS = 100
-  private readonly INVINCIBLE_BLINK_CYCLE_MS = 200
-
+  
   public listenEvent(): void {
     super.listenEvent()
     this.bus.subscribeEvent('init', this.init.bind(this))
@@ -166,14 +162,13 @@ export class ChurarenPlayerPlugin extends BaseGamePlugin {
     this.updateGhostPlayerList()
   }
 
+  private readonly INVINCIBLE_BLINK_CYCLE_MS = 200
+
   private readonly onInvicibleTime = (ev: InvicibleTimeEvent): void => {
     const playerId = ev.id
     this.playerPluginStore.playerRenderers
       .get(playerId)
-      ?.blinkTarget(
-        this.INVINCIBLE_BLINK_DURATION_MS,
-        ev.invicibleTime / this.INVINCIBLE_BLINK_CYCLE_MS
-      )
+      ?.blinkTarget(ev.invicibleTime, this.INVINCIBLE_BLINK_CYCLE_MS)
   }
 
   private readonly getItem = (ev: GetChurarenItemEvent): void => {

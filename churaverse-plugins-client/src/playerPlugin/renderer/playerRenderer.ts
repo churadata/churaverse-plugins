@@ -395,7 +395,7 @@ export class PlayerRenderer implements IPlayerRenderer {
     })
     this.hpBar.update(hp)
     this.damagetween?.stop() // 処理の途中で新たにダメージを食らった際に処理をリセットする
-    this.damagetween = this.blinkTarget(40, 8)
+    this.damagetween = this.blinkTarget(640)
   }
 
   /**
@@ -524,12 +524,16 @@ export class PlayerRenderer implements IPlayerRenderer {
     this.playerContainer.alpha = alpha
   }
 
+  private readonly BLINK_CYCLE_MS = 80
+
   /**
    * 指定されたターゲットを点滅させる
-   * @param duration 1回の点滅の片道時間（ミリ秒）
-   * @param repeat 点滅の繰り返し回数
+   * @param totalDurationMs 点滅させる合計時間（ミリ秒）
+   * @param blinkCycleMs 1サイクルの時間（ミリ秒）。デフォルト80ms
    */
-  public blinkTarget(duration: number, repeat: number): Phaser.Tweens.Tween {
+  public blinkTarget(totalDurationMs: number, blinkCycleMs: number = this.BLINK_CYCLE_MS): Phaser.Tweens.Tween {
+    const repeat = Math.floor(totalDurationMs / blinkCycleMs)
+    const duration = blinkCycleMs / 2
     return this.scene.tweens.add({
       targets: this.sprite,
       alpha: { start: 0, to: 1 },
