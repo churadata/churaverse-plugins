@@ -68,7 +68,7 @@ export class TitlePlayerPlugin extends BasePlugin<ITitleScene> {
       this.store,
       this.ownPlayer,
       this.createPreviewPlayer(this.ownPlayer),
-      new TitleNameFieldRenderer(this.bus),
+      new TitleNameFieldRenderer(this.bus, this.ownPlayer.name),
       new TitlePlayerRoleRenderer(this.scene, this.playerSetupInfoReader)
     )
     this.titlePlayerPluginStore = this.store.of('titlePlayerPlugin')
