@@ -8,7 +8,6 @@ import {
   Track,
 } from 'livekit-client'
 import { IEventBus, IMainScene } from 'churaverse-engine-client'
-import { JoinVoiceChatEvent } from './event/joinVoiceChatEvent'
 import { UnmuteEvent } from './event/unmuteEvent'
 import { MuteEvent } from './event/muteEvent'
 import { PlayerVoiceChatIcons } from './ui/playerVoiceChatIcons'
@@ -37,13 +36,14 @@ export class VoiceChatReceiver {
     // LiveKit が source を Unknown として扱うケースがあるため、音声トラックなら受ける
     if (track.kind !== Track.Kind.Audio) return
 
-    // publication から audioTrack を優先的に取得し、無ければ track を RemoteAudioTrack として扱う
-    const audioTrack = (publication.audioTrack as RemoteAudioTrack | null) ?? (track as RemoteAudioTrack | null)
-    if (audioTrack == null) return
+    if (!(track instanceof RemoteAudioTrack)) return
+    const audioTrack =
+      publication.audioTrack instanceof RemoteAudioTrack
+        ? publication.audioTrack
+        : track
 
     // LiveKit の RemoteAudioTrack を AudioService に委譲して Web Audio グラフへ接続
     this.audioService.addRemoteTrack(participant.identity, audioTrack)
-    this.eventBus.post(new JoinVoiceChatEvent(participant.identity))
 
     publication.addListener('subscriptionStatusChanged', () => {
       if (!track.isMuted) {

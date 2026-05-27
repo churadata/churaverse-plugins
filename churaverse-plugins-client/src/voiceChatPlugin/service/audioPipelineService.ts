@@ -31,10 +31,11 @@ export class AudioPipelineService implements IAudioService {
     if (typeof window === 'undefined') return false
     if ('__CV_DEBUG_AUDIO__' in window && window.__CV_DEBUG_AUDIO__ === true) return true
     try {
-          return window.localStorage.getItem('__CV_DEBUG_AUDIO__') === 'true'
-        } catch {
-          return false
-        }
+      return window.localStorage.getItem('__CV_DEBUG_AUDIO__') === 'true'
+    }
+    catch {
+      return false
+    }
   }
 
   private debug(...args: unknown[]): void {
@@ -55,9 +56,6 @@ export class AudioPipelineService implements IAudioService {
       if (this.room !== undefined) {
         const currentDeviceId = this.room.getActiveDevice('audiooutput') ?? 'default'
         void this.applyOutputDevice(currentDeviceId)
-        if (currentDeviceId === 'default') {
-          void this.room.switchActiveDevice('audiooutput', 'default')
-        }
       }
     }
     return this.context
@@ -133,7 +131,7 @@ export class AudioPipelineService implements IAudioService {
    * - 既存マイクがあれば先に unpublish して差し替える
    */
   public async startLocalMic(): Promise<boolean> {
-    this.debug('startLocalMic called', {haslocalChain: this.localChain !== undefined})
+    this.debug('startLocalMic called', { haslocalChain: this.localChain !== undefined })
     if (this.room === undefined) {
       this.debug('startLocalMic aborted: room not provided')
       return false
@@ -208,7 +206,7 @@ export class AudioPipelineService implements IAudioService {
       } catch (error) {
         this.debug('pre-publish microphone failed', { error: String(error) })
       }
-      
+
       await participant.publishTrack(processedTrack, { source: Track.Source.Microphone, name: 'microphone' })
 
       this.localChain = { stream, inputTrack, processedTrack, source, gain, destination }
@@ -245,9 +243,9 @@ export class AudioPipelineService implements IAudioService {
     }
 
     const chain = this.localChain
-    if (chain !== undefined)  {
+    if (chain !== undefined) {
       try {
-          chain.source?.disconnect()
+        chain.source?.disconnect()
       } catch (error) {
         this.debug('disconnect source failed', { error: String(error) })
       }
@@ -273,7 +271,7 @@ export class AudioPipelineService implements IAudioService {
       }
       try {
         chain.stream.getTracks().forEach((t) => {
-            t.stop()
+          t.stop()
         })
       } catch (error) {
         this.debug('stop stream tracks failed', { error: String(error) })
@@ -300,13 +298,13 @@ export class AudioPipelineService implements IAudioService {
 
     // AudioContext を閉じる（再利用する場合は再生成される前提）
     if (this.context !== undefined) {
-    try {
+      try {
         await this.context.close()
         this.debug('AudioContext closed')
-    } catch (error) {
+      } catch (error) {
         this.debug('AudioContext close failed', { error: String(error) })
-    }
-    this.context = undefined
+      }
+      this.context = undefined
     }
   }
 
