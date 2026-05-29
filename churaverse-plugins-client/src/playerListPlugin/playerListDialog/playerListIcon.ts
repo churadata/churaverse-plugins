@@ -20,7 +20,6 @@ export class PlayerListIcon extends TopBarIconRenderer implements ITopBarIconRen
       },
       isActive: false,
     })
-
     iconContainer.addIcon(this)
 
     switcher.add('playerList', dialog, () => {

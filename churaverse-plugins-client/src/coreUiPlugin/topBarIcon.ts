@@ -21,6 +21,9 @@ export interface IconProps {
 }
 
 const DEFAULT_ICON_SIZE = '40px'
+const DEFAULT_ICON_BACKGROUND_COLOR = 'rgba(255, 255, 255, 0.95)'
+const DEFAULT_ICON_BORDER_RADIUS = '1.8px'
+const DEFAULT_ICON_PADDING = '2.5px'
 
 export abstract class TopBarIconRenderer implements ITopBarIconRenderer {
   protected readonly imgElement: HTMLImageElement
@@ -52,6 +55,8 @@ export abstract class TopBarIconRenderer implements ITopBarIconRenderer {
 
     this.imgElement = img
     domLayerSetting(this.imgElement, 'higher')
+
+    this.applyIconStyle()
 
     this.isActive ? this.activate() : this.deactivate()
   }
@@ -85,7 +90,15 @@ export abstract class TopBarIconRenderer implements ITopBarIconRenderer {
    */
   public deactivate(): void {
     this.isActive = false
-    this.imgElement.style.opacity = '0.5'
+    this.imgElement.style.opacity = '0.70'
     this.imgElement.src = this.inactiveIconImgPath
+  }
+
+  protected applyIconStyle(): void {
+    this.imgElement.style.backgroundColor = DEFAULT_ICON_BACKGROUND_COLOR
+    this.imgElement.style.borderRadius = DEFAULT_ICON_BORDER_RADIUS
+    this.imgElement.style.padding = DEFAULT_ICON_PADDING
+    this.imgElement.style.boxSizing = 'border-box'
+    this.imgElement.style.cursor = 'pointer'
   }
 }

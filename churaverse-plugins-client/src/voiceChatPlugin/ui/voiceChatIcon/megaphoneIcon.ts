@@ -21,7 +21,6 @@ export class MegaphoneIcon extends TopBarIconRenderer {
       isActive: true,
       order: 250,
     })
-
     iconContainer.addIcon(this)
   }
 
