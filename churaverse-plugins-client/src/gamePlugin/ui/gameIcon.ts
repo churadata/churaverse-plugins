@@ -30,8 +30,10 @@ export class GameIcon extends TopBarIconRenderer {
   }
 
   /**
-   * ポインタ以外の背景設定を適用しない
-   * @Override
+   * アイコンの背景を設定する関数
+   * @override
+   * 個々の呼び出しに関係なく、自動呼び出しされる
+   * 背景不要なアイコンにも適用されるため、空で実装して背景を無くしている。
    */
   protected applyIconStyle(): void {
     this.imgElement.style.cursor = 'pointer'
