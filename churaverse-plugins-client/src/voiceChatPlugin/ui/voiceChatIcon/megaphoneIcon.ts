@@ -2,6 +2,7 @@ import { IEventBus, IMainScene } from 'churaverse-engine-client'
 import { ITopBarIconContainer } from '@churaverse/core-ui-plugin-client/interface/ITopBarIconContainer'
 import { TopBarIconRenderer } from '@churaverse/core-ui-plugin-client/topBarIcon'
 import { ToggleMegaphoneEvent } from '../../event/toggleMegaphoneEvent'
+import { DomManager, domLayerSetting } from 'churaverse-engine-client'
 
 import MEGAPHONE_ICON from '../../assets/megaphone.png'
 export const MEGAPHONE_ICON_PATH = MEGAPHONE_ICON
@@ -29,7 +30,7 @@ export class MegaphoneIcon extends TopBarIconRenderer {
     this.imgElement.title =
       'Megaphone:\nこの機能をオンにすると、あなたの声はこの場にいるすべての人に聞こえるようになります'
     this.megaphoneToastElement = this.createMegaphoneToastElement()
-    document.body.appendChild(this.megaphoneToastElement)
+    DomManager.addDom(this.megaphoneToastElement)
     iconContainer.addIcon(this)
   }
 
@@ -47,7 +48,7 @@ export class MegaphoneIcon extends TopBarIconRenderer {
     element.style.lineHeight = '1.6'
     element.style.textAlign = 'center'
     element.style.whiteSpace = 'pre-line' // \n 改行用
-    element.style.zIndex = '10000'
+    domLayerSetting(element, 'higher')
     element.style.pointerEvents = 'none'
     element.style.visibility = 'hidden'
     element.style.opacity = '0'
