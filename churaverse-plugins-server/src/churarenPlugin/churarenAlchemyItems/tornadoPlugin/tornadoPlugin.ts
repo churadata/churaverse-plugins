@@ -21,6 +21,7 @@ export class TornadoPlugin extends BaseAlchemyItemPlugin {
   protected alchemyItem = TORNADO_ITEM
 
   public listenEvent(): void {
+    super.listenEvent()
     this.bus.subscribeEvent('init', this.init.bind(this))
     this.bus.subscribeEvent('update', this.update.bind(this))
 
