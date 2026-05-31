@@ -85,7 +85,7 @@ export class TrapPlugin extends BaseAlchemyItemPlugin {
     resetTrapPluginStore(this.store)
   }
 
-  protected handleMidwayParticipant(): void {
+  protected handleMidwayJoin(): void {
     this.unsubscribeGameEvent()
   }
 
