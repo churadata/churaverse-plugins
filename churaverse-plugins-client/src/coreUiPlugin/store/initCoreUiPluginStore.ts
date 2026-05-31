@@ -5,6 +5,7 @@ import { DialogSwitcher } from '../dialog/dialogSwitcher'
 import { AdminSettingDialog } from '../adminSettingDialog/adminSettingDialog'
 import { FadeOutLogRenderer } from '../fadeOutLog/fadeOutLogRenderer'
 import { IFocusTargetRepository } from '../interface/IFocusTargetRepository'
+import { ExitButton } from '../exit/exitButton'
 import { IEventBus, Scenes, Store, IMainScene } from 'churaverse-engine-client'
 
 export function initCoreUiPlugin(
@@ -14,6 +15,7 @@ export function initCoreUiPlugin(
   focusTargetRepository: IFocusTargetRepository
 ): void {
   const pluginStore: CoreUiPluginStore = {
+    exitButton: new ExitButton(eventBus),
     topBarIconContainer: new TopBarIconContainer(),
     settingDialog: new SettingDialog(),
     adminSettingDialog: new AdminSettingDialog(),

@@ -5,6 +5,7 @@ import { PlayerColor } from '../types/playerColor'
 import { PlayerRole } from '../types/playerRole'
 
 export const PLAYER_RESPAWN_WAITING_TIME_MS = 2500
+export const RESPAWN_INVINCIBLE_TIME_MS = 3000 // リスポーン後の無敵時間
 
 /**
  * PlayerのデフォルトHP
@@ -28,6 +29,7 @@ export class Player extends LivingEntity implements ICollidableEntity {
   private readonly _width = 34
   private readonly _height = 40
   public readonly role: PlayerRole
+  private invincibleEndTime: number = 0
 
   public constructor(
     public readonly id: string,
@@ -61,6 +63,10 @@ export class Player extends LivingEntity implements ICollidableEntity {
     return this.hp <= 0
   }
 
+  public get isInvincible(): boolean {
+    return Date.now() < this.invincibleEndTime
+  }
+
   public turn(direction: Direction): void {
     this.direction = direction
   }
@@ -89,9 +95,10 @@ export class Player extends LivingEntity implements ICollidableEntity {
     this.hp = Math.min(this.hp + amount, DEFAULT_HP)
   }
 
-  public respawn(position: Position): void {
+  public respawn(position: Position, duration: number = RESPAWN_INVINCIBLE_TIME_MS): void {
     this.teleport(position)
     this.hp = DEFAULT_HP
+    this.invincibleEndTime = Date.now() + duration
   }
 
   public setPlayerName(name: string): void {

@@ -34,12 +34,14 @@
   "types": "./dist/types/index.d.ts",
   "license": "MIT",
   "dependencies": {
+    "@churaverse/churaren-black-hole-plugin-client": "file:../blackHolePlugin",
     "@churaverse/churaren-tornado-plugin-client": "file:../tornadoPlugin",
     "@churaverse/churaren-flame-pillar-plugin-client": "file:../flamePillarPlugin",
     "@churaverse/churaren-healing-potion-plugin-client": "file:../healingPotionPlugin",
     "@churaverse/churaren-revival-item-plugin-client": "file:../revivalItemPlugin",
     "@churaverse/churaren-explosion-plugin-client": "file:../explosionPlugin",
     "@churaverse/churaren-water-ring-plugin-client": "file:../waterRingPlugin",
+    "@churaverse/churaren-trap-plugin-client": "file:../trapPlugin",
     "@churaverse/churaren-ice-arrow-plugin-client": "file:../iceArrowPlugin",
     "@churaverse/churaren-alchemy-plugin-client": "file:../../churarenAlchemyPlugin"
   }

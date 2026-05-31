@@ -87,7 +87,7 @@ export class IceArrowPlugin extends BaseAlchemyItemPlugin {
     this.socketController?.unregisterMessageListener()
   }
 
-  protected handleMidwayParticipant(): void {
+  protected handleMidwayJoin(): void {
     this.unsubscribeGameEvent()
   }
 

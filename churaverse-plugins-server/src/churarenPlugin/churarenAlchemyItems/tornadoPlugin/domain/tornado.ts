@@ -12,7 +12,7 @@ const totalSteps = 10
 export const TORNADO_ITEM: IAlchemyItem = {
   kind: 'tornado',
   recipe: {
-    pattern: 'two_same_one_diff',
+    pattern: 'all_same',
     materialKind: 'grassOre',
   },
 }

@@ -44,7 +44,7 @@ export class HealingPotionPlugin extends BaseAlchemyItemPlugin {
     resetHealingPotionPluginStore(this.store)
   }
 
-  protected handleMidwayParticipant(): void {
+  protected handleMidwayJoin(): void {
     this.unsubscribeGameEvent()
   }
 

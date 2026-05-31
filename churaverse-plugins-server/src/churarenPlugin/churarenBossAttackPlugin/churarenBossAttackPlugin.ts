@@ -103,7 +103,7 @@ export class ChurarenBossAttackPlugin extends BaseGamePlugin {
   private bossAttackHitPlayer(bossAttack: BossAttack, player: Player): void {
     if (player.isDead) return
     if (!bossAttack.isCollidable) return
-    if (this.churarenGameInfo === undefined || !this.churarenGameInfo.participantIds.includes(player.id)) return
+    if (this.churarenGameInfo === undefined || !this.churarenGameInfo.joinedPlayerIds.includes(player.id)) return
     // ボス攻撃とプレイヤー衝突イベントの発火
     const bossAttackDamageCause = new BossAttackDamageCause(bossAttack)
     const livingDamageEvent = new LivingDamageEvent(player, bossAttackDamageCause, bossAttack.power)
