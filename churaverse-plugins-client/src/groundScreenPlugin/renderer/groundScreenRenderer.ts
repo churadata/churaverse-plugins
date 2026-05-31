@@ -14,19 +14,20 @@ export class GroundScreenRenderer implements IGroundScreenRenderer {
     private readonly width: number = 1280,
     private readonly height: number = 720
   ) {
-    this.phaserVideo = this.scene.add
-      .video(position.x, position.y)
-      .loadMediaStream(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        this.video.captureStream(),
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        'loadeddata',
-        false
-      )
-      .play()
+    this.phaserVideo = this.scene.add.video(position.x, position.y)
+
+    const stream = this.video.srcObject
+    if (stream !== undefined && stream instanceof MediaStream) {
+      this.phaserVideo
+        .loadMediaStream(
+          stream,
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+          'loadeddata',
+          false
+        )
+        .play()
+    }
 
     layerSetting(this.phaserVideo, 'ground')
     this.focusTargetRepository.addFocusTarget(this)
@@ -47,7 +48,7 @@ export class GroundScreenRenderer implements IGroundScreenRenderer {
    * 共有された画面の比率に合わせて大きさを調整
    */
   private fitScale(): void {
-    const videoWidth = this.phaserVideo.video?.videoWidth ?? 1920 
+    const videoWidth = this.phaserVideo.video?.videoWidth ?? 1920
     const videoHeight = this.phaserVideo.video?.videoHeight ?? 1080
 
     const xRatio = this.width / videoWidth

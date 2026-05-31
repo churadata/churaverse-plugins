@@ -12,7 +12,10 @@ import { StartScreenShare } from './event/startScreenShareEvent'
 import { StopScreenShare } from './event/stopScreenShareEvent'
 
 export class ScreenShareSender implements IScreenShareSender {
-  public constructor(private readonly room: Room, private readonly eventBus: IEventBus<IMainScene>) {
+  public constructor(
+    private readonly room: Room,
+    private readonly eventBus: IEventBus<IMainScene>
+  ) {
     this.room
       .on(RoomEvent.LocalTrackPublished, this.onStartStream.bind(this))
       .on(RoomEvent.LocalTrackUnpublished, this.onStopStream.bind(this))
@@ -23,13 +26,11 @@ export class ScreenShareSender implements IScreenShareSender {
    */
   private onStartStream(publication: LocalTrackPublication, participant: LocalParticipant): void {
     if (publication.source !== Track.Source.ScreenShare) return
-    const remoteTrackPublication = participant.getTrack(Track.Source.ScreenShare)
-    if (remoteTrackPublication?.videoTrack == null || remoteTrackPublication.track == null) {
-      return
-    }
+    const track = participant.getTrackPublication(Track.Source.ScreenShare)?.track
+    if (track?.mediaStreamTrack === undefined) return
 
     const mediaStream = new MediaStream()
-    mediaStream.addTrack(remoteTrackPublication.videoTrack.mediaStreamTrack)
+    mediaStream.addTrack(track.mediaStreamTrack)
 
     const video = document.createElement('video')
     video.srcObject = mediaStream
@@ -73,7 +74,7 @@ export class ScreenShareSender implements IScreenShareSender {
    * 既に他プレイヤーが画面共有している場合true
    */
   private alreadyOthersScreenShared(): boolean {
-    const participants = Array.from(this.room.participants.values())
+    const participants = Array.from(this.room.remoteParticipants.values() as Iterable<LocalParticipant>)
 
     return participants.some((participant) => {
       return participant.isScreenShareEnabled

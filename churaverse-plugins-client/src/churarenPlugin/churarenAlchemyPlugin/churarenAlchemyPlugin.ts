@@ -113,7 +113,7 @@ export class ChurarenAlchemyPlugin extends BaseGamePlugin {
     resetAlchemyPluginStore(this.store)
   }
 
-  protected handleMidwayParticipant(): void {
+  protected handleMidwayJoin(): void {
     this.unsubscribeGameEvent()
   }
 

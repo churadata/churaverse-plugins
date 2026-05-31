@@ -1,10 +1,11 @@
 import { BasePlugin, IMainScene } from 'churaverse-engine-client'
 import { GameStartEvent } from '../event/gameStartEvent'
 import { GameIds } from '../interface/gameIds'
-import { PriorGameDataEvent } from '../event/priorGameDataEvent'
 import { GameAbortEvent } from '../event/gameAbortEvent'
 import { GameEndEvent } from '../event/gameEndEvent'
 import { GameInfoStore } from '../store/defGamePluginStore'
+import { GameMidwayJoinEvent } from '../event/gameMidwayJoinEvent'
+import { SubmitGameJoinEvent } from '../event/submitGameJoinEvent'
 
 /**
  * 全てのゲームプラグインの基本となる抽象クラス
@@ -15,11 +16,11 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
 
   public listenEvent(): void {
     this.bus.subscribeEvent('init', this.getStores.bind(this))
-    this.bus.subscribeEvent('gameStart', this.onGameStart.bind(this))
-    this.bus.subscribeEvent('priorGameData', this.getPriorGameData.bind(this))
+    this.bus.subscribeEvent('submitGameJoin', this.onSubmitGameJoin.bind(this))
+    this.bus.subscribeEvent('gameMidwayJoin', this.onGameMidwayJoin.bind(this))
   }
 
-  public getStores(): void {
+  private getStores(): void {
     this.gameInfoStore = this.store.of('gameInfo')
   }
 
@@ -27,6 +28,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
    * ゲーム開始時に共通して登録されるイベントリスナー
    */
   protected subscribeGameEvent(): void {
+    this.bus.subscribeEvent('gameStart', this.onGameStart)
     this.bus.subscribeEvent('gameAbort', this.onGameTerminate)
     this.bus.subscribeEvent('gameEnd', this.onGameTerminate)
   }
@@ -35,6 +37,7 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
    * ゲーム中断・終了時に共通して削除されるイベントリスナー
    */
   protected unsubscribeGameEvent(): void {
+    this.bus.unsubscribeEvent('gameStart', this.onGameStart)
     this.bus.unsubscribeEvent('gameAbort', this.onGameTerminate)
     this.bus.unsubscribeEvent('gameEnd', this.onGameTerminate)
   }
@@ -43,16 +46,13 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     return this.gameInfoStore.games.get(this.gameId)?.isActive ?? false
   }
 
-  private getPriorGameData(ev: PriorGameDataEvent): void {
-    if (!this.isActive) return
-    // 途中参加者はonGameStartではなく、getPriorGameDataでsubscribeGameEventする
+  private onSubmitGameJoin(ev: SubmitGameJoinEvent): void {
+    if (!this.isActive || !ev.willJoin) return
     this.subscribeGameEvent()
-    this.handleMidwayParticipant()
   }
 
-  private onGameStart(ev: GameStartEvent): void {
+  private readonly onGameStart = (ev: GameStartEvent): void => {
     if (!this.isActive) return
-    this.subscribeGameEvent()
     this.handleGameStart()
   }
 
@@ -62,21 +62,28 @@ export abstract class BaseGamePlugin extends BasePlugin<IMainScene> {
     this.handleGameTermination()
   }
 
+  private onGameMidwayJoin(ev: GameMidwayJoinEvent): void {
+    if (!this.isActive) return
+    if (this.store.of('playerPlugin').ownPlayerId !== ev.joinPlayerId) return
+    this.subscribeGameEvent()
+    this.handleMidwayJoin()
+  }
+
   /**
    * ゲーム特有の開始時の処理を実装するための抽象メソッド
-   * 各ゲームプラグインでオーバーライドし、具体的な処理を定義する
+   * - ゲームに参加している全プレイヤーに対して共通で実行される
    */
   protected abstract handleGameStart(): void
 
   /**
    * ゲームの終了・中断時の処理を実装するための抽象メソッド。
-   * 各ゲームプラグインでオーバーライドし、具体的な処理を定義する。
+   * - ゲームに参加している全プレイヤーに対して共通で実行される
    */
   protected abstract handleGameTermination(): void
 
   /**
    * ゲーム特有の途中参加時の処理を実装するための抽象メソッド
-   * 各ゲームプラグインでオーバーライドし、具体的な処理を定義する
+   * - 途中参加したプレイヤーにのみ実行される
    */
-  protected abstract handleMidwayParticipant(): void
+  protected abstract handleMidwayJoin(): void
 }

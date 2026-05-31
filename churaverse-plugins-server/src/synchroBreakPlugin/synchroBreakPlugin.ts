@@ -20,9 +20,16 @@ import { SynchroBreakTurnStartEvent } from './event/synchroBreakTurnStartEvent'
 import { SynchroBreakTurnStartMessage } from './message/synchroBreakTurnStartMessage'
 import { IGameSequence } from './interface/IGameSequence'
 import { GameSequence } from './logic/gameSequence'
+import { GamePolicy } from '@churaverse/game-plugin-server/interface/gamePolicy'
+
+export const SYNCHRO_BREAK_MID_RESULT_TIME_LIMIT = 3000
+export const BET_TIMER_TIME_LIMIT = 20000 // 20 秒
 
 export class SynchroBreakPlugin extends CoreGamePlugin {
   public readonly gameId = 'synchroBreak'
+  public readonly gamePolicy: GamePolicy = {
+    allowMidwayJoin: false,
+  }
 
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   private synchroBreakPluginStore!: SynchroBreakPluginStore
@@ -34,7 +41,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
 
   public listenEvent(): void {
     super.listenEvent()
-    this.bus.subscribeEvent('init', this.init.bind(this))
+    this.bus.subscribeEvent('start', this.start.bind(this))
 
     this.socketController = new SocketController(this.bus, this.store)
     this.bus.subscribeEvent('registerMessage', this.socketController.registerMessage.bind(this.socketController))
@@ -70,7 +77,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.bus.unsubscribeEvent('synchroBreakTurnStart', this.synchroBreakTurnStart)
   }
 
-  private init(): void {
+  private start(): void {
     this.networkPluginStore = this.store.of('networkPlugin')
   }
 
@@ -82,10 +89,9 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     this.socketController.registerMessageListener()
     this.synchroBreakPluginStore = this.store.of('synchroBreakPlugin')
     this.gameSequence = new GameSequence(this.gameId, this.bus, this.store)
-    for (const playerId of this.participantIds) {
+    for (const playerId of this.joinedPlayerIds) {
       this.synchroBreakPluginStore.playersCoinRepository.set(playerId, this.initialPlayerCoins)
     }
-
     const sortedPlayersCoin = this.synchroBreakPluginStore.playersCoinRepository.sortedPlayerCoins()
     this.networkPluginStore.messageSender.send(new UpdatePlayersCoinMessage({ playersCoin: sortedPlayersCoin }))
   }
@@ -117,7 +123,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * 結果ウィンドウの閉じるボタンを押した時に実行される
    */
   protected handlePlayerQuitGame(playerId: string): void {
-    if (this.participantIds.length <= 0) {
+    if (this.joinedPlayerIds.length <= 0) {
       this.bus.post(new GameEndEvent(this.gameId))
     }
   }
@@ -134,6 +140,9 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    */
   private readonly timeLimitConfirm = (ev: TimeLimitConfirmEvent): void => {
     this.synchroBreakPluginStore.timeLimit = Number(ev.timeLimit)
+    this.gameSequence.processTurnSequence().catch((error) => {
+      console.error('ゲーム開始確認処理でエラーが発生しました:', error)
+    })
   }
 
   /**
@@ -149,21 +158,6 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const currentCoins = coins - betCoins
     this.synchroBreakPluginStore.playersCoinRepository.set(playerId, currentCoins)
     this.networkPluginStore.messageSender.send(new SendBetCoinResponseMessage({ playerId, betCoins, currentCoins }))
-
-    this.checkAndStartGameIfAllBet()
-  }
-
-  /**
-   * 全プレイヤーがベットしているか確認し、全プレイヤーがベットしている場合にゲームを開始する
-   */
-  private checkAndStartGameIfAllBet(): void {
-    const betCoinPlayerNumber = this.synchroBreakPluginStore.betCoinRepository.getBetCoinPlayerCount()
-    const totalPlayerNum = this.participantIds.length
-    if (betCoinPlayerNumber >= totalPlayerNum) {
-      this.gameSequence.processTurnSequence().catch((error) => {
-        console.error('ゲーム開始確認処理でエラーが発生しました:', error)
-      })
-    }
   }
 
   /**
@@ -222,6 +216,9 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const turnNumber = ev.turnNumber
     const synchroBreakTurnStartMessage = new SynchroBreakTurnStartMessage({ turnNumber })
     this.networkPluginStore.messageSender.send(synchroBreakTurnStartMessage)
+    this.gameSequence.processTurnSequence().catch((error) => {
+      console.error('ゲーム開始確認処理でエラーが発生しました:', error)
+    })
   }
 
   /**
@@ -231,7 +228,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     const nyokkiRepository: string[] = this.synchroBreakPluginStore.nyokkiRepository.getAllPlayerId()
 
     // ニョッキしていないプレイヤーIdを取得
-    const noNyokkiPlayerIds = this.participantIds.filter((playerId) => !nyokkiRepository.includes(playerId))
+    const noNyokkiPlayerIds = this.joinedPlayerIds.filter((playerId) => !nyokkiRepository.includes(playerId))
     const synchroBreakTurnSelect = this.synchroBreakPluginStore.turnSelect
 
     if (synchroBreakTurnSelect === undefined) throw new SynchroBreakPluginError('ターン情報が存在しません')
@@ -257,7 +254,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
    * プレイヤーのコインを計算する
    */
   private calculateResultPlayersCoin(): void {
-    this.participantIds.forEach((playerId) => {
+    this.joinedPlayerIds.forEach((playerId) => {
       const calculatedCoins = this.calculateCoins(playerId)
       this.synchroBreakPluginStore.playersCoinRepository.set(playerId, calculatedCoins)
     })
@@ -273,7 +270,7 @@ export class SynchroBreakPlugin extends CoreGamePlugin {
     if (player === undefined) return currentCoins
 
     const betCoins = this.synchroBreakPluginStore.betCoinRepository.get(playerId)
-    const totalPlayerNum = this.participantIds.length
+    const totalPlayerNum = this.joinedPlayerIds.length
     const playerOrder: string[] = this.synchroBreakPluginStore.nyokkiRepository.playerOrders()
     const orderIndex = playerOrder.indexOf(playerId)
 

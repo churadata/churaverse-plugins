@@ -68,7 +68,7 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
     resetItemPluginStore(this.store)
   }
 
-  public handleMidwayParticipant(): void {
+  public handleMidwayJoin(): void {
     this.unsubscribeGameEvent()
   }
 

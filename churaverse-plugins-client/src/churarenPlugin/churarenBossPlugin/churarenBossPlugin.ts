@@ -82,11 +82,14 @@ export class ChurarenBossPlugin extends BaseGamePlugin {
   }
 
   protected handleGameTermination(): void {
+    this.bossPluginStore?.bossRenderers.forEach((renderer) => {
+      renderer.destroy()
+    })
     resetBossPluginStore(this.store)
     this.socketController?.unregisterMessageListener()
   }
 
-  public handleMidwayParticipant(): void {
+  public handleMidwayJoin(): void {
     this.unsubscribeGameEvent()
   }
 

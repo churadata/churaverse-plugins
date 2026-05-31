@@ -104,7 +104,7 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
   private getItem(item: Item, player: Player): void {
     if (this.churarenGameInfo === undefined) return
     // プレイヤーが参加者でない場合は何もしない
-    if (!this.churarenGameInfo.participantIds.includes(player.id)) return
+    if (!this.churarenGameInfo.joinedPlayerIds.includes(player.id)) return
     const getItemEvent = new GetChurarenItemEvent(player.id, item)
     this.bus.post(getItemEvent)
   }
@@ -127,6 +127,6 @@ export class ChurarenItemPlugin extends BaseGamePlugin {
     const multiplier = 3 // プレイヤー数に掛ける倍率
     const baseOffset = 10 // 基本オフセット値
     const maxItemNum = 40 // 最大アイテム数
-    return Math.min((this.churarenGameInfo?.participantIds.length ?? 0) * multiplier + baseOffset, maxItemNum)
+    return Math.min((this.churarenGameInfo?.joinedPlayerIds.length ?? 0) * multiplier + baseOffset, maxItemNum)
   }
 }

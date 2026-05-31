@@ -1,4 +1,5 @@
 import { CoreGamePlugin } from '@churaverse/game-plugin-server/domain/coreGamePlugin'
+import { GamePolicy } from '@churaverse/game-plugin-server/interface/gamePolicy'
 import { SocketController } from './controller/socketController'
 import { initChurarenPluginStore } from './store/churarenPluginStoreManager'
 import { GameEndEvent } from '@churaverse/game-plugin-server/event/gameEndEvent'
@@ -17,6 +18,7 @@ const RESULT_DISPLAY_TIME_SECONDS = 15 // 結果表示時間(sec)
 
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
+  public readonly gamePolicy: GamePolicy = { allowMidwayJoin: false }
   private socketController?: SocketController
   private networkPluginStore!: NetworkPluginStore<IMainScene>
 
@@ -79,7 +81,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   }
 
   protected handlePlayerLeave(playerId: string): void {
-    if (playerId === this.gameOwnerId || this.participantIds.length <= 0) {
+    if (playerId === this.gameOwnerId || this.joinedPlayerIds.length <= 0) {
       this.bus.post(new GameEndEvent(this.gameId))
     } else {
       if (!this.isActive) return
@@ -88,7 +90,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   }
 
   protected handlePlayerQuitGame(playerId: string): void {
-    if (this.participantIds.length <= 0) {
+    if (this.joinedPlayerIds.length <= 0) {
       this.bus.post(new GameEndEvent(this.gameId))
     }
   }
@@ -118,7 +120,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    */
   private readonly skipChuraverseDamage = (ev: LivingDamageEvent): void => {
     if (!isWeaponDamageCause(ev.cause)) return
-    if (isPlayer(ev.target) && this.participantIds.includes(ev.target.id)) {
+    if (isPlayer(ev.target) && this.joinedPlayerIds.includes(ev.target.id)) {
       ev.cancel()
     }
   }

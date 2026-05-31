@@ -19,7 +19,7 @@ export class DialogSwitcher implements IDialogSwitcher {
    * ダイアログを管理対象にする
    * @param name 名前
    * @param dialog 操作対象のダイアログ
-   * @param postClose タイアログが閉じた際にすること
+   * @param postClose ダイアログが閉じた際にすること
    */
   public add(name: DialogType, dialog: IDialog, postClose: () => void): void {
     this.dialogs.set(name, dialog)
@@ -27,15 +27,12 @@ export class DialogSwitcher implements IDialogSwitcher {
   }
 
   /**
-   * タイアログを開く
+   * ダイアログを開く
    * @param name 名前
    * @param postOpen 開いた後にすること
    */
   public open(name: DialogType, postOpen: () => void): void {
-    if (this.target === name) {
-      return
-    }
-
+    if (this.target === name) return
     if (this.target !== null) {
       this.close()
     }
@@ -45,14 +42,25 @@ export class DialogSwitcher implements IDialogSwitcher {
     targetDialog.open()
     postOpen()
     this.target = name
-    
+
     this.eventBus.post(new ActivateUiEvent(targetDialog) as CVEvent<Scenes>)
+
+    /**
+     * onOutsideClickが即時発火するのを防ぐため、遅延をつけてイベントリスナーを追加
+     */
+    setTimeout(() => {
+      if (this.target === name) {
+        document.addEventListener('click', this.onOutsideClick)
+      }
+    })
   }
 
   /**
    * ダイアログを閉じる
    */
   public close(): void {
+    document.removeEventListener('click', this.onOutsideClick)
+
     if (this.target !== null) {
       const targetDialog = this.dialogs.get(this.target)
       if (targetDialog === undefined) return
@@ -60,6 +68,21 @@ export class DialogSwitcher implements IDialogSwitcher {
       this.postCloseCallbacks.get(this.target)?.()
       this.eventBus.post(new DeactivateUiEvent(targetDialog) as CVEvent<Scenes>)
       this.target = null
+    }
+  }
+
+  /**
+   * dialogの外側がクリックされたときの挙動
+   * 
+   */
+  private readonly onOutsideClick = (event: MouseEvent) => {
+    if (this.target === null) return
+
+    const dialog = this.dialogs.get(this.target)
+    if (dialog === undefined) return
+
+    if (event.target instanceof Node && !dialog.node.contains(event.target)) {
+      this.close()
     }
   }
 }
