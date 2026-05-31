@@ -14,6 +14,7 @@ import { MuteEvent } from './event/muteEvent'
 import { NetworkPluginStore } from '@churaverse/network-plugin-client/store/defNetworkPluginStore'
 import { ToggleMicMessage } from './message/toggleMicMessage'
 import { VoiceChatPluginStore } from './store/defVoiceChatPluginStore'
+import { IAudioService } from './domain/IAudioService'
 
 export class VoiceChatSender implements IVoiceChatSender {
   private readonly networkPluginStore!: NetworkPluginStore<IMainScene>
@@ -22,7 +23,8 @@ export class VoiceChatSender implements IVoiceChatSender {
     private readonly room: Room,
     private readonly eventBus: IEventBus<IMainScene>,
     private readonly store: Store<IMainScene>,
-    private readonly ownPlayerId: string
+    private readonly ownPlayerId: string,
+    private readonly audioService?: IAudioService
   ) {
     room.on(RoomEvent.LocalTrackPublished, this.onStartStream.bind(this))
     room.on(RoomEvent.LocalTrackUnpublished, this.onStopStream.bind(this))
@@ -67,13 +69,19 @@ export class VoiceChatSender implements IVoiceChatSender {
   }
 
   public async startStream(): Promise<boolean> {
+    if (this.audioService !== undefined) {
+      return await this.audioService.startLocalMic()
+    }
     await this.room.localParticipant.setMicrophoneEnabled(true)
     return this.room.localParticipant.isMicrophoneEnabled
   }
 
   public async stopStream(): Promise<boolean> {
-    await this.room.localParticipant.setMicrophoneEnabled(false)
+    if (this.audioService !== undefined) {
+      return await this.audioService.stopLocalMic()
+    }
 
+    await this.room.localParticipant.setMicrophoneEnabled(false)
     // 終了失敗=isMicrophoneEnabledがtrueの時なので, isMicrophoneEnabledの否定を返す
     return !this.room.localParticipant.isMicrophoneEnabled
   }
