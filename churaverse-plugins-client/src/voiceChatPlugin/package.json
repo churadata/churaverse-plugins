@@ -40,7 +40,7 @@
     "@churaverse/debug-screen-plugin-client": "~0.1.0",
     "@churaverse/network-plugin-client": "~0.1.0",
     "@churaverse/player-plugin-client": "~0.1.0",
-    "@churaverse/web-rtc-plugin-client": "~0.1.0",
+    "@churaverse/web-rtc-plugin-client": "file:../webRtcPlugin",
     "churaverse-engine-client": "~0.1.0"
   }
 }
