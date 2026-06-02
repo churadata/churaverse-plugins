@@ -1,4 +1,5 @@
 import { MeetingRoom } from '../meetingRoom'
+import { ChatMessage } from '../domain/chatMessage'
 
 declare module 'churaverse-engine-client' {
   export interface StoreInMeeting {
