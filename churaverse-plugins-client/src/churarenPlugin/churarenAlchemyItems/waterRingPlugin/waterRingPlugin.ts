@@ -88,12 +88,12 @@ export class WaterRingPlugin extends BaseAlchemyItemPlugin {
   }
 
   protected handleGameTermination(): void {
-    resetWaterRingPluginStore(this.store)
     this.socketController?.unregisterMessageListener()
     this.clearWaterRing()
+    resetWaterRingPluginStore(this.store)
   }
 
-  protected handleMidwayParticipant(): void {
+  protected handleMidwayJoin(): void {
     this.unsubscribeGameEvent()
   }
 
@@ -167,6 +167,7 @@ export class WaterRingPlugin extends BaseAlchemyItemPlugin {
     waterRing?.die()
     waterRingAttackRenderer?.dead()
     this.waterRingPluginStore.waterRings.delete(waterRing.waterRingId)
+    this.waterRingPluginStore.waterRingAttackRenderers.delete(waterRing.waterRingId)
   }
 
   // 水の輪の出現を受信した時の処理
