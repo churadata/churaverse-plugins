@@ -8,10 +8,6 @@ import waterRingAttackImage from '../assets/waterRingAttack.png'
  */
 const WATER_RING_ATTACK_TEXTURE_KEY = 'waterRingAttack'
 
-/**
- * 水の輪のアニメーションキー
- */
-const WATER_RING_ATTACK_ANIM_KEY = 'waterRingAttackAnimation'
 
 /**
  * 表示時の縦横のサイズ
@@ -48,9 +44,10 @@ export class WaterRingAttackRenderer implements IWaterRingAttackRenderer {
 
     // アニメーションの設定配列から各アニメーションを生成
     _anims.forEach((cfg) => {
+      if (scene.anims.exists(cfg.key)) return
       scene.anims.create({
         key: cfg.key,
-        frames: this.scene.anims.generateFrameNumbers(WATER_RING_ATTACK_ANIM_KEY, {
+        frames: this.scene.anims.generateFrameNumbers(WATER_RING_ATTACK_TEXTURE_KEY, {
           start: cfg.frameStart,
           end: cfg.frameEnd,
         }),
