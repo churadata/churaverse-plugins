@@ -8,6 +8,7 @@ import {
   AVATAR_CONTAINER_ID_PREFIX,
 } from '../components/ParticipantTileComponent'
 import { getAvatarColor, getInitials } from '../utils/avatarUtils'
+import { getParticipantDisplayName } from '@churaverse/livekit-client'
 
 const MAX_VISIBLE_SIDEBAR_TILES = 5
 const PARTICIPANT_SIDEBAR_ID = 'participant-sidebar'
@@ -27,12 +28,13 @@ export class VideoGridUi {
     const tileId = `${PARTICIPANT_TILE_ID_PREFIX}${participant.identity}`
     if (document.getElementById(tileId) !== null) return
 
+    const label = getParticipantDisplayName(participant)
     const tile = DomManager.jsxToDom(
       ParticipantTileComponent({
         participantId: participant.identity,
-        displayName: participant.name ?? participant.identity,
-        avatarColor: getAvatarColor(participant.name ?? participant.identity),
-        initials: getInitials(participant.name ?? participant.identity),
+        displayName: label,
+        avatarColor: getAvatarColor(label),
+        initials: getInitials(label),
         isSelf: participant.identity === this.ownParticipantId,
       })
     )
@@ -46,7 +48,9 @@ export class VideoGridUi {
     if (tile === null) return
     const nameSpan = tile.querySelector(`.${videoGridStyles.name}`)
     if (nameSpan !== null) {
-      const label = participantId === this.ownParticipantId ? `${displayName} (自分)` : displayName
+      const trimmed = displayName.trim()
+      const safeName = trimmed !== '' ? trimmed : participantId
+      const label = participantId === this.ownParticipantId ? `${safeName} (自分)` : safeName
       nameSpan.textContent = label
     }
     const avatarEl = tile.querySelector(`.${videoGridStyles.avatar}`)

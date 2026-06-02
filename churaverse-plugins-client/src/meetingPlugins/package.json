@@ -40,6 +40,8 @@
   "dependencies": {
     "livekit-client": "^1.13.4",
     "churaverse-engine-client": "~0.1.0",
-    "@churaverse/transition-plugin-client": "~0.1.0"
+    "@churaverse/transition-plugin-client": "~0.1.0",
+    "@churaverse/title-plugin-client": "~0.1.0",
+    "@churaverse/livekit-client": "~0.1.0"
   }
 }

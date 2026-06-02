@@ -48,10 +48,12 @@ export class TextChatPlugin extends BasePlugin<IMainScene> {
   }
 
   private onAddTextChat(ev: AddTextChatEvent): void {
-    if (!(ev.textChat instanceof TextChat)) return
+    // AddTextChatEvent の型は TextChat のみだが、実行時にプレーンオブジェクトが来る場合の保険
+    const duck = ev.textChat as unknown as { playerId: string; name: string; message: string }
+    const chat = ev.textChat instanceof TextChat ? ev.textChat : new TextChat(duck.playerId, duck.name, duck.message)
 
-    this.textChatPluginStore.textChatService.addChat(ev.textChat)
-    this.textChatUi.textChatBoard.add(ev.textChat)
+    this.textChatPluginStore.textChatService.addChat(chat)
+    this.textChatUi.textChatBoard.add(chat)
     if (!this.textChatUi.textChatDialog.isOpen) {
       this.textChatUi.textChatIcon.badge.activate()
     }

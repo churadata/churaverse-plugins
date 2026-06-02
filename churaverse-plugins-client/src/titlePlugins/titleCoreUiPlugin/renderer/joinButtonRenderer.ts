@@ -28,7 +28,11 @@ export class JoinButtonRenderer implements IJoinButtonRenderer {
   private readonly transitionPluginStore: TransitionPluginStore<ITitleScene>
   private readonly gameModeSelectorRenderer: GameModeSelectorRenderer
 
-  public constructor(scene: Scene, store: Store<ITitleScene>, private readonly eventBus: IEventBus<ITitleScene>) {
+  public constructor(
+    scene: Scene,
+    store: Store<ITitleScene>,
+    private readonly eventBus: IEventBus<ITitleScene>
+  ) {
     this.titlePlayerPluginStore = store.of('titlePlayerPlugin')
     this.transitionPluginStore = store.of('transitionPlugin')
     this.gameModeSelectorRenderer = new GameModeSelectorRenderer(this.eventBus)
@@ -81,14 +85,7 @@ export class JoinButtonRenderer implements IJoinButtonRenderer {
     if (validateResult) {
       this.joinButton.disableInteractive()
 
-      const targetScene: SceneName = this.gameModeSelectorRenderer.isGameModeEnabled()
-        ? 'MainScene'
-        : 'MeetingScene'
-
-      if (targetScene === 'MeetingScene') {
-        const player = this.titlePlayerPluginStore.ownPlayer
-        sessionStorage.setItem('meetingPlayerName', player.name)
-      }
+      const targetScene: SceneName = this.gameModeSelectorRenderer.isGameModeEnabled() ? 'MainScene' : 'MeetingScene'
 
       DomManager.removeAll()
       this.transitionPluginStore.transitionManager.transitionTo(targetScene)

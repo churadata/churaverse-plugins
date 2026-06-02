@@ -10,7 +10,6 @@ declare module 'churaverse-engine-client' {
 export interface MeetingPluginStore {
   readonly participantId: string
   readonly displayName: string
-  readonly chatHistory: ChatMessage[]
   meetingRoom?: MeetingRoom
   isConnected: boolean
 }

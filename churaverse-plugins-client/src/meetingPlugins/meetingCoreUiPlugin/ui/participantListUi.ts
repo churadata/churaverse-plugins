@@ -2,6 +2,7 @@ import { DomManager } from 'churaverse-engine-client'
 import { Participant } from 'livekit-client'
 import { PARTICIPANT_LIST_ID, PARTICIPANTS_COUNT_ID } from '../components/MeetingSidebarComponent'
 import { ParticipantItemComponent } from '../components/ParticipantItemComponent'
+import { getParticipantDisplayName } from '@churaverse/livekit-client'
 
 export class ParticipantListUi {
   public constructor(private readonly ownParticipantId: string) {}
@@ -17,7 +18,7 @@ export class ParticipantListUi {
     participants.forEach((p) => {
       const item = DomManager.jsxToDom(
         ParticipantItemComponent({
-          displayName: p.name ?? p.identity,
+          displayName: getParticipantDisplayName(p),
           isSelf: p.identity === this.ownParticipantId,
           isMuted: !p.isMicrophoneEnabled,
         })

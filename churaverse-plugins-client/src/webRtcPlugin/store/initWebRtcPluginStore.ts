@@ -1,15 +1,23 @@
-import { Store, IMainScene } from 'churaverse-engine-client'
+import { Store, IMainScene, ITitleScene } from 'churaverse-engine-client'
 import { LkLocalCameraManager } from '../localDeviceManager/livekitApi/lkLocalCameraManager'
 import { LkLocalMicrophoneManager } from '../localDeviceManager/livekitApi/lkLocalMicrophoneManager'
 import { LkLocalSpeakerManager } from '../localDeviceManager/livekitApi/lkLocalSpeakerManager'
 import { WebRtc } from '../webRtc'
 import { WebRtcPluginStore } from './defWebRtcPluginStore'
 import '@churaverse/player-plugin-client/store/defPlayerPluginStore'
+import '@churaverse/transition-plugin-client/store/defTransitionPluginStore'
+import '@churaverse/title-plugin-client/titlePlayerPlugin/defTitlePlayerTransitionData'
 
 export function initWebRtcPluginStore(store: Store<IMainScene>): void {
-  const ownPlayerId = store.of('playerPlugin').ownPlayerId
+  const playerPluginStore = store.of('playerPlugin')
+  const ownPlayerId = playerPluginStore.ownPlayerId
 
-  const webRtc = new WebRtc(ownPlayerId)
+  const transitionPluginStore = store.of('transitionPlugin')
+  const received = transitionPluginStore.transitionManager.getReceivedData<ITitleScene>()
+  const nameFromTitle = received?.ownPlayer?.name?.trim()
+  const ownPlayerName = nameFromTitle !== undefined && nameFromTitle !== '' ? nameFromTitle : ownPlayerId
+
+  const webRtc = new WebRtc(ownPlayerId, ownPlayerName)
 
   const webRtcPluginStore: WebRtcPluginStore = {
     webRtc,
