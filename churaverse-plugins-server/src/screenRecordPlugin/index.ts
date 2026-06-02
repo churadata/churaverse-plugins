@@ -1,0 +1,1 @@
+export { ScreenRecordPlugin } from './screenRecordPlugin'
