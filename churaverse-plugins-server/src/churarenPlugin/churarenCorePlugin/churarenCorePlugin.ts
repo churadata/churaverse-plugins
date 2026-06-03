@@ -22,6 +22,8 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
   private socketController?: SocketController
   private networkPluginStore!: NetworkPluginStore<IMainScene>
 
+  private resultDisplayTimeoutId: ReturnType<typeof setTimeout> | undefined
+
   public listenEvent(): void {
     super.listenEvent()
     this.bus.subscribeEvent('init', this.init.bind(this))
@@ -76,6 +78,8 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    * 中断・終了時に実行される処理
    */
   protected handleGameTermination(): void {
+    clearTimeout(this.resultDisplayTimeoutId)
+    this.resultDisplayTimeoutId = undefined
     this.store.deleteStoreOf('churarenPlugin')
     this.socketController?.unregisterMessageListener()
   }
@@ -109,7 +113,7 @@ export class ChurarenCorePlugin extends CoreGamePlugin {
    */
   private readonly sendChurarenResult = (ev: ChurarenResultEvent): void => {
     this.networkPluginStore.messageSender.send(new ChurarenResultMessage({ resultType: ev.resultType }))
-    setTimeout(() => {
+    this.resultDisplayTimeoutId = setTimeout(() => {
       if (!this.isActive) return
       this.bus.post(new GameEndEvent(this.gameId))
     }, RESULT_DISPLAY_TIME_SECONDS * 1000)
