@@ -14,7 +14,6 @@ import '@churaverse/player-plugin-client/store/defPlayerPluginStore'
 import { setupChurarenDialog } from './ui/startWindow/setupChurarenDialog'
 import { isWeaponEntity } from './util/isWeaponEntity'
 import { EntitySpawnEvent } from 'churaverse-engine-client'
-import { GamePolicy } from '@churaverse/game-plugin-client/interface/gamePolicy'
 
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID

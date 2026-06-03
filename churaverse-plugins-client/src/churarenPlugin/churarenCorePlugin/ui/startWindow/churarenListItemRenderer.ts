@@ -4,7 +4,6 @@ import { GameSelectionListItemRenderer } from '@churaverse/game-plugin-client/ui
 import { GamePolicy } from '@churaverse/game-plugin-client/interface/gamePolicy'
 import { CHURAREN_CONSTANTS } from '../../constants/churarenConstants'
 import CHURAREN_ICON_PATH from '../../assets/churarenIcon.png'
-import { GamePolicy } from '@churaverse/game-plugin-client/interface/gamePolicy'
 
 export class ChurarenListItemRenderer extends GameSelectionListItemRenderer {
   public constructor(
