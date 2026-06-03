@@ -13,13 +13,11 @@ import { ChurarenResultMessage } from './message/churarenResultMessage'
 import { GamePlayerQuitEvent } from '@churaverse/game-plugin-server/event/gamePlayerQuitEvent'
 import { isWeaponDamageCause } from './utils/isWeaponDamageCause'
 import { isPlayer } from '@churaverse/player-plugin-server/domain/player'
-import { GamePolicy } from '@churaverse/game-plugin-server/interface/gamePolicy'
 
 const RESULT_DISPLAY_TIME_SECONDS = 15 // 結果表示時間(sec)
 
 export class ChurarenCorePlugin extends CoreGamePlugin {
   public gameId = CHURAREN_CONSTANTS.GAME_ID
-  public readonly gamePolicy: GamePolicy = { allowMidwayJoin: false }
   private socketController?: SocketController
   private networkPluginStore!: NetworkPluginStore<IMainScene>
   public readonly gamePolicy: GamePolicy = {
