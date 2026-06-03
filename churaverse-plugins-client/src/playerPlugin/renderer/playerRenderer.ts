@@ -532,7 +532,7 @@ export class PlayerRenderer implements IPlayerRenderer {
    * @param blinkCycleMs 1サイクルの時間（ミリ秒）。デフォルト80ms
    */
   public blinkTarget(totalDurationMs: number, blinkCycleMs: number = this.BLINK_CYCLE_MS): Phaser.Tweens.Tween {
-    const repeat = Math.floor(totalDurationMs / blinkCycleMs)
+    const repeat = Math.floor(totalDurationMs / blinkCycleMs) - 1
     const duration = blinkCycleMs / 2
     return this.scene.tweens.add({
       targets: this.sprite,
