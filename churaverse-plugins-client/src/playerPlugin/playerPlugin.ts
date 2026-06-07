@@ -134,10 +134,13 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
     this.bus.subscribeEvent('playerColorChange', this.onChangePlayerColor.bind(this))
     this.bus.subscribeEvent('livingDamage', this.onLivingDamage.bind(this))
     this.bus.subscribeEvent('livingHeal', this.onLivingHeal.bind(this))
+    this.bus.subscribeEvent('playerDie', this.onDiePlayer.bind(this))
+    this.bus.subscribeEvent('playerRespawn', this.onRespawnPlayer.bind(this))
     this.bus.subscribeEvent('playerInvincibleTime', this.onInvincibleTimePlayer.bind(this))
     this.bus.subscribeEvent('dumpDebugData', this.dumpDebugData.bind(this))
     this.bus.subscribeEvent('networkConnect', this.onNetworkConnect.bind(this))
     this.bus.subscribeEvent('networkDisconnect', this.onNetworkDisconnect.bind(this))
+    this.bus.subscribeEvent('onGameShutdown', this.saveOwnPlayerInfo.bind(this))
   }
 
   private phaserSceneInit(ev: PhaserSceneInit): void {
@@ -469,6 +472,12 @@ export class PlayerPlugin extends BasePlugin<IMainScene> {
       }
       this.networkStore.messageSender.send(new PlayerColorChangeMessage({ color: ev.color }))
     }
+  }
+
+  private saveOwnPlayerInfo(): void {
+    const ownPlayer = this.playerPluginStore.players.get(this.playerPluginStore.ownPlayerId)
+    if (ownPlayer === undefined) return
+    this.savePlayerInfo(ownPlayer)
   }
 
   private savePlayerInfo(ownPlayer: Player): void {
