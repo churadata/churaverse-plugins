@@ -93,7 +93,7 @@ export class WaterRingPlugin extends BaseAlchemyItemPlugin {
     this.clearWaterRing()
   }
 
-  protected handleMidwayParticipant(): void {
+  protected handleMidwayJoin(): void {
     this.unsubscribeGameEvent()
   }
 

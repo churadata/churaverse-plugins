@@ -90,7 +90,7 @@ export class BlackHolePlugin extends BaseAlchemyItemPlugin {
     resetBlackHolePluginStore(this.store)
   }
 
-  protected handleMidwayParticipant(): void {
+  protected handleMidwayJoin(): void {
     this.unsubscribeGameEvent()
   }
 
