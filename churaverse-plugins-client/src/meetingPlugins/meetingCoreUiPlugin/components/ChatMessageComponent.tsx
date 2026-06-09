@@ -4,11 +4,11 @@ import style from './MeetingSidebarComponent.module.scss'
 interface Props {
   senderLabel: string
   text: string
-  isSelf: boolean
+  isOwn: boolean
 }
 
-export const ChatMessageComponent: JSXFunc<Props> = ({ senderLabel, text, isSelf }: Props) => {
-  const label = isSelf ? `${senderLabel} (自分)` : senderLabel
+export const ChatMessageComponent: JSXFunc<Props> = ({ senderLabel, text, isOwn }: Props) => {
+  const label = isOwn ? `${senderLabel} (自分)` : senderLabel
   return (
     <div className={style.chatMessage}>
       <span className={style.chatAuthor}>{label}</span>
