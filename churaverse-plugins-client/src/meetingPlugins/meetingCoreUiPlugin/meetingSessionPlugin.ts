@@ -76,7 +76,9 @@ export class MeetingSessionPlugin extends BasePlugin<IMeetingScene> {
   private async waitForVideoGrid(): Promise<void> {
     const TIMEOUT_MS = 5000
     await new Promise<void>((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error('video-grid element not found within timeout')), TIMEOUT_MS)
+      const timer = setTimeout(() => {
+        reject(new Error('video-grid element not found within timeout'))
+      }, TIMEOUT_MS)
       const check = (): void => {
         if (document.getElementById(VIDEO_GRID_ID) !== null) {
           clearTimeout(timer)
@@ -306,6 +308,7 @@ export class MeetingSessionPlugin extends BasePlugin<IMeetingScene> {
     this.showReactionAnimation(reactionType)
   }
 
+  // TODO(CV-896): Scene遷移対応までの暫定対応としてリロード遷移を使用する
   private async enterGameMode(): Promise<void> {
     sessionStorage.setItem(PORTAL_STORAGE_KEYS.TO_GAME_MODE, 'true')
     sessionStorage.setItem(PORTAL_STORAGE_KEYS.PLAYER_NAME, this.meetingPluginStore.displayName)
@@ -348,7 +351,7 @@ export class MeetingSessionPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private showReactionAnimation(type: 'shark' | 'bomb'): void {
-    const container = document.querySelector('[class*="mainArea"]') as HTMLElement
+    const container = document.querySelector<HTMLElement>('[class*="mainArea"]')
     if (container === null) return
     if (type === 'shark') {
       this.showSharkAnimation(container)
