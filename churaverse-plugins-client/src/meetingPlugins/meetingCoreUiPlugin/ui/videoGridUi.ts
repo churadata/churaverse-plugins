@@ -66,28 +66,20 @@ export class VideoGridUi {
 
   public attachTrack(track: RemoteTrack | Track, participantId: string): void {
     if (track.kind === Track.Kind.Video) {
-      this.attachVideoTrack(track, participantId)
+      const container = document.getElementById(`${VIDEO_CONTAINER_ID_PREFIX}${participantId}`)
+      const avatarContainer = document.getElementById(`${AVATAR_CONTAINER_ID_PREFIX}${participantId}`)
+      if (container !== null) {
+        const element = track.attach()
+        element.style.cssText = 'width:100%;height:100%;object-fit:cover;'
+        container.appendChild(element)
+        container.style.display = 'block'
+        if (avatarContainer !== null) avatarContainer.style.display = 'none'
+      }
     } else if (track.kind === Track.Kind.Audio) {
-      this.attachAudioTrack(track, participantId)
-    }
-  }
-
-  private attachVideoTrack(track: RemoteTrack | Track, participantId: string): void {
-    const container = document.getElementById(`${VIDEO_CONTAINER_ID_PREFIX}${participantId}`)
-    const avatarContainer = document.getElementById(`${AVATAR_CONTAINER_ID_PREFIX}${participantId}`)
-    if (container !== null) {
       const element = track.attach()
-      element.style.cssText = 'width:100%;height:100%;object-fit:cover;'
-      container.appendChild(element)
-      container.style.display = 'block'
-      if (avatarContainer !== null) avatarContainer.style.display = 'none'
+      const tile = document.getElementById(`${PARTICIPANT_TILE_ID_PREFIX}${participantId}`)
+      tile?.appendChild(element)
     }
-  }
-
-  private attachAudioTrack(track: RemoteTrack | Track, participantId: string): void {
-    const element = track.attach()
-    const tile = document.getElementById(`${PARTICIPANT_TILE_ID_PREFIX}${participantId}`)
-    tile?.appendChild(element)
   }
 
   public detachTrack(track: RemoteTrack | Track, participantId: string): void {
@@ -95,20 +87,16 @@ export class VideoGridUi {
       el.remove()
     })
     if (track.kind === Track.Kind.Video) {
-      this.detachVideoTrack(participantId)
-    }
-  }
-
-  private detachVideoTrack(participantId: string): void {
-    const container = document.getElementById(`${VIDEO_CONTAINER_ID_PREFIX}${participantId}`)
-    const avatarContainer = document.getElementById(`${AVATAR_CONTAINER_ID_PREFIX}${participantId}`)
-    if (container !== null) {
-      while (container.firstChild !== null) {
-        container.removeChild(container.firstChild)
+      const container = document.getElementById(`${VIDEO_CONTAINER_ID_PREFIX}${participantId}`)
+      const avatarContainer = document.getElementById(`${AVATAR_CONTAINER_ID_PREFIX}${participantId}`)
+      if (container !== null) {
+        while (container.firstChild !== null) {
+          container.removeChild(container.firstChild)
+        }
+        container.style.display = 'none'
       }
-      container.style.display = 'none'
+      if (avatarContainer !== null) avatarContainer.style.display = 'flex'
     }
-    if (avatarContainer !== null) avatarContainer.style.display = 'flex'
   }
 
   public attachScreenShareTrack(track: RemoteTrack | Track, participantId: string, displayName: string): void {

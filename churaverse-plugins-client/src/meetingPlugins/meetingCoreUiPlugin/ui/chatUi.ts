@@ -9,19 +9,14 @@ export class ChatUi {
     const chatMessages = document.getElementById(CHAT_MESSAGES_ID)
     if (chatMessages === null) return
 
-    const thresholdPx = 100  // 許容誤差
-    const wasNearBottom = chatMessages.scrollTop + chatMessages.clientHeight >= chatMessages.scrollHeight - thresholdPx
-
     const messageEl = DomManager.jsxToDom(
       ChatMessageComponent({
         senderLabel,
         text,
-        isOwn: senderId === this.ownParticipantId,
+        isSelf: senderId === this.ownParticipantId,
       })
     )
     chatMessages.appendChild(messageEl)
-    if (wasNearBottom) {
-      chatMessages.scrollTop = chatMessages.scrollHeight
-    }
+    chatMessages.scrollTop = chatMessages.scrollHeight
   }
 }
