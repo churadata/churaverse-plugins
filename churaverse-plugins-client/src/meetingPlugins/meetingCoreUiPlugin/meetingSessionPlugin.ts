@@ -203,6 +203,19 @@ export class MeetingSessionPlugin extends BasePlugin<IMeetingScene> {
       this.updateParticipantList(meetingRoom)
     })
 
+    room.on(RoomEvent.TrackMuted, (publication, participant) => {
+      if (publication.source === Track.Source.Camera) {
+        this.videoGridUi.detachTrack(participant.identity, Track.Kind.Video)
+      }
+    })
+
+    room.on(RoomEvent.TrackUnmuted, (publication, participant) => {
+      if (publication.source === Track.Source.Camera && publication.track !== undefined) {
+        this.videoGridUi.attachTrack(publication.track, participant.identity)
+      }
+    })
+
+
     room.on(RoomEvent.DataReceived, (payload) => {
       try {
         const message = JSON.parse(new TextDecoder().decode(payload)) as { type?: string; reactionType?: string }
@@ -229,8 +242,6 @@ export class MeetingSessionPlugin extends BasePlugin<IMeetingScene> {
         el.remove()
       })
       this.videoGridUi.detachScreenShareTrack(participantIdentity)
-    } else {
-      this.videoGridUi.detachTrack(track, participantIdentity)
     }
   }
 

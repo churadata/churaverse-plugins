@@ -82,11 +82,8 @@ export class VideoGridUi {
     }
   }
 
-  public detachTrack(track: RemoteTrack | Track, participantId: string): void {
-    track.detach().forEach((el) => {
-      el.remove()
-    })
-    if (track.kind === Track.Kind.Video) {
+  public detachTrack(participantId: string, kind: Track.Kind): void {
+    if (kind === Track.Kind.Video) {
       const container = document.getElementById(`${VIDEO_CONTAINER_ID_PREFIX}${participantId}`)
       const avatarContainer = document.getElementById(`${AVATAR_CONTAINER_ID_PREFIX}${participantId}`)
       if (container !== null) {
@@ -95,7 +92,9 @@ export class VideoGridUi {
         }
         container.style.display = 'none'
       }
-      if (avatarContainer !== null) avatarContainer.style.display = 'flex'
+      if (avatarContainer !== null) {
+        avatarContainer.style.display = 'flex'
+      }
     }
   }
 
