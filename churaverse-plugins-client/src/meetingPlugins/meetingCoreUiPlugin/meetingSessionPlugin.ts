@@ -198,7 +198,7 @@ export class MeetingSessionPlugin extends BasePlugin<IMeetingScene> {
       }
       if (publication.source === Track.Source.ScreenShare) {
         this.isScreenShareEnabled = false
-        this.updateButtonState(SCREEN_SHARE_BUTTON_ID, false)
+        this.updateButtonState(SCREEN_SHARE_BUTTON_ID, true)
       }
       this.updateParticipantList(meetingRoom)
     })
@@ -353,11 +353,11 @@ export class MeetingSessionPlugin extends BasePlugin<IMeetingScene> {
     this.isScreenShareEnabled = !this.isScreenShareEnabled
     try {
       await room.localParticipant.setScreenShareEnabled(this.isScreenShareEnabled)
-      this.updateButtonState(SCREEN_SHARE_BUTTON_ID, this.isScreenShareEnabled)
+      this.updateButtonState(SCREEN_SHARE_BUTTON_ID, !this.isScreenShareEnabled)
     } catch (e) {
       console.error('[MeetingSession] Screen share failed:', e)
       this.isScreenShareEnabled = false
-      this.updateButtonState(SCREEN_SHARE_BUTTON_ID, false)
+      this.updateButtonState(SCREEN_SHARE_BUTTON_ID, true)
     }
   }
 

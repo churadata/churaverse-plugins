@@ -33,6 +33,7 @@ export const MeetingControlBarComponent: JSXFunc = () => {
           <svg className={style.icon} viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm-1-9c0-.55.45-1 1-1s1 .45 1 1v6c0 .55-.45 1-1 1s-1-.45-1-1V5z" />
             <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z" />
+            <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className={style.slashLine} />
           </svg>
         </button>
 
@@ -40,13 +41,15 @@ export const MeetingControlBarComponent: JSXFunc = () => {
         <button className={`defaultStyle ${style.controlButton} ${style.activeButton}`} id={CAMERA_TOGGLE_BUTTON_ID} title="カメラ">
           <svg className={style.icon} viewBox="0 0 24 24" fill="currentColor">
             <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z" />
+            <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className={style.slashLine} />
           </svg>
         </button>
 
         {/* 画面共有ボタン */}
-        <button className={`defaultStyle ${style.controlButton}`} id={SCREEN_SHARE_BUTTON_ID} title="画面共有">
+        <button className={`defaultStyle ${style.controlButton} ${style.activeButton}`} id={SCREEN_SHARE_BUTTON_ID} title="画面共有">
           <svg className={style.icon} viewBox="0 0 24 24" fill="currentColor">
             <path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z" />
+            <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className={style.slashLine} />
           </svg>
         </button>
 

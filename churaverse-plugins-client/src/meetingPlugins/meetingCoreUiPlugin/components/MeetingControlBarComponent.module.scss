@@ -146,3 +146,22 @@
 .portalLabel {
   white-space: nowrap;
 }
+
+.slashLine {
+  display: none;
+}
+
+.activeButton {
+  background-color: #ea4335;
+  border-color: #ea4335;
+  color: white;
+
+  .slashLine {
+    display: block;
+  }
+
+  &:hover {
+    background-color: #d93025;
+    border-color: #d93025;
+  }
+}
