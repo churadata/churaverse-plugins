@@ -329,9 +329,11 @@ export class MeetingSessionPlugin extends BasePlugin<IMeetingScene> {
   }
 
   private exitMeeting(): void {
-    this.cleanup()
-    DomManager.removeAll()
-    this.store.of('transitionPlugin').transitionManager.transitionTo('TitleScene')
+    if (window.confirm('このミーティングから退出しますか？')) {
+      this.cleanup()
+      DomManager.removeAll()
+      this.store.of('transitionPlugin').transitionManager.transitionTo('TitleScene')
+    }
   }
 
   private async toggleMicrophone(room: Room): Promise<void> {
