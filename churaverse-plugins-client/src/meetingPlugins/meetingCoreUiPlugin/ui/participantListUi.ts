@@ -9,10 +9,11 @@ export class ParticipantListUi {
 
   public update(participants: Participant[]): void {
     const list = document.getElementById(PARTICIPANT_LIST_ID)
+    const countEl = document.getElementById(PARTICIPANTS_COUNT_ID)
     if (list === null) return
 
     while (list.firstChild !== null) {
-      list.replaceChildren(list.firstChild)
+      list.removeChild(list.firstChild)
     }
 
     participants.forEach((p) => {
@@ -26,7 +27,6 @@ export class ParticipantListUi {
       list.appendChild(item)
     })
 
-    const countEl = document.getElementById(PARTICIPANTS_COUNT_ID)
     if (countEl !== null) {
       countEl.textContent = `参加者 (${participants.length})`
     }

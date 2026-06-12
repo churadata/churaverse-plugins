@@ -1,15 +1,15 @@
-const AVATAR_COLORS = ['#4285f4', '#ea4335', '#fbbc04', '#34a853', '#673ab7', '#e91e63', '#00bcd4']
+import heroBasic from '../assets/hero.png'
+import heroRed from '../assets/hero_red.png'
+import heroBlue from '../assets/hero_blue.png'
+import heroBlack from '../assets/hero_black.png'
+import heroGray from '../assets/hero_gray.png'
 
-// idを元に色を選択する。同じ id は常に同じ色を返す。
-export function getAvatarColor(id: string): string {
-  let hash = 5381
-  for (let i = 0; i < id.length; i++) {
-    hash = id.charCodeAt(i) + ((hash << 5) - hash)
+const HERO_SPRITES = [heroBasic, heroRed, heroBlue, heroBlack, heroGray]
+
+export function getHeroSprite(name: string): string {
+  let hash = 0
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash)
   }
-  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length]
-}
-
-// アバター画像がないときに「丸の中に2文字出す」ためのイニシャルを取得する
-export function getInitials(name: string): string {
-  return name.slice(0, 2).toUpperCase()
+  return HERO_SPRITES[Math.abs(hash) % HERO_SPRITES.length]
 }

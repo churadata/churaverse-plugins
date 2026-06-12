@@ -1,0 +1,23 @@
+.reactionBase {
+  position: absolute;
+  z-index: 100;
+  image-rendering: pixelated;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.shark {
+  composes: reactionBase;
+  width: 120px;
+  height: 120px;
+  background-size: 240px 480px;
+  background-position: 0px -240px;
+}
+
+.bomb {
+  composes: reactionBase;
+  width: 100px;
+  height: 100px;
+  background-size: 300px 400px;
+  background-position: 0 0;
+}

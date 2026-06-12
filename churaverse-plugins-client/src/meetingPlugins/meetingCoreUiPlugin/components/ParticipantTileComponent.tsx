@@ -4,8 +4,7 @@ import style from './VideoGridComponent.module.scss'
 interface Props {
   participantId: string
   displayName: string
-  avatarColor: string
-  initials: string
+  heroSprite: string
   isSelf: boolean
 }
 
@@ -16,8 +15,7 @@ export const AVATAR_CONTAINER_ID_PREFIX = 'avatar-'
 export const ParticipantTileComponent: JSXFunc<Props> = ({
   participantId,
   displayName,
-  avatarColor,
-  initials,
+  heroSprite,
   isSelf,
 }: Props) => {
   const label = isSelf ? `${displayName} (自分)` : displayName
@@ -29,9 +27,7 @@ export const ParticipantTileComponent: JSXFunc<Props> = ({
           style={{ width: '100%', height: '100%', display: 'none', position: 'absolute', top: 0, left: 0 }}
         ></div>
         <div id={`${AVATAR_CONTAINER_ID_PREFIX}${participantId}`} className={style.avatarContainer}>
-          <div className={style.avatar} style={{ backgroundColor: avatarColor }}>
-            {initials}
-          </div>
+          <div className={style.avatar} style={{ backgroundImage: `url(${heroSprite})` }}></div>
         </div>
       </div>
       <div className={style.nameBar}>

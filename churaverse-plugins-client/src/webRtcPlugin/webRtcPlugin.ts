@@ -28,6 +28,9 @@ export class WebRtcPlugin extends BasePlugin<IMainScene> {
   private init(): void {
     initWebRtcPluginStore(this.store)
     this.webRtcPluginStore = this.store.of('webRtcPlugin')
+    window.addEventListener('beforeunload', () => {
+      void this.webRtcPluginStore.webRtc.disconnect()
+    })
   }
 
   private start(): void {

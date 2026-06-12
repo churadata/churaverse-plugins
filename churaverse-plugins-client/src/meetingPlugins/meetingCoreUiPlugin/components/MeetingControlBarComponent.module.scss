@@ -3,10 +3,21 @@
   align-items: center;
   justify-content: center;
   padding: 12px 16px;
-  background-color: #202124;
-  border-top: 1px solid #3c4043;
+  background-color: white;
+  border-radius: 14px;
+  box-shadow: 0 10px 15px 0 rgba(0, 0, 0, 0.2);
   min-height: 72px;
   position: relative;
+  margin: 0 16px 16px;
+  z-index: 1;
+}
+
+.leftSection {
+  position: absolute;
+  left: 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .centerSection {
@@ -27,35 +38,42 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  border: none;
+  border: 2px solid lightsteelblue;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background-color 0.2s ease;
-  background-color: #8a8f94;
-  color: #e8eaed;
+  background-color: white;
+  color: #3c79c4;
 
   &:hover {
-    background-color: #9da2a7;
+    background-color: lightsteelblue;
+    color: white;
   }
 }
 
 .activeButton {
   background-color: #ea4335;
+  border-color: #ea4335;
+  color: white;
 
   &:hover {
     background-color: #d93025;
+    border-color: #d93025;
   }
 }
 
 .exitButton {
   background-color: #ea4335;
+  border-color: #ea4335;
+  color: white;
   width: 56px;
   border-radius: 24px;
 
   &:hover {
     background-color: #d93025;
+    border-color: #d93025;
   }
 }
 
@@ -64,33 +82,13 @@
   height: 24px;
 }
 
-.iconWhenDefault {
-  width: 24px;
-  height: 24px;
-  display: block;
-}
-
-.iconWhenActive {
-  width: 24px;
-  height: 24px;
-  display: none;
-}
-
-.controlButton.activeButton .iconWhenDefault {
-  display: none;
-}
-
-.controlButton.activeButton .iconWhenActive {
-  display: block;
-}
-
 .sidebarButton {
   width: 48px;
   height: 48px;
   border-radius: 50%;
   border: none;
-  background-color: #8a8f94;
-  color: #e8eaed;
+  background-color: transparent;
+  color: #3c79c4;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -98,6 +96,72 @@
   transition: background-color 0.2s ease;
 
   &:hover {
-    background-color: #9da2a7;
+    background-color: rgba(176, 196, 222, 0.3);
+  }
+}
+
+.reactionButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid lightsteelblue;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  font-size: 20px;
+  transition: transform 0.15s ease, background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(176, 196, 222, 0.2);
+    transform: scale(1.15);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.portalButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 2px solid #3c79c4;
+  cursor: pointer;
+  background-color: white;
+  color: #3c79c4;
+  font-size: 12px;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #3c79c4;
+    color: white;
+  }
+}
+
+.portalLabel {
+  white-space: nowrap;
+}
+
+.slashLine {
+  display: none;
+}
+
+.activeButton {
+  background-color: #ea4335;
+  border-color: #ea4335;
+  color: white;
+
+  .slashLine {
+    display: block;
+  }
+
+  &:hover {
+    background-color: #d93025;
+    border-color: #d93025;
   }
 }

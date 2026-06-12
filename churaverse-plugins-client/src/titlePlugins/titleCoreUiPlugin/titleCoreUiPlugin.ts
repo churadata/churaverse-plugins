@@ -7,9 +7,11 @@ import {
   StartEvent,
 } from 'churaverse-engine-client'
 import { Scene } from 'phaser'
+import { PORTAL_STORAGE_KEYS } from '@churaverse/transition-plugin-client'
 import { JoinButtonRenderer } from './renderer/joinButtonRenderer'
 import { TitleBackgroundRenderer } from './renderer/titleBackgroundRenderer'
 import { ChuraDataLogoRenderer } from './renderer/churaDataLogoRenderer'
+import { GameModeSelectorRenderer } from './renderer/gameModeSelectorRenderer'
 import { TitlePlayerRoleChangeEvent } from './event/titlePlayerRoleChangeEvent'
 import { TitlePlayerPluginStore } from '../titlePlayerPlugin/store/defTitlePlayerPlugin'
 
@@ -17,6 +19,7 @@ export class TitleCoreUiPlugin extends BasePlugin<ITitleScene> {
   private scene!: Scene
   private titlePlayerPluginStore!: TitlePlayerPluginStore
   private joinButtonRenderer!: JoinButtonRenderer
+  private gameModeSelectorRenderer!: GameModeSelectorRenderer
 
   public listenEvent(): void {
     this.bus.subscribeEvent('phaserSceneInit', this.phaserSceneInit.bind(this))
@@ -41,9 +44,35 @@ export class TitleCoreUiPlugin extends BasePlugin<ITitleScene> {
   }
 
   private start(ev: StartEvent): void {
-    this.joinButtonRenderer = new JoinButtonRenderer(this.scene, this.store, this.bus)
-    new TitleBackgroundRenderer(this.scene)
-    new ChuraDataLogoRenderer(this.scene, this.store, this.bus)
+    this.gameModeSelectorRenderer = new GameModeSelectorRenderer()
+    this.joinButtonRenderer = new JoinButtonRenderer(this.scene, this.store, this.gameModeSelectorRenderer)
+    void new TitleBackgroundRenderer(this.scene)
+    void new ChuraDataLogoRenderer(this.scene, this.store, this.bus)
+    this.checkPortalAutoStart()
+  }
+
+  private checkPortalAutoStart(): void {
+    const toGame = sessionStorage.getItem(PORTAL_STORAGE_KEYS.TO_GAME_MODE) === 'true'
+    const toMeeting = sessionStorage.getItem(PORTAL_STORAGE_KEYS.TO_MEETING) === 'true'
+    if (!toGame && !toMeeting) return
+
+    sessionStorage.removeItem(PORTAL_STORAGE_KEYS.TO_GAME_MODE)
+    sessionStorage.removeItem(PORTAL_STORAGE_KEYS.TO_MEETING)
+
+    const name = sessionStorage.getItem(PORTAL_STORAGE_KEYS.PLAYER_NAME)
+    if (name !== null && name !== '') {
+      const nameInput = document.getElementById('title-name-field') as HTMLInputElement | null
+      if (nameInput !== null) {
+        nameInput.value = name
+        nameInput.dispatchEvent(new Event('input'))
+      }
+    }
+
+    this.gameModeSelectorRenderer.setGameModeEnabled(toGame)
+
+    requestAnimationFrame(() => {
+      this.joinButtonRenderer.autoJoin()
+    })
   }
 
   private changePlayerRole(ev: TitlePlayerRoleChangeEvent): void {

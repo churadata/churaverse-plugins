@@ -7,7 +7,7 @@ import {
   VIDEO_CONTAINER_ID_PREFIX,
   AVATAR_CONTAINER_ID_PREFIX,
 } from '../components/ParticipantTileComponent'
-import { getAvatarColor, getInitials } from '../utils/avatarUtils'
+import { getHeroSprite } from '../utils/avatarUtils'
 import { getParticipantDisplayName } from '@churaverse/livekit-client'
 
 const MAX_VISIBLE_SIDEBAR_TILES = 5
@@ -33,8 +33,7 @@ export class VideoGridUi {
       ParticipantTileComponent({
         participantId: participant.identity,
         displayName: label,
-        avatarColor: getAvatarColor(label),
-        initials: getInitials(label),
+        heroSprite: getHeroSprite(label),
         isSelf: participant.identity === this.ownParticipantId,
       })
     )
@@ -55,8 +54,7 @@ export class VideoGridUi {
     }
     const avatarEl = tile.querySelector(`.${videoGridStyles.avatar}`)
     if (avatarEl !== null) {
-      avatarEl.textContent = getInitials(displayName)
-      ;(avatarEl as HTMLElement).style.backgroundColor = getAvatarColor(displayName)
+      ;(avatarEl as HTMLElement).style.backgroundImage = `url(${getHeroSprite(displayName)})`
     }
   }
 
@@ -68,49 +66,36 @@ export class VideoGridUi {
 
   public attachTrack(track: RemoteTrack | Track, participantId: string): void {
     if (track.kind === Track.Kind.Video) {
-      this.attachVideoTrack(track, participantId)
-    } else if (track.kind === Track.Kind.Audio) {
-      this.attachAudioTrack(track, participantId)
-    }
-  }
-
-  private attachVideoTrack(track: RemoteTrack | Track, participantId: string): void {
-    const container = document.getElementById(`${VIDEO_CONTAINER_ID_PREFIX}${participantId}`)
-    const avatarContainer = document.getElementById(`${AVATAR_CONTAINER_ID_PREFIX}${participantId}`)
-    if (container !== null) {
-      const element = track.attach()
-      element.style.cssText = 'width:100%;height:100%;object-fit:cover;'
-      container.appendChild(element)
-      container.style.display = 'block'
-      if (avatarContainer !== null) avatarContainer.style.display = 'none'
-    }
-  }
-
-  private attachAudioTrack(track: RemoteTrack | Track, participantId: string): void {
-    const element = track.attach()
-    const tile = document.getElementById(`${PARTICIPANT_TILE_ID_PREFIX}${participantId}`)
-    tile?.appendChild(element)
-  }
-
-  public detachTrack(track: RemoteTrack | Track, participantId: string): void {
-    track.detach().forEach((el) => {
-      el.remove()
-    })
-    if (track.kind === Track.Kind.Video) {
-      this.detachVideoTrack(participantId)
-    }
-  }
-
-  private detachVideoTrack(participantId: string): void {
-    const container = document.getElementById(`${VIDEO_CONTAINER_ID_PREFIX}${participantId}`)
-    const avatarContainer = document.getElementById(`${AVATAR_CONTAINER_ID_PREFIX}${participantId}`)
-    if (container !== null) {
-      while (container.firstChild !== null) {
-        container.removeChild(container.firstChild)
+      const container = document.getElementById(`${VIDEO_CONTAINER_ID_PREFIX}${participantId}`)
+      const avatarContainer = document.getElementById(`${AVATAR_CONTAINER_ID_PREFIX}${participantId}`)
+      if (container !== null) {
+        const element = track.attach()
+        element.style.cssText = 'width:100%;height:100%;object-fit:cover;'
+        container.appendChild(element)
+        container.style.display = 'block'
+        if (avatarContainer !== null) avatarContainer.style.display = 'none'
       }
-      container.style.display = 'none'
+    } else if (track.kind === Track.Kind.Audio) {
+      const element = track.attach()
+      const tile = document.getElementById(`${PARTICIPANT_TILE_ID_PREFIX}${participantId}`)
+      tile?.appendChild(element)
     }
-    if (avatarContainer !== null) avatarContainer.style.display = 'flex'
+  }
+
+  public detachTrack(participantId: string, kind: Track.Kind): void {
+    if (kind === Track.Kind.Video) {
+      const container = document.getElementById(`${VIDEO_CONTAINER_ID_PREFIX}${participantId}`)
+      const avatarContainer = document.getElementById(`${AVATAR_CONTAINER_ID_PREFIX}${participantId}`)
+      if (container !== null) {
+        while (container.firstChild !== null) {
+          container.removeChild(container.firstChild)
+        }
+        container.style.display = 'none'
+      }
+      if (avatarContainer !== null) {
+        avatarContainer.style.display = 'flex'
+      }
+    }
   }
 
   public attachScreenShareTrack(track: RemoteTrack | Track, participantId: string, displayName: string): void {
