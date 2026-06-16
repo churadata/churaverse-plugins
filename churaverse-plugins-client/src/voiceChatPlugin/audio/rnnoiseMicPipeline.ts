@@ -1,10 +1,9 @@
 import { loadRnnoise, RnnoiseWorkletNode } from '@sapphi-red/web-noise-suppressor'
-// eslint-disable-next-line import/no-unresolved -- Vite resolves `?url` imports at build time
+/* eslint-disable import/no-unresolved -- Vite resolves `?url` imports at build time */
 import rnnoiseWorkletUrl from '@sapphi-red/web-noise-suppressor/rnnoiseWorklet.js?url'
-// eslint-disable-next-line import/no-unresolved -- Vite resolves `?url` imports at build time
 import rnnoiseWasmUrl from '@sapphi-red/web-noise-suppressor/rnnoise.wasm?url'
-// eslint-disable-next-line import/no-unresolved -- Vite resolves `?url` imports at build time
 import rnnoiseSimdWasmUrl from '@sapphi-red/web-noise-suppressor/rnnoise_simd.wasm?url'
+/* eslint-enable import/no-unresolved */
 
 /**
  * RNNoise ベースのマイク用パイプライン.
@@ -17,13 +16,13 @@ import rnnoiseSimdWasmUrl from '@sapphi-red/web-noise-suppressor/rnnoise_simd.wa
  * このクラスは「音声処理」に専念し、LiveKit との連携は VoiceChatSender 側に任せる。
  */
 export class RnnoiseMicPipeline {
-  private audioContext: AudioContext | undefined
-  private destination: MediaStreamAudioDestinationNode | undefined
-  private sourceStream: MediaStream | undefined
-  private processedTrack: MediaStreamTrack | undefined
-  private workletNode: RnnoiseWorkletNode | undefined
+  private audioContext?: AudioContext 
+  private destination?: MediaStreamAudioDestinationNode 
+  private sourceStream?: MediaStream 
+  private processedTrack?: MediaStreamTrack 
+  private workletNode?: RnnoiseWorkletNode 
 
-  private static wasmBinaryPromise: Promise<ArrayBuffer> | undefined
+  private static wasmBinaryPromise?: Promise<ArrayBuffer> 
 
   public async start(): Promise<MediaStreamTrack> {
     if (this.processedTrack?.readyState === 'live') {
