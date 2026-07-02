@@ -38,6 +38,7 @@ export class KeyActionObserver<Scene extends Scenes> {
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private _update(dt: number, keyActionReceiver: KeyActionReceiver<Scene>): void {
+    if (this.key.logicalUp) return
     this.key.updateHoldTime(dt)
 
     if (!this.myKeyAction.ignoreJustDown && this.key.isJustDown) {
@@ -58,5 +59,9 @@ export class KeyActionObserver<Scene extends Scenes> {
 
   public get targetKeyAction(): KeyAction<Scene> {
     return this.myKeyAction
+  }
+
+  public getKey(): IKey {
+    return this.key
   }
 }
